@@ -32,4 +32,11 @@ return [
     'semver' => 'The :attribute must be a valid semantic version.',
     'vin' => 'The :attribute must be a valid vehicle identification number.',
 
+    // Net
+    'cidr' => 'The :attribute must be a valid CIDR network.',
+    'domain_name' => 'The :attribute must be a valid domain name.',
+    'private_ip' => 'The :attribute must be a private or reserved IP address.',
+    'public_ip' => 'The :attribute must be a publicly routable IP address.',
+    'subdomain' => 'The :attribute must be a valid subdomain.',
+
 ];

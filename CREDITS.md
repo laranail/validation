@@ -28,6 +28,10 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Identifiers\Vin` | ISO 3779; check digit per the US NHTSA rule | Implemented from the standards. The transliteration table is factual reference data. |
 | `Identifiers\SemVer` | [semver.org](https://semver.org) 2.0.0 | The officially published pattern, unmodified; timed against pathological input in the suite. |
 | `Identifiers\Jwt` | RFC 7515 §3.1 | Implemented from the RFC. Validates form only, never trust. |
+| `Net\DomainName` | RFC 1035, RFC 5891 | Implemented from the RFCs. The A-label vs NR-LDH-label split follows the approach in the abandoned in-house `enekia` codebase; no code was carried over. |
+| `Net\Subdomain` | RFC 1035 | Implemented from the RFC. |
+| `Net\Cidr` | RFC 4632 | Implemented from the RFC. |
+| `Net\PublicIp`, `Net\PrivateIp` | RFC 1122, 1918, 4193, 6598, 6666, 5737, 2544, 3849 | Range tables are factual reference data, taken from the RFCs and the IANA special-purpose address registries. |
 
 ## Packages studied but not depended on
 
