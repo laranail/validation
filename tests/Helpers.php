@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
 
 /**
@@ -37,4 +38,16 @@ function rulesOfType(array $rules, string $type): array
         $rules,
         static fn (object|string $rule): bool => $rule instanceof $type,
     ));
+}
+
+/**
+ * Run a single rule object against a value and report whether it passed.
+ *
+ * Lives here rather than in a test file because several rule-family suites
+ * share it and phpunit.xml.dist randomises execution order — a helper defined
+ * in one test file is not reliably declared before another runs.
+ */
+function ruleAccepts(object $rule, mixed $value): bool
+{
+    return Validator::make(['f' => $value], ['f' => $rule])->passes();
 }

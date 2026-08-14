@@ -20,6 +20,10 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Banking\Iban` | ISO 13616, ISO 7064 MOD-97-10; length table from the SWIFT IBAN Registry | Implemented from the standards. The length table is factual reference data. |
 | `Banking\Bic` | ISO 9362 | Implemented from the standard. |
 | `Banking\Isin` | ISO 6166 | Implemented from the standard, composing `Luhn`. |
+| `Codes\Gtin` | GS1 General Specifications | Implemented from the standard; one mod-10 routine serves GTIN-8/12/13/14. |
+| `Codes\Ean` | GS1 General Specifications | The retail subset of `Gtin`, delegating to it. |
+| `Codes\Isbn` | ISO 2108 | Implemented from the standard. ISBN-10 is mod-11; ISBN-13 is a GTIN-13 with a 978/979 prefix. |
+| `Codes\Issn` | ISO 3297 | Implemented from the standard. |
 
 ## Packages studied but not depended on
 

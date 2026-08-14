@@ -20,4 +20,10 @@ return [
     'isin' => 'The :attribute must be a valid ISIN.',
     'luhn' => 'The :attribute must pass the Luhn checksum.',
 
+    // Codes
+    'ean' => 'The :attribute must be a valid EAN barcode.',
+    'gtin' => 'The :attribute must be a valid GTIN.',
+    'isbn' => 'The :attribute must be a valid ISBN.',
+    'issn' => 'The :attribute must be a valid ISSN.',
+
 ];

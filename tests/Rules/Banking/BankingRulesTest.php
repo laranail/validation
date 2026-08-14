@@ -6,12 +6,6 @@ use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
 
-/** Run a single rule object against a value and report whether it passed. */
-function ruleAccepts(object $rule, mixed $value): bool
-{
-    return Validator::make(['f' => $value], ['f' => $rule])->passes();
-}
-
 // =========================================================================
 // Luhn
 // =========================================================================
