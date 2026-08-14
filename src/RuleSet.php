@@ -16,13 +16,13 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use LogicException;
 use ReflectionProperty;
+use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 use Simtabi\Laranail\Validation\Internal\BatchLimitRemap;
 use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
 use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
 use Simtabi\Laranail\Validation\Internal\ItemValidator;
-use Simtabi\Laranail\Validation\Rules\ArrayRule;
-use Simtabi\Laranail\Validation\Rules\FieldRule;
 use Traversable;
 
 /**

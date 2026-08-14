@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules\Concerns;
+namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
 use BackedEnum;
 use Closure;

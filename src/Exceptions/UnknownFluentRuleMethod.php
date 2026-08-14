@@ -3,7 +3,7 @@
 namespace Simtabi\Laranail\Validation\Exceptions;
 
 use BadMethodCallException;
-use Simtabi\Laranail\Validation\Rules\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 
 /**
  * Thrown when a method is called on the untyped `FluentRule::field()` builder

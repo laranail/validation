@@ -19,3 +19,22 @@ function laravelSupportsIntegerStrict(): bool
 
     return count($reflection->getParameters()) >= 3;
 }
+
+/**
+ * Pick out the compiled rules that are instances of a given rule class.
+ *
+ * Rule objects that can carry closures (Exists, Unique, Dimensions) must never
+ * be stringified during compilation — __toString() silently drops them. Use
+ * this to assert the object itself survived rather than its lossy string form.
+ *
+ * @param  list<object|string>  $rules
+ * @param  class-string  $type
+ * @return list<object>
+ */
+function rulesOfType(array $rules, string $type): array
+{
+    return array_values(array_filter(
+        $rules,
+        static fn (object|string $rule): bool => $rule instanceof $type,
+    ));
+}

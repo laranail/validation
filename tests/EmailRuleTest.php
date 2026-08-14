@@ -1,7 +1,10 @@
 <?php declare(strict_types=1);
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rules\Email;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Unique;
 use Simtabi\Laranail\Validation\FluentRule;
 
 // =========================================================================
@@ -35,18 +38,24 @@ it('validates EmailRule rejects non-string', function (): void {
     expect($validator->passes())->toBeFalse();
 });
 
+// Unique and Exists compile to array form, never a pipe string: their
+// __toString() drops closure-based wheres, so isSafeToStringify() excludes them
+// whether or not a closure is present. Laravel handles the object directly.
+
 it('EmailRule compiles unique', function (): void {
-    $compiled = FluentRule::email()->required()->unique('users', 'email')->compiledRules();
-    expect($compiled)->toBeString()
-        ->toStartWith('required|string|email|')
-        ->toContain('unique:');
+    $rule = FluentRule::email()->required()->unique('users', 'email');
+
+    expect($rule->compiledRules())->toBeArray()
+        ->and($rule->toArray())->toContain('required', 'string', 'email')
+        ->and(rulesOfType($rule->toArray(), Unique::class))->toHaveCount(1);
 });
 
 it('EmailRule compiles exists', function (): void {
-    $compiled = FluentRule::email()->required()->exists('users', 'email')->compiledRules();
-    expect($compiled)->toBeString()
-        ->toStartWith('required|string|email|')
-        ->toContain('exists:');
+    $rule = FluentRule::email()->required()->exists('users', 'email');
+
+    expect($rule->compiledRules())->toBeArray()
+        ->and($rule->toArray())->toContain('required', 'string', 'email')
+        ->and(rulesOfType($rule->toArray(), Exists::class))->toHaveCount(1);
 });
 
 it('EmailRule compiles confirmed', function (): void {
@@ -134,4 +143,45 @@ it('defaults: false with label works', function (): void {
     } finally {
         Email::$defaultCallback = null;
     }
+});
+
+// -------------------------------------------------------------------------
+// Exists/Unique carry closure-based wheres in $using, which __toString() never
+// emits (DatabaseRule::formatWheres only reads $wheres). Stringifying them
+// silently drops the constraint — a soft-delete or tenant scope disappears and
+// `exists` then passes rows it was written to exclude. SelfValidates guards
+// this via isSafeToStringify(); EmailRule must not bypass that guard.
+// -------------------------------------------------------------------------
+
+it('keeps exists() as an object when it carries a closure constraint', function (): void {
+    $rule = FluentRule::email()->required()->exists(
+        'users',
+        'email',
+        fn (Exists $exists): Exists => $exists->where(fn (Builder $q): Builder => $q->whereNull('deleted_at')),
+    );
+
+    // If this were stringified the closure would be gone: DatabaseRule routes a
+    // Closure to $using, and __toString() only formats $wheres.
+    expect($rule->compiledRules())->toBeArray()
+        ->and(rulesOfType($rule->toArray(), Exists::class))->toHaveCount(1);
+});
+
+it('keeps unique() as an object when it carries a closure constraint', function (): void {
+    $rule = FluentRule::email()->required()->unique(
+        'users',
+        'email',
+        fn (Unique $unique): Unique => $unique->where(fn (Builder $q): Builder => $q->whereNull('deleted_at')),
+    );
+
+    expect($rule->compiledRules())->toBeArray()
+        ->and(rulesOfType($rule->toArray(), Unique::class))->toHaveCount(1);
+});
+
+it('still pipe-joins when every rule is safely stringifiable', function (): void {
+    // The guard must not make everything fall back to array form — plain string
+    // rules and In/NotIn still compile to the fast pipe-string path.
+    expect(FluentRule::email()->required()->max(255)->compiledRules())
+        ->toBe('required|string|max:255|email')
+        ->and(FluentRule::email()->required()->in(['a@x.test', 'b@x.test'])->compiledRules())
+        ->toBeString();
 });

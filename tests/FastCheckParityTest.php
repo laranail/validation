@@ -27,9 +27,23 @@ function parityValues(): array
         'abcdef',
         'a@b.co',
         '2026-01-01',
+        // Relative and impossible dates: strtotime() accepts all of these,
+        // Laravel's validateDate() then rejects them via checkdate().
+        'tomorrow',
+        'now',
+        '+1 week',
+        '2024-02-31',
+        // FILTER_VALIDATE_URL accepts any scheme; Str::isUrl() uses a protocol
+        // allow-list, so these two are valid to one and not the other.
+        'file:///etc/passwd',
+        'mailto:a@b.com',
+        'https://ok.test',
+        // A value that only differs under str_getcsv vs explode(',').
+        'a,b',
         0,
         1,
         5,
+        2.2,
         -1,
         true,
         false,
@@ -85,6 +99,11 @@ function parityRules(): array
         'date|before:2030-01-01',
         'date_format:Y-m-d',
         'not_regex:/[a-z]+/',
+        'nullable|url',
+        'numeric|min:2.5',
+        'numeric|max:2.5',
+        'string|in:\"a,b\",\"c\"',
+        'string|not_in:\"a,b\"',
     ];
 }
 

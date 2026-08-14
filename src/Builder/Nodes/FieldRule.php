@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules;
+namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
@@ -10,11 +10,11 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasEmbeddedRules;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Rules\Concerns\SelfValidates;
 
 /**
  * An untyped rule builder — adds no base type constraint.

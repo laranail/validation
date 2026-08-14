@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\FastCheck;
 
 use Closure;
 use DateTime;
+use Illuminate\Support\Str;
 
 /**
  * Single source of truth for fast-check rule parsing and value-closure
@@ -91,8 +92,11 @@ final class RuleConfigBuilder
             // present-null requires presence info the closure doesn't have.
             $part === 'sometimes' => null,
             $part === 'bail' => $config,
-            str_starts_with($part, 'min:') => [...$config, 'min' => (int) substr($part, 4)],
-            str_starts_with($part, 'max:') => [...$config, 'max' => (int) substr($part, 4)],
+            // Not (int): NumericRule::min() accepts int|float, and Laravel
+            // compares with BigNumber against the raw parameter. Casting
+            // `min:2.5` to 2 lets 2.2 through.
+            str_starts_with($part, 'min:') => [...$config, 'min' => self::parseSize(substr($part, 4))],
+            str_starts_with($part, 'max:') => [...$config, 'max' => self::parseSize(substr($part, 4))],
             str_starts_with($part, 'digits:') => [...$config, 'digits' => (int) substr($part, 7)],
             str_starts_with($part, 'digits_between:') => self::parseDigitsBetween($config, substr($part, 15)),
             str_starts_with($part, 'in:') => [...$config, 'in' => self::parseInValues(substr($part, 3))],
@@ -145,8 +149,8 @@ final class RuleConfigBuilder
         $isNumeric = (bool) $c['numeric'];
         $isInteger = (bool) $c['integer'];
         $isArray = (bool) $c['array'];
-        /** @var ?int $min */ $min = $c['min'];
-        /** @var ?int $max */ $max = $c['max'];
+        /** @var int|float|null $min */ $min = $c['min'];
+        /** @var int|float|null $max */ $max = $c['max'];
         /** @var ?list<string> $in */ $in = $c['in'];
         /** @var ?list<string> $notIn */ $notIn = $c['notIn'];
         /** @var ?string $regex */ $regex = $c['regex'];
@@ -255,13 +259,69 @@ final class RuleConfigBuilder
         return [...$config, 'digitsMin' => (int) $parts[0], 'digitsMax' => (int) ($parts[1] ?? $parts[0])];
     }
 
-    /** @return list<string> */
+    /**
+     * Parse a size parameter (`min:`, `max:`) preserving fractional precision.
+     * Returns an int when the value is integral so the common path keeps its
+     * existing type, a float otherwise.
+     */
+    /**
+     * strtotime(), but only for strings that are also real calendar dates.
+     *
+     * strtotime() alone is not Laravel's test — validateDate() additionally
+     * runs checkdate() over date_parse()'s components. That rejects relative
+     * expressions ('tomorrow', 'now', '+1 week', where date_parse leaves
+     * month/day/year as false) and calendar-invalid dates like '2024-02-31'.
+     * Without it the fast path accepts ordinary bad user input the validator
+     * rejects. Returns false for anything Laravel would not call a date.
+     */
+    private static function calendarTimestamp(string $value): int|false
+    {
+        $timestamp = strtotime($value);
+
+        if ($timestamp === false) {
+            return false;
+        }
+
+        $parsed = date_parse($value);
+
+        if (! is_int($parsed['month']) || ! is_int($parsed['day']) || ! is_int($parsed['year'])) {
+            return false;
+        }
+
+        return checkdate($parsed['month'], $parsed['day'], $parsed['year']) ? $timestamp : false;
+    }
+
+    private static function parseSize(string $value): int|float
+    {
+        if (! is_numeric($value)) {
+            return 0;
+        }
+
+        $number = (float) $value;
+
+        // Keep integral parameters as int so the hot path's types are unchanged
+        // for the overwhelmingly common `min:3` case.
+        return $number === floor($number) && abs($number) <= PHP_INT_MAX
+            ? (int) $number
+            : $number;
+    }
+
+    /**
+     * Split an `in:`/`not_in:` parameter list the way Laravel does.
+     *
+     * ValidationRuleParser::parseParameters() uses str_getcsv, so a quoted
+     * value may contain a comma: `in:"a,b","c"` is two values, not three.
+     * Rule::in(['a,b'])->__toString() emits exactly that quoted form, so this
+     * is reachable from the ordinary fluent path.
+     *
+     * @return list<string>
+     */
     private static function parseInValues(string $values): array
     {
-        return array_map(
-            static fn (string $v): string => trim($v, '"'),
-            explode(',', $values),
-        );
+        return array_values(array_map(
+            static fn (?string $v): string => (string) $v,
+            str_getcsv($values, escape: '\\'),
+        ));
     }
 
     /**
@@ -338,7 +398,12 @@ final class RuleConfigBuilder
         }
 
         if (($c['url'] ?? false) === true) {
-            $checks[] = static fn (mixed $v): bool => is_string($v) && filter_var($v, FILTER_VALIDATE_URL) !== false;
+            // Str::isUrl(), not FILTER_VALIDATE_URL: validateUrl() delegates to
+            // Str::isUrl(), whose Symfony-derived pattern enforces a protocol
+            // allow-list. filter_var() accepts any scheme, so it passes
+            // `file:///etc/passwd` and `mailto:` — a `url` rule that accepts
+            // file:// is an SSRF/open-redirect foothold.
+            $checks[] = static fn (mixed $v): bool => Str::isUrl($v);
         }
 
         if (($c['ip'] ?? false) === true) {
@@ -405,7 +470,7 @@ final class RuleConfigBuilder
                     return $d !== false && $d->format($dateFormat) === $v;
                 }
 
-                $ts = strtotime($v);
+                $ts = self::calendarTimestamp($v);
 
                 if ($ts === false) {
                     return ! $isDate && $after === null && $afterOrEqual === null

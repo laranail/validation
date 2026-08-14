@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 use Illuminate\Validation\Rules\In;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 
 // =========================================================================
 // Phase 2 — addRule($rules, ?$message) extension. Unit-level tests that

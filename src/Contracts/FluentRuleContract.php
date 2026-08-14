@@ -10,7 +10,7 @@ use Illuminate\Support\HigherOrderWhenProxy;
 
 /**
  * Contract implemented by every rule class shipped in
- * `Simtabi\Laranail\Validation\Rules\*`.
+ * `Simtabi\Laranail\Validation\Builder\Nodes\*`.
  *
  * Use as the return-type for fluent rule arrays — collapses unwieldy
  * concrete-type unions like `FieldRule|StringRule|NumericRule|…` to one

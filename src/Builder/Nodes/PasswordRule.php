@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules;
+namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -8,9 +8,9 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Password;
 use ReflectionProperty;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Rules\Concerns\SelfValidates;
 
 class PasswordRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {

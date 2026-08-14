@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
 use Illuminate\Support\Facades\Lang;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\FieldRule;
 use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================

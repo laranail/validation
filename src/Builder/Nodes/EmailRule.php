@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules;
+namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Email;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasEmbeddedRules;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Rules\Concerns\SelfValidates;
-use Stringable;
 
 class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -87,22 +86,16 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         return $this->addRule('different:' . $field, $message);
     }
 
-    /** @return string|list<string|object> */
-    public function compiledRules(): string|array
-    {
-        $allRules = $this->buildValidationRules();
-
-        foreach ($allRules as $allRule) {
-            if (is_object($allRule) && ! $allRule instanceof Stringable) {
-                return $allRules;
-            }
-        }
-
-        /** @var list<string|Stringable> $allRules */
-        return implode('|', array_map(static fn (Stringable|string $r): string => (string) $r, $allRules));
-    }
-
-    /** @return list<string|object> */
+    /**
+     * Note: compiledRules() is deliberately NOT overridden here. SelfValidates
+     * already calls this buildValidationRules(), and its version applies two
+     * guards this class must not lose — it skips pipe-joining when any token
+     * contains a literal `|` (otherwise Laravel's parser splits a regex mid
+     * pattern), and it only stringifies In/NotIn, because Exists/Unique
+     * silently drop closure-based wheres in __toString().
+     *
+     * @return list<string|object>
+     */
     protected function buildValidationRules(): array
     {
         // Explicit modes always take precedence.

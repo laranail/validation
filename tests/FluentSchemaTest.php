@@ -4,10 +4,10 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\AnyOf;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentSchema;
 use Simtabi\Laranail\Validation\HasFluentRules;
-use Simtabi\Laranail\Validation\Rules\StringRule;
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 

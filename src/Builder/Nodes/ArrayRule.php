@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules;
+namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use BackedEnum;
 use Illuminate\Contracts\Support\Arrayable;
@@ -14,10 +14,10 @@ use Illuminate\Validation\Rules\DoesntContain;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Exceptions\CannotExtendListShapedEach;
-use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Rules\Concerns\SelfValidates;
 use UnitEnum;
 
 class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\FieldRule;
 
 afterEach(function (): void {
     FieldRule::flushMacros();

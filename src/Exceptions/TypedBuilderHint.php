@@ -4,17 +4,17 @@ namespace Simtabi\Laranail\Validation\Exceptions;
 
 use ReflectionClass;
 use ReflectionMethod;
-use Simtabi\Laranail\Validation\Rules\AcceptedRule;
-use Simtabi\Laranail\Validation\Rules\ArrayRule;
-use Simtabi\Laranail\Validation\Rules\BooleanRule;
-use Simtabi\Laranail\Validation\Rules\DateRule;
-use Simtabi\Laranail\Validation\Rules\EmailRule;
-use Simtabi\Laranail\Validation\Rules\FieldRule;
-use Simtabi\Laranail\Validation\Rules\FileRule;
-use Simtabi\Laranail\Validation\Rules\ImageRule;
-use Simtabi\Laranail\Validation\Rules\NumericRule;
-use Simtabi\Laranail\Validation\Rules\PasswordRule;
-use Simtabi\Laranail\Validation\Rules\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 
 /**
  * Maps method names to hints pointing at the typed builder(s) that

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation\Rules;
+namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Illuminate\Validation\Rules\Dimensions;
 

@@ -87,13 +87,31 @@ class OptimizedValidator extends MemoizingValidator
         }
 
         $removedRules = [];
-        $flatData = Arr::dot($this->getData());
+        $data = $this->getData();
+        $flatData = Arr::dot($data);
 
         foreach ($this->fastCheckGroups as $pattern => $attributes) {
             $check = $this->fastChecks[$pattern];
 
             foreach ($attributes as $attribute) {
-                if (isset($this->rules[$attribute]) && $check($flatData[$attribute] ?? null)) {
+                if (! isset($this->rules[$attribute])) {
+                    continue;
+                }
+
+                // Arr::dot() recurses into a non-empty array and emits only its
+                // leaves — it never emits a key for the array node itself. So
+                // `$flatData[$attribute]` is absent exactly when the value IS a
+                // non-empty array, and reading `?? null` would hand the closure
+                // null. Under `nullable` the closure then reports "satisfied",
+                // the rule is dropped, and an array silently passes a `string`
+                // (or `array|min:3`) rule that Laravel would fail. Fall back to
+                // data_get() for that case; genuinely absent paths still yield
+                // null, so behaviour there is unchanged.
+                $value = array_key_exists($attribute, $flatData)
+                    ? $flatData[$attribute]
+                    : data_get($data, $attribute);
+
+                if ($check($value)) {
                     $removedRules[$attribute] = $this->rules[$attribute];
                     unset($this->rules[$attribute]);
                 }

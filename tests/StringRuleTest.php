@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\StringRule;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 
 // =========================================================================

@@ -64,3 +64,38 @@ it('object-form regex with a pipe works alongside a conditional rule on a wildca
 
     expect($errors)->toBe(['items.0.code']); // included (type=keep), regex intact, 'zzz' fails
 });
+
+// -------------------------------------------------------------------------
+// The pipe guard lives in SelfValidates::buildCompiledRules(). Any node that
+// overrides compiledRules() bypasses it, so assert every typed builder — not
+// just field() — falls back to array form. EmailRule regressed here.
+// -------------------------------------------------------------------------
+
+it('every typed builder falls back to array form when a rule contains a pipe', function (string $factory): void {
+    $rule = match ($factory) {
+        'string' => FluentRule::string(),
+        'numeric' => FluentRule::numeric(),
+        'integer' => FluentRule::integer(),
+        'date' => FluentRule::date(),
+        'boolean' => FluentRule::boolean(),
+        'array' => FluentRule::array(),
+        'file' => FluentRule::file(),
+        'image' => FluentRule::image(),
+        'password' => FluentRule::password(),
+        'email' => FluentRule::email(),
+        'accepted' => FluentRule::accepted(),
+        default => FluentRule::field(),
+    };
+
+    expect($rule->rule('regex:/^(foo|bar)$/')->compiledRules())->toBeArray();
+})->with([
+    'string', 'numeric', 'integer', 'date', 'boolean', 'array',
+    'file', 'image', 'password', 'email', 'field', 'accepted',
+]);
+
+it('a pipe-containing regex on an email field validates like native', function (): void {
+    $rules = ['e' => FluentRule::email()->required()->rule('regex:/^(alice|bob)@example\.com$/')];
+
+    expect(RuleSet::from($rules)->check(['e' => 'alice@example.com'])->passes())->toBeTrue()
+        ->and(RuleSet::from($rules)->check(['e' => 'carol@example.com'])->passes())->toBeFalse();
+});

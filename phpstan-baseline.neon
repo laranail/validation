@@ -6,8 +6,12 @@ parameters:
 		# Factoring out hurts benchmark numbers; keep inlined + baselined.
 		# Relocated from CoreValueCompiler to RuleConfigBuilder in the
 		# May 2026 maintainability refactor — same code, new home.
+		# Raised 115 -> 120 by the Laravel-parity fixes: calendarTimestamp()
+		# (validateDate also runs checkdate, not just strtotime) and
+		# parseSize() (min:/max: must keep fractional precision). Both are
+		# extracted helpers, so addDateChecks() stayed under its own limit.
 		-
-			rawMessage: 'Class cognitive complexity is 115, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 120, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/FastCheck/RuleConfigBuilder.php

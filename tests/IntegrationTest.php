@@ -4,8 +4,8 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule as LaravelRule;
 use Illuminate\Validation\Validator;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\StringRule;
 
 // =========================================================================
 // Mixed with other rules in an array

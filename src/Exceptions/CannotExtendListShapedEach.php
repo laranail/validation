@@ -3,7 +3,7 @@
 namespace Simtabi\Laranail\Validation\Exceptions;
 
 use LogicException;
-use Simtabi\Laranail\Validation\Rules\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 
 /**
  * Thrown when `ArrayRule::addEachRule()` / `mergeEachRules()` is invoked on
