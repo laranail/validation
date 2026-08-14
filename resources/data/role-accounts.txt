@@ -1,0 +1,42 @@
+# Role-account local parts — mailboxes belonging to a function rather than a
+# person. Several are mandated by RFC 2142; the rest are conventional.
+#
+# Used to keep a signup form from creating an account owned by "the sales
+# team", which nobody can recover and everybody forwards.
+abuse
+accounts
+admin
+administrator
+billing
+careers
+contact
+enquiries
+enquiry
+ftp
+help
+hostmaster
+hr
+info
+inquiries
+it
+jobs
+legal
+mail
+mailer-daemon
+marketing
+news
+no-reply
+noc
+noreply
+office
+postmaster
+press
+privacy
+root
+sales
+security
+support
+team
+usenet
+uucp
+webmaster

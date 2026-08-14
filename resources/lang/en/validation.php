@@ -57,6 +57,15 @@ return [
     'longitude' => 'The :attribute must be a longitude between -180 and 180.',
     'us_state' => 'The :attribute must be a US state.',
 
+    // Email
+    'email' => [
+        'disposable' => 'The :attribute must not be a disposable email address.',
+        'domain_is' => 'The :attribute must be at one of: :domains.',
+        'domain_is_not' => 'The :attribute must not be at any of: :domains.',
+        'malformed' => 'The :attribute must be a valid email address.',
+        'role' => 'The :attribute must belong to a person, not a shared mailbox.',
+    ],
+
     // Database
     'authorized' => 'The selected :attribute is invalid.',
     'models_exist' => [

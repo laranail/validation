@@ -31,6 +31,9 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Net\DomainName` | RFC 1035, RFC 5891 | Implemented from the RFCs. The A-label vs NR-LDH-label split follows the approach in the abandoned in-house `enekia` codebase; no code was carried over. |
 | `Net\Subdomain` | RFC 1035 | Implemented from the RFC. |
 | `Net\Cidr` | RFC 4632 | Implemented from the RFC. |
+| `Email\*` | — | Original. The wildcard-domain concept appeared in the abandoned in-house `enekia` codebase and in `ashallendesign/email-utilities`; no code was carried over from either. |
+| bundled disposable-domain list | [disposable-email-domains](https://github.com/disposable-email-domains/disposable-email-domains) | Data only, dedicated to the public domain under **CC0 1.0**. Snapshot of 8,201 domains taken 2026-08-14. |
+| bundled role-account list | RFC 2142, plus convention | Compiled here; RFC 2142 mandates several of the entries. |
 | `Database\Authorized`, `Database\ModelsExist` | — | Original. The concepts appear in `spatie/laravel-validation-rules`; no code was carried over. `Authorized` differs from Laravel's own `Rule::can()` in resolving the value to a model before the Gate check. |
 | `Structure\Delimited` | — | Original. The concept (per-item validation of a delimited string) appeared in the abandoned in-house `enekia` codebase and in `spatie/laravel-validation-rules`; no code was carried over from either. |
 | `Crypto\BitcoinAddress` | Base58Check; BIP-173 (Bech32); BIP-350 (Bech32m) | Implemented from the BIPs. Checksums are verified, not pattern-matched. |

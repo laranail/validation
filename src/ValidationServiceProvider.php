@@ -4,6 +4,10 @@ namespace Simtabi\Laranail\Validation;
 
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
+use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 
 /**
  * The package is usable with no provider at all — every builder entry point is
@@ -43,6 +47,25 @@ class ValidationServiceProvider extends PackageServiceProvider
     public function registeringPackage(): void
     {
         $this->mergeConfigFrom($this->configPath(), 'laranail.validation');
+
+        $this->bindEmailListFallbacks();
+    }
+
+    /**
+     * Bind the bundled email lists, but only if nothing else has.
+     *
+     * `singletonIf`, not `singleton`, and the asymmetry is deliberate:
+     * laranail/email binds these contracts UNCONDITIONALLY, so whichever
+     * provider registers second gets the outcome right. If this one runs
+     * first, laranail/email replaces the snapshot; if laranail/email runs
+     * first, `singletonIf` sees the binding and leaves it alone. Using
+     * `singleton` here — or `singletonIf` there — would make the result
+     * depend on provider order, which is not something a consumer controls.
+     */
+    private function bindEmailListFallbacks(): void
+    {
+        $this->app->singletonIf(DisposableDomainList::class, BundledDisposableDomainList::class);
+        $this->app->singletonIf(RoleAccountList::class, BundledRoleAccountList::class);
     }
 
     public function bootingPackage(): void
