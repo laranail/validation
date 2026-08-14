@@ -18,14 +18,19 @@ so tooling can hook in without reimplementing the stage above it.
 ### Builders
 
 `FluentRule` is a static factory, not a class you hold. `FluentRule::string()` returns a
-`Rules\StringRule`, `FluentRule::date()` a `Rules\DateRule`, and so on across the eleven rule
-classes in `src/Rules/`. The type-specific surface lives on the concrete class, which is what
-makes the autocompletion narrow — `StringRule` has no `mimes()` to offer.
+`Builder\Nodes\StringRule`, `FluentRule::date()` a `Builder\Nodes\DateRule`, and so on across
+the twelve node classes in `src/Builder/Nodes/`. The type-specific surface lives on the
+concrete class, which is what makes the autocompletion narrow — `StringRule` has no `mimes()`
+to offer.
 
-What every rule shares lives in traits under `src/Rules/Concerns/`: `HasFieldModifiers` for the
-modifier/conditional surface, `HasEmbeddedRules` for `each()`/`children()`, and `SelfValidates`
-so a single rule object can validate a value on its own as an
+What every node shares lives in traits under `src/Builder/Concerns/`: `HasFieldModifiers` for
+the modifier/conditional surface, `HasEmbeddedRules` for `unique()`/`exists()`/`enum()`, and
+`SelfValidates` so a single node can validate a value on its own as an
 `Illuminate\Contracts\Validation\ValidationRule`.
+
+> `src/Rules/` is deliberately left free for the extended rule library (`Iban`, `Vin`,
+> `PostalCode`, …). Builder nodes and domain rules are different things and do not share a
+> namespace. Bind to `Contracts\FluentRuleContract` rather than a concrete node class.
 
 `FluentRule::field()` is the untyped escape hatch. It accepts any modifier, which is why the
 package also ships an opt-in arch test (`Testing\Arch\BansFieldRuleTypeMethods`) to keep

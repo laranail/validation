@@ -67,7 +67,7 @@ Full documentation is at
 
 ### Project
 
-- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md)
+- [Changelog](CHANGELOG.md) · [Upgrading](UPGRADING.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## Credits
 
