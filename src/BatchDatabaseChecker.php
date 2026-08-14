@@ -10,6 +10,7 @@ use ReflectionException;
 use ReflectionProperty;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 use Simtabi\Laranail\Validation\Internal\BatchPresenceQuery;
+use Simtabi\Laranail\Validation\Internal\PresenceMatchFidelity;
 use Simtabi\Laranail\Validation\Internal\ValueTypePredicates;
 use Stringable;
 use Throwable;
@@ -346,7 +347,15 @@ final class BatchDatabaseChecker
         }
 
         $verifier = self::makeVerifier($fallback instanceof PresenceVerifierInterface ? $fallback : null);
-        self::registerLookups($verifier, $groups);
+        $complete = self::registerLookups($verifier, $groups);
+
+        // A group skipped for safety is answered by the fallback verifier.
+        // With no fallback bound, PrecomputedPresenceVerifier::getCount()
+        // returns 0 for an unregistered group — which reads as "not taken"
+        // and would let a `unique` rule pass. Batch nothing instead.
+        if (! $complete && ! $fallback instanceof PresenceVerifierInterface) {
+            return null;
+        }
 
         return $verifier->hasLookups() ? $verifier : null;
     }
@@ -396,10 +405,13 @@ final class BatchDatabaseChecker
      * perf hit — exists and unique on the same (table, column) is unusual.
      *
      * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups  Keyed by "table:column:ruleType"
+     * @return bool  False if any group was skipped, so the caller knows a
+     *               fallback verifier is required to answer it.
      */
-    public static function registerLookups(PrecomputedPresenceVerifier $verifier, array $groups): void
+    public static function registerLookups(PrecomputedPresenceVerifier $verifier, array $groups): bool
     {
         $conflicting = self::findConflictingTableColumns($groups);
+        $complete = true;
 
         foreach ($groups as $key => $group) {
             $values = $group['values'];
@@ -411,6 +423,8 @@ final class BatchDatabaseChecker
             [$table, $column] = self::parseGroupKey($key);
 
             if (isset($conflicting[$table . ':' . $column])) {
+                $complete = false;
+
                 continue;
             }
 
@@ -418,8 +432,16 @@ final class BatchDatabaseChecker
                 ? self::fetchTaken($values, $group['rule'])
                 : self::fetchExisting($values, $group['rule']);
 
+            if (! PresenceMatchFidelity::isFaithful($values, $fetched)) {
+                $complete = false;
+
+                continue;
+            }
+
             $verifier->addLookup($table, $column, $fetched);
         }
+
+        return $complete;
     }
 
     /**
@@ -524,7 +546,7 @@ final class BatchDatabaseChecker
      * @param  array<mixed>  $values
      * @return list<string>
      */
-    private static function uniqueStringValues(array $values): array
+    public static function uniqueStringValues(array $values): array
     {
         return array_values(array_unique(
             array_map(
