@@ -1,22 +1,51 @@
 # Configuration
 
-There is no published config file and nothing to add to `.env`. The package reads no `config()`
-key and registers no service provider — behaviour is set on the rule chain itself, with one
-global safety fuse.
+Almost nothing needs configuring. Behaviour is set on the rule chain itself; the config file
+exists for the two things that cannot live there — a global safety fuse, and the opt-in string
+rule aliases.
 
-## There is nothing to publish
+## Publishing
 
-`vendor:publish` has no tag for this package. If you are looking for a `config/validation.php`
-to tune, it does not exist by design: the rule chain carries its own configuration, and the
-optimizations are transparent rather than opt-in.
+```bash
+php artisan vendor:publish --tag=laranail::validation-config
+```
 
-Adding `HasFluentRules` to a form request is what enables the optimized path — see
-[Getting started](getting-started.md). Nothing else needs switching on.
+That writes `config/laranail-validation.php`. The file name is prefixed so publishing can
+never clobber an application's own `config/validation.php`; the settings themselves read from
+the flat `laranail.validation` key.
 
-## The one global: the batch query cap
+The builders work without publishing anything. Adding `HasFluentRules` to a form request is
+what enables the optimized path — see [Getting started](getting-started.md). Nothing else
+needs switching on.
+
+## String rule aliases are opt-in
+
+`laranail.validation.aliases.enabled` is `false` by default, and every alias the extended rule
+library registers is prefixed (`laranail_iban`, not `iban`).
+
+This is deliberate. Laravel keeps validator extensions in a flat map and resolves them
+last-writer-wins, so registering a generic name silently replaces whatever a sibling package,
+a third-party package, or the application itself already put there — and the damage surfaces
+far away as the wrong rule running. Rule classes are the canonical surface; aliases are a
+convenience you switch on knowingly. The prefix is configurable so an application that already
+owns the name can move ours aside rather than fight it.
+
+## The batch query cap
 
 `BatchDatabaseChecker::$maxValuesPerGroup` caps how many distinct values a single batched
-`whereIn` may carry. It defaults to `10_000`.
+`whereIn` may carry, so a hostile payload cannot turn one request into an unbounded `IN` list.
+It defaults to `10_000`.
+
+Set it in the published config — the provider applies it once at boot:
+
+```php
+// config/laranail-validation.php
+'batch' => ['max_values_per_group' => 5_000],
+```
+
+The static is still writable directly, which is what you want in a test. Either way it is
+**boot-time only**: mutating it per request is unsafe under Octane, where the value would leak
+across requests sharing a worker.
 
 ```php
 // AppServiceProvider::boot()

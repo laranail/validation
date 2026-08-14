@@ -50,6 +50,22 @@ grep -rl 'Simtabi\\Laranail\\Validation\\Rules' app/ tests/ \
 Prefer binding to `Contracts\FluentRuleContract` afterwards, so a future node reorganisation
 does not reach your code at all.
 
+### A service provider is now registered
+
+The package previously had none, and `docs/configuration.md` said so. It now ships
+`ValidationServiceProvider`, auto-discovered via `extra.laravel.providers`.
+
+It registers one config file under the flat `laranail.validation` key and publishes it as
+`config/laranail-validation.php`:
+
+```bash
+php artisan vendor:publish --tag=laranail::validation-config
+```
+
+Nothing else changes: the builders never needed a provider and still do not. If you set
+`BatchDatabaseChecker::$maxValuesPerGroup` in your own `AppServiceProvider`, it still works —
+but the config key is now the better home, and the provider applies it at boot.
+
 ### Validation results changed for six rules
 
 These are Laravel-parity fixes: the optimized path now agrees with

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -17,6 +18,7 @@ class TestCase extends Orchestra
     {
         return [
             LivewireServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
