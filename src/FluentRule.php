@@ -7,7 +7,6 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\AnyOf;
-use RuntimeException;
 use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
@@ -274,15 +273,9 @@ class FluentRule
 
     /**
      * @param  array<int, mixed>  $rules
-     *
-     * @throws RuntimeException If AnyOf is not available (requires Laravel 13+)
      */
     public static function anyOf(array $rules): AnyOf
     {
-        if (! class_exists(AnyOf::class)) {
-            throw new RuntimeException('FluentRule::anyOf() requires Laravel 13+.');
-        }
-
         return new AnyOf($rules);
     }
 }

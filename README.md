@@ -7,7 +7,7 @@
 
 > Write Laravel validation rules with IDE autocompletion instead of memorising string syntax — each rule type exposes only the methods that apply to it, `each()` and `children()` keep parent and child rules in one place, and large wildcard arrays validate up to 160x faster.
 
-Targets PHP `^8.3` on Laravel `^12 || ^13`.
+Targets PHP `^8.4.1` on Laravel `^13`.
 
 ```php
 // Before
