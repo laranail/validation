@@ -24,6 +24,10 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Codes\Ean` | GS1 General Specifications | The retail subset of `Gtin`, delegating to it. |
 | `Codes\Isbn` | ISO 2108 | Implemented from the standard. ISBN-10 is mod-11; ISBN-13 is a GTIN-13 with a 978/979 prefix. |
 | `Codes\Issn` | ISO 3297 | Implemented from the standard. |
+| `Identifiers\Imei` | 3GPP TS 23.003 | Implemented from the standard, composing `Luhn`. |
+| `Identifiers\Vin` | ISO 3779; check digit per the US NHTSA rule | Implemented from the standards. The transliteration table is factual reference data. |
+| `Identifiers\SemVer` | [semver.org](https://semver.org) 2.0.0 | The officially published pattern, unmodified; timed against pathological input in the suite. |
+| `Identifiers\Jwt` | RFC 7515 §3.1 | Implemented from the RFC. Validates form only, never trust. |
 
 ## Packages studied but not depended on
 

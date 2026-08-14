@@ -26,4 +26,10 @@ return [
     'isbn' => 'The :attribute must be a valid ISBN.',
     'issn' => 'The :attribute must be a valid ISSN.',
 
+    // Identifiers
+    'imei' => 'The :attribute must be a valid IMEI.',
+    'jwt' => 'The :attribute must be a valid JSON Web Token.',
+    'semver' => 'The :attribute must be a valid semantic version.',
+    'vin' => 'The :attribute must be a valid vehicle identification number.',
+
 ];
