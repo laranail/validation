@@ -31,6 +31,7 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Net\DomainName` | RFC 1035, RFC 5891 | Implemented from the RFCs. The A-label vs NR-LDH-label split follows the approach in the abandoned in-house `enekia` codebase; no code was carried over. |
 | `Net\Subdomain` | RFC 1035 | Implemented from the RFC. |
 | `Net\Cidr` | RFC 4632 | Implemented from the RFC. |
+| `Postal\PostalCode` | Universal Postal Union member formats | Pattern table derived from the abandoned in-house `enekia` codebase, re-verified and corrected: three codes it carried (`KV`, `XY`, `ZU`) are not ISO 3166-1 alpha-2 — `KV` became `XK` for Kosovo, the other two were dropped — and its Canadian pattern made the final digit optional, accepting the five-character `K1A 0B`. No code was carried over. |
 | `Geo\Latitude`, `Geo\Longitude`, `Geo\LatLng` | — | Original. Decimal-degree ranges are definitional, not proprietary. |
 | `Geo\UsState` | USPS state abbreviations | Original. The code/name table is factual reference data. |
 | `Geo\CaProvince` | Canada Post provincial abbreviations | Original. The code/name table is factual reference data. |

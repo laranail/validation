@@ -32,6 +32,7 @@ return [
     'semver' => 'The :attribute must be a valid semantic version.',
     'vin' => 'The :attribute must be a valid vehicle identification number.',
 
+
     // Net
     'cidr' => 'The :attribute must be a valid CIDR network.',
     'domain_name' => 'The :attribute must be a valid domain name.',
@@ -55,6 +56,9 @@ return [
     'latitude' => 'The :attribute must be a latitude between -90 and 90.',
     'longitude' => 'The :attribute must be a longitude between -180 and 180.',
     'us_state' => 'The :attribute must be a US state.',
+
+    // Postal
+    'postal_code' => 'The :attribute is not a valid postcode for the selected country.',
 
     /*
     | Nested, because CaseStyle appends its style to the key — one rule with a
