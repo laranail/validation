@@ -38,7 +38,16 @@ final class RuleMessagesResolveTest extends TestCase
         // `lang/vendor/{namespace}` is a single published directory, so a slash
         // nests the files a level deeper than vendor:publish and every
         // consumer's override path expect. The rules all say `laranail-`.
-        $this->assertTrue(app('translator')->hasForLocale('laranail-validation::validation.iban', 'en'));
+        //
+        // Asserted through trans() in both directions rather than through the
+        // translator's hasForLocale(): that method is on the concrete
+        // Translator and not on the contract, so reaching it means either a
+        // string container key or a type-hint that does not declare it.
+        $dashed = 'laranail-validation::validation.iban';
+        $slashed = 'laranail/validation::validation.iban';
+
+        $this->assertNotSame($dashed, trans($dashed), 'The dashed namespace did not resolve.');
+        $this->assertSame($slashed, trans($slashed), 'The slashed namespace resolved, so both are registered.');
     }
 
     public function test_no_message_is_left_as_a_placeholder(): void
