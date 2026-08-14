@@ -1,0 +1,113 @@
+parameters:
+	ignoreErrors:
+		# Hot-path closure builders: complexity comes from intentional
+		# inlining (size, in/regex, date comparisons) to avoid closure
+		# allocation + call overhead on every validated item.
+		# Factoring out hurts benchmark numbers; keep inlined + baselined.
+		# Relocated from CoreValueCompiler to RuleConfigBuilder in the
+		# May 2026 maintainability refactor — same code, new home.
+		-
+			rawMessage: 'Class cognitive complexity is 115, keep it under 80'
+			identifier: complexity.classLike
+			count: 1
+			path: src/FastCheck/RuleConfigBuilder.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::buildValueClosure()" is 52, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/FastCheck/RuleConfigBuilder.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::addDateChecks()" is 23, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/FastCheck/RuleConfigBuilder.php
+
+		-
+			rawMessage: 'Class cognitive complexity is 101, keep it under 80'
+			identifier: complexity.classLike
+			count: 1
+			path: src/FastCheck/ItemContextCompiler.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler::buildItemAwareClosure()" is 59, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/FastCheck/ItemContextCompiler.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler::compile()" is 25, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/FastCheck/PresenceConditionalCompiler.php
+
+		# Grew by one with Phase 2's runValidateInternal remap layer, and by one
+		# more with the separateRules() malformed-wildcard guard — a single
+		# conditional throw that converts a silent validation bypass (a '*' key
+		# with no '.*' segment applied no rule) into a loud error. The +1 is
+		# irreducible for a guard, and dropping RuleSet below the 80 threshold is a
+		# whole-class refactor out of scope here. Grew by five more with the
+		# object-form wildcard-dep fix and its codex-review hardening:
+		# rewriteRulesForPerItem normalizes FluentRule objects to native form so
+		# conditional deps like requiredUnless('items.*.type', …) get the wildcard
+		# prefix stripped per item — stripping the whole compiled string (not an
+		# explode that would corrupt a regex token like regex:/^(a|b)$/) — plus the
+		# metadata-before-rewrite reorder in validateWildcardGroups. The
+		# per-function complexity stays under 20 (logic in stripPrefixFromConstraints);
+		# only the class total moves.
+		-
+			rawMessage: 'Class cognitive complexity is 145, keep it under 80'
+			identifier: complexity.classLike
+			count: 1
+			path: src/RuleSet.php
+
+		# Inherently-complex per-item rule compiler: buildFastChecks (46) dominates
+		# the class total, and evaluating every exclude_* condition per field
+		# (fieldIsExcluded + findCommonDispatchField) adds irreducible branching
+		# for native-parity. Dropping the class under 80 is a whole-class refactor
+		# out of scope.
+		-
+			rawMessage: 'Class cognitive complexity is 88, keep it under 80'
+			identifier: complexity.classLike
+			count: 1
+			path: src/Internal/ItemRuleCompiler.php
+
+		# buildFastChecks branches over field-shape × closure-type (wildcard vs
+		# flat × item-aware vs value-only) — structural complexity that
+		# refactoring would only move.
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemRuleCompiler::buildFastChecks()" is 46, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/Internal/ItemRuleCompiler.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\RuleSet::validateInternal()" is 25, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/RuleSet.php
+
+		# Phase 2b: RuleSet::validateItems body relocated verbatim to
+		# ItemValidator::validate. Complexity is identical (49) — the loop's
+		# nested fast-check → dispatch-cache → validator-cache structure
+		# carries the score, and refactoring those caches has measurable
+		# perf cost (per-item validator reuse + dispatch reduction).
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemValidator::validate()" is 49, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/Internal/ItemValidator.php
+
+		# Cross-version Filament guard. The trait may be mixed into components
+		# that lack getCachedForms (plain Livewire without InteractsWithForms),
+		# so the method_exists() check is required at runtime. PHPStan only ever
+		# analyses the trait through the single test double, which declares
+		# getCachedForms, making the guard look always-true in that sole
+		# context. Inline @phpstan-ignore in a trait does not apply to
+		# using-class-context analysis (newer larastan), so it is baselined.
+		-
+			rawMessage: 'Call to function method_exists() with $this(TestableFilamentComponent) and ''getCachedForms'' will always evaluate to true.'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: tests/HasFluentValidationForFilamentTest.php

@@ -1,0 +1,99 @@
+<?php declare(strict_types=1);
+
+namespace Simtabi\Laranail\Validation\Rules;
+
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Rules\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Rules\Concerns\SelfValidates;
+
+class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
+{
+    use Conditionable;
+    use HasFieldModifiers;
+    use Macroable;
+    use SelfValidates;
+
+    /** @var list<string> */
+    protected array $constraints = ['file'];
+
+    public function __construct()
+    {
+        $this->seedLastConstraint($this->defaultConstraintName());
+    }
+
+    /**
+     * Hook for subclasses (ImageRule) to override which constraint name
+     * seeds $lastConstraint without re-implementing __construct.
+     */
+    protected function defaultConstraintName(): string
+    {
+        return 'file';
+    }
+
+    public function min(int|string $size, ?string $message = null): static
+    {
+        return $this->addRule('min:' . $this->toKilobytes($size), $message);
+    }
+
+    public function max(int|string $size, ?string $message = null): static
+    {
+        return $this->addRule('max:' . $this->toKilobytes($size), $message);
+    }
+
+    public function between(int|string $min, int|string $max, ?string $message = null): static
+    {
+        return $this->addRule('between:' . $this->toKilobytes($min) . ',' . $this->toKilobytes($max), $message);
+    }
+
+    public function exactly(int|string $size, ?string $message = null): static
+    {
+        return $this->addRule('size:' . $this->toKilobytes($size), $message);
+    }
+
+    public function extensions(string ...$extensions): static
+    {
+        return $this->addRule('extensions:' . implode(',', $extensions));
+    }
+
+    public function mimes(string ...$mimes): static
+    {
+        return $this->addRule('mimes:' . implode(',', $mimes));
+    }
+
+    public function mimetypes(string ...$mimetypes): static
+    {
+        return $this->addRule('mimetypes:' . implode(',', $mimetypes));
+    }
+
+    protected function toKilobytes(int|string $size): int
+    {
+        if (is_int($size)) {
+            return $size;
+        }
+
+        if (preg_match('/^(\d+(?:\.\d+)?)\s*(kb|mb|gb|tb)$/i', trim($size), $matches) === 1) {
+            $value = (float) $matches[1];
+            $unit = strtolower($matches[2]);
+
+            return (int) round(match ($unit) {
+                'kb' => $value,
+                'mb' => $value * 1_000,
+                'gb' => $value * 1_000_000,
+                'tb' => $value * 1_000_000_000,
+                default => $value,
+            });
+        }
+
+        return (int) $size;
+    }
+
+    /** @return list<string|object> */
+    protected function buildValidationRules(): array
+    {
+        return [...$this->reorderConstraints($this->constraints), ...$this->rules];
+    }
+}

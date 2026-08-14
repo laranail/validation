@@ -1,0 +1,118 @@
+{
+    "name": "laranail/validation",
+    "description": "Fluent validation rule builders for Laravel — type-aware rule objects, structured array validation, and an optimized wildcard validator.",
+    "keywords": [
+        "laravel",
+        "laranail",
+        "validation",
+        "fluent",
+        "rule-builder"
+    ],
+    "homepage": "https://opensource.simtabi.com/products/laranail/validation",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simtabi LLC",
+            "email": "opensource@simtabi.com",
+            "homepage": "https://opensource.simtabi.com",
+            "role": "Organization"
+        },
+        {
+            "name": "Imani Manyara",
+            "email": "imani@simtabi.com",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Sander Muller",
+            "email": "github@scode.nl",
+            "role": "Original author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/laranail/validation/issues",
+        "source": "https://github.com/laranail/validation",
+        "docs": "https://opensource.simtabi.com/documentation/laranail/validation/"
+    },
+    "require": {
+        "php": "^8.3",
+        "illuminate/contracts": "^12.0||^13.0",
+        "illuminate/http": "^12.0||^13.0",
+        "illuminate/support": "^12.0||^13.0",
+        "illuminate/validation": "^12.0||^13.0"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.3",
+        "larastan/larastan": "^3.9.3",
+        "laravel/pao": "^1.1",
+        "laravel/pint": "^1.29",
+        "livewire/livewire": "^3.0||^4.0",
+        "mrpunyapal/rector-pest": "^0.2.7",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^10.11",
+        "pestphp/pest": "^3.0||^4.4.5",
+        "pestphp/pest-plugin-arch": "^3.0||^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0||^4.1",
+        "phpstan/extension-installer": "^1.4.3",
+        "phpstan/phpstan-deprecation-rules": "^2.0.4",
+        "phpstan/phpstan-phpunit": "^2.0.16",
+        "phpstan/phpstan-strict-rules": "^2.0.10",
+        "rector/rector": "^2.4.1",
+        "sandermuller/boost-skills": "^2.5",
+        "sandermuller/package-boost-laravel": "^1.0",
+        "spaze/phpstan-disallowed-calls": "^4.10",
+        "symplify/phpstan-extensions": "^12.0.2",
+        "tomasvotruba/cognitive-complexity": "^1.1",
+        "tomasvotruba/type-coverage": "^2.1"
+    },
+    "suggest": {
+        "nikic/php-parser": "^5.0 — required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
+    },
+    "autoload": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Validation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Simtabi\\Laranail\\Validation\\Tests\\": "tests/"
+        },
+        "files": [
+            "tests/Helpers.php"
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "SanderMuller\\BoostCore\\Scripts\\BoostAutoSync::run"
+        ],
+        "post-update-cmd": [
+            "SanderMuller\\BoostCore\\Scripts\\BoostAutoSync::run"
+        ],
+        "phpstan": "vendor/bin/phpstan analyse --memory-limit=2G",
+        "phpstan-simplified": "vendor/bin/phpstan analyse --memory-limit=2G --error-format symplify",
+        "phpstan-clear-cache": "vendor/bin/phpstan clear-result-cache",
+        "format": "vendor/bin/pint",
+        "rector": "vendor/bin/rector process",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "sync-ai": "vendor/bin/boost sync",
+        "qa": [
+            "@rector",
+            "@format",
+            "@phpstan-simplified"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

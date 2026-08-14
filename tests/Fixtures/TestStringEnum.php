@@ -1,0 +1,9 @@
+<?php declare(strict_types=1);
+
+namespace Simtabi\Laranail\Validation\Tests\Fixtures;
+
+enum TestStringEnum: string
+{
+    case Active = 'active';
+    case Inactive = 'inactive';
+}
