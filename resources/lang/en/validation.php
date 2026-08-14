@@ -49,6 +49,13 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // Geo
+    'ca_province' => 'The :attribute must be a Canadian province or territory.',
+    'lat_lng' => 'The :attribute must be a latitude,longitude pair.',
+    'latitude' => 'The :attribute must be a latitude between -90 and 90.',
+    'longitude' => 'The :attribute must be a longitude between -180 and 180.',
+    'us_state' => 'The :attribute must be a US state.',
+
     /*
     | Nested, because CaseStyle appends its style to the key — one rule with a
     | parameter rather than five classes differing by a pattern and a message.

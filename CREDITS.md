@@ -31,6 +31,9 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Net\DomainName` | RFC 1035, RFC 5891 | Implemented from the RFCs. The A-label vs NR-LDH-label split follows the approach in the abandoned in-house `enekia` codebase; no code was carried over. |
 | `Net\Subdomain` | RFC 1035 | Implemented from the RFC. |
 | `Net\Cidr` | RFC 4632 | Implemented from the RFC. |
+| `Geo\Latitude`, `Geo\Longitude`, `Geo\LatLng` | — | Original. Decimal-degree ranges are definitional, not proprietary. |
+| `Geo\UsState` | USPS state abbreviations | Original. The code/name table is factual reference data. |
+| `Geo\CaProvince` | Canada Post provincial abbreviations | Original. The code/name table is factual reference data. |
 | `Text\Slug`, `Text\Username`, `Text\CaseStyle`, `Text\WithoutSpaces` | — | Original. Conventional formats with no governing standard. |
 | `Text\PersonName` | — | Original. Unicode letter/mark classes rather than an ASCII assumption. |
 | `Text\HtmlClean` | — | Original. A data-shape rule; explicitly not an XSS defence. |
