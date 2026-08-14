@@ -57,6 +57,10 @@ return [
     'longitude' => 'The :attribute must be a longitude between -180 and 180.',
     'us_state' => 'The :attribute must be a US state.',
 
+    // Crypto
+    'bitcoin_address' => 'The :attribute must be a valid Bitcoin address.',
+    'ethereum_address' => 'The :attribute must be a valid Ethereum address.',
+
     // Postal
     'postal_code' => 'The :attribute is not a valid postcode for the selected country.',
 
