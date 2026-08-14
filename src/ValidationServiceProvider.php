@@ -15,13 +15,19 @@ class ValidationServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        // Views and translations are deliberately not registered here yet.
-        // This package ships neither, and package-tools' current tagged
-        // release derives a `laranail/validation::` translation namespace
-        // (slash) rather than the `laranail-validation::` the convention
-        // requires. Wire them when the rule library's lang files land, once
-        // that fix is tagged.
-        $package->name('laranail/validation');
+        // Translations are registered; views are not, because this package
+        // ships none.
+        //
+        // This was deferred while package-tools derived the namespace as
+        // `laranail/validation` with a slash. That mattered beyond tidiness:
+        // published translations live in one directory, `lang/vendor/{ns}`, so
+        // a slash nested them a level deeper than `vendor:publish` and every
+        // consumer's override path look for them. package-tools now returns
+        // the dashed form, which is what all 23 message keys here already
+        // reference.
+        $package
+            ->name('laranail/validation')
+            ->hasTranslations();
     }
 
     /**
@@ -39,21 +45,6 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->mergeConfigFrom($this->configPath(), 'laranail.validation');
     }
 
-    /**
-     * Translations are registered explicitly, for the same reason as config.
-     *
-     * package-tools' `hasTranslations()` derives the namespace as
-     * `{vendor}/{package}` — with a slash — on its currently tagged release.
-     * That nests published files one level deeper than `lang/vendor/{namespace}`
-     * expects, and it is not the `laranail-validation` the convention requires.
-     * Calling loadTranslationsFrom() directly pins the correct namespace
-     * regardless of which package-tools version resolves.
-     */
-    public function packageRegistered(): void
-    {
-        $this->loadTranslationsFrom($this->langPath(), 'laranail-validation');
-    }
-
     public function bootingPackage(): void
     {
         $this->applyBatchLimit();
@@ -62,11 +53,6 @@ class ValidationServiceProvider extends PackageServiceProvider
             $this->publishes(
                 [$this->configPath() => config_path('laranail-validation.php')],
                 $this->package->getNamespacedPublishTag('config'),
-            );
-
-            $this->publishes(
-                [$this->langPath() => $this->app->langPath('vendor/laranail-validation')],
-                $this->package->getNamespacedPublishTag('translations'),
             );
         }
     }
@@ -88,10 +74,5 @@ class ValidationServiceProvider extends PackageServiceProvider
     private function configPath(): string
     {
         return dirname(__DIR__) . '/config/laranail-validation.php';
-    }
-
-    private function langPath(): string
-    {
-        return dirname(__DIR__) . '/lang';
     }
 }

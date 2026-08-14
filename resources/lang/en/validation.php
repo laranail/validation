@@ -39,4 +39,26 @@ return [
     'public_ip' => 'The :attribute must be a publicly routable IP address.',
     'subdomain' => 'The :attribute must be a valid subdomain.',
 
+    'slug' => 'The :attribute must be a URL slug: lowercase letters, digits and single hyphens, with no hyphen at the start or end.',
+
+    'username' => 'The :attribute may contain letters, digits, and single dots, hyphens or underscores between them — not at the start, at the end, or doubled.',
+
+    'person_name' => 'The :attribute must be a name: letters, marks, spaces, apostrophes and hyphens.',
+
+    'html_clean' => 'The :attribute must not contain HTML tags.',
+
+    'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
+
+    /*
+    | Nested, because CaseStyle appends its style to the key — one rule with a
+    | parameter rather than five classes differing by a pattern and a message.
+    */
+    'case_style' => [
+        'camel' => 'The :attribute must be camelCase.',
+        'kebab' => 'The :attribute must be kebab-case.',
+        'pascal' => 'The :attribute must be PascalCase.',
+        'snake' => 'The :attribute must be snake_case.',
+        'title' => 'The :attribute must be Title Case.',
+    ],
+
 ];
