@@ -57,6 +57,19 @@ return [
     'longitude' => 'The :attribute must be a longitude between -180 and 180.',
     'us_state' => 'The :attribute must be a US state.',
 
+    // Structure
+    //
+    // Nested and several keys, because "the field is invalid" is useless when
+    // the field holds a dozen values. Each key names what to change.
+    'delimited' => [
+        'distinct' => 'The :attribute must not repeat an entry.',
+        'empty' => 'Entry :position of :attribute is empty — check for a stray separator.',
+        'invalid' => 'The :attribute must be a delimited list.',
+        'item' => 'Entry :position of :attribute is not valid.',
+        'max' => 'The :attribute must not have more than :max entries.',
+        'min' => 'The :attribute must have at least :min entries.',
+    ],
+
     // Crypto
     'bitcoin_address' => 'The :attribute must be a valid Bitcoin address.',
     'ethereum_address' => 'The :attribute must be a valid Ethereum address.',
