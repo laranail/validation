@@ -1,0 +1,52 @@
+# Credits
+
+## Original author
+
+The fluent builder, the `RuleSet` compiler and the optimization engine were
+written by **[Sander Muller](https://github.com/sandermuller)** as
+[`sandermuller/laravel-fluent-validation`](https://github.com/SanderMuller/laravel-fluent-validation)
+(MIT). That copyright is retained in [LICENSE](LICENSE) alongside Simtabi LLC's.
+
+## Rule provenance
+
+Every rule in the extended library records where its algorithm came from. The
+distinction that matters is **specification vs implementation**: a checksum
+defined by an ISO standard is not anyone's copyrighted work, but somebody's
+*code* for it is.
+
+| Family | Source of the algorithm | Notes |
+|---|---|---|
+| `Banking\Luhn` | ISO/IEC 7812-1 | Implemented from the standard. |
+| `Banking\Iban` | ISO 13616, ISO 7064 MOD-97-10; length table from the SWIFT IBAN Registry | Implemented from the standards. The length table is factual reference data. |
+| `Banking\Bic` | ISO 9362 | Implemented from the standard. |
+| `Banking\Isin` | ISO 6166 | Implemented from the standard, composing `Luhn`. |
+
+## Packages studied but not depended on
+
+- **[`intervention/validation`](https://github.com/Intervention/validation)**
+  (MIT) — the richest single source of extra Laravel rules, and the obvious
+  candidate to wrap. We do not, because its service provider auto-registers all
+  42 of its rules as **bare** string aliases (`iban`, `slug`, `username`, …) and
+  claims the generic `validation::` translation namespace. Laravel resolves
+  `extra.laravel.dont-discover` from the *application's* `composer.json` only —
+  `PackageManifest` is constructed with the app's base path — so a library
+  cannot suppress a dependency's discovery on its consumers' behalf. Requiring
+  it would inflict those aliases on every consuming application with no opt-out,
+  which is exactly the collision the naming convention exists to prevent. Rules
+  are therefore implemented here instead.
+
+- **[`proengsoft/laravel-jsvalidation`](https://github.com/proengsoft/laravel-jsvalidation)**
+  (MIT) — prior art for the planned JSON rule-export contract, in particular its
+  positional-to-named parameter mapping and its "unknown rule defaults to a
+  server round-trip" policy.
+
+- **[`square/laravel-hyrule`](https://github.com/square/laravel-hyrule)**
+  (Apache-2.0) and
+  **[`IndexZer0/laravel-validation-provider`](https://github.com/IndexZer0/laravel-validation-provider)**
+  (MIT) — architectural references for the typed node tree and the composable
+  rule-set providers respectively. Neither can be depended on: they are capped
+  at Laravel 10 and 11.
+
+No code from any of the above is copied into this package. Where a future rule
+does adapt third-party code, its licence and attribution are recorded in this
+file and in the rule's docblock before the rule is merged.
