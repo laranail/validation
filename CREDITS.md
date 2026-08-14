@@ -31,6 +31,7 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Net\DomainName` | RFC 1035, RFC 5891 | Implemented from the RFCs. The A-label vs NR-LDH-label split follows the approach in the abandoned in-house `enekia` codebase; no code was carried over. |
 | `Net\Subdomain` | RFC 1035 | Implemented from the RFC. |
 | `Net\Cidr` | RFC 4632 | Implemented from the RFC. |
+| `Database\Authorized`, `Database\ModelsExist` | — | Original. The concepts appear in `spatie/laravel-validation-rules`; no code was carried over. `Authorized` differs from Laravel's own `Rule::can()` in resolving the value to a model before the Gate check. |
 | `Structure\Delimited` | — | Original. The concept (per-item validation of a delimited string) appeared in the abandoned in-house `enekia` codebase and in `spatie/laravel-validation-rules`; no code was carried over from either. |
 | `Crypto\BitcoinAddress` | Base58Check; BIP-173 (Bech32); BIP-350 (Bech32m) | Implemented from the BIPs. Checksums are verified, not pattern-matched. |
 | `Crypto\EthereumAddress` | EIP-55 | Shape only — EIP-55 verification needs Keccak-256, which PHP core does not provide. Stated in the class docblock and asserted in a test. |

@@ -57,6 +57,13 @@ return [
     'longitude' => 'The :attribute must be a longitude between -180 and 180.',
     'us_state' => 'The :attribute must be a US state.',
 
+    // Database
+    'authorized' => 'The selected :attribute is invalid.',
+    'models_exist' => [
+        'array' => 'The :attribute must be a list of identifiers.',
+        'missing' => 'The :attribute contains values that do not exist: :values.',
+    ],
+
     // Structure
     //
     // Nested and several keys, because "the field is invalid" is useless when
