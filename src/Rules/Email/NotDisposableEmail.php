@@ -23,9 +23,21 @@ use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
  *
  * Pure tier: a hash lookup, no IO. Refreshing the list is a command's job.
  */
-final readonly class NotDisposableEmail implements ValidationRule
+final class NotDisposableEmail implements ValidationRule
 {
-    public function __construct(private DisposableDomainList $domains) {}
+    /**
+     * The list is optional so the builder can offer a named method without the
+     * caller wiring the contract by hand. Passed explicitly it is used as-is;
+     * left null it resolves from the container at validation time rather than
+     * construction time, so a rule set can be built outside a booted
+     * application — in a queued job, or a test that never boots Laravel.
+     */
+    public function __construct(private ?DisposableDomainList $domains = null) {}
+
+    private function domains(): DisposableDomainList
+    {
+        return $this->domains ??= resolve(DisposableDomainList::class);
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -37,7 +49,7 @@ final readonly class NotDisposableEmail implements ValidationRule
             return;
         }
 
-        if ($this->domains->contains($address[1])) {
+        if ($this->domains()->contains($address[1])) {
             $fail('laranail-validation::validation.email.disposable')->translate();
         }
     }

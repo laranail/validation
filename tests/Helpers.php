@@ -41,6 +41,35 @@ function rulesOfType(array $rules, string $type): array
 }
 
 /**
+ * The compiled rule set, asserted to be in array form.
+ *
+ * `compiledRules()` returns `string|array`, and the array branch is itself the
+ * property under test wherever a rule OBJECT is expected: a non-Stringable
+ * rule cannot survive the pipe-string branch, so a set that stringified has
+ * already lost it. Asserting here keeps that check at every call site.
+ *
+ * @return list<object|string>
+ */
+function compiledArray(mixed $compiled): array
+{
+    expect($compiled)->toBeArray();
+
+    $rules = is_array($compiled) ? array_values($compiled) : [];
+
+    $narrowed = array_values(array_filter(
+        $rules,
+        static fn (mixed $rule): bool => is_object($rule) || is_string($rule),
+    ));
+
+    // A compiled set holds rule strings and rule objects and nothing else.
+    // Filtering silently would hide anything that slipped through, so the
+    // counts have to match.
+    expect($narrowed)->toHaveSameSize($rules);
+
+    return $narrowed;
+}
+
+/**
  * Run a single rule object against a value and report whether it passed.
  *
  * Lives here rather than in a test file because several rule-family suites

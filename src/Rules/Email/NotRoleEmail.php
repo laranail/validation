@@ -20,9 +20,21 @@ use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
  *
  * Pure tier: a hash lookup, no IO.
  */
-final readonly class NotRoleEmail implements ValidationRule
+final class NotRoleEmail implements ValidationRule
 {
-    public function __construct(private RoleAccountList $localParts) {}
+    /**
+     * The list is optional so the builder can offer a named method without the
+     * caller wiring the contract by hand. Passed explicitly it is used as-is;
+     * left null it resolves from the container at validation time rather than
+     * construction time, so a rule set can be built outside a booted
+     * application — in a queued job, or a test that never boots Laravel.
+     */
+    public function __construct(private ?RoleAccountList $localParts = null) {}
+
+    private function localParts(): RoleAccountList
+    {
+        return $this->localParts ??= resolve(RoleAccountList::class);
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -44,7 +56,7 @@ final readonly class NotRoleEmail implements ValidationRule
             $localPart = substr($localPart, 0, $plus);
         }
 
-        if ($this->localParts->contains($localPart)) {
+        if ($this->localParts()->contains($localPart)) {
             $fail('laranail-validation::validation.email.role')->translate();
         }
     }

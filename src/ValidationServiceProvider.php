@@ -2,12 +2,18 @@
 
 namespace Simtabi\Laranail\Validation;
 
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\InvokableValidationRule;
+use Illuminate\Validation\Validator as ValidationValidator;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
+use Simtabi\Laranail\Validation\Support\RuleAliases;
+use Stringable;
 
 /**
  * The package is usable with no provider at all — every builder entry point is
@@ -71,6 +77,7 @@ class ValidationServiceProvider extends PackageServiceProvider
     public function bootingPackage(): void
     {
         $this->applyBatchLimit();
+        $this->registerRuleAliases();
 
         if ($this->app->runningInConsole()) {
             $this->publishes(
@@ -92,6 +99,100 @@ class ValidationServiceProvider extends PackageServiceProvider
         if (is_int($limit) && $limit > 0) {
             BatchDatabaseChecker::$maxValuesPerGroup = $limit;
         }
+    }
+
+    /**
+     * Register the extended rule library as string rules — opt-in, prefixed.
+     *
+     * Off by default because the validator's extension map is a flat,
+     * host-owned registry where the last writer silently wins; a library that
+     * claimed 38 names in it unasked would be exactly the collision hazard the
+     * naming convention exists to prevent. Prefixed even when enabled, and the
+     * prefix is configurable so an application that already owns a name can
+     * move ours rather than fight it.
+     *
+     * Registered through `Validator::extend` rather than package-tools'
+     * `hasValidationRule()`, which instantiates the rule class with no
+     * arguments and drops the rule's parameters — that would leave every
+     * parameterised alias (`laranail_postal_code:US`) silently unparameterised.
+     *
+     * Execution goes through Laravel's own `InvokableValidationRule`, so a
+     * rule reached by alias sees the same DataAware/ValidatorAware wiring and
+     * message translation it gets when used as an object.
+     */
+    private function registerRuleAliases(): void
+    {
+        if (config('laranail.validation.aliases.enabled') !== true) {
+            return;
+        }
+
+        $prefix = config('laranail.validation.aliases.prefix');
+        $prefix = is_string($prefix) ? $prefix : 'laranail_';
+
+        foreach (RuleAliases::map() as $suffix => $factory) {
+            $alias = $prefix . $suffix;
+
+            // The key Laravel will look the message up under. It studly-cases
+            // the rule string to dispatch and snake-cases it again to format,
+            // so the round trip — not the alias as written — is what matches.
+            $messageKey = Str::snake(Str::studly($alias));
+
+            Validator::extend(
+                $alias,
+                static function (string $attribute, mixed $value, array $parameters, ValidationValidator $validator) use ($factory, $messageKey): bool {
+                    $rule = InvokableValidationRule::make($factory(self::stringParameters($parameters)));
+                    $rule->setValidator($validator);
+
+                    if ($rule->passes($attribute, $value)) {
+                        return true;
+                    }
+
+                    // The rule already produced a translated message. Without
+                    // handing it over, the failure falls back to Laravel's
+                    // `validation.laranail_iban` key, which no locale defines,
+                    // and the user is shown the raw key.
+                    //
+                    // message() returns a LIST — a rule may call $fail more
+                    // than once — while a custom message must be a string. An
+                    // extension can only register one failure per attribute,
+                    // so the messages are joined rather than silently reduced
+                    // to the first.
+                    $messages = (array) $rule->message();
+
+                    if ($messages !== []) {
+                        $validator->setCustomMessages([
+                            $attribute . '.' . $messageKey => implode(' ', self::stringParameters($messages)),
+                        ]);
+                    }
+
+                    return false;
+                },
+            );
+        }
+    }
+
+    /**
+     * Narrow the validator's loosely-typed parameter array to a string list.
+     *
+     * `Validator::extend` types the third argument as a bare `array`, so the
+     * factories cannot assume anything about it. Non-scalars are dropped
+     * rather than coerced: `(string) []` is a fatal, and a rule string cannot
+     * carry an array parameter in the first place.
+     *
+     * @param  array<array-key, mixed>  $parameters
+     * @return list<string>
+     */
+    private static function stringParameters(array $parameters): array
+    {
+        $strings = [];
+
+        foreach ($parameters as $parameter) {
+            if (is_scalar($parameter) || $parameter instanceof Stringable) {
+                $strings[] = (string) $parameter;
+            }
+        }
+
+        return $strings;
     }
 
     private function configPath(): string

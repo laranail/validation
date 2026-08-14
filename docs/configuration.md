@@ -30,6 +30,36 @@ far away as the wrong rule running. Rule classes are the canonical surface; alia
 convenience you switch on knowingly. The prefix is configurable so an application that already
 owns the name can move ours aside rather than fight it.
 
+### Naming
+
+The alias is the rule's class name in snake case, behind the prefix — `Iban` is
+`laranail_iban`, `PostalCode` is `laranail_postal_code`, `EmailDomainIs` is
+`laranail_email_domain_is`. Every rule in the library has one except `Delimited`, which takes
+a nested rule set that no rule string can express faithfully; use the rule object for it.
+
+### Parameters
+
+Aliases carry parameters the ordinary way, and a rule reached by alias behaves exactly as it
+does when constructed in PHP. An alias with no parameters uses the rule's own defaults.
+
+```php
+'account'  => 'laranail_iban',
+'zip'      => 'laranail_postal_code:US',           // or :US,CA
+'zip'      => 'laranail_postal_code:@country',     // read the country from a sibling field
+'handle'   => 'laranail_username:3,20',
+'style'    => 'laranail_case_style:camel',
+'email'    => 'laranail_email_domain_is:example.com,*.example.com',
+'tag_ids'  => 'laranail_models_exist:App\Models\Tag,slug',
+```
+
+`@name` marks a field reference rather than a value. `PostalCode` accepts either a country or
+the name of a field to read the country from, and a bare parameter cannot say which is meant —
+`laranail_postal_code:country` is ambiguous between an ISO code and a field called `country`.
+
+An alias naming a model rejects a class that is not an Eloquent model, so a typo in
+`laranail_models_exist:App\Models\Tags` fails with a message naming that class rather than the
+bare class-not-found the rule would otherwise raise when it instantiated it.
+
 ## The batch query cap
 
 `BatchDatabaseChecker::$maxValuesPerGroup` caps how many distinct values a single batched
@@ -99,7 +129,7 @@ Everything else is set on the rule that needs it, not globally:
 
 ## Extending the builders
 
-`FluentRule`, `RuleSet`, `FluentSchema` and each `Rules\*` class use Laravel's `Macroable`, so
+`FluentRule`, `RuleSet`, `FluentSchema` and each `Builder\Nodes\*` class use Laravel's `Macroable`, so
 an application can add its own methods. The package registers no macros itself — the names are
 yours. Register them in a service provider's `boot()` for the same reason the batch cap belongs
 there.

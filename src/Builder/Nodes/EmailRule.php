@@ -11,6 +11,10 @@ use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
+use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
+use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
+use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
 
 class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -65,6 +69,48 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     }
 
     // -- String-like constraints that make sense on email fields --
+
+    /**
+     * Reject addresses at a throwaway-mailbox provider.
+     *
+     * The list comes from the container, so an application that installs
+     * laranail/email gets its maintained list here without changing this call.
+     */
+    public function notDisposable(?string $message = null): static
+    {
+        return $this->rule(new NotDisposableEmail(), $message);
+    }
+
+    /**
+     * Reject shared-mailbox local parts — info@, sales@, postmaster@.
+     */
+    public function notRole(?string $message = null): static
+    {
+        return $this->rule(new NotRoleEmail(), $message);
+    }
+
+    /**
+     * Restrict the address to the given domains.
+     *
+     * `*.example.com` matches any subdomain and NOT the bare domain; list
+     * both when both are wanted. See EmailDomainIs for why that is strict.
+     *
+     * @param  list<string>|string  $domains
+     */
+    public function domainIs(array|string $domains, ?string $message = null): static
+    {
+        return $this->rule(new EmailDomainIs((array) $domains), $message);
+    }
+
+    /**
+     * Bar the address from the given domains, same pattern syntax.
+     *
+     * @param  list<string>|string  $domains
+     */
+    public function domainIsNot(array|string $domains, ?string $message = null): static
+    {
+        return $this->rule(new EmailDomainIsNot((array) $domains), $message);
+    }
 
     public function max(int $value, ?string $message = null): static
     {
