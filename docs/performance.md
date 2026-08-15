@@ -14,16 +14,28 @@ When you use one of the optimized entry points (`HasFluentRules` on a FormReques
 
 ## Benchmarks
 
-| Scenario                                                                    | Optimizations                          | Native Laravel | Optimized   | Speedup |
-|-----------------------------------------------------------------------------|----------------------------------------|----------------|-------------|---------|
-| [Product import](#product-import), 500 items, simple rules                  | Wildcard, fast-check                   | ~163ms         | **~3ms**    | ~62x    |
-| [Nested order lines](#nested-order-lines), 1000 orders × 5 line items       | Wildcard, fast-check (nested)          | ~2,491ms       | **~15ms**   | ~163x   |
-| [Conditional import](#conditional-import), 100 items, 47 conditional fields | Wildcard, pre-evaluation               | ~2,928ms       | **~47ms**   | ~62x    |
-| [Event scheduling](#event-scheduling), 100 items, field-ref dates           | Wildcard, fast-check (field-ref dates) | ~19ms          | **~0.7ms**  | ~28x    |
-| [Article submission](#article-submission), 50 items, custom Rule objects    | Wildcard only                          | ~8ms           | **~2ms**    | ~3x     |
-| [Login form](#login-form), 3 fields, no wildcards                           | Fast-check (flat)                      | ~0.1ms         | **~0.01ms** | ~12x    |
+| Scenario                                                                    | Optimizations                          | Native Laravel | Optimized  | Speedup |
+|-----------------------------------------------------------------------------|----------------------------------------|----------------|------------|---------|
+| [Product import](#product-import), 500 items, simple rules                  | Wildcard, fast-check                   | ~100ms         | **~2ms**   | ~47x    |
+| [Nested order lines](#nested-order-lines), 1000 orders × 5 line items       | Wildcard, fast-check (nested)          | ~678ms         | **~12ms**  | ~57x    |
+| [Conditional import](#conditional-import), 100 items, 47 conditional fields | Wildcard, pre-evaluation               | ~2,300ms       | **~30ms**  | ~77x    |
+| [Event scheduling](#event-scheduling), 100 items, field-ref dates           | Wildcard, fast-check (field-ref dates) | ~15ms          | **~0.7ms** | ~21x    |
+| [Article submission](#article-submission), 50 items, custom Rule objects    | Wildcard only                          | ~6ms           | **~1.7ms** | ~4x     |
+| [Login form](#login-form), 3 fields, no wildcards                           | Fast-check (flat)                      | ~0.1ms         | **~0.0ms** | ~15x    |
 
-All numbers are from `php benchmark.php` (macOS, PHP 8.4, OPcache); CI runs produce the same scenarios on Ubuntu.
+All numbers are from `php benchmark.php` (macOS, PHP 8.4, OPcache) and are the ratio between
+the two paths in the same run, not absolute timings — the absolute figures move by an order of
+magnitude with machine load, while the ratio is stable.
+
+Treat them as the shape of the win, not a promise. What the optimizer removes is per-item
+overhead, so the gain scales with array size and with how much of the rule set can be decided
+without the validator: a 1,000-row import gains a great deal, a three-field login form gains
+little in absolute terms because there was little to save.
+
+An earlier revision of this table recorded ~163x for nested order lines. That figure does not
+reproduce and has been replaced by a measured one. It was not a regression — the same scenario
+measures ~58x on this hardware both before and after the Laravel-parity fixes, checked A/B in a
+single run.
 
 ## O(n) wildcard expansion
 

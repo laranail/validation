@@ -5,7 +5,7 @@
 [![Static analysis](https://github.com/laranail/validation/actions/workflows/phpstan.yml/badge.svg)](https://github.com/laranail/validation/actions/workflows/phpstan.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> Write Laravel validation rules with IDE autocompletion instead of memorising string syntax — each rule type exposes only the methods that apply to it, `each()` and `children()` keep parent and child rules in one place, and large wildcard arrays validate up to 160x faster.
+> Write Laravel validation rules with IDE autocompletion instead of memorising string syntax — each rule type exposes only the methods that apply to it, `each()` and `children()` keep parent and child rules in one place, and large wildcard arrays validate tens of times faster — see the [benchmarks](docs/performance.md).
 
 Targets PHP `^8.4.1` on Laravel `^13`.
 
