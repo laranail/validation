@@ -113,6 +113,9 @@ return [
     // Vendor identifiers
     'vendor_identifier' => 'The :attribute must be a valid :vendor identifier.',
 
+    // Fiscal
+    'national_identifier' => 'The :attribute must be a valid :country national identification number.',
+
     // Markup
     'xml' => [
         'malformed' => 'The :attribute must be well-formed XML.',

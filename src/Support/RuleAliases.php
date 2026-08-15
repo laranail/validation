@@ -25,6 +25,7 @@ use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
 use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
 use Simtabi\Laranail\Validation\Rules\Geo\CaProvince;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
@@ -147,6 +148,9 @@ final class RuleAliases
 
             // Anti-spam
             'honeypot' => static fn (): ValidationRule => new Honeypot(),
+
+            // Fiscal
+            'national_identifier' => static fn (array $p): ValidationRule => new NationalIdentifier(self::str($p, 0)),
 
             // Markup
             'xml' => static fn (array $p): ValidationRule => new Xml(self::nullableStr($p, 0)),

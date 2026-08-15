@@ -19,8 +19,8 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   Pest testing helpers.
 - Four Laravel Boost skills shipped under `resources/boost/skills/`, namespaced
   `laranail-validation*`.
-- An extended rule library under `Rules\`: 47 rules across AntiSpam, Banking, Codes, Colour,
-  Crypto, Database, Email, Geo, Identifiers, Markup, Net, Network, Numbers, Postal,
+- An extended rule library under `Rules\`: 48 rules across AntiSpam, Banking, Codes, Colour,
+  Crypto, Database, Email, Fiscal, Geo, Identifiers, Markup, Net, Network, Numbers, Postal,
   Structure, Text and Vendor. Each is a plain `ValidationRule`
   usable on its own, in a rule array, or through the builder's `rule()` escape hatch. See
   [the reference](docs/tools/rule-library.md).

@@ -1,6 +1,6 @@
 # Rule library
 
-Forty-seven validation rules for the formats Laravel does not ship, grouped by family.
+Forty-eight validation rules for the formats Laravel does not ship, grouped by family.
 
 Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
 register and nothing to configure — construct one and put it in a rule array:
@@ -196,6 +196,43 @@ lands with `laranail/email`.
   replace it with a maintained one without changing any call site.
 - **`NotRoleEmail`** — rejects shared mailboxes (`info@`, `sales@`, `postmaster@`). Strips a
   plus tag first, since `info+signup@` is still the `info` mailbox.
+
+## Fiscal
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `NationalIdentifier` | `string $country` | `national_identifier` | `national_identifier` |
+
+**`NationalIdentifier`** validates a national identification number in a particular country's
+scheme. One rule parameterised by country, because the field always means "this person's
+national id" and which scheme applies is a property of the country.
+
+| Constant | Scheme | Checked by |
+|---|---|---|
+| `NL` | burgerservicenummer | the 11-proef |
+| `BR` | Cadastro de Pessoas Físicas | two mod-11 check digits |
+| `FR` | NIR / numéro de sécurité sociale | mod-97 key |
+| `US` | Social Security Number | format and unissued ranges — **no checksum exists** |
+| `GB` | National Insurance number | format and reserved prefixes — **no checksum exists** |
+
+Where a scheme has a checksum it is computed, not pattern-matched: the entire value of these
+numbers is that a transposed pair fails arithmetic instead of sailing through a regex. Where a
+scheme has none, that is stated rather than faked.
+
+Two details these get wrong when written quickly:
+
+- The Dutch 11-proef weights the **final** digit `-1`. A plain weighted sum accepts a different
+  last digit, which is the case the check exists for.
+- A French NIR from Corsica writes its department as `2A` or `2B`, which are not digits. The
+  published rule substitutes `19` and `18` before the modulo; without that every Corsican
+  number fails.
+
+> These identify people. Storing one makes the record personal data under GDPR and equivalents,
+> and validating one does not make it safe to log. Nothing here writes the value anywhere, and
+> the failure message never echoes it.
+
+None of these can tell you a number was **issued** — only that it is well-formed. That needs
+the issuing authority.
 
 ## Geo
 

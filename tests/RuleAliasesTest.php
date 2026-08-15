@@ -33,6 +33,7 @@ function sampleParameters(): array
         'authorized' => ['do-something', User::class],
         'parity' => ['even'],
         'vendor_identifier' => ['aws_region'],
+        'national_identifier' => ['nl'],
     ];
 }
 
