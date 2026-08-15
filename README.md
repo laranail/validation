@@ -139,12 +139,13 @@ rather than `php artisan`. Fixtures live under `workbench/`.
 | [`laranail/chrono`](https://github.com/laranail/chrono) | Timezones, date existence and ambiguity |
 | [`laranail/toolkit`](https://github.com/laranail/toolkit) | Password strength and common-password rejection |
 | [`laranail/captcha`](https://github.com/laranail/captcha) | Turnstile, hCaptcha and reCAPTCHA |
+| [`laranail/email`](https://github.com/laranail/email) | Maintained disposable and role-account lists, and a production DNS resolver |
 | [`laranail/package-tools`](https://github.com/laranail/package-tools) | The package scaffolding this one is built on |
 
 Email deliverability ships here as `Rules\Network\DeliverableEmail`, over a bundled cached
-resolver. `laranail/email` — not built yet — will supply maintained disposable-domain and
-role-account lists and a production resolver, replacing the bundled fallbacks through the same
-contracts without any call site changing.
+resolver. [`laranail/email`](https://github.com/laranail/email) supplies maintained
+disposable-domain and role-account lists and a production resolver, replacing those fallbacks
+through the same contracts — installing it changes nothing you call.
 
 ## Community
 

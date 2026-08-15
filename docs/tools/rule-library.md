@@ -175,8 +175,7 @@ The only two rules that touch the database. One indexed read each, no writes.
 
 ## Email
 
-Domain and mailbox rules. Deliverability is **not** here — it needs DNS, and the Network tier
-lands with `laranail/email`.
+Domain and mailbox rules. Deliverability needs DNS, so it lives in the Network tier below.
 
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
@@ -192,8 +191,9 @@ lands with `laranail/email`.
   local part like `"a@b"@example.com` still resolves correctly, and the two rules share one
   matcher so a pattern cannot mean different things to an allow-list and a deny-list.
 - **`NotDisposableEmail`** — rejects throwaway-mailbox providers. The list comes from the
-  container; a bundled CC0 snapshot of 8,201 domains is the fallback, and `laranail/email` will
-  replace it with a maintained one without changing any call site.
+  container; a bundled CC0 snapshot of 8,201 domains is the fallback.
+  [`laranail/email`](https://github.com/laranail/email) replaces it with a refreshable one, and
+  no call site changes.
 - **`NotRoleEmail`** — rejects shared mailboxes (`info@`, `sales@`, `postmaster@`). Strips a
   plus tag first, since `info+signup@` is still the `info` mailbox.
 
@@ -510,7 +510,7 @@ Only English ships. The package deliberately does not carry translations it cann
 | Captcha verification | `laranail/captcha` |
 | Licence keys | `laranail/license-kit` |
 | Phone numbers | `laranail/phone` |
-| Email deliverability (MX / DNS) | `laranail/email` — not built yet |
+| Maintained disposable / role lists, and a production DNS resolver | `laranail/email` |
 
 `ulid`, `uuid`, `url`, `hex_color`, `mac_address`, `timezone`, `ascii`, `lowercase`,
 `uppercase` and `multiple_of` are all native Laravel rules. This library does not reimplement

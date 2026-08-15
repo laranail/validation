@@ -37,8 +37,8 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   vendor-prefixed. Registered through `Validator::extend` so rule parameters actually reach the
   rule — package-tools' `hasValidationRule()` constructs it with none.
 - `notDisposable()`, `notRole()`, `domainIs()` and `domainIsNot()` on the email builder node,
-  backed by contracts that `laranail/email` will supply implementations for; a bundled
-  disposable-domain and role-account snapshot serves as the fallback.
+  backed by contracts that `laranail/email` supplies maintained implementations for; a bundled
+  disposable-domain and role-account snapshot serves as the fallback when it is not installed.
 - `UPGRADING.md` and `CREDITS.md`.
 
 ### Changed

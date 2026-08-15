@@ -2,6 +2,10 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/laranail/email"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/laranail/phone"
         },
         {
@@ -89,8 +93,9 @@
         "laranail/phone": "^0.1@dev"
     },
     "suggest": {
-        "nikic/php-parser": "^5.0 \u2014 required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder.",
-        "laranail/phone": "^0.1 \u2014 required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install."
+        "laranail/email": "^0.1 \u2014 maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
+        "laranail/phone": "^0.1 \u2014 required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
+        "nikic/php-parser": "^5.0 \u2014 required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
     },
     "autoload": {
         "psr-4": {
