@@ -1,0 +1,298 @@
+# Rule library
+
+Thirty-eight validation rules for the formats Laravel does not ship, grouped by family.
+
+Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
+register and nothing to configure — construct one and put it in a rule array:
+
+```php
+use Simtabi\Laranail\Validation\Rules\Banking\Iban;
+
+$request->validate(['account' => ['required', new Iban()]]);
+```
+
+They compose with the fluent builder through `rule()`, which keeps the rule object intact
+rather than stringifying it:
+
+```php
+FluentRule::string()->required()->rule(new Iban());
+```
+
+The email rules also have named methods on the email node — see [Fluent rule](fluent-rule.md).
+
+## Reading this page
+
+| Column | Meaning |
+|---|---|
+| **Rule** | The class, under `Simtabi\Laranail\Validation\Rules\{Family}\` |
+| **Parameters** | Constructor arguments, with their defaults |
+| **Alias** | The [opt-in string form](../configuration.md#string-rule-aliases-are-opt-in), behind the `laranail_` prefix. Off by default |
+| **Message key** | Under `laranail-validation::validation.`, overridable per application |
+
+Every rule here is **Pure tier** except the two in `Database`, which perform one indexed read
+each. No rule in this library writes, and none performs network IO — see
+[Architecture](../architecture.md) for what the tiers guarantee and the arch tests that enforce
+them.
+
+## Banking
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Iban` | — | `iban` | `iban` |
+| `Bic` | — | `bic` | `bic` |
+| `Isin` | — | `isin` | `isin` |
+| `Luhn` | — | `luhn` | `luhn` |
+
+- **`Iban`** — an International Bank Account Number (ISO 13616). Checks the country's declared
+  length before the ISO 7064 MOD-97-10 checksum, so a truncated number fails as a length error
+  rather than as a checksum coincidence.
+- **`Bic`** — a BIC / SWIFT business identifier code (ISO 9362), 8 or 11 characters.
+- **`Isin`** — an International Securities Identification Number (ISO 6166): two-letter country
+  prefix, nine alphanumerics, Luhn check digit over the letter-expanded string.
+- **`Luhn`** — the bare Luhn mod-10 checksum (ISO/IEC 7812-1), for card numbers and anything
+  else carrying one. It checks the checksum only; it does not identify a card brand.
+
+## Codes
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Gtin` | `array $lengths = [8, 12, 13, 14]` | `gtin` | `gtin` |
+| `Ean` | — | `ean` | `ean` |
+| `Isbn` | `array $editions = [10, 13]` | `isbn` | `isbn` |
+| `Issn` | — | `issn` | `issn` |
+
+- **`Gtin`** — a GS1 Global Trade Item Number. Pass `$lengths` to accept only some of GTIN-8,
+  -12, -13 and -14: `new Gtin([13])`, or `laranail_gtin:13`.
+- **`Ean`** — a European Article Number, the retail barcode, in its 8 or 13 digit form.
+- **`Isbn`** — an International Standard Book Number (ISO 2108). Accepts both editions by
+  default; `new Isbn([13])` restricts to ISBN-13. ISBN-10's check digit uses mod-11 with `X` as
+  the value 10, which is why an `X` in the final position is valid and nowhere else.
+- **`Issn`** — an International Standard Serial Number (ISO 3297), same `X` escape.
+
+## Crypto
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `BitcoinAddress` | `bool $testnet = false` | `bitcoin_address` | `bitcoin_address` |
+| `EthereumAddress` | — | `ethereum_address` | `ethereum_address` |
+
+- **`BitcoinAddress`** — checksum-verified rather than pattern-matched: Base58Check
+  (double-SHA256) for P2PKH and P2SH, Bech32 and Bech32m (BIP-173 / BIP-350) for SegWit. A
+  regex alone accepts a mistyped address, which is the failure that loses money. Pass
+  `$testnet` for testnet prefixes.
+- **`EthereumAddress`** — `0x` followed by 40 hexadecimal characters. **Shape only.** EIP-55
+  mixed-case checksum verification needs Keccak-256, which PHP core does not provide, and this
+  package will not add a dependency for it. An all-lowercase or all-uppercase address is
+  indistinguishable from a checksummed one here.
+
+## Database
+
+The only two rules that touch the database. One indexed read each, no writes.
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Authorized` | `string $ability, string $model, ?string $guard = null, array $arguments = []` | `authorized` | `authorized` |
+| `ModelsExist` | `string $model, ?string $column = null` | `models_exist` | `models_exist.array`, `models_exist.missing` |
+
+- **`Authorized`** — resolves the submitted identifier to a model, then asks the Gate. This is
+  the difference from the native `Rule::can()`, which hands the policy the raw submitted value:
+  a policy declaring `Post $post` must receive a `Post`, not the string `"1"`. A missing record
+  and a denied one produce the **same** message, deliberately — distinguishing them turns the
+  field into an oracle for which ids exist.
+- **`ModelsExist`** — every value in a submitted array names an existing record, in one
+  `whereIn` rather than one query per item. It names the missing values in the message, because
+  "one of these does not exist" is not actionable when fifty were submitted. Duplicates in the
+  input are counted once: a repeated selection is a UI artefact, not a missing record.
+  `$column` defaults to the model's route key.
+
+## Email
+
+Domain and mailbox rules. Deliverability is **not** here — it needs DNS, and the Network tier
+lands with `laranail/email`.
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `EmailDomainIs` | `array $domains` | `email_domain_is` | `email.domain_is`, `email.malformed` |
+| `EmailDomainIsNot` | `array $domains` | `email_domain_is_not` | `email.domain_is_not`, `email.malformed` |
+| `NotDisposableEmail` | `?DisposableDomainList $domains = null` | `not_disposable_email` | `email.disposable`, `email.malformed` |
+| `NotRoleEmail` | `?RoleAccountList $localParts = null` | `not_role_email` | `email.role`, `email.malformed` |
+
+- **`EmailDomainIs` / `EmailDomainIsNot`** — exact domains, or `*.example.com` for subdomains.
+  The wildcard matches one or more subdomain labels and does **not** match the bare domain:
+  `*.corp.example.com` that silently admitted the parent would be a quiet privilege widening.
+  List both when both are wanted. Matching is on the domain after the last `@`, so a quoted
+  local part like `"a@b"@example.com` still resolves correctly, and the two rules share one
+  matcher so a pattern cannot mean different things to an allow-list and a deny-list.
+- **`NotDisposableEmail`** — rejects throwaway-mailbox providers. The list comes from the
+  container; a bundled CC0 snapshot of 8,201 domains is the fallback, and `laranail/email` will
+  replace it with a maintained one without changing any call site.
+- **`NotRoleEmail`** — rejects shared mailboxes (`info@`, `sales@`, `postmaster@`). Strips a
+  plus tag first, since `info+signup@` is still the `info` mailbox.
+
+## Geo
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Latitude` | — | `latitude` | `latitude` |
+| `Longitude` | — | `longitude` | `longitude` |
+| `LatLng` | — | `lat_lng` | `lat_lng` |
+| `UsState` | `bool $includeTerritories = false` | `us_state` | `us_state` |
+| `CaProvince` | — | `ca_province` | `ca_province` |
+
+- **`Latitude`** / **`Longitude`** — decimal degrees, -90..90 and -180..180 inclusive.
+- **`LatLng`** — a `latitude,longitude` pair in that order.
+- **`UsState`** — a US state by USPS two-letter code or by full name. `$includeTerritories`
+  adds PR, GU, VI and the rest; `laranail_us_state:true`.
+- **`CaProvince`** — a Canadian province or territory, by code or full name.
+
+Country, currency and language codes are **not** here — they live in `laranail/atlas`, which
+owns that dataset.
+
+## Identifiers
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Imei` | — | `imei` | `imei` |
+| `Vin` | `bool $checkDigit = false` | `vin` | `vin` |
+| `SemVer` | — | `semver` | `semver` |
+| `Jwt` | — | `jwt` | `jwt` |
+
+- **`Imei`** — an International Mobile Equipment Identity (3GPP TS 23.003): 15 digits, Luhn.
+- **`Vin`** — a Vehicle Identification Number (ISO 3779): 17 characters, with `I`, `O` and `Q`
+  excluded because they are confusable with `1` and `0`. `$checkDigit` additionally enforces
+  the North American position-9 check digit, which is **off by default** because it is not
+  applied worldwide and would reject valid non-NA numbers.
+- **`SemVer`** — a Semantic Versioning 2.0.0 string, including prerelease and build metadata.
+- **`Jwt`** — a JSON Web Token in JWS compact serialisation (RFC 7515 §3.1). Structural only:
+  three base64url segments with a decodable JSON header. It does **not** verify the signature
+  and is not an authentication check.
+
+## Net
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `DomainName` | `bool $requireTld = true` | `domain_name` | `domain_name` |
+| `Subdomain` | — | `subdomain` | `subdomain` |
+| `Cidr` | — | `cidr` | `cidr` |
+| `PublicIp` | — | `public_ip` | `public_ip` |
+| `PrivateIp` | — | `private_ip` | `private_ip` |
+
+- **`DomainName`** — a fully-qualified domain name per RFC 1035 as amended by RFC 5891 for
+  internationalised names, so an A-label (`xn--`) is validated as one rather than as an
+  arbitrary hyphenated label. `$requireTld: false` accepts a bare hostname.
+- **`Subdomain`** — a single DNS label, for a user-chosen subdomain.
+- **`Cidr`** — an address, a slash, and a prefix length, with the length checked against the
+  address family.
+- **`PublicIp`** / **`PrivateIp`** — complements, sharing one classifier. `PublicIp` is the
+  **SSRF guard**: it rejects private (RFC 1918), loopback, link-local, shared address space
+  (RFC 6598), unique local v6 (RFC 4193), documentation, benchmarking and discard ranges, and
+  it resolves IPv4-mapped IPv6 (`::ffff:127.0.0.1`) before classifying — the mapped form is the
+  standard bypass for a naive check.
+
+> `PublicIp` validates an **address**, not a URL, and does not resolve hostnames. A URL whose
+> host is a name still has to be resolved, and a name can resolve differently between your
+> check and your request. That rule belongs to the Network tier and is not built yet.
+
+## Postal
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `PostalCode` | `array\|string $countries = [], ?string $countryField = null` | `postal_code` | `postal_code` |
+
+**`PostalCode`** validates against a specific country's format — 100 countries, 20 distinct
+patterns. Name the country directly, or read it from another field in the same payload:
+
+```php
+'zip' => new PostalCode('US'),
+'zip' => new PostalCode(['US', 'CA']),
+'zip' => PostalCode::reference('country'),      // reads the sibling field
+```
+
+It implements `DataAwareRule` for the reference form. Inside a wildcard, a sibling reference
+resolves within the same row: under `addresses.*.postcode`, referencing `addresses.*.country`
+uses that row's country rather than the first one.
+
+As a string alias the sibling form takes an `@` sigil, because a bare parameter cannot say
+whether `country` means the ISO code or a field of that name:
+
+```php
+'zip' => 'laranail_postal_code:US',
+'zip' => 'laranail_postal_code:@country',
+```
+
+## Structure
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Delimited` | `array $rules, string $separator = ',', ?int $min = null, ?int $max = null, bool $distinct = false, bool $trim = true` | *(none)* | `delimited.*` |
+
+**`Delimited`** validates every item of a delimited string against the same rules — a comma-
+separated tag list, a semicolon-separated set of addresses:
+
+```php
+'emails' => new Delimited(['email'], separator: ',', max: 5, distinct: true),
+```
+
+It reports which item failed, not just that one did. This is the one rule with **no string
+alias**: it takes a nested rule set, and `delimited:email|min:3` cannot survive the pipe
+splitting that produced it. Use the object.
+
+## Text
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Slug` | — | `slug` | `slug` |
+| `Username` | `int $min = 3, int $max = 32` | `username` | `username` |
+| `PersonName` | `bool $allowDigits = false` | `person_name` | `person_name` |
+| `CaseStyle` | `string $style` | `case_style` | `case_style.{style}` |
+| `HtmlClean` | — | `html_clean` | `html_clean` |
+| `WithoutSpaces` | — | `without_spaces` | `without_spaces` |
+
+- **`Slug`** — lowercase alphanumerics separated by single hyphens, no leading or trailing one.
+- **`Username`** — letters, digits and single internal separators, within `$min`..`$max`;
+  `laranail_username:3,20`.
+- **`PersonName`** — a human name. Allow-lists rather than deny-lists: Unicode letters and
+  combining marks (`\p{L}`, `\p{M}`) plus spaces, hyphens and apostrophes, so `O'Neill`,
+  `Jean-Luc`, `Müller` and `李` all pass while digits, emoji and markup do not. `$allowDigits`
+  permits the systems that genuinely carry them.
+- **`CaseStyle`** — an identifier in a given convention. `CaseStyle::CAMEL`, `KEBAB`, `PASCAL`,
+  `SNAKE`, `TITLE`; as a string, `laranail_case_style:camel`.
+- **`HtmlClean`** — the value contains no HTML markup. A rejection, not a sanitiser: it tells
+  the user their input was not accepted rather than silently rewriting it.
+- **`WithoutSpaces`** — no whitespace of any kind, including the Unicode separators a
+  `\s`-based check misses.
+
+## Messages
+
+Every message lives under `laranail-validation::validation.` and is overridable the usual way,
+by publishing the language file or by passing a custom message:
+
+```php
+$request->validate(
+    ['account' => ['required', new Iban()]],
+    ['account' => 'That does not look like a valid IBAN.'],
+);
+```
+
+Only English ships. The package deliberately does not carry translations it cannot maintain.
+
+## Not in this library
+
+| You want | It lives in |
+|---|---|
+| Country / currency / language codes | `laranail/atlas` |
+| Enum values, names, transitions | `laranail/enumerator` |
+| Timezones, date existence and ambiguity | `laranail/chrono` |
+| Password strength, common-password rejection | `laranail/toolkit` |
+| Captcha verification | `laranail/captcha` |
+| Licence keys | `laranail/license-kit` |
+| Phone numbers | `laranail/phone` |
+| Email deliverability (MX / DNS) | `laranail/email` — not built yet |
+
+`ulid`, `uuid`, `url`, `hex_color`, `mac_address`, `timezone`, `ascii`, `lowercase`,
+`uppercase` and `multiple_of` are all native Laravel rules. This library does not reimplement
+them.
+
+---
+
+[← Docs index](../../README.md#documentation)
