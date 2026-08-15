@@ -19,10 +19,14 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   Pest testing helpers.
 - Four Laravel Boost skills shipped under `resources/boost/skills/`, namespaced
   `laranail-validation*`.
-- An extended rule library under `Rules\`: 38 rules across Banking, Codes, Crypto, Database,
-  Email, Geo, Identifiers, Net, Postal, Structure and Text. Each is a plain `ValidationRule`
+- An extended rule library under `Rules\`: 39 rules across Banking, Codes, Crypto, Database,
+  Email, Geo, Identifiers, Net, Network, Postal, Structure and Text. Each is a plain `ValidationRule`
   usable on its own, in a rule array, or through the builder's `rule()` escape hatch. See
   [the reference](docs/tools/rule-library.md).
+- `Network\DeliverableEmail`, the first Network-tier rule: a cached MX lookup behind the
+  `DnsResolver` contract, skipped entirely during a precognitive request, and passing rather
+  than failing when the lookup itself is unreachable. The bundled `Actions\CachedDnsResolver`
+  is bound only if nothing else has bound the contract.
 - Rule tiers — Pure, Database and Network — enforced by arch tests rather than convention:
   nothing under `Rules\` may write, database reads are confined to `Rules\Database\`, and a
   Network rule must implement `PrecognitionSkippable`.

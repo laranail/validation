@@ -36,6 +36,7 @@ use Simtabi\Laranail\Validation\Rules\Net\DomainName;
 use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
@@ -139,6 +140,10 @@ final class RuleAliases
             'not_role_email' => static fn (): ValidationRule => new NotRoleEmail(),
             'email_domain_is' => static fn (array $p): ValidationRule => new EmailDomainIs(self::strings($p)),
             'email_domain_is_not' => static fn (array $p): ValidationRule => new EmailDomainIsNot(self::strings($p)),
+
+            // Network — the only tier that performs IO. Skipped entirely
+            // during a precognitive request.
+            'deliverable_email' => static fn (): ValidationRule => new DeliverableEmail(),
 
             // Database
             'models_exist' => static fn (array $p): ValidationRule => new ModelsExist(self::model($p, 0), self::nullableStr($p, 1)),

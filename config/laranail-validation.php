@@ -20,6 +20,22 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Deliverability lookups
+    |--------------------------------------------------------------------------
+    |
+    | How long a domain's MX result is cached, in seconds. The same handful of
+    | domains dominates any signup form, so this is what keeps DeliverableEmail
+    | from issuing a lookup per submission. Only read when the bundled
+    | CachedDnsResolver is in use.
+    |
+    */
+
+    'dns' => [
+        'ttl' => env('LARANAIL_VALIDATION_DNS_TTL', 3600),
+    ],
+
     'aliases' => [
         'enabled' => env('LARANAIL_VALIDATION_ALIASES', false),
         'prefix' => 'laranail_',

@@ -8,7 +8,9 @@ use Illuminate\Validation\InvokableValidationRule;
 use Illuminate\Validation\Validator as ValidationValidator;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
+use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
@@ -72,6 +74,7 @@ class ValidationServiceProvider extends PackageServiceProvider
     {
         $this->app->singletonIf(DisposableDomainList::class, BundledDisposableDomainList::class);
         $this->app->singletonIf(RoleAccountList::class, BundledRoleAccountList::class);
+        $this->app->singletonIf(DnsResolver::class, CachedDnsResolver::class);
     }
 
     public function bootingPackage(): void

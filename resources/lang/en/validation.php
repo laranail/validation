@@ -64,6 +64,7 @@ return [
         'domain_is_not' => 'The :attribute must not be at any of: :domains.',
         'malformed' => 'The :attribute must be a valid email address.',
         'role' => 'The :attribute must belong to a person, not a shared mailbox.',
+        'undeliverable' => 'The :attribute is at a domain that cannot receive mail.',
     ],
 
     // Database

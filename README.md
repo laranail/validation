@@ -86,7 +86,7 @@ Full documentation is at
 ### Reference
 
 - [Rule reference](docs/tools/fluent-rule.md) — every entry point, modifier, conditional, and macro hook
-- [Rule library](docs/tools/rule-library.md) — the 38 extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
+- [Rule library](docs/tools/rule-library.md) — the 39 extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
 - [Phone rule](docs/tools/phone-rule.md) — countries, line types, strictness, and E.164-normalised uniqueness
 - [`RuleSet`](docs/tools/rule-set.md) — build, compose, inspect, export, and validate
 - [Array validation](docs/tools/array-validation.md) — `each()` for wildcards, `children()` for fixed keys
@@ -141,7 +141,10 @@ rather than `php artisan`. Fixtures live under `workbench/`.
 | [`laranail/captcha`](https://github.com/laranail/captcha) | Turnstile, hCaptcha and reCAPTCHA |
 | [`laranail/package-tools`](https://github.com/laranail/package-tools) | The package scaffolding this one is built on |
 
-Email deliverability (MX/DNS) is scoped to `laranail/email`, which is not built yet.
+Email deliverability ships here as `Rules\Network\DeliverableEmail`, over a bundled cached
+resolver. `laranail/email` — not built yet — will supply maintained disposable-domain and
+role-account lists and a production resolver, replacing the bundled fallbacks through the same
+contracts without any call site changing.
 
 ## Community
 

@@ -1,6 +1,6 @@
 # Rule library
 
-Thirty-eight validation rules for the formats Laravel does not ship, grouped by family.
+Thirty-nine validation rules for the formats Laravel does not ship, grouped by family.
 
 Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
 register and nothing to configure — construct one and put it in a rule array:
@@ -30,9 +30,9 @@ The email rules also have named methods on the email node — see [Fluent rule](
 | **Message key** | Under `laranail-validation::validation.`, overridable per application |
 
 Every rule here is **Pure tier** except the two in `Database`, which perform one indexed read
-each. No rule in this library writes, and none performs network IO — see
-[Architecture](../architecture.md) for what the tiers guarantee and the arch tests that enforce
-them.
+each, and the one in `Network`, which performs a cached DNS lookup. No rule in this library
+writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
+that enforce them.
 
 ## Banking
 
@@ -192,6 +192,42 @@ owns that dataset.
 > `PublicIp` validates an **address**, not a URL, and does not resolve hostnames. A URL whose
 > host is a name still has to be resolved, and a name can resolve differently between your
 > check and your request. That rule belongs to the Network tier and is not built yet.
+
+## Network
+
+The only tier that performs IO, and the only rules skipped during a precognitive request.
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `DeliverableEmail` | `?DnsResolver $resolver = null` | `deliverable_email` | `email.undeliverable`, `email.malformed` |
+
+**`DeliverableEmail`** — the address's domain can actually receive mail. One DNS lookup, behind
+the `DnsResolver` contract so it is injectable, cached and fakeable; Laravel's own `email:dns`
+calls egulias' `DNSCheckValidation` directly, with no injection point and no caching.
+
+```php
+'email' => ['required', 'email', new DeliverableEmail()],
+```
+
+Three things it deliberately is not:
+
+- **Not a mailbox check.** Only an SMTP conversation establishes that, most providers now
+  answer it dishonestly to defeat harvesting, and running one from a signup form is a good way
+  to get the sending host blocked. This answers the narrower question — does the domain accept
+  mail at all — which is enough to catch `gmial.com`.
+- **Not a security boundary.** A lookup that fails for any reason **passes**. An unreachable or
+  rate-limited resolver is not the same as an undeliverable domain, and rejecting every signup
+  for the duration of a DNS outage is the worse error.
+- **Not MX-only.** RFC 5321 §5.1 says a domain with an address record and no MX takes delivery
+  at that address, and small domains rely on it, so the bundled resolver falls back to A/AAAA.
+
+It implements `PrecognitionSkippable` and performs no lookup during a precognitive request.
+Laravel's precognition filter narrows by attribute rather than by what a rule does, so without
+that a debounced email field would issue one DNS lookup per keystroke.
+
+The bundled `Actions\CachedDnsResolver` is bound only if nothing else has bound the contract,
+so `laranail/email` can replace it without any call site changing. Cache lifetime is
+`laranail.validation.dns.ttl`, default one hour.
 
 ## Postal
 
