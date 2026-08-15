@@ -134,11 +134,11 @@ final class UniquePhone implements DataAwareRule, ValidationRule
             );
         }
 
-        return app(PhoneFormatter::class);
+        return resolve(PhoneFormatter::class);
     }
 
     private function resolver(): DatabaseManager
     {
-        return app(DatabaseManager::class);
+        return resolve(DatabaseManager::class);
     }
 }
