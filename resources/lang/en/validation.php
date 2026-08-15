@@ -103,7 +103,6 @@ return [
     // Colour
     'css_color' => 'The :attribute must be a colour in one of these notations: :notations.',
 
-
     /*
     | Nested, because CaseStyle appends its style to the key — one rule with a
     | parameter rather than five classes differing by a pattern and a message.
