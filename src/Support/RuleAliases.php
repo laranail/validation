@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use Simtabi\Laranail\Validation\Contracts\TermList;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
@@ -45,6 +46,7 @@ use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
@@ -85,12 +87,17 @@ final class RuleAliases
      * view or copied between forms until one of them is `0`. Constructing it
      * explicitly keeps that decision in one place.
      *
-     * Use the rule object for both.
+     * `NoProfanity` needs a word list, and this package deliberately ships
+     * none — see {@see TermList}.
+     * A rule string cannot carry one.
+     *
+     * Use the rule object for all three.
      *
      * @var list<class-string<ValidationRule>>
      */
     public const array UNALIASED = [
         Delimited::class,
+        NoProfanity::class,
         SubmissionTiming::class,
     ];
 

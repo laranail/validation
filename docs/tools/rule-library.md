@@ -1,6 +1,6 @@
 # Rule library
 
-Forty-eight validation rules for the formats Laravel does not ship, grouped by family.
+Forty-nine validation rules for the formats Laravel does not ship, grouped by family.
 
 Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
 register and nothing to configure — construct one and put it in a rule array:
@@ -381,6 +381,40 @@ username is left alone because folding either way would admit a value Discord it
 
 These are format checks, not existence checks. A well-formed id for a property you do not own
 passes; verifying ownership means calling the vendor, which is Network tier.
+
+## Profanity
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `NoProfanity` | `TermList\|list<string> $terms, list<string> $allowed = []` | *(none)* | `no_profanity` |
+
+**No word list ships with this package**, and that is deliberate on two counts. The obvious
+sources are unusable — `laravel-validation-rules/offensive` is LGPL-3.0 and cannot be copied
+into an MIT package, and the multi-language lists circulating in the ecosystem generally record
+no licence at all. It is also the wrong shape: what counts as unacceptable differs by audience,
+jurisdiction and moderation policy, and changes over time. A list frozen into a package is
+wrong for most of the people who install it.
+
+What ships is the **matching**, which is the part naive implementations get wrong:
+
+```php
+'bio' => ['required', new NoProfanity($myTerms, allowed: ['scunthorpe'])],
+```
+
+- Character substitution is folded in the value: `b4dger`, `b@dger` and `ｂａｄｇｅｒ` all match
+  `badger`.
+- Separators and repeats are absorbed by the **pattern**, not by rewriting the value:
+  `b.a.d.g.e.r` and `baaaadger` match, while `assess` and `class` still do not match a term of
+  `ass`. Those requirements pull in opposite directions — stripping separators to catch the
+  first destroys the word boundary protecting the second — so the term becomes a pattern that
+  tolerates both while staying anchored.
+- The allow-list is applied **before** the terms, for the real words that contain one. Without
+  it any list with a short term rejects Scunthorpe, Penistone and assess, and the people it
+  rejects are the least able to work around it.
+
+It is a filter, not a moderation system. Anyone determined to get a word past it will; the
+point is to catch the careless case without insulting the innocent one. There is no string
+alias — a rule string cannot carry a word list.
 
 ## Postal
 

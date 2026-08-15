@@ -131,6 +131,9 @@ return [
     // Fiscal
     'national_identifier' => 'The :attribute must be a valid :country national identification number.',
 
+    // Profanity
+    'no_profanity' => 'The :attribute contains language that is not allowed.',
+
     // Markup
     'xml' => [
         'malformed' => 'The :attribute must be well-formed XML.',

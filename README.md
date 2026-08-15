@@ -86,7 +86,7 @@ Full documentation is at
 ### Reference
 
 - [Rule reference](docs/tools/fluent-rule.md) — every entry point, modifier, conditional, and macro hook
-- [Rule library](docs/tools/rule-library.md) — the 48 extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
+- [Rule library](docs/tools/rule-library.md) — the 49 extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
 - [Phone rule](docs/tools/phone-rule.md) — countries, line types, strictness, and E.164-normalised uniqueness
 - [`RuleSet`](docs/tools/rule-set.md) — build, compose, inspect, export, and validate
 - [Array validation](docs/tools/array-validation.md) — `each()` for wildcards, `children()` for fixed keys
