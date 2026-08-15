@@ -49,12 +49,51 @@ class OptimizedValidator extends MemoizingValidator
     }
 
     /**
+     * The rules as they stood before the fast-check and conditional phases
+     * removed any, so questions Laravel asks about OTHER fields still get the
+     * answer they would have got unoptimized.
+     *
+     * @var array<array-key, mixed>
+     */
+    private array $rulesBeforeOptimization = [];
+
+    /**
+     * Answer from the pre-optimization rules, not the pruned ones.
+     *
+     * Laravel's dependent rules — required_if, exclude_if, prohibited_if and
+     * the rest — convert their `true`/`false` parameters to real booleans only
+     * when the DEPENDENT field is declared `boolean`, which it learns by
+     * reading `$this->rules[$parameter]`. The fast-check phase removes a
+     * satisfied attribute from `$this->rules` before Laravel validates, so a
+     * dependent that passed its own `boolean` rule vanished from that lookup,
+     * the conversion was skipped, and `required_if:items.*.notify,true` no
+     * longer matched a notify of 1 — leaving a required field unenforced
+     * rather than reporting an error.
+     *
+     * @param  string  $parameter
+     */
+    protected function shouldConvertToBoolean($parameter): bool
+    {
+        $rules = $this->rules[$parameter]
+            ?? $this->rulesBeforeOptimization[$parameter]
+            ?? [];
+
+        return in_array('boolean', (array) $rules, true);
+    }
+
+    /**
      * Pre-validate fast-checkable attributes and pre-evaluate conditional
      * rules (exclude_unless/exclude_if) before the main validation loop,
      * removing passing/excluded attributes so Laravel never iterates them.
      */
     public function passes(): bool
     {
+        // Snapshot before either phase removes anything. Laravel reads
+        // `$this->rules` while validating to answer questions ABOUT other
+        // fields — see shouldConvertToBoolean() below — so removing a rule
+        // silently changes how an unrelated attribute is evaluated.
+        $this->rulesBeforeOptimization = $this->rules;
+
         $removedRules = $this->runFastCheckPhase();
         $this->runConditionalPhase($removedRules);
 
