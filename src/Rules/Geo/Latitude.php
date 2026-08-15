@@ -42,6 +42,9 @@ final class Latitude implements ClientCheckable, ValidationRule
      * the runner follows it.
      * @return array<int, array<string, string|mixed[]>|array<string, string|array<string, string>>>
      */
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         return [

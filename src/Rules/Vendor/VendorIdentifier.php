@@ -123,6 +123,9 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
      * alternation rather than a lookup, since three named aliases are valid
      * wherever a UUID is.
      */
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         $vendor = mb_strtolower(trim($this->vendor));

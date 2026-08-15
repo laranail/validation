@@ -2,21 +2,9 @@
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
-use Simtabi\Laranail\Validation\Rules\Banking\Iban;
-use Simtabi\Laranail\Validation\Rules\Banking\Isin;
-use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
-use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
-use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
 use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
-use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
-use Simtabi\Laranail\Validation\Rules\Database\Authorized;
-use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
-use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
-use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
@@ -45,9 +33,17 @@ function clientCheckableArguments(): array
 }
 
 /** @param  class-string  $class */
-function makeClientCheckable(string $class): object
+function makeClientCheckable(string $class): ClientCheckable
 {
-    return new $class(...(clientCheckableArguments()[$class] ?? []));
+    $rule = new $class(...(clientCheckableArguments()[$class] ?? []));
+
+    // Narrowed here rather than at each call site: without it every
+    // clientRules() below is mixed, and the analyser cannot check any of the
+    // shapes this file exists to check.
+    expect($rule)->toBeInstanceOf(ClientCheckable::class);
+
+    /** @var ClientCheckable $rule */
+    return $rule;
 }
 
 /** @return list<class-string> */
@@ -153,25 +149,33 @@ it('gives the same verdict as the rule itself', function (): void {
 it('is implemented only where the browser form is exactly equivalent', function (): void {
     // A checksum rule must never advertise a shape-only pattern: it would pass
     // a mistyped account number in the browser and fail it on the server.
-    $mustNotBeClientCheckable = [
-        Iban::class,
-        Luhn::class,
-        Isin::class,
-        Imei::class,
-        Vin::class,
-        Isbn::class,
-        Gtin::class,
-        BitcoinAddress::class,
-        NationalIdentifier::class,
-        Authorized::class,
-        ModelsExist::class,
-        DeliverableEmail::class,
+    //
+    // Asked of the DISCOVERED set rather than with is_a() on literal class
+    // names — the analyser can fold those to a constant and the assertion
+    // stops meaning anything.
+    $mustNotAdvertise = [
+        'Banking\\Iban', 'Banking\\Luhn', 'Banking\\Isin', 'Identifiers\\Imei',
+        'Identifiers\\Vin', 'Codes\\Isbn', 'Codes\\Gtin', 'Crypto\\BitcoinAddress',
+        'Fiscal\\NationalIdentifier', 'Database\\Authorized', 'Database\\ModelsExist',
+        'Network\\DeliverableEmail',
     ];
 
-    foreach ($mustNotBeClientCheckable as $class) {
-        expect(is_a($class, ClientCheckable::class, true))
-            ->toBeFalse("{$class} performs a checksum, a query or IO and must not advertise a browser form");
+    $advertising = clientCheckableRules();
+    $offenders = [];
+
+    foreach ($mustNotAdvertise as $suffix) {
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $suffix;
+
+        expect(class_exists($class))->toBeTrue("{$class} no longer exists — update this list");
+
+        if (in_array($class, $advertising, true)) {
+            $offenders[] = $suffix;
+        }
     }
+
+    expect($offenders)->toBeEmpty(
+        'performs a checksum, a query or IO but advertises a browser form: ' . implode(', ', $offenders),
+    );
 });
 
 it('has at least one implementation, so the contract is not decorative', function (): void {

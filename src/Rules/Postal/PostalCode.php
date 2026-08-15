@@ -162,6 +162,9 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
      * NOTHING: its country comes from a sibling field, so which pattern
      * applies cannot be decided while exporting.
      */
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         if ($this->countryField !== null || $this->countries === []) {

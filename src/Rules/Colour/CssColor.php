@@ -131,6 +131,9 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
      * The alternative — omitting names — would mean a browser rejecting
      * `red`, which is worse than a slightly longer pattern.
      */
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         $branches = [];

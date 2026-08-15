@@ -80,6 +80,9 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
         return '/^' . $sign . '\\d+' . $fraction . '$/';
     }
 
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         return [['rule' => 'regex', 'params' => ['pattern' => self::pattern($this->decimals, $this->allowNegative)]]];

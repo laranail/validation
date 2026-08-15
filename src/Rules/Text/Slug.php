@@ -31,6 +31,9 @@ final class Slug implements ClientCheckable, ValidationRule
      * The whole check is this pattern, so the browser can run the same one
      * rather than a hand-written twin that would drift from it.
      */
+    /**
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
     public function clientRules(): array
     {
         return [['rule' => 'regex', 'params' => ['pattern' => self::PATTERN]]];
