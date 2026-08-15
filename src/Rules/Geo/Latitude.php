@@ -39,6 +39,7 @@ final class Latitude implements ValidationRule
      * `between` compares by VALUE rather than string length here because the
      * `numeric` rule is present — that is how Laravel decides the unit, and
      * the runner follows it.
+     * @return array<int, array<string, string|mixed[]>|array<string, string|array<string, string>>>
      */
     public function clientRules(): array
     {

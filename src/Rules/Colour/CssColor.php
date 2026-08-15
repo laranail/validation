@@ -136,7 +136,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
         $branches = [];
 
         foreach ($this->notations as $notation) {
-            $branch = self::branch($notation);
+            $branch = $this->branch($notation);
 
             // An unrecognised notation makes the rule reject everything for
             // it, which a pattern cannot express — so advertise nothing and
@@ -156,7 +156,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
     }
 
     /** The unanchored body for one notation, or null if there is no such notation. */
-    private static function branch(string $notation): ?string
+    private function branch(string $notation): ?string
     {
         $component = '[+-]?(?:\d+\.?\d*|\.\d+)(?:%|deg|grad|rad|turn)?';
         $separator = '(?:\s*,\s*|\s+)';

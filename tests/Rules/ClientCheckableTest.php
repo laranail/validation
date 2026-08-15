@@ -222,7 +222,7 @@ it('expresses a numeric range as numeric plus between, not as a regex', function
     // contorted into a pattern, but it is unreadable, has to be rewritten per
     // bound, and getting the boundary wrong means disagreeing with the server
     // on exactly the values that matter.
-    $advertised = (new $class())->clientRules();
+    $advertised = new $class()->clientRules();
 
     expect(array_column($advertised, 'rule'))->toBe(['numeric', 'between'])
         ->and($advertised[1]['params'])->toBe(['min' => "-{$bound}", 'max' => $bound]);
@@ -235,7 +235,7 @@ it('covers the named colours rather than omitting them', function (): void {
     // Leaving them out would mean a browser rejecting `red`. 150 literal names
     // is about 2 KB of pattern, in a package that ships an 8,201-entry domain
     // list — the size was never the real objection.
-    $pattern = (new CssColor())->clientRules()[0]['params']['pattern'];
+    $pattern = new CssColor()->clientRules()[0]['params']['pattern'];
 
     foreach (['red', 'rebeccapurple', 'transparent', 'currentcolor', '#fff', 'rgb(1,2,3)'] as $value) {
         expect(preg_match($pattern, $value))->toBe(1, $value);
