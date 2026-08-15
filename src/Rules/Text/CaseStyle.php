@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * An identifier written in a particular casing convention.
@@ -20,7 +21,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final readonly class CaseStyle implements ValidationRule
+final readonly class CaseStyle implements ClientCheckable, ValidationRule
 {
     public const string CAMEL = 'camel';
 
@@ -62,5 +63,19 @@ final readonly class CaseStyle implements ValidationRule
         }
 
         return preg_match(self::PATTERNS[$style], $value) === 1;
+    }
+
+    /**
+     * The configured style's pattern, which is the whole check.
+     *
+     * Null for an unknown style: the rule rejects everything in that case, and
+     * advertising nothing routes it to the server rather than shipping a
+     * pattern that does not exist.
+     */
+    public function clientRule(): ?array
+    {
+        $pattern = self::PATTERNS[$this->style] ?? null;
+
+        return $pattern === null ? null : ['rule' => 'regex', 'params' => ['pattern' => $pattern]];
     }
 }

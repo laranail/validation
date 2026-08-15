@@ -2,7 +2,7 @@
 
 Every `FluentRule` entry point, the modifiers each type accepts, the conditional helpers, and how to add your own via macros.
 
-Available types: `FluentRule::string()`, `integer()`, `numeric()`, `email()`, `password()`, `date()`, `dateTime()`, `boolean()`, `array()`, `file()`, `image()`, `field()`, `anyOf()`. Shortcuts: `url()`, `uuid()`, `ulid()`, `ip()`.
+Available types: `FluentRule::string()`, `integer()`, `numeric()`, `email()`, `phone()`, `password()`, `date()`, `dateTime()`, `boolean()`, `array()`, `file()`, `image()`, `field()`, `anyOf()`. Shortcuts: `url()`, `uuid()`, `ulid()`, `ip()`.
 
 <details>
 <summary><a name="rule-string"></a><strong>String</strong>: length, pattern, format, comparison</summary>
@@ -59,6 +59,34 @@ FluentRule::email()->required()->unique('users', 'email')
 
 > [!TIP]
 > `FluentRule::string()->email()` is also available if you prefer keeping email as a string modifier.
+
+</details>
+
+<details>
+<summary><a name="rule-phone"></a><strong>Phone</strong>: country, line type, strictness</summary>
+
+Checked against Google's numbering-plan metadata, not a regex. Requires [`laranail/phone`](https://opensource.simtabi.com/documentation/laranail/phone/), which is a `suggest` rather than a `require` — it carries libphonenumber's metadata, and a project validating only strings and dates should not have to install it.
+
+```php
+FluentRule::phone()->required()                          // any country
+FluentRule::phone()->country('KE')                       // one country; also the parse hint
+FluentRule::phone()->country(['KE', 'TZ', 'UG'])         // several
+FluentRule::phone()->countryFrom('phone_country')        // read it from the picker beside the input
+FluentRule::phone()->mobile()                            // also: fixedLine(), tollFree(), voip(), type([...])
+FluentRule::phone()->possible()                          // shape only; strict() requires an allocated range
+FluentRule::phone()->withoutExtension()
+FluentRule::phone()->rejectShortNumbers()->rejectEmergency()
+```
+
+Input is normalised before parsing, so `00254712123456`, `+254 712 123 456`, `(0712) 123-456` and `٠٠٢٥٤٧١٢١٢٣٤٥٦` are all the same number.
+
+> [!TIP]
+> With one country configured, a bare national number validates without the user writing it in international form. With several, pair it with `countryFrom()` — picking one arbitrarily would make the outcome depend on array order.
+
+> [!IMPORTANT]
+> `possible()` versus the default `strict()` is a real trade-off, not a strictness dial. A newly allocated range is correctly *shaped* for months before Google's metadata marks it valid, so the default turns away a small number of genuine customers. On a signup form that usually costs more than accepting an unreachable number.
+
+Line types are matched leniently in one specific case: in the NANP, mobile and fixed-line share ranges, so libphonenumber reports `FIXED_LINE_OR_MOBILE` and that satisfies both `mobile()` and `fixedLine()`. A strict comparison would reject every valid North American mobile.
 
 </details>
 

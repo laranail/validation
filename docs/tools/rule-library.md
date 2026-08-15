@@ -487,10 +487,26 @@ splitting that produced it. Use the object.
 
 ## Checking a rule in the browser
 
-Five rules implement `Contracts\ClientCheckable`, which lets
+Nine rules implement `Contracts\ClientCheckable`, which lets
 [`laranail/validation-js`](https://github.com/laranail/validation-js) run them in the browser
-instead of routing them to the server: `Text\Slug`, `Text\WithoutSpaces`,
-`Identifiers\SemVer`, `Net\Subdomain` and `Crypto\EthereumAddress`.
+instead of routing them to the server:
+
+| Rule | Notes |
+|---|---|
+| `Text\Slug`, `Text\WithoutSpaces`, `Identifiers\SemVer`, `Net\Subdomain`, `Crypto\EthereumAddress` | The whole check is one pattern |
+| `Text\CaseStyle` | The configured style's pattern; nothing for an unknown style |
+| `Text\Username` | Shape and length in one pattern — see below |
+| `Numbers\MonetaryAmount` | The pattern built from `$decimals` and `$allowNegative` |
+| `Vendor\VendorIdentifier` | The vendor's pattern, carrying the same case handling the rule applies |
+| `Postal\PostalCode` | Only the named countries' patterns — never the hundred-country table |
+
+`Username` is worth a note because its length bound used to be a `strlen()` check, which counts
+**bytes**, while a regex lookahead counts characters. They cannot differ here: the character
+class is ASCII-only, so anything that could pass has one byte per character. A rule with a
+Unicode class could not make the same move.
+
+`PostalCode` advertises nothing when built with `reference('country')` — the country comes from
+a sibling field, so which pattern applies is not knowable while exporting.
 
 They advertise their **own pattern** rather than a JavaScript implementation. That is the whole
 design: a hand-written twin of every rule would drift from the PHP one and disagree with the
@@ -504,6 +520,16 @@ ModelsExist and DeliverableEmail stay off the list.
 
 Another test checks each advertised pattern gives the same verdict as the rule itself over a
 grid of values, so the two cannot drift apart silently.
+
+### Rules that could be patterns and deliberately are not
+
+`Geo\Latitude` and `Geo\Longitude` compare **magnitudes**. A regex can be contorted into a
+bounded numeric range, but the result is unreadable and easy to get subtly wrong — and being
+wrong means the browser disagreeing with the server. The contract is for rules whose check *is*
+a pattern.
+
+`Colour\CssColor` accepts named colours by default, and a pattern covering them would embed all
+150 names. That is not wrong, only large, and it has not been needed.
 
 ## Messages
 

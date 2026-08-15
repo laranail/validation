@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Numbers;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A money amount written in plain decimal form.
@@ -27,7 +28,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final readonly class MonetaryAmount implements ValidationRule
+final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
 {
     public function __construct(
         private int $decimals = 2,
@@ -65,9 +66,22 @@ final readonly class MonetaryAmount implements ValidationRule
             return false;
         }
 
-        $sign = $allowNegative ? '[+-]?' : '\+?';
-        $fraction = $decimals > 0 ? '(?:\.\d{1,' . $decimals . '})?' : '';
+        return preg_match(self::pattern($decimals, $allowNegative), $value) === 1;
+    }
 
-        return preg_match('/^' . $sign . '\d+' . $fraction . '$/', $value) === 1;
+    /**
+     * The pattern the rule itself matches against, so there is one definition.
+     */
+    public static function pattern(int $decimals = 2, bool $allowNegative = false): string
+    {
+        $sign = $allowNegative ? '[+-]?' : '\\+?';
+        $fraction = $decimals > 0 ? '(?:\\.\\d{1,' . $decimals . '})?' : '';
+
+        return '/^' . $sign . '\\d+' . $fraction . '$/';
+    }
+
+    public function clientRule(): array
+    {
+        return ['rule' => 'regex', 'params' => ['pattern' => self::pattern($this->decimals, $this->allowNegative)]];
     }
 }

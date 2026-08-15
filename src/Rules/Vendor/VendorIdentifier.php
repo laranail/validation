@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Vendor;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * An identifier issued by a third-party service, in that service's format.
@@ -29,7 +30,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final readonly class VendorIdentifier implements ValidationRule
+final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
 {
     /** GA4 measurement id, `G-XXXXXXXXXX`. */
     public const string GOOGLE_ANALYTICS = 'google_analytics';
@@ -111,5 +112,35 @@ final readonly class VendorIdentifier implements ValidationRule
         }
 
         return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $value) === 1;
+    }
+
+    /**
+     * The vendor's pattern, carrying the same case handling the rule applies.
+     *
+     * Google ids are matched case-insensitively because the rule folds them up
+     * before matching; AWS and Discord are not, because folding either would
+     * admit a value the vendor itself refuses. The Microsoft tenant needs an
+     * alternation rather than a lookup, since three named aliases are valid
+     * wherever a UUID is.
+     */
+    public function clientRule(): ?array
+    {
+        $vendor = mb_strtolower(trim($this->vendor));
+
+        if ($vendor === self::MICROSOFT_TENANT) {
+            return ['rule' => 'regex', 'params' => [
+                'pattern' => '/^(?:common|organizations|consumers|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i',
+            ]];
+        }
+
+        $pattern = self::PATTERNS[$vendor] ?? null;
+
+        if ($pattern === null) {
+            return null;
+        }
+
+        $foldsCase = in_array($vendor, [self::GOOGLE_ANALYTICS, self::GOOGLE_TAG_MANAGER], true);
+
+        return ['rule' => 'regex', 'params' => ['pattern' => $foldsCase ? $pattern . 'i' : $pattern]];
     }
 }

@@ -2480,13 +2480,17 @@ it('dump is chainable on rules', function (): void {
 // FluentRule::macro() — custom factory methods
 // =========================================================================
 
+// The macro name must not collide with a shipped factory. `Macroable::__callStatic` only fires for
+// names PHP cannot resolve to a real method, so a macro named after an existing factory would never
+// run — and this test would quietly be asserting the factory's behaviour instead of the macro's.
+// It was `phone` until `FluentRule::phone()` became real.
 it('supports macros on FluentRule', function (): void {
-    FluentRule::macro('phone', fn (?string $label = null) => FluentRule::string($label)->rule('phone'));
+    FluentRule::macro('callSign', fn (?string $label = null) => FluentRule::string($label)->rule('call_sign'));
 
-    $rule = FluentRule::phone('Phone'); // @phpstan-ignore staticMethod.notFound
+    $rule = FluentRule::callSign('Call sign'); // @phpstan-ignore staticMethod.notFound
     expect($rule)->toBeInstanceOf(StringRule::class) // @phpstan-ignore argument.templateType
-        ->and($rule->getLabel())->toBe('Phone')
-        ->and($rule->toArray())->toContain('phone');
+        ->and($rule->getLabel())->toBe('Call sign')
+        ->and($rule->toArray())->toContain('call_sign');
 });
 
 // =========================================================================

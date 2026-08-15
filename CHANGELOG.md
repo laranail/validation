@@ -41,8 +41,11 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   disposable-domain and role-account snapshot serves as the fallback when it is not installed.
 - `Contracts\ClientCheckable`, letting a rule advertise a browser-equivalent form for
   `laranail/validation-js` to export. Implemented by `Text\Slug`, `Text\WithoutSpaces`,
-  `Identifiers\SemVer`, `Net\Subdomain` and `Crypto\EthereumAddress` — the rules whose entire
-  check is a pattern, which they return so there is no second implementation to drift.
+  `Identifiers\SemVer`, `Net\Subdomain`, `Crypto\EthereumAddress`, `Text\CaseStyle`,
+  `Text\Username`, `Numbers\MonetaryAmount`, `Vendor\VendorIdentifier` and `Postal\PostalCode`
+  — the rules whose entire check is a pattern, which they return so there is no second
+  implementation to drift. `PostalCode` sends only the named countries' patterns and nothing at
+  all when the country comes from a sibling field.
   Deliberately NOT implemented by any rule performing a checksum, a query or IO: advertising a
   shape-only pattern for an IBAN would pass a mistyped account number in the browser and fail
   it on the server, which is exactly what client-side validation exists to prevent.

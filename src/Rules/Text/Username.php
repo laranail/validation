@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A username: letters, digits, and single internal separators.
@@ -21,7 +22,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  * Pure tier — no IO. Availability is `unique`'s job, and a reserved-word list
  * belongs in the application.
  */
-final readonly class Username implements ValidationRule
+final readonly class Username implements ClientCheckable, ValidationRule
 {
     public function __construct(
         private int $min = 3,
@@ -41,13 +42,27 @@ final readonly class Username implements ValidationRule
             return false;
         }
 
-        $length = strlen($value);
+        return preg_match(self::pattern($min, $max), $value) === 1;
+    }
 
-        if ($length < $min || $length > $max) {
-            return false;
-        }
-
+    /**
+     * Shape and length in one pattern, so the rule and the form advertised to
+     * a browser cannot disagree.
+     *
+     * The length bound was a `strlen()` check, which counts BYTES; the
+     * lookahead counts characters. They cannot differ here, because the
+     * character class is ASCII-only — anything that could pass has one byte
+     * per character. That is what makes this rule expressible as a pattern at
+     * all, and why a rule with a Unicode class could not do the same.
+     */
+    public static function pattern(int $min = 3, int $max = 32): string
+    {
         // Alphanumeric at both ends; separators only between, never doubled.
-        return preg_match('/^[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*$/', $value) === 1;
+        return '/^(?=.{' . $min . ',' . $max . '}$)[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*$/';
+    }
+
+    public function clientRule(): array
+    {
+        return ['rule' => 'regex', 'params' => ['pattern' => self::pattern($this->min, $this->max)]];
     }
 }

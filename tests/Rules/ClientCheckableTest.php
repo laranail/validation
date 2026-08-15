@@ -10,9 +10,14 @@ use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
+use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
+use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
+use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
+use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 
 /**
  * A rule that advertises a browser-equivalent form is making a promise: run
@@ -20,6 +25,28 @@ use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
  * because the failure it prevents is the one client-side validation exists to
  * avoid — a green tick in the browser for input the server rejects.
  */
+
+/**
+ * Rules that cannot be constructed without arguments, and one set that works.
+ *
+ * Kept beside the discovery below so a new implementation with a required
+ * argument fails loudly here rather than being quietly skipped.
+ *
+ * @return array<class-string, list<mixed>>
+ */
+function clientCheckableArguments(): array
+{
+    return [
+        CaseStyle::class => [CaseStyle::KEBAB],
+        VendorIdentifier::class => [VendorIdentifier::AWS_REGION],
+    ];
+}
+
+/** @param  class-string  $class */
+function makeClientCheckable(string $class): object
+{
+    return new $class(...(clientCheckableArguments()[$class] ?? []));
+}
 
 /** @return list<class-string> */
 function clientCheckableRules(): array
@@ -50,7 +77,7 @@ it('advertises a rule the browser runner actually implements', function (): void
     $runnerKnows = ['regex', 'not_regex', 'in', 'not_in', 'starts_with', 'ends_with'];
 
     foreach (clientCheckableRules() as $class) {
-        $advertised = new $class()->clientRule();
+        $advertised = makeClientCheckable($class)->clientRule();
 
         if ($advertised === null) {
             continue;
@@ -68,12 +95,17 @@ it('gives the same verdict as the rule itself', function (): void {
         '', ' ', 'abc', 'ABC', 'abc-def', 'abc--def', '-abc', 'abc-', 'a b', "a\tb", "a\u{200B}b",
         '1.0.0', '1.0.0-alpha.1', '1.0', 'v1.0.0', '0x' . str_repeat('a', 40), '0x' . str_repeat('g', 40),
         'sub.domain', 'subdomain', str_repeat('a', 64), 'a_b', 'café', '123',
+        // For the parameterised implementations.
+        'kebab-case', 'camelCase', 'PascalCase', 'snake_case',
+        '12.34', '12.345', '-12.00', '+3', '1e3', '$12', '1,234.50',
+        'us-east-1', 'US-EAST-1', 'G-ABCDE12345', 'g-abcde12345', 'common',
+        'ab', 'abc', 'a__b', str_repeat('a', 33), '90210', '9021', 'SW1A 1AA',
     ];
 
     $mismatches = [];
 
     foreach (clientCheckableRules() as $class) {
-        $rule = new $class();
+        $rule = makeClientCheckable($class);
         $advertised = $rule->clientRule();
 
         if ($advertised === null) {
@@ -130,4 +162,35 @@ it('is implemented only where the browser form is exactly equivalent', function 
 
 it('has at least one implementation, so the contract is not decorative', function (): void {
     expect(clientCheckableRules())->not->toBeEmpty();
+});
+
+it('advertises nothing when the country is only known at validation time', function (): void {
+    // A reference() instance takes its country from a sibling field, so which
+    // pattern applies cannot be decided while exporting. Advertising one
+    // would mean picking a country at random.
+    $referenced = PostalCode::reference('country');
+
+    expect($referenced->clientRule())->toBeNull()
+        ->and(new PostalCode(['US'])->clientRule())->not->toBeNull();
+});
+
+it('combines several countries without one pattern’s flags leaking onto another', function (): void {
+    // GB and CA are case-insensitive, US is not. Concatenating them naively
+    // would either lose a flag or apply it to all three.
+    $advertised = new PostalCode(['US', 'CA'])->clientRule();
+
+    expect($advertised)->not->toBeNull();
+
+    foreach (['90210' => true, 'K1A 0B1' => true, 'k1a 0b1' => true, 'nonsense' => false] as $value => $expected) {
+        expect(preg_match($advertised['params']['pattern'], (string) $value) === 1)->toBe($expected, (string) $value);
+    }
+});
+
+it('does not advertise a rule whose check is a numeric range', function (): void {
+    // Latitude and Longitude compare magnitudes. A regex CAN be contorted into
+    // a bounded numeric range, but the result is unreadable and easy to get
+    // subtly wrong, and being wrong here means the browser disagreeing with
+    // the server. The contract is for rules whose check IS a pattern.
+    expect(is_a(Latitude::class, ClientCheckable::class, true))->toBeFalse()
+        ->and(is_a(Longitude::class, ClientCheckable::class, true))->toBeFalse();
 });

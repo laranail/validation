@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A postal code, validated against the format of a particular country.
@@ -33,7 +34,7 @@ use Illuminate\Support\Arr;
  * Pure tier — no IO. This checks shape, not existence; confirming a postcode
  * is real needs a licensed dataset.
  */
-final class PostalCode implements DataAwareRule, ValidationRule
+final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
 {
     /** @var array<array-key, mixed> */
     private array $data = [];
@@ -150,5 +151,65 @@ final class PostalCode implements DataAwareRule, ValidationRule
         }
 
         return $path;
+    }
+
+    /**
+     * The named countries' patterns, or null when the country is not known
+     * until validation time.
+     *
+     * Only the countries this instance was given are sent — one pattern each,
+     * never the hundred-country table. A `reference()` instance advertises
+     * NOTHING: its country comes from a sibling field, so which pattern
+     * applies cannot be decided while exporting.
+     */
+    public function clientRule(): ?array
+    {
+        if ($this->countryField !== null || $this->countries === []) {
+            return null;
+        }
+
+        $patterns = [];
+
+        foreach ($this->countries as $country) {
+            $pattern = Patterns::for($country);
+
+            // An unknown country makes the rule reject everything, which a
+            // pattern cannot express — so advertise nothing and let the
+            // server say so.
+            if ($pattern === null) {
+                return null;
+            }
+
+            $patterns[] = $pattern;
+        }
+
+        if (count($patterns) === 1) {
+            return ['rule' => 'regex', 'params' => ['pattern' => $patterns[0]]];
+        }
+
+        // Several countries: each pattern keeps its own anchors and flags
+        // inside a group, since they do not all share the same flags.
+        $alternation = implode('|', array_map(
+            static fn (string $p): string => '(?:' . self::inlineFlags($p) . ')',
+            $patterns,
+        ));
+
+        return ['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/']];
+    }
+
+    /**
+     * Turn `/body/i` into `(?i:body)` with its anchors removed, so several
+     * patterns can be combined without one's flags leaking onto another.
+     */
+    private static function inlineFlags(string $pattern): string
+    {
+        if (preg_match('#^/(.*)/([a-z]*)$#s', $pattern, $m) !== 1) {
+            return $pattern;
+        }
+
+        $body = preg_replace('/^\^|\$$/', '', $m[1]) ?? $m[1];
+        $flags = str_replace(['u', 'D'], '', $m[2]);
+
+        return $flags === '' ? $body : '(?' . $flags . ':' . $body . ')';
     }
 }
