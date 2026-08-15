@@ -46,6 +46,17 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Text\PersonName` | — | Original. Unicode letter/mark classes rather than an ASCII assumption. |
 | `Text\HtmlClean` | — | Original. A data-shape rule; explicitly not an XSS defence. |
 | `Net\PublicIp`, `Net\PrivateIp` | RFC 1122, 1918, 4193, 6598, 6666, 5737, 2544, 3849 | Range tables are factual reference data, taken from the RFCs and the IANA special-purpose address registries. |
+| `Geo\Latitude`, `Geo\Longitude`, `Geo\LatLng` (via `Geo\Coordinate`) | — | Original. Decimal-degree bounds are arithmetic, not anyone's table. |
+| `Geo\UsState`, `Geo\CaProvince` (via `Geo\Subdivisions`) | USPS and Canada Post abbreviations | Original. The shared lookup helper carries the same factual reference data as the rules above. |
+| `Telecom\Phone`, `Telecom\UniquePhone` | Google's libphonenumber numbering-plan metadata, reached through `laranail/phone` | The rules are original; the numbering-plan data is **not** bundled here. `laranail/phone` wraps `giggsey/libphonenumber-for-php-lite` (Apache-2.0), which carries Google's metadata (Apache-2.0). Suggested rather than required, so a project that does not validate phone numbers never installs it. |
+| `Numbers\Parity`, `Numbers\MonetaryAmount` | — | Original. Arithmetic and formatting, no governing standard. |
+| `Colour\CssColor` | CSS Color Module Level 4 | Implemented from the specification. The 148 named colours are factual reference data reproduced from it. |
+| `AntiSpam\Honeypot`, `AntiSpam\SubmissionTiming` | — | Original. The timestamp is encrypted with Laravel's own encrypter. |
+| `Vendor\VendorIdentifier` | Each vendor's published identifier format | Original. Formats are documented facts; no vendor code or data is used. |
+| `Markup\Xml` | W3C XML 1.0 and XML Schema | Uses PHP's libxml. External entity expansion is disabled. |
+| `Network\DeliverableEmail` | RFC 5321 §5.1 (address-record fallback) | Original. Performs one DNS lookup through an injected resolver; the bundled resolver uses PHP's own `checkdnsrr`. No third-party service or data. |
+| `Fiscal\NationalIdentifier` | Dutch 11-proef; Brazilian CPF mod-11; French NIR mod-97 (INSEE); US SSA unissued ranges; UK NINO reserved prefixes | Implemented from the published algorithms and verified against published or derived vectors. No national register data is bundled, and none of these can confirm a number was issued. |
+| `Profanity\NoProfanity` | — | Original matching only. **No word list ships** — LGPL sources cannot be used in an MIT package, and the circulating lists record no licence. The application supplies the terms via `Contracts\TermList`. |
 
 ## Packages studied but not depended on
 
