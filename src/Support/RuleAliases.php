@@ -14,6 +14,7 @@ use Simtabi\Laranail\Validation\Rules\Codes\Ean;
 use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
 use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
 use Simtabi\Laranail\Validation\Rules\Codes\Issn;
+use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
 use Simtabi\Laranail\Validation\Rules\Crypto\EthereumAddress;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
@@ -37,6 +38,8 @@ use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
+use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
+use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
@@ -129,6 +132,13 @@ final class RuleAliases
             // Spread rather than restate the defaults: hardcoding them here
             // let `laranail_username` drift from `new Username()` once already.
             'username' => static fn (array $p): ValidationRule => new Username(...self::ints($p)),
+
+            // Numbers
+            'parity' => static fn (array $p): ValidationRule => new Parity(self::str($p, 0)),
+            'monetary_amount' => self::monetary(...),
+
+            // Colour
+            'css_color' => static fn (array $p): ValidationRule => new CssColor(self::strings($p)),
 
             // Crypto
             'ethereum_address' => static fn (): ValidationRule => new EthereumAddress(),
@@ -239,6 +249,35 @@ final class RuleAliases
     private static function nullableStr(array $parameters, int $index): ?string
     {
         return self::strings($parameters)[$index] ?? null;
+    }
+
+    /**
+     * `laranail_monetary_amount:3` or `:3,true` — decimals, then whether a
+     * negative is allowed.
+     *
+     * Spread rather than defaulted, so an omitted parameter leaves the rule's
+     * own default in force. See {@see flags()} for why that matters.
+     *
+     * @param  array<array-key, mixed>  $parameters
+     */
+    private static function monetary(array $parameters): MonetaryAmount
+    {
+        $given = self::strings($parameters);
+
+        if ($given === []) {
+            return new MonetaryAmount();
+        }
+
+        $decimals = is_numeric($given[0]) ? (int) $given[0] : 2;
+
+        if (! isset($given[1])) {
+            return new MonetaryAmount($decimals);
+        }
+
+        return new MonetaryAmount(
+            $decimals,
+            filter_var($given[1], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? false,
+        );
     }
 
     /**

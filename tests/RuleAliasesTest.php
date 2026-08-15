@@ -31,6 +31,7 @@ function sampleParameters(): array
     return [
         'models_exist' => [User::class],
         'authorized' => ['do-something', User::class],
+        'parity' => ['even'],
     ];
 }
 

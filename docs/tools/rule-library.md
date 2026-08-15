@@ -1,6 +1,6 @@
 # Rule library
 
-Thirty-nine validation rules for the formats Laravel does not ship, grouped by family.
+Forty-two validation rules for the formats Laravel does not ship, grouped by family.
 
 Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
 register and nothing to configure — construct one and put it in a rule array:
@@ -68,6 +68,47 @@ that enforce them.
   default; `new Isbn([13])` restricts to ISBN-13. ISBN-10's check digit uses mod-11 with `X` as
   the value 10, which is why an `X` in the final position is valid and nowhere else.
 - **`Issn`** — an International Standard Serial Number (ISO 3297), same `X` escape.
+
+## Colour
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `CssColor` | `array\|string $notations = []` | `css_color` | `css_color` |
+
+**`CssColor`** accepts a colour in any notation CSS parses — `#fff`, `#ffff`, `#ffffff`,
+`#ffffffff`, `rgb()`/`rgba()`, `hsl()`/`hsla()`, and the 148 CSS Color 4 named colours plus
+`transparent` and `currentColor`. Narrow it by naming notations: `new CssColor([CssColor::HEX])`,
+or `laranail_css_color:hex,rgb`.
+
+One parameterised rule rather than the five near-identical classes the plan listed. A field
+almost always means "a colour", and `rgb()` and `rgba()` are the same function in CSS Color 4 —
+splitting them encodes a distinction the spec removed.
+
+Two deliberate limits:
+
+- **Component ranges are not enforced.** `rgb(300, 0, 0)` renders as red in every browser, so
+  rejecting it would make the rule stricter than the thing it validates for.
+- **`hsv` is off unless named.** No browser parses `hsv()`. It is supported because colour
+  pickers emit it, not because it is CSS.
+
+Hex alone overlaps Laravel's native `hex_color` — use the native rule if that is all you need.
+
+## Numbers
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Parity` | `string $parity` | `parity` | `parity.even`, `parity.odd` |
+| `MonetaryAmount` | `int $decimals = 2, bool $allowNegative = false` | `monetary_amount` | `monetary_amount` |
+
+- **`Parity`** — `Parity::EVEN` or `Parity::ODD`. Only integers have parity, so `2.5` is
+  rejected rather than truncated; numeric strings are accepted because form input arrives as
+  `"4"`. Negatives work: PHP's `%` keeps the sign of the dividend, so `-3 % 2` is `-1`, and the
+  naive `=== 1` check calls every negative odd number even.
+- **`MonetaryAmount`** — an amount in plain decimal form. Distinct from `numeric|decimal:0,2`,
+  which accepts `1e3`, `0x1A` and `INF` — all numeric to PHP, none of them a price anyone typed.
+  The decimal count is a parameter because currencies differ: JPY has none, KWD has three. The
+  value is never rewritten; a rule that turned `1,234.50` into `1234.50` would leave the
+  application storing the original.
 
 ## Crypto
 
