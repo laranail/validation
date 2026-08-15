@@ -485,6 +485,26 @@ splitting that produced it. Use the object.
 - **`WithoutSpaces`** — no whitespace of any kind, including the Unicode separators a
   `\s`-based check misses.
 
+## Checking a rule in the browser
+
+Five rules implement `Contracts\ClientCheckable`, which lets
+[`laranail/validation-js`](https://github.com/laranail/validation-js) run them in the browser
+instead of routing them to the server: `Text\Slug`, `Text\WithoutSpaces`,
+`Identifiers\SemVer`, `Net\Subdomain` and `Crypto\EthereumAddress`.
+
+They advertise their **own pattern** rather than a JavaScript implementation. That is the whole
+design: a hand-written twin of every rule would drift from the PHP one and disagree with the
+server in the cases nobody tested. One pattern, exported, executed in both places.
+
+**No rule performing a checksum, a query or IO implements it, and none should.** Advertising a
+shape-only pattern for an IBAN would pass a mistyped account number in the browser and fail it
+on the server — the precise failure client-side validation exists to prevent. A test asserts
+that Iban, Luhn, Isin, Imei, Vin, Isbn, Gtin, BitcoinAddress, NationalIdentifier, Authorized,
+ModelsExist and DeliverableEmail stay off the list.
+
+Another test checks each advertised pattern gives the same verdict as the rule itself over a
+grid of values, so the two cannot drift apart silently.
+
 ## Messages
 
 Every message lives under `laranail-validation::validation.` and is overridable the usual way,

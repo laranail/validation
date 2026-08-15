@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Identifiers;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A Semantic Versioning 2.0.0 version string.
@@ -15,7 +16,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class SemVer implements ValidationRule
+final class SemVer implements ClientCheckable, ValidationRule
 {
     /**
      * The official semver.org pattern. Every quantifier is separated from the
@@ -33,5 +34,14 @@ final class SemVer implements ValidationRule
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
             $fail('laranail-validation::validation.semver')->translate();
         }
+    }
+
+    /**
+     * The whole check is this pattern, so the browser can run the same one
+     * rather than a hand-written twin that would drift from it.
+     */
+    public function clientRule(): array
+    {
+        return ['rule' => 'regex', 'params' => ['pattern' => self::PATTERN]];
     }
 }

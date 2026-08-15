@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Net;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A single DNS label, as used for a user-chosen subdomain.
@@ -20,7 +21,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  * Pure tier — no IO. Whether the subdomain is already taken is a Database-tier
  * question for `unique`.
  */
-final class Subdomain implements ValidationRule
+final class Subdomain implements ClientCheckable, ValidationRule
 {
     private const string PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
 
@@ -38,5 +39,14 @@ final class Subdomain implements ValidationRule
         }
 
         return ! str_starts_with(strtolower($value), 'xn--');
+    }
+
+    /**
+     * The whole check is this pattern, so the browser can run the same one
+     * rather than a hand-written twin that would drift from it.
+     */
+    public function clientRule(): array
+    {
+        return ['rule' => 'regex', 'params' => ['pattern' => self::PATTERN]];
     }
 }

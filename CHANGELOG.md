@@ -39,6 +39,13 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 - `notDisposable()`, `notRole()`, `domainIs()` and `domainIsNot()` on the email builder node,
   backed by contracts that `laranail/email` supplies maintained implementations for; a bundled
   disposable-domain and role-account snapshot serves as the fallback when it is not installed.
+- `Contracts\ClientCheckable`, letting a rule advertise a browser-equivalent form for
+  `laranail/validation-js` to export. Implemented by `Text\Slug`, `Text\WithoutSpaces`,
+  `Identifiers\SemVer`, `Net\Subdomain` and `Crypto\EthereumAddress` — the rules whose entire
+  check is a pattern, which they return so there is no second implementation to drift.
+  Deliberately NOT implemented by any rule performing a checksum, a query or IO: advertising a
+  shape-only pattern for an IBAN would pass a mistyped account number in the browser and fail
+  it on the server, which is exactly what client-side validation exists to prevent.
 - `UPGRADING.md` and `CREDITS.md`.
 
 ### Changed

@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A value containing no whitespace of any kind.
@@ -16,7 +17,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class WithoutSpaces implements ValidationRule
+final class WithoutSpaces implements ClientCheckable, ValidationRule
 {
     /** Unicode separators, ASCII whitespace controls, and zero-width characters. */
     private const string WHITESPACE = '/[\p{Z}\s\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u';
@@ -26,5 +27,14 @@ final class WithoutSpaces implements ValidationRule
         if (! is_string($value) || preg_match(self::WHITESPACE, $value) === 1) {
             $fail('laranail-validation::validation.without_spaces')->translate();
         }
+    }
+
+    /**
+     * The whole check is this pattern, so the browser can run the same one
+     * rather than a hand-written twin that would drift from it.
+     */
+    public function clientRule(): array
+    {
+        return ['rule' => 'not_regex', 'params' => ['pattern' => self::WHITESPACE]];
     }
 }

@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A URL slug: lowercase alphanumerics separated by single hyphens.
@@ -15,7 +16,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO. Whether the slug is already taken is `unique`'s job.
  */
-final class Slug implements ValidationRule
+final class Slug implements ClientCheckable, ValidationRule
 {
     private const string PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
@@ -24,5 +25,14 @@ final class Slug implements ValidationRule
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
             $fail('laranail-validation::validation.slug')->translate();
         }
+    }
+
+    /**
+     * The whole check is this pattern, so the browser can run the same one
+     * rather than a hand-written twin that would drift from it.
+     */
+    public function clientRule(): array
+    {
+        return ['rule' => 'regex', 'params' => ['pattern' => self::PATTERN]];
     }
 }
