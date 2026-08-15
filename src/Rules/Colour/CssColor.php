@@ -47,6 +47,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
     private const array CSS_NOTATIONS = [self::HEX, self::RGB, self::HSL, self::NAME];
 
     /** @var list<string> */
+    /** @var non-empty-list<string> */
     private array $notations;
 
     /** @param  list<string>|string  $notations */
@@ -149,10 +150,6 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
             }
 
             $branches[] = $branch;
-        }
-
-        if ($branches === []) {
-            return [];
         }
 
         return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . implode('|', $branches) . ')$/i']]];

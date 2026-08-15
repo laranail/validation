@@ -32,7 +32,6 @@ function clientCheckableArguments(): array
     ];
 }
 
-/** @param  class-string  $class */
 function makeClientCheckable(string $class): ClientCheckable
 {
     $rule = new $class(...(clientCheckableArguments()[$class] ?? []));
@@ -204,12 +203,17 @@ it('combines several countries without one pattern’s flags leaking onto anothe
     }
 });
 
+/** @param  class-string  $class */
 it('expresses a numeric range as numeric plus between, not as a regex', function (string $class, string $bound): void {
     // The reason the contract returns a list. A bounded numeric range can be
     // contorted into a pattern, but it is unreadable, has to be rewritten per
     // bound, and getting the boundary wrong means disagreeing with the server
     // on exactly the values that matter.
-    $advertised = new $class()->clientRules();
+    // Also narrows string -> class-string for the analyser, which is why it
+    // comes before the call rather than being assumed.
+    expect(class_exists($class))->toBeTrue($class);
+
+    $advertised = makeClientCheckable($class)->clientRules();
 
     expect(array_column($advertised, 'rule'))->toBe(['numeric', 'between'])
         ->and($advertised[1]['params'])->toBe(['min' => "-{$bound}", 'max' => $bound]);
