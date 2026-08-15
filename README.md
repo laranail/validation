@@ -34,6 +34,39 @@ Targets PHP `^8.4.1` on Laravel `^13`.
 composer require laranail/validation
 ```
 
+## Quick start
+
+Add `HasFluentRules` to a form request and return fluent rules from `rules()`. The trait is
+what enables the optimized path — without it the builders still work, they just compile to
+ordinary Laravel rules.
+
+```php
+use Illuminate\Foundation\Http\FormRequest;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\HasFluentRules;
+use Simtabi\Laranail\Validation\Rules\Banking\Iban;
+
+final class StorePayoutRequest extends FormRequest
+{
+    use HasFluentRules;
+
+    public function rules(): array
+    {
+        return [
+            'account' => FluentRule::string('Account')->required()->rule(new Iban()),
+            'email'   => FluentRule::email()->required()->notDisposable(),
+            'lines'   => FluentRule::array()->required()->max(50)->each([
+                'sku'    => FluentRule::string()->required()->exists('products', 'sku'),
+                'amount' => FluentRule::numeric()->required()->min(0.01),
+            ]),
+        ];
+    }
+}
+```
+
+`$request->validated()` returns the same shape it always did. For Livewire use
+`HasFluentValidation`; outside both, `RuleSet::from([...])->check($data)`.
+
 ## <a name="documentation"></a>Documentation
 
 Full documentation is at
@@ -71,6 +104,50 @@ Full documentation is at
 ### Project
 
 - [Changelog](CHANGELOG.md) · [Upgrading](UPGRADING.md) · [Credits](CREDITS.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md)
+
+## Stability
+
+Pre-1.0. The builder surface — `FluentRule`, `FluentSchema`, `RuleSet` and
+`Contracts\FluentRuleContract` — is settled and is what the documentation describes. The
+extended rule library under `Rules\` is newer; its rules are stable in behaviour but their
+constructor signatures may still gain parameters.
+
+Constrain to `^0.1` and read [UPGRADING.md](UPGRADING.md) before moving between versions: this
+package fixes divergences from Laravel's own validator, and a fix can mean input an application
+previously accepted is now correctly rejected.
+
+## Local development
+
+```bash
+composer install
+composer test          # Pest
+composer phpstan       # level max, 100% type coverage
+composer format        # Pint
+composer rector
+php benchmark.php      # the optimizer's headline numbers
+```
+
+Tests run on Orchestra Testbench — there is no host application, so use `vendor/bin/testbench`
+rather than `php artisan`. Fixtures live under `workbench/`.
+
+## Sister packages
+
+| Package | What it owns |
+|---|---|
+| [`laranail/atlas`](https://github.com/laranail/atlas) | Country, currency and language data — and the rules over it |
+| [`laranail/enumerator`](https://github.com/laranail/enumerator) | Enum values, names and transitions |
+| [`laranail/chrono`](https://github.com/laranail/chrono) | Timezones, date existence and ambiguity |
+| [`laranail/toolkit`](https://github.com/laranail/toolkit) | Password strength and common-password rejection |
+| [`laranail/captcha`](https://github.com/laranail/captcha) | Turnstile, hCaptcha and reCAPTCHA |
+| [`laranail/package-tools`](https://github.com/laranail/package-tools) | The package scaffolding this one is built on |
+
+Email deliverability (MX/DNS) is scoped to `laranail/email`, which is not built yet.
+
+## Community
+
+Questions and ideas belong in
+[Discussions](https://github.com/laranail/validation/discussions); bugs in
+[Issues](https://github.com/laranail/validation/issues).
 
 ## Credits
 

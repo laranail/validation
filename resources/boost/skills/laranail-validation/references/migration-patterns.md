@@ -277,10 +277,21 @@ These are appropriate uses of `->rule()`:
 
 ```php
 ->rule(new MyCustomRule())          // app-specific ValidationRule
-->rule(new Iban())                  // third-party rule
-->rule(new EnumValue(Status::class)) // bensampo/enum
+->rule(new Iban())                  // this package's own rule library — see below
+->rule(new EnumValue(Status::class)) // laranail/enumerator
 ->rule('custom_string_rule')        // registered via Validator::extend()
 ->rule(fn ($attr, $val, $fail) => ...) // inline closure
 ->rule(Email::default())            // only if you need Email::default() alongside other escape-hatch rules
 ->rule(Rule::when($cond, [...]))    // mixed-array conditional blocks
+```
+
+`Iban` above is `Simtabi\Laranail\Validation\Rules\Banking\Iban` — one of the 38 rules
+this package ships for formats Laravel has none for (banking, barcodes, identifiers, geo,
+postal codes, IP classification, text shapes, crypto addresses, email domains). Reaching for
+`->rule()` with one of those is the intended way to use them, not an escape hatch. Do not add
+a third-party package or hand-roll a regex for anything the library already covers — the
+families are listed in the core guideline.
+
+```php
+->rule(new MyCustomRule())          // app-specific, genuinely an escape hatch
 ```

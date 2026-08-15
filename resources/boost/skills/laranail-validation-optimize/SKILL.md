@@ -373,5 +373,5 @@ Flag these to the user before applying changes:
 
 - **Cross-field wildcard references** (`requiredUnless('items.*.type', ...)`) MUST use `HasFluentRules` or `FluentValidator`. They don't work through standalone FluentRule self-validation. Flag any file that has these.
 - **`exclude` rules** only affect `validated()` output when placed at the outer validator level. When converting, keep `['exclude', FluentRule::string()]` not `FluentRule::string()->exclude()`.
-- **`anyOf()`** requires Laravel 13+. Use `class_exists(\Illuminate\Validation\Rules\AnyOf::class)` to check. Skip on older versions.
+- **`anyOf()`** requires Laravel 13+, which is this package's only supported major, so no version guard is needed.
 - **Gradual adoption is fine.** Convert one field at a time. Fluent rules mix with string rules in the same array.
