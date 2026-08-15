@@ -243,3 +243,32 @@ it('covers the named colours rather than omitting them', function (): void {
 
     expect(preg_match($pattern, 'notacolour'))->toBe(0);
 });
+
+it('declares the interface on every rule that has the method', function (): void {
+    // Discovery here is by INTERFACE, so a rule carrying clientRules() without
+    // declaring ClientCheckable is invisible to every other test in this file:
+    // it looks implemented, is never checked against its own rule, and is
+    // never exported. Latitude and Longitude were in exactly that state —
+    // the method was added and the implements clause was not, and nothing
+    // failed.
+    $undeclared = [];
+
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/src/Rules')) as $file) {
+        if (! $file instanceof SplFileInfo || $file->getExtension() !== 'php') {
+            continue;
+        }
+
+        $relative = str_replace([dirname(__DIR__, 2) . '/src/Rules/', '/', '.php'], ['', '\\', ''], $file->getPathname());
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $relative;
+
+        if (! class_exists($class) || ! method_exists($class, 'clientRules')) {
+            continue;
+        }
+
+        if (! is_a($class, ClientCheckable::class, true)) {
+            $undeclared[] = $class;
+        }
+    }
+
+    expect($undeclared)->toBeEmpty('has clientRules() but does not implement ClientCheckable: ' . implode(', ', $undeclared));
+});

@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Geo;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A longitude in decimal degrees, -180 to 180 inclusive.
@@ -12,7 +13,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class Longitude implements ValidationRule
+final class Longitude implements ClientCheckable, ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

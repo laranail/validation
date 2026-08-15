@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Geo;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
  * A latitude in decimal degrees, -90 to 90 inclusive.
@@ -15,7 +16,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class Latitude implements ValidationRule
+final class Latitude implements ClientCheckable, ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
