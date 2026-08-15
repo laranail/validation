@@ -423,12 +423,19 @@ it('collectExpandedValues keeps exists and unique against same (table, column) i
         ],
     ]);
 
+    // The key gained a fourth segment — a digest of the rule's query shape —
+    // so two rules that would issue different queries cannot share a group.
+    // Assert the prefix rather than the digest, which is an implementation
+    // detail and would make this test a change-detector.
     $keys = array_keys($groups);
-    expect($keys)->toContain('users:email:exists')
-        ->and($keys)->toContain('users:email:unique')
+    $exists = array_values(array_filter($keys, static fn (string $k): bool => str_starts_with($k, 'users:email:exists:')));
+    $unique = array_values(array_filter($keys, static fn (string $k): bool => str_starts_with($k, 'users:email:unique:')));
+
+    expect($exists)->toHaveCount(1)
+        ->and($unique)->toHaveCount(1)
         ->and($groups)->toHaveCount(2)
-        ->and($groups['users:email:exists']['values'])->toBe(['alice@example.com'])
-        ->and($groups['users:email:unique']['values'])->toBe(['new@example.com']);
+        ->and($groups[$exists[0]]['values'])->toBe(['alice@example.com'])
+        ->and($groups[$unique[0]]['values'])->toBe(['new@example.com']);
 });
 
 // =========================================================================

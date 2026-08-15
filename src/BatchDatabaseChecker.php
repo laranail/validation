@@ -10,6 +10,7 @@ use ReflectionException;
 use ReflectionProperty;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 use Simtabi\Laranail\Validation\Internal\BatchPresenceQuery;
+use Simtabi\Laranail\Validation\Internal\BatchRuleShape;
 use Simtabi\Laranail\Validation\Internal\PresenceMatchFidelity;
 use Simtabi\Laranail\Validation\Internal\ValueTypePredicates;
 use Stringable;
@@ -226,7 +227,19 @@ final class BatchDatabaseChecker
                 continue;
             }
 
-            $groups[self::groupKey($table, $column, $rule)] = ['rule' => $rule, 'values' => $values];
+            // Merge, never assign: two fields can legitimately point at the
+            // same table and column (a primary and a backup address both
+            // checked against users.email). Assigning outright kept only the
+            // field declared last, so the earlier field's values were never
+            // queried, came back absent from the lookup, and a `unique` rule
+            // reported "not taken" for a value that was. The key now carries
+            // the rule's query shape, so sharing one implies the merged values
+            // would have been queried identically.
+            $key = self::groupKey($table, $column, $rule);
+            $groups[$key] ??= ['rule' => $rule, 'values' => []];
+            $groups[$key]['values'] = self::uniqueStringValues(
+                array_merge($groups[$key]['values'], $values),
+            );
         }
 
         return $groups;
@@ -302,7 +315,9 @@ final class BatchDatabaseChecker
      */
     private static function groupKey(string $table, string $column, Exists|Unique $rule): string
     {
-        return $table . ':' . $column . ':' . ($rule instanceof Unique ? 'unique' : 'exists');
+        return $table . ':' . $column . ':'
+            . ($rule instanceof Unique ? 'unique' : 'exists') . ':'
+            . BatchRuleShape::of(self::extractMeta($rule));
     }
 
     /**
@@ -458,8 +473,12 @@ final class BatchDatabaseChecker
         $seen = [];
 
         foreach (array_keys($groups) as $key) {
-            [$table, $column, $ruleType] = self::parseGroupKey($key);
-            $seen[$table . ':' . $column][$ruleType] = true;
+            [$table, $column, $ruleType, $shape] = self::parseGroupKey($key);
+
+            // Keyed by rule type AND query shape: the verifier looks up by
+            // table and column only, so anything that would have queried
+            // differently cannot share that lookup.
+            $seen[$table . ':' . $column][$ruleType . ':' . $shape] = true;
         }
 
         $conflicting = [];
@@ -474,13 +493,13 @@ final class BatchDatabaseChecker
     }
 
     /**
-     * @return array{0: string, 1: string, 2: string}
+     * @return array{0: string, 1: string, 2: string, 3: string}
      */
     private static function parseGroupKey(string $key): array
     {
-        $parts = explode(':', $key, 3);
+        $parts = explode(':', $key, 4);
 
-        return [$parts[0] ?? '', $parts[1] ?? '', $parts[2] ?? 'exists'];
+        return [$parts[0] ?? '', $parts[1] ?? '', $parts[2] ?? 'exists', $parts[3] ?? ''];
     }
 
     /**
