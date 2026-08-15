@@ -5,6 +5,7 @@ namespace Simtabi\Laranail\Validation\Internal;
 use Closure;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Validator as BaseValidator;
+use ReflectionProperty;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Simtabi\Laranail\Validation\MemoizingValidator;
 use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
@@ -128,6 +129,7 @@ final readonly class ItemValidator
                         }
                     } else {
                         $validatorCache[$cacheKey]->setData($itemData);
+                        $this->resetExclusions($validatorCache[$cacheKey]);
                     }
 
                     if (! $validatorCache[$cacheKey]->passes()) {
@@ -152,6 +154,7 @@ final readonly class ItemValidator
                 }
             } else {
                 $validatorCache[$cacheKey]->setData($itemData);
+                $this->resetExclusions($validatorCache[$cacheKey]);
             }
 
             if (! $validatorCache[$cacheKey]->passes()) {
@@ -186,6 +189,44 @@ final readonly class ItemValidator
      * @param  array<string, mixed>  $rules
      * @param  array<string, string>  $messages
      * @param  array<string, string>  $attributes
+     */
+    /**
+     * Clear exclusions carried over from the previous item.
+     *
+     * A validator is built once per distinct rule SHAPE and reused across
+     * every item with that shape, with only the data swapped. Laravel's
+     * `passes()` resets `$messages`, `$failedRules` and `$distinctValues` at
+     * the top, and `setData()` re-parses the data and re-sets the rules — but
+     * neither clears `$excludeAttributes`, which is append-only
+     * (`Validator::excludeAttribute()`).
+     *
+     * So once any item excluded an attribute, every later item sharing the
+     * validator inherited that exclusion: its copy of the field was skipped
+     * and dropped from the validated data. `exclude_if`/`exclude_unless` are
+     * pre-evaluated before this point and never reach here, but `exclude`,
+     * `exclude_with` and `exclude_without` are not, and they keep the same
+     * rule string across items while the DATA decides — which is exactly the
+     * shape that shares a cached validator.
+     *
+     * The giveaway was order dependence: with the excluded item first, an
+     * invalid value in a later item produced no error at all; moving the
+     * valid item first reported it.
+     *
+     * Reflected on the base class rather than overridden, because the
+     * validator may come from an application-supplied factory and not be one
+     * of ours.
+     */
+    private function resetExclusions(BaseValidator $validator): void
+    {
+        (new ReflectionProperty(BaseValidator::class, 'excludeAttributes'))
+            ->setValue($validator, []);
+    }
+
+    /**
+     * @param array<string, mixed> $itemData
+     * @param array<string, mixed> $rules
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
      */
     private function makeItemValidator(array $itemData, array $rules, array $messages, array $attributes): BaseValidator
     {
