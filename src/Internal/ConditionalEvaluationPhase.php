@@ -66,8 +66,13 @@ final class ConditionalEvaluationPhase
      *
      * @param  list<array{action: string, field: string, values: list<string>}>  $tuples
      * @param  Closure(string): mixed  $getValue
+     * @param  array<array-key, mixed>  $rules  The validator's parsed rules, read
+     *                                       only to learn whether a dependent
+     *                                       is declared `boolean`. Defaults to
+     *                                       none, which simply skips the
+     *                                       conversion.
      */
-    public function evaluate(string $attribute, array $tuples, Closure $getValue): ConditionalVerdict
+    public function evaluate(string $attribute, array $tuples, Closure $getValue, array $rules = []): ConditionalVerdict
     {
         $deferred = false;
 
@@ -105,7 +110,20 @@ final class ConditionalEvaluationPhase
             // Match Laravel's dependent-value coercion (null/bool/loose scalar)
             // via the shared matcher, against the value resolved through the
             // validator's getValue() closure.
-            $match = ConditionalValueMatcher::matchesValue($value, $tuple['values']);
+            //
+            // The boolean flag is not optional here. Laravel's
+            // parseDependentRuleParameters() converts the rule's 'true'/'false'
+            // parameters to real booleans whenever the dependent is DECLARED
+            // `boolean`, not only when its submitted value happens to be one.
+            // Omitting it makes `exclude_unless:notify,true` fail to match a
+            // notify of 1 — a value the `boolean` rule accepts — and a
+            // non-match under exclude_unless EXCLUDES, so the field vanishes
+            // from validated() while Laravel keeps it.
+            $match = ConditionalValueMatcher::matchesValue(
+                $value,
+                $tuple['values'],
+                ConditionalValueMatcher::dependentHasBooleanRule($field, $rules),
+            );
             $excludes = $tuple['action'] === 'exclude_unless' ? ! $match : $match;
 
             if ($excludes) {

@@ -140,7 +140,7 @@ class OptimizedValidator extends MemoizingValidator
             /** @var list<mixed> $rules */
             $rules = $this->rules[$attribute];
 
-            $verdict = $phase->evaluate($attribute, $tuples, $getValue);
+            $verdict = $phase->evaluate($attribute, $tuples, $getValue, $this->rules);
 
             if ($verdict === ConditionalVerdict::Exclude) {
                 // Excluded — don't add to removedRules so it's absent from validated().

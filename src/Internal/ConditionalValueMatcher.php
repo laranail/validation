@@ -122,12 +122,19 @@ final class ConditionalValueMatcher
 
     /**
      * Does the dependent field's rule set contain a `boolean` marker?
+     *
+     * Public because both the item-scoped path ({@see matches()}) and the
+     * top-level path ({@see ConditionalEvaluationPhase::evaluate()}) need the
+     * same answer, and Laravel applies the conversion in both.
      * Best-effort check against the item-scoped rule set — mirrors Laravel's
      * `shouldConvertToBoolean` which reads `$this->rules[$parameter]`.
      *
-     * @param  array<string, mixed>  $itemRules
+     * `array-key`, not `string`: the top-level caller hands over the
+     * validator's own `$rules`, which Laravel types as a bare array.
+     *
+     * @param  array<array-key, mixed>  $itemRules
      */
-    private static function dependentHasBooleanRule(string $depPath, array $itemRules): bool
+    public static function dependentHasBooleanRule(string $depPath, array $itemRules): bool
     {
         $rules = $itemRules[$depPath] ?? null;
 
