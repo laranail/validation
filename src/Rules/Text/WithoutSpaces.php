@@ -33,8 +33,8 @@ final class WithoutSpaces implements ClientCheckable, ValidationRule
      * The whole check is this pattern, so the browser can run the same one
      * rather than a hand-written twin that would drift from it.
      */
-    public function clientRule(): array
+    public function clientRules(): array
     {
-        return ['rule' => 'not_regex', 'params' => ['pattern' => self::WHITESPACE]];
+        return [['rule' => 'not_regex', 'params' => ['pattern' => self::WHITESPACE]]];
     }
 }

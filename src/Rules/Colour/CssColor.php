@@ -4,6 +4,7 @@ namespace Simtabi\Laranail\Validation\Rules\Colour;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 use Simtabi\Laranail\Validation\Rules\Colour\Support\Names;
 
 /**
@@ -30,7 +31,7 @@ use Simtabi\Laranail\Validation\Rules\Colour\Support\Names;
  *
  * Pure tier — no IO.
  */
-final readonly class CssColor implements ValidationRule
+final readonly class CssColor implements ClientCheckable, ValidationRule
 {
     public const string HEX = 'hex';
 
@@ -115,5 +116,64 @@ final readonly class CssColor implements ValidationRule
         $alpha = '(?:\s*(?:,|\/)\s*' . $component . ')?';
 
         return preg_match('/^' . $function . '\(\s*' . $body . $alpha . '\s*\)$/i', $value) === 1;
+    }
+
+    /**
+     * One pattern covering the configured notations.
+     *
+     * The named colours are inlined as an alternation. That was previously
+     * called out as "large" and left undone, which was the wrong reason not
+     * to: 150 literal names is about 1.5 KB of pattern, against a package
+     * that already ships an 8,201-entry domain list. It is a plain
+     * alternation of literals inside an anchored group, so there is no
+     * backtracking hazard either.
+     *
+     * The alternative — omitting names — would mean a browser rejecting
+     * `red`, which is worse than a slightly longer pattern.
+     */
+    public function clientRules(): array
+    {
+        $branches = [];
+
+        foreach ($this->notations as $notation) {
+            $branch = self::branch($notation);
+
+            // An unrecognised notation makes the rule reject everything for
+            // it, which a pattern cannot express — so advertise nothing and
+            // let the server answer.
+            if ($branch === null) {
+                return [];
+            }
+
+            $branches[] = $branch;
+        }
+
+        if ($branches === []) {
+            return [];
+        }
+
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . implode('|', $branches) . ')$/i']]];
+    }
+
+    /** The unanchored body for one notation, or null if there is no such notation. */
+    private static function branch(string $notation): ?string
+    {
+        $component = '[+-]?(?:\d+\.?\d*|\.\d+)(?:%|deg|grad|rad|turn)?';
+        $separator = '(?:\s*,\s*|\s+)';
+        $body = static fn (string $function): string => $function . '\(\s*' . $component
+            . str_repeat($separator . $component, 2)
+            . '(?:\s*(?:,|\/)\s*' . $component . ')?\s*\)';
+
+        return match ($notation) {
+            self::HEX => '#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})',
+            self::RGB => $body('rgba?'),
+            self::HSL => $body('hsla?'),
+            self::HSV => $body('hsva?'),
+            self::NAME => implode('|', array_map(
+                static fn (string $name): string => preg_quote($name, '/'),
+                Names::all(),
+            )),
+            default => null,
+        };
     }
 }

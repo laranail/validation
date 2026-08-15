@@ -487,7 +487,7 @@ splitting that produced it. Use the object.
 
 ## Checking a rule in the browser
 
-Nine rules implement `Contracts\ClientCheckable`, which lets
+Twelve rules implement `Contracts\ClientCheckable`, which lets
 [`laranail/validation-js`](https://github.com/laranail/validation-js) run them in the browser
 instead of routing them to the server:
 
@@ -499,6 +499,8 @@ instead of routing them to the server:
 | `Numbers\MonetaryAmount` | The pattern built from `$decimals` and `$allowNegative` |
 | `Vendor\VendorIdentifier` | The vendor's pattern, carrying the same case handling the rule applies |
 | `Postal\PostalCode` | Only the named countries' patterns — never the hundred-country table |
+| `Geo\Latitude`, `Geo\Longitude` | `numeric` **and** `between` — two rules, not a pattern |
+| `Colour\CssColor` | One pattern per configured notation, named colours included |
 
 `Username` is worth a note because its length bound used to be a `strlen()` check, which counts
 **bytes**, while a regex lookahead counts characters. They cannot differ here: the character
@@ -521,15 +523,26 @@ ModelsExist and DeliverableEmail stay off the list.
 Another test checks each advertised pattern gives the same verdict as the rule itself over a
 grid of values, so the two cannot drift apart silently.
 
-### Rules that could be patterns and deliberately are not
+### Why the contract returns a LIST
 
-`Geo\Latitude` and `Geo\Longitude` compare **magnitudes**. A regex can be contorted into a
-bounded numeric range, but the result is unreadable and easy to get subtly wrong — and being
-wrong means the browser disagreeing with the server. The contract is for rules whose check *is*
-a pattern.
+`clientRules()` returns several rules, all of which must pass — not one.
 
-`Colour\CssColor` accepts named colours by default, and a pattern covering them would embed all
-150 names. That is not wrong, only large, and it has not been needed.
+That is what makes `Geo\Latitude` expressible. Its check is `is_numeric` plus a range, so its
+browser form is `numeric` **and** `between:-90,90`: two rules the runner already implements.
+Forced into one rule it would have to be a regex contorted into a bounded numeric range —
+unreadable, rewritten for every bound, and wrong at exactly the boundary values that matter.
+
+`Colour\CssColor` inlines the 150 named colours into its pattern, about 2 KB. Omitting them
+would mean a browser rejecting `red`, which is a real defect; the size never was one, in a
+package that ships an 8,201-entry domain list.
+
+### Rules that still do not advertise
+
+Anything whose check includes a **checksum** (`Iban`, `Luhn`, `Isin`, `Imei`, `Vin`, `Isbn`,
+`Gtin`, `BitcoinAddress`, `NationalIdentifier`), a **database query** (`Authorized`,
+`ModelsExist`) or **IO** (`Network\DeliverableEmail`). A shape-only approximation would pass a
+mistyped account number in the browser and fail it on the server. A test asserts they stay
+off.
 
 ## Messages
 

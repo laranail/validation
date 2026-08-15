@@ -39,11 +39,13 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 - `notDisposable()`, `notRole()`, `domainIs()` and `domainIsNot()` on the email builder node,
   backed by contracts that `laranail/email` supplies maintained implementations for; a bundled
   disposable-domain and role-account snapshot serves as the fallback when it is not installed.
-- `Contracts\ClientCheckable`, letting a rule advertise a browser-equivalent form for
-  `laranail/validation-js` to export. Implemented by `Text\Slug`, `Text\WithoutSpaces`,
+- `Contracts\ClientCheckable`, letting a rule advertise browser-equivalent NATIVE LARAVEL
+  RULES for `laranail/validation-js` to export. It returns a LIST, which is what makes a rule
+  like `Geo\Latitude` expressible: its browser form is `numeric` AND `between:-90,90`, not a
+  regex contorted into a numeric range. Implemented by `Text\Slug`, `Text\WithoutSpaces`,
   `Identifiers\SemVer`, `Net\Subdomain`, `Crypto\EthereumAddress`, `Text\CaseStyle`,
-  `Text\Username`, `Numbers\MonetaryAmount`, `Vendor\VendorIdentifier` and `Postal\PostalCode`
-  — the rules whose entire check is a pattern, which they return so there is no second
+  `Text\Username`, `Numbers\MonetaryAmount`, `Vendor\VendorIdentifier`, `Postal\PostalCode`,
+  `Geo\Latitude`, `Geo\Longitude` and `Colour\CssColor` — the rules whose entire check is a pattern, which they return so there is no second
   implementation to drift. `PostalCode` sends only the named countries' patterns and nothing at
   all when the country comes from a sibling field.
   Deliberately NOT implemented by any rule performing a checksum, a query or IO: advertising a

@@ -162,10 +162,10 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
      * NOTHING: its country comes from a sibling field, so which pattern
      * applies cannot be decided while exporting.
      */
-    public function clientRule(): ?array
+    public function clientRules(): array
     {
         if ($this->countryField !== null || $this->countries === []) {
-            return null;
+            return [];
         }
 
         $patterns = [];
@@ -177,14 +177,14 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
             // pattern cannot express — so advertise nothing and let the
             // server say so.
             if ($pattern === null) {
-                return null;
+                return [];
             }
 
             $patterns[] = $pattern;
         }
 
         if (count($patterns) === 1) {
-            return ['rule' => 'regex', 'params' => ['pattern' => $patterns[0]]];
+            return [['rule' => 'regex', 'params' => ['pattern' => $patterns[0]]]];
         }
 
         // Several countries: each pattern keeps its own anchors and flags
@@ -194,7 +194,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
             $patterns,
         ));
 
-        return ['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/']];
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/']]];
     }
 
     /**

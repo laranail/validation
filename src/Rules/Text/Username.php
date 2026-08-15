@@ -61,8 +61,8 @@ final readonly class Username implements ClientCheckable, ValidationRule
         return '/^(?=.{' . $min . ',' . $max . '}$)[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*$/';
     }
 
-    public function clientRule(): array
+    public function clientRules(): array
     {
-        return ['rule' => 'regex', 'params' => ['pattern' => self::pattern($this->min, $this->max)]];
+        return [['rule' => 'regex', 'params' => ['pattern' => self::pattern($this->min, $this->max)]]];
     }
 }

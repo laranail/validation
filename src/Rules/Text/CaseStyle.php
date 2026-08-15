@@ -72,10 +72,10 @@ final readonly class CaseStyle implements ClientCheckable, ValidationRule
      * advertising nothing routes it to the server rather than shipping a
      * pattern that does not exist.
      */
-    public function clientRule(): ?array
+    public function clientRules(): array
     {
         $pattern = self::PATTERNS[$this->style] ?? null;
 
-        return $pattern === null ? null : ['rule' => 'regex', 'params' => ['pattern' => $pattern]];
+        return $pattern === null ? [] : [['rule' => 'regex', 'params' => ['pattern' => $pattern]]];
     }
 }
