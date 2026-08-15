@@ -29,7 +29,7 @@ parameters:
 			path: src/FastCheck/RuleConfigBuilder.php
 
 		-
-			rawMessage: 'Class cognitive complexity is 101, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 98, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/FastCheck/ItemContextCompiler.php
@@ -60,8 +60,11 @@ parameters:
 		# metadata-before-rewrite reorder in validateWildcardGroups. The
 		# per-function complexity stays under 20 (logic in stripPrefixFromConstraints);
 		# only the class total moves.
+		# Dropped 145 -> 135 by the php84 Rector sweep, which replaced several
+		# foreach loops with array_any()/array_all(). validateInternal() fell
+		# below 20 in the same pass and its entry is gone entirely.
 		-
-			rawMessage: 'Class cognitive complexity is 145, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 135, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/RuleSet.php
@@ -86,11 +89,6 @@ parameters:
 			count: 1
 			path: src/Internal/ItemRuleCompiler.php
 
-		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\RuleSet::validateInternal()" is 25, keep it under 20'
-			identifier: complexity.functionLike
-			count: 1
-			path: src/RuleSet.php
 
 		# Phase 2b: RuleSet::validateItems body relocated verbatim to
 		# ItemValidator::validate. Complexity is identical (49) — the loop's

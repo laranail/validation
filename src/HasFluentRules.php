@@ -82,7 +82,7 @@ trait HasFluentRules
      */
     private function schemaExpectsFluentSchema(): bool
     {
-        $parameters = (new ReflectionMethod($this, 'schema'))->getParameters();
+        $parameters = new ReflectionMethod($this, 'schema')->getParameters();
         $firstType = ($parameters[0] ?? null)?->getType();
 
         return $firstType instanceof ReflectionNamedType
@@ -129,8 +129,8 @@ trait HasFluentRules
      */
     private function resolveSchemaOutranksRules(): bool
     {
-        $schemaClass = (new ReflectionMethod($this, 'schema'))->getDeclaringClass();
-        $rulesClass = (new ReflectionMethod($this, 'rules'))->getDeclaringClass();
+        $schemaClass = new ReflectionMethod($this, 'schema')->getDeclaringClass();
+        $rulesClass = new ReflectionMethod($this, 'rules')->getDeclaringClass();
 
         if ($schemaClass->getName() !== $rulesClass->getName()) {
             return $schemaClass->isSubclassOf($rulesClass->getName());
@@ -168,7 +168,7 @@ trait HasFluentRules
      */
     private function definesOwnRules(): bool
     {
-        return (new ReflectionMethod($this, 'rules'))->getFileName() !== __FILE__;
+        return new ReflectionMethod($this, 'rules')->getFileName() !== __FILE__;
     }
 
     protected function createDefaultValidator(ValidationFactory $factory): Validator
@@ -228,7 +228,7 @@ trait HasFluentRules
         }
 
         if ($prepared->implicitAttributes !== []) {
-            (new ReflectionProperty(Validator::class, 'implicitAttributes'))
+            new ReflectionProperty(Validator::class, 'implicitAttributes')
                 ->setValue($validator, $prepared->implicitAttributes);
         }
 

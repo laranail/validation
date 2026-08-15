@@ -25,7 +25,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Jwt implements ValidationRule
 {
-    private const PATTERN = '/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/';
+    private const string PATTERN = '/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

@@ -49,7 +49,7 @@ function vanillaWildcardFails(mixed $notify): bool
 function optimizedWildcardFails(mixed $notify): bool
 {
     try {
-        (new WildcardRequiredIfValidator(['items' => [['notify' => $notify]]]))->validated();
+        new WildcardRequiredIfValidator(['items' => [['notify' => $notify]]])->validated();
 
         return false;
     } catch (ValidationException) {

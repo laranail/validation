@@ -28,7 +28,7 @@ final class Iban implements ValidationRule
      *
      * @var array<string, int>
      */
-    private const LENGTHS = [
+    private const array LENGTHS = [
         'AD' => 24, 'AE' => 23, 'AL' => 28, 'AT' => 20, 'AZ' => 28,
         'BA' => 20, 'BE' => 16, 'BG' => 22, 'BH' => 22, 'BI' => 27,
         'BR' => 29, 'BY' => 28, 'CH' => 21, 'CR' => 22, 'CY' => 28,
@@ -48,7 +48,7 @@ final class Iban implements ValidationRule
         'VA' => 22, 'VG' => 24, 'XK' => 20,
     ];
 
-    private const PATTERN = '/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/';
+    private const string PATTERN = '/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

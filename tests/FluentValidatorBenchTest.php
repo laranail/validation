@@ -85,11 +85,11 @@ it('benchmarks FluentValidator vs native vs RuleSet::validate (conditional impor
 
         // Warmup
         Validator::make($data, $nativeRules)->validate();
-        (new BenchImportValidator($data))->validate();
+        new BenchImportValidator($data)->validate();
         RuleSet::from($nativeRules)->validate($data);
 
         $native = benchmarkMedian(fn () => Validator::make($data, $nativeRules)->validate(), 3);
-        $fluent = benchmarkMedian(fn () => (new BenchImportValidator($data))->validate(), 3);
+        $fluent = benchmarkMedian(fn () => new BenchImportValidator($data)->validate(), 3);
         $ruleSet = benchmarkMedian(fn () => RuleSet::from($nativeRules)->validate($data), 3);
 
         fprintf(STDERR, "  %-6d %10.0fms %12.0fms (%4.1fx) %10.0fms (%4.1fx)\n",
@@ -101,9 +101,9 @@ it('benchmarks FluentValidator vs native vs RuleSet::validate (conditional impor
     $data = benchItems(100);
     $nativeRules = benchNativeRules();
     Validator::make($data, $nativeRules)->validate();
-    (new BenchImportValidator($data))->validate();
+    new BenchImportValidator($data)->validate();
     $native = benchmarkMedian(fn () => Validator::make($data, $nativeRules)->validate(), 3);
-    $fluent = benchmarkMedian(fn () => (new BenchImportValidator($data))->validate(), 3);
+    $fluent = benchmarkMedian(fn () => new BenchImportValidator($data)->validate(), 3);
 
     expect($fluent)->toBeLessThan($native);
 })->group('benchmark');

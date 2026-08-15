@@ -116,6 +116,34 @@ attributes be dropped from the rule set before the validator ever sees them. On 
 100 items and 47 conditional fields this takes the rule set from roughly 4,700 entries to 200,
 so the saving compounds with every later stage.
 
+## Why the phone rules depend on `laranail/phone`
+
+The phone rules are the only ones in this package that need an external body of knowledge. Whether
+`+254712345678` is a real number is not something a pattern can answer — it depends on which ranges
+Kenya has actually allocated, which changes, and which lives in Google's libphonenumber metadata.
+
+So `laranail/phone` owns the parsing, the normalisation and the metadata, and this package owns the
+rule. The dependency points that way round because a rule needs a parser and a parser does not need a
+rule; inverting it would drag every validation consumer into a phone-number library.
+
+It is a **`suggest`**, not a `require`. libphonenumber's metadata is a real weight — a per-region
+metadata file load and several megabytes resident once warmed — and a project validating only strings
+and dates should not carry it. Every entry point checks first and throws with a sentence naming the
+package, rather than a class-not-found from three frames deeper.
+
+### Why `unique()` is overridden there and nowhere else
+
+`FluentRule::phone()->unique()` does not compile to Laravel's `Rule::unique()`. It compiles to
+`Rules\Telecom\UniquePhone`, which normalises the value to E.164 and queries the canonical form.
+
+The generic rule compares the attribute exactly as it arrived, and for phone numbers that is simply
+wrong: a row holding `+254712123456` and a user typing `0712 123456` are different strings, so the
+query finds nothing and a duplicate is created. Nothing in the table shows why.
+
+It is a separate rule class rather than a change to the shared `unique()` because `unique` is used on
+every other kind of column, where comparing the value as-typed is exactly the right behaviour. One
+column type needing a different comparison is not a reason to make the general case surprising.
+
 ## Source layout
 
 ```

@@ -45,7 +45,7 @@ return RectorConfig::configure()
     ->withFluentCallNewLine()
     ->withParallel(300, 15, 15)
     ->withMemoryLimit('3G')
-    ->withPhpSets(php82: true)
+    ->withPhpSets(php84: true)
     ->withSets([
         LaravelSetList::LARAVEL_110,
         LaravelSetList::LARAVEL_CODE_QUALITY,

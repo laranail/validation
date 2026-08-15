@@ -43,7 +43,7 @@ Full documentation is at
 
 - [Installation](docs/installation.md) — Composer install, supported versions, optional Boost skills
 - [Getting started](docs/getting-started.md) — a form request end to end, then the same builders elsewhere
-- [Configuration](docs/configuration.md) — there is no config file; the one global knob and the per-chain options
+- [Configuration](docs/configuration.md) — the publishable config, opt-in string rule aliases, and the per-chain options
 - [Architecture](docs/architecture.md) — builders, compiler, optimized execution, and why the fast path is safe
 - [Performance](docs/performance.md) — what makes it fast, the benchmarks, and when none of it helps
 - [Comparison](docs/comparison.md) — how this differs from rule strings and Laravel's `Rule` class
@@ -53,6 +53,7 @@ Full documentation is at
 ### Reference
 
 - [Rule reference](docs/tools/fluent-rule.md) — every entry point, modifier, conditional, and macro hook
+- [Phone rule](docs/tools/phone-rule.md) — countries, line types, strictness, and E.164-normalised uniqueness
 - [`RuleSet`](docs/tools/rule-set.md) — build, compose, inspect, export, and validate
 - [Array validation](docs/tools/array-validation.md) — `each()` for wildcards, `children()` for fixed keys
 - [Error messages](docs/tools/error-messages.md) — labels and per-rule messages on the rule itself
@@ -64,6 +65,7 @@ Full documentation is at
 
 - [Migrate existing rules](docs/recipes/migrate-existing-rules.md) — convert incrementally; both forms coexist
 - [Extend parent form-request rules](docs/recipes/extend-parent-form-request-rules.md) — add to or override inherited rules
+- [Validate a phone number](docs/recipes/validate-a-phone-number.md) — country, line type, and the duplicate a plain `unique` misses
 
 ### Project
 

@@ -56,13 +56,13 @@ it('FluentValidator batches exists queries for wildcard arrays', function (): vo
     DB::connection('testing')->flushQueryLog();
     DB::connection('testing')->enableQueryLog();
 
-    $validated = (new BatchExistsValidator([
+    $validated = new BatchExistsValidator([
         'items' => [
             ['email' => 'alice@example.com'],
             ['email' => 'bob@example.com'],
             ['email' => 'carol@example.com'],
         ],
-    ]))->validate();
+    ])->validate();
 
     $queryLog = DB::connection('testing')->getQueryLog();
     DB::connection('testing')->disableQueryLog();
@@ -80,13 +80,13 @@ it('FluentValidator batched exists rejects invalid values with correct error key
     $errors = [];
 
     try {
-        (new BatchExistsValidator([
+        new BatchExistsValidator([
             'items' => [
                 ['email' => 'alice@example.com'],
                 ['email' => 'nonexistent@example.com'],
                 ['email' => 'bob@example.com'],
             ],
-        ]))->validate();
+        ])->validate();
     } catch (ValidationException $validationException) {
         $errors = $validationException->errors();
     }

@@ -23,7 +23,7 @@ namespace Simtabi\Laranail\Validation\Internal;
 final class ExcludeConditionExtractor
 {
     /** @var list<string> */
-    private const ACTIONS = ['exclude_unless', 'exclude_if'];
+    private const array ACTIONS = ['exclude_unless', 'exclude_if'];
 
     /**
      * @return list<array{action: string, field: string, values: list<string>}>

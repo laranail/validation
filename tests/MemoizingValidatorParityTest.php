@@ -173,7 +173,7 @@ it('populates the parse cache for string rules and reuses it across validators',
 it('shares one static parse cache with OptimizedValidator (not redeclared)', function (): void {
     // The memo must live on the base class so OptimizedValidator inherits the
     // same storage — a redeclared static would split the cache in two.
-    $declaring = (new ReflectionProperty(OptimizedValidator::class, 'parsedRuleCache'))->getDeclaringClass();
+    $declaring = new ReflectionProperty(OptimizedValidator::class, 'parsedRuleCache')->getDeclaringClass();
 
     expect($declaring->getName())->toBe(MemoizingValidator::class);
 });

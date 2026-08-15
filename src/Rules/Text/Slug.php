@@ -17,7 +17,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Slug implements ValidationRule
 {
-    private const PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
+    private const string PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

@@ -46,7 +46,7 @@ final class BatchLimitRemap
             ? [(string) $exception->limit]
             : [];
 
-        (new ReflectionProperty(IlluminateValidator::class, 'failedRules'))
+        new ReflectionProperty(IlluminateValidator::class, 'failedRules')
             ->setValue($validator, [$attribute => [$ruleKey => $parameters]]);
 
         return new ValidationException($validator);

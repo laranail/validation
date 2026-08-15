@@ -73,7 +73,7 @@ function macroableMethodNames(): array
 {
     return array_map(
         static fn (ReflectionMethod $m): string => $m->getName(),
-        (new ReflectionClass(Macroable::class))->getMethods(),
+        new ReflectionClass(Macroable::class)->getMethods(),
     );
 }
 
@@ -83,7 +83,7 @@ function fluentRuleFactoryMethods(): array
     $skip = macroableMethodNames();
 
     return array_values(array_filter(
-        (new ReflectionClass(FluentRule::class))->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_STATIC),
+        new ReflectionClass(FluentRule::class)->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_STATIC),
         static fn (ReflectionMethod $m): bool => ! in_array($m->getName(), $skip, true),
     ));
 }
@@ -106,14 +106,14 @@ it('exposes an instance method for every FluentRule factory', function (Reflecti
 })->with(fluentRuleFactoryMethods());
 
 it('matches the return type of every FluentRule factory', function (ReflectionMethod $factory): void {
-    $mirror = (new ReflectionClass(FluentSchema::class))->getMethod($factory->getName());
+    $mirror = new ReflectionClass(FluentSchema::class)->getMethod($factory->getName());
 
     expect((string) $mirror->getReturnType())
         ->toBe((string) $factory->getReturnType(), "FluentSchema::{$factory->getName()}() return type drifted");
 })->with(fluentRuleFactoryMethods());
 
 it('matches the parameter signature of every FluentRule factory', function (ReflectionMethod $factory): void {
-    $mirror = (new ReflectionClass(FluentSchema::class))->getMethod($factory->getName());
+    $mirror = new ReflectionClass(FluentSchema::class)->getMethod($factory->getName());
 
     $signature = static fn (ReflectionMethod $m): array => array_map(
         static fn (ReflectionParameter $p): string => sprintf(
@@ -133,7 +133,7 @@ it('has no instance methods beyond the FluentRule factory surface', function ():
     $factoryNames = array_map(static fn (ReflectionMethod $m): string => $m->getName(), fluentRuleFactoryMethods());
 
     $extra = array_filter(
-        (new ReflectionClass(FluentSchema::class))->getMethods(ReflectionMethod::IS_PUBLIC),
+        new ReflectionClass(FluentSchema::class)->getMethods(ReflectionMethod::IS_PUBLIC),
         static fn (ReflectionMethod $m): bool => $m->getName() !== '__call' && ! in_array($m->getName(), $factoryNames, true),
     );
 
@@ -152,7 +152,7 @@ it('builds the same rule object as the static factory', function (): void {
 });
 
 it('returns the concrete typed rule from a starter', function (): void {
-    expect((new FluentSchema())->string())->toBeInstanceOf(StringRule::class);
+    expect(new FluentSchema()->string())->toBeInstanceOf(StringRule::class);
 });
 
 it('forwards every non-default argument identically to FluentRule', function (Closure $viaSchema, Closure $viaStatic): void {
@@ -222,7 +222,7 @@ it('forwards anyOf to FluentRule when AnyOf is available', function (): void {
         $this->markTestSkipped('AnyOf requires Laravel 13+.');
     }
 
-    expect((new FluentSchema())->anyOf([FluentRule::string(), FluentRule::integer()]))
+    expect(new FluentSchema()->anyOf([FluentRule::string(), FluentRule::integer()]))
         ->toBeInstanceOf(AnyOf::class);
 })->skip(! class_exists(AnyOf::class), 'AnyOf requires Laravel 13+.');
 
@@ -398,7 +398,7 @@ it('forwards macros to FluentRule through __call', function (): void {
 
     // Exercise the forwarding method directly — the unknown macro name stays
     // off PHPStan's radar while still routing FluentSchema -> FluentRule.
-    $rule = (new FluentSchema())->__call('slug', []);
+    $rule = new FluentSchema()->__call('slug', []);
 
     $this->assertInstanceOf(StringRule::class, $rule);
 

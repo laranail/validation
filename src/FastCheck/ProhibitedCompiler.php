@@ -19,7 +19,7 @@ use Simtabi\Laranail\Validation\FastCheck\Shared\LaravelEmptiness;
  */
 final class ProhibitedCompiler
 {
-    private const ALLOWED_SIBLINGS = ['prohibited', 'nullable', 'sometimes', 'bail'];
+    private const array ALLOWED_SIBLINGS = ['prohibited', 'nullable', 'sometimes', 'bail'];
 
     /**
      * @return Closure(mixed): bool|null

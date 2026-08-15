@@ -28,7 +28,7 @@ final class FastCheckCompiler
      * this size we drop the cache to avoid worker bloat — correctness is
      * preserved, only the warm hit-rate resets.
      */
-    private const COMPILE_CACHE_MAX = 1024;
+    private const int COMPILE_CACHE_MAX = 1024;
 
     /** @var array<string, ?Closure(mixed): bool> */
     private static array $compileCache = [];

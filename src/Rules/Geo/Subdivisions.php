@@ -27,13 +27,7 @@ final class Subdivisions
             return false;
         }
 
-        foreach ($subdivisions as $code => $name) {
-            if ($candidate === strtolower($code) || $candidate === self::normalise($name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($subdivisions, fn (string $name, string $code): bool => $candidate === strtolower($code) || $candidate === self::normalise($name));
     }
 
     private static function normalise(string $value): string

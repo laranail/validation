@@ -16,7 +16,7 @@ function stateCopierValidator(array $data, array $rules): BaseValidator
 
 function readValidatorProperty(BaseValidator $validator, string $property): mixed
 {
-    return (new ReflectionProperty(BaseValidator::class, $property))->getValue($validator);
+    return new ReflectionProperty(BaseValidator::class, $property)->getValue($validator);
 }
 
 it('copies wildcard implicitAttributes so expansion metadata pairs with the copied rules', function (): void {

@@ -22,22 +22,22 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final readonly class CaseStyle implements ValidationRule
 {
-    public const CAMEL = 'camel';
+    public const string CAMEL = 'camel';
 
-    public const KEBAB = 'kebab';
+    public const string KEBAB = 'kebab';
 
-    public const PASCAL = 'pascal';
+    public const string PASCAL = 'pascal';
 
-    public const SNAKE = 'snake';
+    public const string SNAKE = 'snake';
 
-    public const TITLE = 'title';
+    public const string TITLE = 'title';
 
     /**
      * Each pattern requires at least one character and forbids the shapes that
      * make two identifiers look identical: leading, trailing and doubled
      * separators.
      */
-    private const PATTERNS = [
+    private const array PATTERNS = [
         self::CAMEL => '/^[a-z][a-zA-Z0-9]*$/',
         self::PASCAL => '/^[A-Z][a-zA-Z0-9]*$/',
         self::SNAKE => '/^[a-z0-9]+(?:_[a-z0-9]+)*$/',

@@ -40,7 +40,7 @@ class PasswordRule implements DataAwareRule, FluentRuleContract, ValidatorAwareR
 
     public function min(int $size): static
     {
-        (new ReflectionProperty($this->password, 'min'))->setValue($this->password, $size);
+        new ReflectionProperty($this->password, 'min')->setValue($this->password, $size);
 
         return $this;
     }

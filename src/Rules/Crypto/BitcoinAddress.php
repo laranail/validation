@@ -28,13 +28,13 @@ use Simtabi\Laranail\Validation\Rules\Crypto\Support\Bech32;
  */
 final readonly class BitcoinAddress implements ValidationRule
 {
-    private const MAINNET_P2PKH = 0x00;
+    private const int MAINNET_P2PKH = 0x00;
 
-    private const MAINNET_P2SH = 0x05;
+    private const int MAINNET_P2SH = 0x05;
 
-    private const TESTNET_P2PKH = 0x6F;
+    private const int TESTNET_P2PKH = 0x6F;
 
-    private const TESTNET_P2SH = 0xC4;
+    private const int TESTNET_P2SH = 0xC4;
 
     public function __construct(private bool $testnet = false) {}
 

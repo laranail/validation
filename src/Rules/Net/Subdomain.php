@@ -22,7 +22,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Subdomain implements ValidationRule
 {
-    private const PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
+    private const string PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

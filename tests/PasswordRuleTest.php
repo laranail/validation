@@ -51,8 +51,8 @@ it('password uncompromised configures the Password rule', function (): void {
     $password = $compiled[1];
     expect($password)->toBeInstanceOf(Password::class);
     /** @var Password $password */
-    expect((new ReflectionProperty($password, 'uncompromised'))->getValue($password))->toBeTrue();
-    expect((new ReflectionProperty($password, 'compromisedThreshold'))->getValue($password))->toBe(5);
+    expect(new ReflectionProperty($password, 'uncompromised')->getValue($password))->toBeTrue();
+    expect(new ReflectionProperty($password, 'compromisedThreshold')->getValue($password))->toBe(5);
 });
 
 it('password canCompile returns false', function (): void {

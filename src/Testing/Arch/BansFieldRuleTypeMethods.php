@@ -56,7 +56,7 @@ final class BansFieldRuleTypeMethods
         // undefined method`. Catching `\Error` turns that into an actionable
         // upgrade message.
         try {
-            $parser = (new ParserFactory())->createForHostVersion();
+            $parser = new ParserFactory()->createForHostVersion();
         } catch (\Error $error) {
             throw new RuntimeException('BansFieldRuleTypeMethods requires nikic/php-parser ^5.0 '
             . '(installed version is too old). '

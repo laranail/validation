@@ -75,7 +75,7 @@ it('findCommonDispatchField returns null when fields differ', function (): void 
 });
 
 it('findCommonDispatchField returns null for empty input', function (): void {
-    expect((new ItemRuleCompiler())->findCommonDispatchField([]))->toBeNull();
+    expect(new ItemRuleCompiler()->findCommonDispatchField([]))->toBeNull();
 });
 
 it('reduceRulesForItem strips excluded fields when action matches', function (): void {

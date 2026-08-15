@@ -22,7 +22,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final class CaProvince implements ValidationRule
 {
     /** @var array<string, string> */
-    private const PROVINCES = [
+    private const array PROVINCES = [
         'AB' => 'Alberta',
         'BC' => 'British Columbia',
         'MB' => 'Manitoba',
@@ -39,7 +39,7 @@ final class CaProvince implements ValidationRule
     ];
 
     /** Alternate spellings a bilingual or older form may submit. */
-    private const ALIASES = [
+    private const array ALIASES = [
         'QC' => 'Québec',
         'NL' => 'Newfoundland & Labrador',
     ];

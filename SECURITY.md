@@ -2,7 +2,8 @@
 
 ## Supported versions
 
-Security fixes land on the latest `1.x` release. Older minors are not backported.
+Security fixes land on the latest `0.1.x` release. The package is pre-1.0 and older tags
+are not backported.
 
 ## Reporting a vulnerability
 

@@ -57,7 +57,7 @@ function vanillaExcluding(string $rule, mixed $notify): array
 it('keeps exclude_unless in step with Laravel for every value boolean accepts', function (mixed $notify): void {
     // 1 and '1' are the cases that broke: accepted by `boolean`, not bools.
     $vanilla = vanillaExcluding('exclude_unless:notify,true', $notify);
-    $optimized = (new ExcludeUnlessBooleanValidator(['notify' => $notify, 'email' => 'a@b.com']))->validated();
+    $optimized = new ExcludeUnlessBooleanValidator(['notify' => $notify, 'email' => 'a@b.com'])->validated();
 
     expect(array_key_exists('email', $optimized))->toBe(array_key_exists('email', $vanilla));
 })->with([
@@ -71,7 +71,7 @@ it('keeps exclude_unless in step with Laravel for every value boolean accepts', 
 
 it('keeps exclude_if in step with Laravel for the same values', function (mixed $notify): void {
     $vanilla = vanillaExcluding('exclude_if:notify,true', $notify);
-    $optimized = (new ExcludeIfBooleanValidator(['notify' => $notify, 'email' => 'a@b.com']))->validated();
+    $optimized = new ExcludeIfBooleanValidator(['notify' => $notify, 'email' => 'a@b.com'])->validated();
 
     expect(array_key_exists('email', $optimized))->toBe(array_key_exists('email', $vanilla));
 })->with([

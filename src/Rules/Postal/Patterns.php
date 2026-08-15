@@ -27,7 +27,7 @@ final class Patterns
      *
      * @var array<string, string>
      */
-    private const BY_PATTERN = [
+    private const array BY_PATTERN = [
         'AD, AS, BA, CU, DE, DZ, EE, ES, FI, FM, FR, GF, GP, GU, HR, IC, ID, IT, KR, LT,' .
         'MA, MC, ME, MH, MP, MQ, MY, NC, PK, PR, PW, RE, RS, SM, TH, TR, UA, US, VI, XK,' .
         'YT' => '/^[0-9]{5}$/',

@@ -24,7 +24,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final readonly class Gtin implements ValidationRule
 {
-    private const VALID_LENGTHS = [8, 12, 13, 14];
+    private const array VALID_LENGTHS = [8, 12, 13, 14];
 
     /** @var list<int> */
     private array $lengths;

@@ -20,14 +20,14 @@ namespace Simtabi\Laranail\Validation\Rules\Crypto\Support;
  */
 final class Bech32
 {
-    private const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+    private const string CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
-    private const BECH32_CONST = 1;
+    private const int BECH32_CONST = 1;
 
-    private const BECH32M_CONST = 0x2BC830A3;
+    private const int BECH32M_CONST = 0x2BC830A3;
 
     /** @var list<int> */
-    private const GENERATOR = [0x3B6A57B2, 0x26508E6D, 0x1EA119FA, 0x3D4233DD, 0x2A1462B3];
+    private const array GENERATOR = [0x3B6A57B2, 0x26508E6D, 0x1EA119FA, 0x3D4233DD, 0x2A1462B3];
 
     /**
      * Whether the value is a valid Bech32/Bech32m string with the given human

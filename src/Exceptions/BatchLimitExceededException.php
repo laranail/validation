@@ -19,9 +19,9 @@ use RuntimeException;
  */
 final class BatchLimitExceededException extends RuntimeException
 {
-    public const REASON_PARENT_MAX = 'parent-max';
+    public const string REASON_PARENT_MAX = 'parent-max';
 
-    public const REASON_HARD_CAP = 'hard-cap';
+    public const string REASON_HARD_CAP = 'hard-cap';
 
     public function __construct(
         public readonly string $table,

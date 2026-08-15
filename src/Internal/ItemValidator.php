@@ -218,7 +218,7 @@ final readonly class ItemValidator
      */
     private function resetExclusions(BaseValidator $validator): void
     {
-        (new ReflectionProperty(BaseValidator::class, 'excludeAttributes'))
+        new ReflectionProperty(BaseValidator::class, 'excludeAttributes')
             ->setValue($validator, []);
     }
 

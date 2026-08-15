@@ -63,7 +63,7 @@ abstract class FluentValidator extends OptimizedValidator
         $this->withFastChecks($fastChecks, $attributePatternMap);
 
         if ($prepared->implicitAttributes !== []) {
-            (new ReflectionProperty($this, 'implicitAttributes'))
+            new ReflectionProperty($this, 'implicitAttributes')
                 ->setValue($this, $prepared->implicitAttributes);
         }
 

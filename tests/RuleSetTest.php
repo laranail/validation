@@ -1457,7 +1457,7 @@ it('prepare implicitAttributes enables correct validation when applied', functio
 
     // Apply implicit attributes (needed for distinct to work across items)
     if ($prepared->implicitAttributes !== []) {
-        (new ReflectionProperty($validator, 'implicitAttributes'))
+        new ReflectionProperty($validator, 'implicitAttributes')
             ->setValue($validator, $prepared->implicitAttributes);
     }
 
@@ -1805,7 +1805,7 @@ it('validated() includes nested each+children keys via prepare path', function (
     $validator = Validator::make($data, $prepared->rules);
 
     if ($prepared->implicitAttributes !== []) {
-        (new ReflectionProperty($validator, 'implicitAttributes'))
+        new ReflectionProperty($validator, 'implicitAttributes')
             ->setValue($validator, $prepared->implicitAttributes);
     }
 

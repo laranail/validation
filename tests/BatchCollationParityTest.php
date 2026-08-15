@@ -61,7 +61,7 @@ final class CollatedUniqueValidator extends FluentValidator
 function batchedUniquePasses(string $email): bool
 {
     try {
-        (new CollatedUniqueValidator(['items' => [['email' => $email]]]))->validated();
+        new CollatedUniqueValidator(['items' => [['email' => $email]]])->validated();
 
         return true;
     } catch (ValidationException) {

@@ -21,7 +21,7 @@ namespace Simtabi\Laranail\Validation\Rules\Crypto\Support;
  */
 final class Base58Check
 {
-    private const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    private const string ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     /**
      * Verify the payload and return its version byte, or null if the string is

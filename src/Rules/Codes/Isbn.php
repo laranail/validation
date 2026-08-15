@@ -22,9 +22,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final readonly class Isbn implements ValidationRule
 {
-    public const EDITION_10 = 10;
+    public const int EDITION_10 = 10;
 
-    public const EDITION_13 = 13;
+    public const int EDITION_13 = 13;
 
     /** @var list<int> */
     private array $editions;

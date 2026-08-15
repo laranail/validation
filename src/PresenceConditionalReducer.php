@@ -25,7 +25,7 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
      *
      * @var list<string>
      */
-    private const RULE_NAMES = [
+    private const array RULE_NAMES = [
         'required_without_all',
         'required_with_all',
         'required_without',

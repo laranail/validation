@@ -45,7 +45,7 @@ use function Livewire\store;
  */
 final class FluentRulesTester
 {
-    private const UNAUTHORIZED_ERROR_KEY = '_authorization';
+    private const string UNAUTHORIZED_ERROR_KEY = '_authorization';
 
     /** @var array<string, mixed>|null */
     private ?array $data = null;
@@ -612,9 +612,9 @@ final class FluentRulesTester
      */
     private function makeRouteShim(array $parameters): object
     {
-        return new class ($parameters) {
+        return new readonly class ($parameters) {
             /** @param  array<string, mixed>  $parameters */
-            public function __construct(private readonly array $parameters) {}
+            public function __construct(private array $parameters) {}
 
             public function parameter(string $name, mixed $default = null): mixed
             {

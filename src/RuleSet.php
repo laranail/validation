@@ -554,30 +554,13 @@ final class RuleSet implements Arrayable, IteratorAggregate
 
         if ($wildcardGroups === []) {
             $compiled = self::compile($topRules);
-
-            // Fast-check pass: run compiled closures on top-level fields when
-            // all keys are flat (no dots). Dotted keys from children() require
-            // nested lookup and validated-data shaping that Laravel provides.
-            $hasDottedKey = false;
-            foreach (array_keys($compiled) as $key) {
-                if (str_contains($key, '.')) {
-                    $hasDottedKey = true;
-                    break;
-                }
-            }
+            $hasDottedKey = array_any(array_keys($compiled), fn (string $key) => str_contains($key, '.'));
 
             if (! $hasDottedKey) {
                 [$fastChecks, $slowRules] = $this->ruleCompiler->buildFastChecks($compiled);
 
                 if ($slowRules === [] && $fastChecks !== []) {
-                    $allPass = true;
-                    foreach ($fastChecks as $check) {
-                        if (! $check($data)) {
-                            $allPass = false;
-                            break;
-                        }
-                    }
-
+                    $allPass = array_all($fastChecks, fn (Closure $check): bool => $check($data));
                     if ($allPass) {
                         /** @var array<string, mixed> */
                         return array_intersect_key($data, $compiled);
@@ -740,7 +723,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
      */
     private function validateItems(array $items, array $itemRules, array $itemMessages, array $itemAttributes, string $parent, bool $isScalar, bool $stopOnFirstFailure = false): array
     {
-        return (new ItemValidator($stopOnFirstFailure, $this->ruleCompiler, $this->errorCollector))
+        return new ItemValidator($stopOnFirstFailure, $this->ruleCompiler, $this->errorCollector)
             ->validate($items, $itemRules, $itemMessages, $itemAttributes, $parent, $isScalar);
     }
 
@@ -932,7 +915,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
         $validator->excludeUnvalidatedArrayKeys = $this->dropUnknownFields || $validator->excludeUnvalidatedArrayKeys;
 
         if ($implicitAttributes !== []) {
-            (new ReflectionProperty($validator, 'implicitAttributes'))
+            new ReflectionProperty($validator, 'implicitAttributes')
                 ->setValue($validator, $implicitAttributes);
         }
 

@@ -133,7 +133,7 @@ it('benchmarks complex import validation', function (): void {
     [$expanded, $ia] = $ruleSet->expand($data); // @phpstan-ignore method.internal
     $compiled = RuleSet::compile($expanded);
     $v = Validator::make($data, $compiled);
-    (new ReflectionProperty($v, 'implicitAttributes'))->setValue($v, $ia);
+    new ReflectionProperty($v, 'implicitAttributes')->setValue($v, $ia);
     $v->validate();
 
     // ── Benchmark ──
@@ -144,7 +144,7 @@ it('benchmarks complex import validation', function (): void {
         [$expanded, $ia] = $ruleSet->expand($data); // @phpstan-ignore method.internal
         $compiled = RuleSet::compile($expanded);
         $v = Validator::make($data, $compiled);
-        (new ReflectionProperty($v, 'implicitAttributes'))->setValue($v, $ia);
+        new ReflectionProperty($v, 'implicitAttributes')->setValue($v, $ia);
         $v->validate();
     }, 3);
 

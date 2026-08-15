@@ -41,7 +41,7 @@ class MemoizingValidator extends Validator
      * preserved, only the warm hit-rate resets. Mirrors
      * {@see FastCheckCompiler}'s compile-cache cap.
      */
-    private const PARSE_CACHE_MAX = 1024;
+    private const int PARSE_CACHE_MAX = 1024;
 
     /**
      * Worker-global memo: rule string => parsed `[name, parameters]`.

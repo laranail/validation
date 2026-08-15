@@ -30,10 +30,12 @@ style fixes rather than reporting them.
 
 ## Supported versions
 
-PHP `^8.3` on Laravel `^12 || ^13`. The test matrix runs PHP 8.3 / 8.4 / 8.5 against both
-Laravel majors, on Ubuntu and Windows, under both `prefer-lowest` and `prefer-stable`. Code
-must work on the floor of that range, not just the version installed locally — `prefer-lowest`
-exists to catch exactly that.
+PHP `^8.4.1 || ^8.5` on Laravel `^13.0`. The test matrix runs PHP 8.4 / 8.5 on Ubuntu and
+Windows, under both `prefer-lowest` and `prefer-stable`. Code must work on the floor of that
+range, not just the version installed locally — `prefer-lowest` exists to catch exactly that.
+
+The floor comes from the laranail foundation packages, which are `^8.4.1` and Laravel 13 only.
+PHP 8.3 and Laravel 12 were supported before that adoption and are not now.
 
 ## Tests are the specification
 

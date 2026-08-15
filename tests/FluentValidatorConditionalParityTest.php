@@ -57,7 +57,7 @@ function nativeConditionalFailures(array $data): array
 function fluentConditionalFailures(array $data): array
 {
     try {
-        (new ConditionalParityValidator($data))->validate();
+        new ConditionalParityValidator($data)->validate();
 
         return [];
     } catch (ValidationException $validationException) {

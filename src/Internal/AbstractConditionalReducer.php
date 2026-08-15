@@ -164,13 +164,7 @@ abstract class AbstractConditionalReducer
     protected static function stringContainsRule(string $rule): bool
     {
         if (str_contains($rule, '|')) {
-            foreach (explode('|', $rule) as $part) {
-                if (static::parse($part) !== null) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any(explode('|', $rule), fn (string $part) => static::parse($part) !== null);
         }
 
         return static::parse($rule) !== null;

@@ -22,7 +22,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final readonly class UsState implements ValidationRule
 {
     /** @var array<string, string> */
-    private const STATES = [
+    private const array STATES = [
         'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas',
         'CA' => 'California', 'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware',
         'FL' => 'Florida', 'GA' => 'Georgia', 'HI' => 'Hawaii', 'ID' => 'Idaho',
@@ -40,7 +40,7 @@ final readonly class UsState implements ValidationRule
     ];
 
     /** @var array<string, string> */
-    private const TERRITORIES = [
+    private const array TERRITORIES = [
         'AS' => 'American Samoa',
         'GU' => 'Guam',
         'MP' => 'Northern Mariana Islands',

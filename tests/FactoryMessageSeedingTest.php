@@ -116,7 +116,7 @@ it('EmailRule: messageFor("email") surfaces on failing Email::default() object b
     // Register a non-recursive default. Email::default() reads $defaultCallback
     // via a closure that constructs a fresh Email — don't call Email::default()
     // from within the callback or it recurses.
-    Email::defaults(fn () => (new Email())->rfcCompliant());
+    Email::defaults(fn () => new Email()->rfcCompliant());
 
     try {
         $v = makeValidator(

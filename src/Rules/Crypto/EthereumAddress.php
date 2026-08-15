@@ -31,7 +31,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class EthereumAddress implements ValidationRule
 {
-    private const PATTERN = '/^0x[0-9a-fA-F]{40}$/';
+    private const string PATTERN = '/^0x[0-9a-fA-F]{40}$/';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

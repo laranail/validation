@@ -28,7 +28,7 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
      *
      * @var list<string>
      */
-    private const RULE_NAMES = [
+    private const array RULE_NAMES = [
         'required_unless',
         'required_if',
         'prohibited_unless',
@@ -41,7 +41,7 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
      *
      * @var array<string, string>
      */
-    private const REWRITE_TARGET = [
+    private const array REWRITE_TARGET = [
         'required_if' => 'required',
         'required_unless' => 'required',
         'prohibited_if' => 'prohibited',

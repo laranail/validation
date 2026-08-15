@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class BatchPresenceQuery
 {
-    private const CHUNK_SIZE = 1000;
+    private const int CHUNK_SIZE = 1000;
 
     /**
      * @param  array<int, mixed>  $values

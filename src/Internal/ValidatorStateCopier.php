@@ -34,7 +34,7 @@ final class ValidatorStateCopier
      *
      * @var list<string>
      */
-    private const COPIED_PROPERTIES = [
+    private const array COPIED_PROPERTIES = [
         'rules',
         'initialRules',
         'implicitAttributes',

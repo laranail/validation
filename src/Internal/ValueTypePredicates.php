@@ -30,15 +30,7 @@ final class ValueTypePredicates
             return array_values($values);
         }
 
-        return array_values(array_filter($values, static function (mixed $v) use ($predicates): bool {
-            foreach ($predicates as $predicate) {
-                if (! $predicate($v)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }));
+        return array_values(array_filter($values, static fn (mixed $v): bool => array_all($predicates, fn (Closure $predicate): bool => $predicate($v))));
     }
 
     /**

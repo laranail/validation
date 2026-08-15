@@ -24,7 +24,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Bic implements ValidationRule
 {
-    private const PATTERN = '/^[A-Z]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?$/';
+    private const string PATTERN = '/^[A-Z]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?$/';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

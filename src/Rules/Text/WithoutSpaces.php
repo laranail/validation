@@ -19,7 +19,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final class WithoutSpaces implements ValidationRule
 {
     /** Unicode separators, ASCII whitespace controls, and zero-width characters. */
-    private const WHITESPACE = '/[\p{Z}\s\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u';
+    private const string WHITESPACE = '/[\p{Z}\s\x{200B}-\x{200D}\x{2060}\x{FEFF}]/u';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

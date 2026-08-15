@@ -21,9 +21,9 @@ use Simtabi\Laranail\Validation\ValidationServiceProvider;
  */
 function fakeList(array $entries): DisposableDomainList&RoleAccountList
 {
-    return new class ($entries) implements DisposableDomainList, RoleAccountList {
+    return new readonly class ($entries) implements DisposableDomainList, RoleAccountList {
         /** @param  list<string>  $entries */
-        public function __construct(private readonly array $entries) {}
+        public function __construct(private array $entries) {}
 
         public function contains(string $domain): bool
         {

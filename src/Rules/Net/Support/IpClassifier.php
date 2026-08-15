@@ -27,7 +27,7 @@ final class IpClassifier
      *
      * @var list<array{string, int}>
      */
-    private const V4_RESERVED = [
+    private const array V4_RESERVED = [
         ['0.0.0.0', 8],          // "this network" (RFC 1122)
         ['10.0.0.0', 8],         // private (RFC 1918)
         ['100.64.0.0', 10],      // carrier-grade NAT (RFC 6598)
@@ -50,7 +50,7 @@ final class IpClassifier
      *
      * @var list<array{string, int}>
      */
-    private const V6_RESERVED = [
+    private const array V6_RESERVED = [
         ['::', 128],             // unspecified
         ['::1', 128],            // loopback
         ['100::', 64],           // discard-only (RFC 6666)

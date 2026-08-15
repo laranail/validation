@@ -30,11 +30,11 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final readonly class DomainName implements ValidationRule
 {
     /** RFC 1035: 253 characters in ASCII form, excluding the root dot. */
-    private const MAX_LENGTH = 253;
+    private const int MAX_LENGTH = 253;
 
-    private const MAX_LABEL_LENGTH = 63;
+    private const int MAX_LABEL_LENGTH = 63;
 
-    private const NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
+    private const string NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
 
     /**
      * @param  bool  $requireTld  Reject single-label names such as `localhost`.

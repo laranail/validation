@@ -578,6 +578,6 @@ final class BatchDatabaseChecker
 
     private static function readProperty(object $object, string $property): mixed
     {
-        return (new ReflectionProperty($object, $property))->getValue($object);
+        return new ReflectionProperty($object, $property)->getValue($object);
     }
 }

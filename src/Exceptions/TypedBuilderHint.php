@@ -44,7 +44,7 @@ final class TypedBuilderHint
      * The key set is authoritative for reflection; the value is the
      * factory name inserted into generated hints.
      */
-    private const TYPED_BUILDERS = [
+    private const array TYPED_BUILDERS = [
         StringRule::class => 'string',
         NumericRule::class => 'numeric',
         DateRule::class => 'date',
@@ -63,7 +63,7 @@ final class TypedBuilderHint
      * so users migrating from rule strings get a clear hint rather
      * than an unhelpful generic fallback.
      */
-    private const LARAVEL_ALIAS_ONLY = ['gt', 'gte', 'lt', 'lte', 'size', 'alphaNum'];
+    private const array LARAVEL_ALIAS_ONLY = ['gt', 'gte', 'lt', 'lte', 'size', 'alphaNum'];
 
     /** @var array<string, list<string>>|null cached method → factory names */
     private static ?array $methodMap = null;

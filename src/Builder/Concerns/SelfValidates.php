@@ -402,13 +402,7 @@ trait SelfValidates
      */
     private function anyContainsPipe(array $rules): bool
     {
-        foreach ($rules as $rule) {
-            if (str_contains($rule, '|')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($rules, fn (string $rule) => str_contains($rule, '|'));
     }
 
     /**

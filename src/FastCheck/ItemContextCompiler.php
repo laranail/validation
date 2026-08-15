@@ -59,13 +59,7 @@ final class ItemContextCompiler
      */
     private static function containsConfirmedRule(string $ruleString): bool
     {
-        foreach (explode('|', $ruleString) as $part) {
-            if ($part === 'confirmed' || str_starts_with($part, 'confirmed:')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(explode('|', $ruleString), fn (string $part): bool => $part === 'confirmed' || str_starts_with($part, 'confirmed:'));
     }
 
     /**
