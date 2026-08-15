@@ -53,24 +53,7 @@ function makeClientCheckable(string $class): object
 /** @return list<class-string> */
 function clientCheckableRules(): array
 {
-    $found = [];
-
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/src/Rules')) as $file) {
-        if (! $file instanceof SplFileInfo || $file->getExtension() !== 'php') {
-            continue;
-        }
-
-        $relative = str_replace([dirname(__DIR__, 2) . '/src/Rules/', '/', '.php'], ['', '\\', ''], $file->getPathname());
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $relative;
-
-        if (class_exists($class) && is_a($class, ClientCheckable::class, true)) {
-            $found[] = $class;
-        }
-    }
-
-    sort($found);
-
-    return $found;
+    return ruleClassesUnder(ClientCheckable::class);
 }
 
 it('advertises only rules the browser runner implements', function (): void {
@@ -253,15 +236,8 @@ it('declares the interface on every rule that has the method', function (): void
     // failed.
     $undeclared = [];
 
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/src/Rules')) as $file) {
-        if (! $file instanceof SplFileInfo || $file->getExtension() !== 'php') {
-            continue;
-        }
-
-        $relative = str_replace([dirname(__DIR__, 2) . '/src/Rules/', '/', '.php'], ['', '\\', ''], $file->getPathname());
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $relative;
-
-        if (! class_exists($class) || ! method_exists($class, 'clientRules')) {
+    foreach (ruleClassesUnder() as $class) {
+        if (! method_exists($class, 'clientRules')) {
             continue;
         }
 

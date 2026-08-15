@@ -48,20 +48,8 @@ function enableAliases(string $prefix = 'laranail_'): void
 /** @return list<class-string<ValidationRule>> */
 function ruleClasses(): array
 {
-    $classes = [];
-
-    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__) . '/src/Rules')) as $file) {
-        if (! $file instanceof SplFileInfo || $file->getExtension() !== 'php') {
-            continue;
-        }
-
-        $relative = str_replace([dirname(__DIR__) . '/src/Rules/', '/', '.php'], ['', '\\', ''], $file->getPathname());
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $relative;
-
-        if (class_exists($class) && is_a($class, ValidationRule::class, true)) {
-            $classes[] = $class;
-        }
-    }
+    /** @var list<class-string<ValidationRule>> $classes */
+    $classes = ruleClassesUnder(ValidationRule::class);
 
     return $classes;
 }

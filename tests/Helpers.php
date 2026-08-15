@@ -70,6 +70,53 @@ function compiledArray(mixed $compiled): array
 }
 
 /**
+ * Every rule class under `src/Rules`, discovered from the filesystem.
+ *
+ * The separator handling is the point. `SplFileInfo::getPathname()` returns
+ * the platform's separator, so a path is joined with `\` on Windows and `/`
+ * everywhere else. Building an FQN by replacing only `/` therefore produced a
+ * name like `Rules\Banking\Iban` on Linux and `Rules/Banking/Iban` on
+ * Windows, where `class_exists()` is false for every entry — so a
+ * discovery-based guard found NOTHING and either passed over an empty set or
+ * failed outright. Every Windows CI cell failed that way while every Linux one
+ * passed.
+ *
+ * @param  class-string|null  $implementing  Restrict to classes of this type.
+ * @return list<class-string>
+ */
+function ruleClassesUnder(?string $implementing = null): array
+{
+    $base = dirname(__DIR__) . '/src/Rules';
+    $classes = [];
+
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base)) as $file) {
+        if (! $file instanceof SplFileInfo || $file->getExtension() !== 'php') {
+            continue;
+        }
+
+        // Normalise to forward slashes FIRST, so the rest is platform-agnostic.
+        $path = str_replace('\\', '/', $file->getPathname());
+        $relative = substr($path, strlen(str_replace('\\', '/', $base)) + 1, -4);
+
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . str_replace('/', '\\', $relative);
+
+        if (! class_exists($class)) {
+            continue;
+        }
+
+        if ($implementing !== null && ! is_a($class, $implementing, true)) {
+            continue;
+        }
+
+        $classes[] = $class;
+    }
+
+    sort($classes);
+
+    return $classes;
+}
+
+/**
  * Run a single rule object against a value and report whether it passed.
  *
  * Lives here rather than in a test file because several rule-family suites

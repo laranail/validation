@@ -29,7 +29,12 @@ function ruleSourceFiles(): array
 
     foreach (new RecursiveIteratorIterator($directory) as $file) {
         if ($file instanceof SplFileInfo && $file->getExtension() === 'php') {
-            $files[] = $file->getPathname();
+            // Normalised to forward slashes: getPathname() returns the
+            // platform separator, and tierOf() below looks for '/src/Rules/'.
+            // On Windows that never matched, every rule's tier came back
+            // empty, and the Database rules read as tier violations — which
+            // is exactly how every Windows CI cell failed while Linux passed.
+            $files[] = str_replace('\\', '/', $file->getPathname());
         }
     }
 
@@ -129,4 +134,22 @@ it('keeps Database-tier rules out of the precognition opt-out', function (): voi
         expect(is_a($class, PrecognitionSkippable::class, true))
             ->toBeFalse("{$class} is database-tier and must not opt out of precognition");
     }
+});
+
+it('resolves a tier for every rule file, on any platform', function (): void {
+    // The guard for the bug this file had: tierOf() searched for the literal
+    // '/src/Rules/', which never appears in a Windows path, so every rule's
+    // tier came back EMPTY. The Database rules then looked like they were
+    // reading the database from the wrong tier, and every Windows CI cell
+    // failed while every Linux one passed.
+    //
+    // An empty tier must be a failure, not a shrug: with one, the tier
+    // guarantees above are being checked against nothing.
+    $files = ruleSourceFiles();
+
+    expect($files)->not->toBeEmpty('no rule sources discovered at all');
+
+    $untiered = array_values(array_filter($files, static fn (string $f): bool => tierOf($f) === ''));
+
+    expect($untiered)->toBeEmpty('no tier resolved for: ' . implode(', ', $untiered));
 });
