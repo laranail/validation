@@ -166,6 +166,33 @@ it('maps only rule classes that exist', function (): void {
     }
 });
 
+it('behaves exactly like the rule built with no arguments', function (): void {
+    // The docblock promises "an alias with no parameter behaves exactly like
+    // `new Rule()`". Restating a rule's defaults in the factory is how that
+    // breaks: laranail_username capped at 30 while Username's own default was
+    // 32, so the alias quietly validated something different.
+    $drifted = [];
+
+    foreach (RuleAliases::map() as $suffix => $factory) {
+        $viaAlias = $factory(sampleParameters()[$suffix] ?? []);
+        $class = $viaAlias::class;
+
+        // Only rules constructible with no arguments have a "default" to
+        // compare against; the rest are told what to validate.
+        if (new ReflectionClass($class)->getConstructor()?->getNumberOfRequiredParameters() > 0) {
+            continue;
+        }
+
+        $direct = new $class();
+
+        if (print_r($viaAlias, true) !== print_r($direct, true)) {
+            $drifted[] = $suffix;
+        }
+    }
+
+    expect($drifted)->toBeEmpty('aliases whose defaults differ from the rule: ' . implode(', ', $drifted));
+});
+
 it('refuses a database alias whose model parameter is not a model', function (): void {
     // Better here than at validation time, where it surfaces on a user request
     // as a class-not-found with no mention of the rule that caused it.

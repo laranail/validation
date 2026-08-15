@@ -99,14 +99,14 @@ final class RuleAliases
             'imei' => static fn (): ValidationRule => new Imei(),
             'jwt' => static fn (): ValidationRule => new Jwt(),
             'semver' => static fn (): ValidationRule => new SemVer(),
-            'vin' => static fn (array $p): ValidationRule => new Vin(self::bool($p, 0, true)),
+            'vin' => static fn (array $p): ValidationRule => new Vin(...self::flags($p)),
 
             // Geo
             'latitude' => static fn (): ValidationRule => new Latitude(),
             'longitude' => static fn (): ValidationRule => new Longitude(),
             'lat_lng' => static fn (): ValidationRule => new LatLng(),
             'ca_province' => static fn (): ValidationRule => new CaProvince(),
-            'us_state' => static fn (array $p): ValidationRule => new UsState(self::bool($p, 0, false)),
+            'us_state' => static fn (array $p): ValidationRule => new UsState(...self::flags($p)),
 
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
@@ -117,19 +117,21 @@ final class RuleAliases
             'subdomain' => static fn (): ValidationRule => new Subdomain(),
             'public_ip' => static fn (): ValidationRule => new PublicIp(),
             'private_ip' => static fn (): ValidationRule => new PrivateIp(),
-            'domain_name' => static fn (array $p): ValidationRule => new DomainName(self::bool($p, 0, true)),
+            'domain_name' => static fn (array $p): ValidationRule => new DomainName(...self::flags($p)),
 
             // Text
             'slug' => static fn (): ValidationRule => new Slug(),
             'html_clean' => static fn (): ValidationRule => new HtmlClean(),
             'without_spaces' => static fn (): ValidationRule => new WithoutSpaces(),
             'case_style' => static fn (array $p): ValidationRule => new CaseStyle(self::str($p, 0)),
-            'person_name' => static fn (array $p): ValidationRule => new PersonName(self::bool($p, 0, false)),
-            'username' => static fn (array $p): ValidationRule => new Username(self::int($p, 0, 3), self::int($p, 1, 30)),
+            'person_name' => static fn (array $p): ValidationRule => new PersonName(...self::flags($p)),
+            // Spread rather than restate the defaults: hardcoding them here
+            // let `laranail_username` drift from `new Username()` once already.
+            'username' => static fn (array $p): ValidationRule => new Username(...self::ints($p)),
 
             // Crypto
             'ethereum_address' => static fn (): ValidationRule => new EthereumAddress(),
-            'bitcoin_address' => static fn (array $p): ValidationRule => new BitcoinAddress(self::bool($p, 0, false)),
+            'bitcoin_address' => static fn (array $p): ValidationRule => new BitcoinAddress(...self::flags($p)),
 
             // Email — the two list-backed rules resolve their list from the
             // container, so they need no parameter at all.
@@ -234,30 +236,27 @@ final class RuleAliases
         return self::strings($parameters)[$index] ?? null;
     }
 
-    /** @param  array<array-key, mixed>  $parameters */
-    private static function int(array $parameters, int $index, int $default): int
-    {
-        $value = self::strings($parameters)[$index] ?? null;
-
-        return is_numeric($value) ? (int) $value : $default;
-    }
-
     /**
-     * A trailing flag parameter, spelled the way Laravel spells booleans in
-     * rule strings. Absent means the rule's own default, so an alias with no
-     * parameter behaves exactly like `new Rule()`.
+     * Flag parameters, spelled the way Laravel spells booleans in rule strings.
+     *
+     * Returns only what was actually supplied, so the factories can spread it
+     * and an absent parameter leaves the rule's OWN default in force. Naming a
+     * default here instead is how two aliases silently drifted from their
+     * rules: `laranail_username` capped at 30 against Username's 32, and
+     * `laranail_vin` demanded a check digit that `new Vin()` does not.
      *
      * @param  array<array-key, mixed>  $parameters
+     * @return list<bool>
      */
-    private static function bool(array $parameters, int $index, bool $default): bool
+    private static function flags(array $parameters): array
     {
-        $value = self::strings($parameters)[$index] ?? null;
+        $flags = [];
 
-        if ($value === null) {
-            return $default;
+        foreach (self::strings($parameters) as $value) {
+            $flags[] = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? false;
         }
 
-        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $default;
+        return $flags;
     }
 
     /**
