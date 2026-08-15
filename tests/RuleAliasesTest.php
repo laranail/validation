@@ -32,6 +32,7 @@ function sampleParameters(): array
         'models_exist' => [User::class],
         'authorized' => ['do-something', User::class],
         'parity' => ['even'],
+        'vendor_identifier' => ['aws_region'],
     ];
 }
 

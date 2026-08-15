@@ -1,6 +1,6 @@
 # Rule library
 
-Forty-two validation rules for the formats Laravel does not ship, grouped by family.
+Forty-seven validation rules for the formats Laravel does not ship, grouped by family.
 
 Every rule is a plain `Illuminate\Contracts\Validation\ValidationRule`. There is nothing to
 register and nothing to configure — construct one and put it in a rule array:
@@ -33,6 +33,33 @@ Every rule here is **Pure tier** except the two in `Database`, which perform one
 each, and the one in `Network`, which performs a cached DNS lookup. No rule in this library
 writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
 that enforce them.
+
+## Anti-spam
+
+Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Honeypot` | — | `honeypot` | `honeypot` |
+| `SubmissionTiming` | `int $minimumSeconds = 3, int $maximumSeconds = 7200` | *(none)* | `submission_timing.*` |
+
+- **`Honeypot`** — a decoy field that must arrive empty. Hide it with CSS, not `type="hidden"`,
+  which many bots skip. Whitespace counts as empty, because a browser autofill leaves some and
+  rejecting a real person for that is the expensive error. `"0"` counts as **filled** — the
+  value a lazy bot posts, and the one `empty()` gets wrong.
+
+  > Hide it accessibly: a screen reader follows the accessibility tree, not the visual one, so
+  > the field needs `aria-hidden="true"` and `tabindex="-1"` as well. Without those a
+  > screen-reader user fills it in and is treated as a bot.
+
+- **`SubmissionTiming`** — a form submitted in milliseconds was not filled in by a person.
+  Render `SubmissionTiming::token()` into a hidden field and validate it back. The timestamp is
+  **encrypted, not plain**: a plain one is attacker-supplied, so a bot posts whatever passes and
+  the check becomes decoration. It has no string alias on purpose — the two bounds are a
+  security setting, and a rule string invites them to be tuned in a view until one is `0`.
+
+  It does not prevent replay *within* the window; that needs a nonce the application records as
+  spent.
 
 ## Banking
 
@@ -208,6 +235,28 @@ owns that dataset.
   three base64url segments with a decodable JSON header. It does **not** verify the signature
   and is not an authentication check.
 
+## Markup
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Xml` | `?string $schema = null` | `xml` | `xml.malformed`, `xml.schema`, `xml.schema_missing` |
+
+**`Xml`** — well-formed XML, and optionally valid against an XSD. Nothing else in the Laravel
+ecosystem validates against a schema, which is the reason it exists: "is it XML" is a weak
+question, and "is it the document we agreed on" is the one an integration asks.
+
+```php
+'payload' => ['required', new Xml(schema: resource_path('schemas/invoice.xsd'))],
+```
+
+**External entities are not expanded.** Parsing untrusted XML with substitution on is XXE — the
+path to reading local files or making the server issue requests for an attacker. `LIBXML_NONET`
+is passed explicitly rather than relying on a libxml version default, and the error-handling
+mode is restored afterwards because it is process-global.
+
+A missing schema file reports separately from a bad document: that is a deployment fault, and
+failing the input would blame the user for it.
+
 ## Net
 
 | Rule | Parameters | Alias | Message key |
@@ -269,6 +318,32 @@ that a debounced email field would issue one DNS lookup per keystroke.
 The bundled `Actions\CachedDnsResolver` is bound only if nothing else has bound the contract,
 so `laranail/email` can replace it without any call site changing. Cache lifetime is
 `laranail.validation.dns.ttl`, default one hour.
+
+## Vendor identifiers
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `VendorIdentifier` | `string $vendor` | `vendor_identifier` | `vendor_identifier` |
+
+**`VendorIdentifier`** validates an id issued by a third-party service, in that service's
+format — the values a settings screen collects and pastes into a script tag, where a typo
+surfaces days later as "why is there no data".
+
+| Constant | Shape |
+|---|---|
+| `GOOGLE_ANALYTICS` | `G-XXXXXXXXXX` (GA4 measurement id) |
+| `GOOGLE_TAG_MANAGER` | `GTM-XXXXXXX` |
+| `FACEBOOK_PIXEL` | 15 or 16 digits |
+| `MICROSOFT_TENANT` | a UUID, or `common` / `organizations` / `consumers` |
+| `AWS_REGION` | `us-east-1`, `eu-west-3`, `us-gov-west-1` |
+| `DISCORD_USERNAME` | lowercase, 2–32 chars, no consecutive dots |
+
+Case handling is **per vendor, not global**: Google ids are folded up because they are pasted in
+any case, AWS regions are left alone because they are lowercase by specification, and a Discord
+username is left alone because folding either way would admit a value Discord itself refuses.
+
+These are format checks, not existence checks. A well-formed id for a property you do not own
+passes; verifying ownership means calling the vendor, which is Network tier.
 
 ## Postal
 

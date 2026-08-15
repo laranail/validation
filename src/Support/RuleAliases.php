@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
+use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
@@ -32,6 +34,7 @@ use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
 use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
+use Simtabi\Laranail\Validation\Rules\Markup\Xml;
 use Simtabi\Laranail\Validation\Rules\Net\Cidr;
 use Simtabi\Laranail\Validation\Rules\Net\DomainName;
 use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
@@ -48,6 +51,7 @@ use Simtabi\Laranail\Validation\Rules\Text\PersonName;
 use Simtabi\Laranail\Validation\Rules\Text\Slug;
 use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Rules\Text\WithoutSpaces;
+use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 use Stringable;
 
 /**
@@ -73,12 +77,20 @@ final class RuleAliases
      *
      * `Delimited` takes a nested rule set, which has no faithful string
      * spelling — `delimited:email|min:3` cannot survive the pipe splitting
-     * that produced it. Use the rule object.
+     * that produced it.
+     *
+     * `SubmissionTiming` is left out for a different reason: its two bounds
+     * are a security setting, and a string rule invites them to be tuned in a
+     * view or copied between forms until one of them is `0`. Constructing it
+     * explicitly keeps that decision in one place.
+     *
+     * Use the rule object for both.
      *
      * @var list<class-string<ValidationRule>>
      */
     public const array UNALIASED = [
         Delimited::class,
+        SubmissionTiming::class,
     ];
 
     /**
@@ -132,6 +144,15 @@ final class RuleAliases
             // Spread rather than restate the defaults: hardcoding them here
             // let `laranail_username` drift from `new Username()` once already.
             'username' => static fn (array $p): ValidationRule => new Username(...self::ints($p)),
+
+            // Anti-spam
+            'honeypot' => static fn (): ValidationRule => new Honeypot(),
+
+            // Markup
+            'xml' => static fn (array $p): ValidationRule => new Xml(self::nullableStr($p, 0)),
+
+            // Vendor identifiers
+            'vendor_identifier' => static fn (array $p): ValidationRule => new VendorIdentifier(self::str($p, 0)),
 
             // Numbers
             'parity' => static fn (array $p): ValidationRule => new Parity(self::str($p, 0)),
