@@ -92,6 +92,58 @@ tenant scope was being dropped will now correctly reject rows it previously acce
 value was a non-empty array, so `['items.*.name' => 'nullable|string']` silently passed for
 `['items' => [['name' => ['oops']]]]`. It now fails, as it always did under vanilla Laravel.
 
+### `unique` and `exists` now agree with the database
+
+Two fixes to the batched presence check. Both make previously-passing input fail, and both
+matter because the failure they replace was silent.
+
+The batched query matches with `whereIn`, so the **database** decides what equals what — its
+collation, its padding, its numeric coercion. The results were then compared to the submitted
+values as exact PHP array keys, which is a different comparison. On any case-insensitive
+collation — MySQL's `utf8mb4_0900_ai_ci` default, SQL Server's default, a Postgres `citext`
+column — a `unique` rule reported "not taken" for a value the database considered taken, and
+the duplicate was written to a column the database treats as unique. Where the two comparisons
+cannot be shown to agree, the group now falls back to per-item queries: correct, and slower.
+
+Separately, batched groups were keyed on table and column alone and **assigned**, so a second
+field checking the same column replaced the first outright and left it unchecked. Two fields
+against one column is ordinary — a primary and a backup address both against `users.email`.
+The tell was that the outcome depended on declaration order.
+
+**Audit if:** you rely on `unique` against a case-insensitive column, or two fields in one
+request validate against the same table and column. Rows admitted under the old behaviour are
+still in your database; this fixes new writes, not existing ones.
+
+### Conditional rules now see a `boolean` dependent the way Laravel does
+
+Laravel converts a dependent rule's `true`/`false` parameters to real booleans whenever the
+dependent field is **declared** `boolean`, not only when its submitted value already is one.
+Two paths skipped that:
+
+- `exclude_unless:notify,true` did not match a `notify` of `1` or `'1'` — values the `boolean`
+  rule accepts — and under `exclude_unless` a non-match *excludes*, so the field disappeared
+  from `validated()` while Laravel kept it.
+- Removing a satisfied attribute for the fast-check phase hid it from Laravel's own
+  `shouldConvertToBoolean()`, so `required_if:items.*.notify,true` stopped matching and the
+  field went unenforced. This only affected wildcard-expanded attributes, since only those
+  enter the fast-check map.
+
+**Audit if:** you send booleans as `0`/`1` from a form — the common case — and gate a field on
+them with `required_if`, `exclude_unless`, `prohibited_if` or any other dependent rule. A field
+you expected in `validated()` may have been missing, and a required field may not have been
+required.
+
+### Exclusions no longer carry between array items
+
+A per-item validator is reused across every item sharing a rule shape, and Laravel's
+`$excludeAttributes` is append-only — `passes()` and `setData()` both leave it alone. So once
+one item excluded an attribute, every later item skipped its own copy too, with no error
+raised. `exclude_if` / `exclude_unless` are pre-evaluated and were never affected; `exclude`,
+`exclude_with` and `exclude_without` were.
+
+**Audit if:** you use `exclude_with` / `exclude_without` inside an array. Items after the first
+excluded one were not validated at all.
+
 ---
 
 [← Docs index](README.md#documentation)
