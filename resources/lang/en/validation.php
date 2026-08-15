@@ -32,6 +32,21 @@ return [
     'semver' => 'The :attribute must be a valid semantic version.',
     'vin' => 'The :attribute must be a valid vehicle identification number.',
 
+    // Telecom
+    //
+    // Deliberately several keys rather than one. A single "invalid phone number" tells the user
+    // nothing they can act on; "must be a mobile number" and "must be a number from KE" each name
+    // the thing to change. None of the three upstream Filament phone packages ships any message at
+    // all — each tells you to add one to your own validation.php.
+    'phone' => 'The :attribute must be a valid phone number.',
+    'phone_possible' => 'The :attribute is not a possible phone number.',
+    'phone_country' => 'The :attribute must be a phone number from :country.',
+    'phone_type' => 'The :attribute must be a :type number.',
+    'phone_extension' => 'The :attribute must not include an extension.',
+    'phone_short_code' => 'The :attribute must be a full phone number, not a short code.',
+    'phone_emergency' => 'The :attribute must not be an emergency number.',
+    'phone_unique' => 'The :attribute has already been taken.',
+
     // Net
     'cidr' => 'The :attribute must be a valid CIDR network.',
     'domain_name' => 'The :attribute must be a valid domain name.',

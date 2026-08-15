@@ -18,6 +18,7 @@ use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 
 /**
@@ -95,6 +96,11 @@ final class FluentSchema
     public function email(?string $label = null, bool $defaults = true, ?string $message = null): EmailRule
     {
         return FluentRule::email($label, $defaults, $message);
+    }
+
+    public function phone(?string $label = null, ?string $message = null): PhoneRule
+    {
+        return FluentRule::phone($label, $message);
     }
 
     public function image(?string $label = null, ?string $message = null): ImageRule

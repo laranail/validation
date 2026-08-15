@@ -35,7 +35,7 @@ use Illuminate\Support\Arr;
  */
 final class PostalCode implements DataAwareRule, ValidationRule
 {
-    /** @var array<string, mixed> */
+    /** @var array<array-key, mixed> */
     private array $data = [];
 
     /** @var list<string> */
@@ -64,7 +64,13 @@ final class PostalCode implements DataAwareRule, ValidationRule
         return new self(countryField: $field);
     }
 
-    /** @param  array<string, mixed>  $data */
+    /**
+     * `array-key`, not `string`: `DataAwareRule::setData()` declares a bare `array`, so narrowing the
+     * key type in the implementation is a contravariance violation — a caller holding the interface
+     * may legitimately hand over an integer-keyed array.
+     *
+     * @param array<array-key, mixed> $data
+     */
     public function setData(array $data): static
     {
         $this->data = $data;

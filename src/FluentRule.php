@@ -18,6 +18,7 @@ use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 
 class FluentRule
@@ -163,6 +164,27 @@ class FluentRule
         }
 
         return $emailRule;
+    }
+
+    /**
+     * A phone number, checked against Google's numbering-plan metadata.
+     *
+     * Accepts any country unless narrowed — see {@see PhoneRule::country()} and
+     * {@see PhoneRule::countryFrom()}. Requires `laranail/phone`, which is suggested rather than
+     * required because it carries libphonenumber's metadata.
+     */
+    public static function phone(?string $label = null, ?string $message = null): PhoneRule
+    {
+        $phoneRule = new PhoneRule();
+        if ($label !== null) {
+            $phoneRule->label($label);
+        }
+
+        if ($message !== null) {
+            $phoneRule->message($message);
+        }
+
+        return $phoneRule;
     }
 
     public static function image(?string $label = null, ?string $message = null): ImageRule
