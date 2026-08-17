@@ -4,6 +4,47 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 
 ## Unreleased
 
+### `FluentRule::url()`, `ip()`, `ipv4()`, `ipv6()` and `macAddress()` return their own node
+
+They returned `StringRule` and now return `UrlRule`, `IpAddressRule` and `MacAddressRule`. The
+surface each offers is narrower and specific to the field — which is the package's whole premise,
+and these five were the places it was not being kept.
+
+Existing chains are unaffected: `FluentRule::url()->required()->max(255)` compiles to the same
+rules it always did. Two things break:
+
+- **A type hint or an assignment declared as `StringRule`.** Change it to the new node, or to
+  `Contracts\FluentRuleContract`, which all of them implement.
+- **A call to a `StringRule` method that never applied to the field** — `->hexColor()` on an IP
+  field, `->uuid()` on a URL. Those were always meaningless and now do not exist.
+
+`FluentRule::url()` also gains defaults it did not have: `http`/`https` only, and no `user:pass@`
+in the authority. A form that legitimately accepts `ftp://` needs `->scheme(['ftp'])`, and one that
+accepts credentials needs `->allowCredentials()`. Both were previously accepted silently, which is
+the reason for the change rather than an argument against it.
+
+### `Rules\Text\Username` rejects reserved names by default
+
+`admin`, `support`, `api`, `root` and about thirty more — every one a name that breaks something
+concrete rather than merely being undesirable. Matching is case-insensitive and ignores separators,
+so `a.d.m.i.n` and `ad-min` are refused too.
+
+Restore the old behaviour with `new Username(reserved: [])`, or
+`FluentRule::username()->reserved([])`. To keep the list and add to it, use
+`->alsoReserved(['acme'])`.
+
+### `Rules\Text\PersonName` accepts several names in one field
+
+It always did — the change is that the count is now bounded on request rather than unbounded
+always, and that a count failure reports the count instead of the character message. Nothing that
+passed before fails now. `PersonName::single()` is the opt-in to the strict single-token reading.
+
+The `person_name` translation key is unchanged; `person_name_min`, `person_name_max` and
+`person_name_required` are new. A published `lang/vendor/laranail-validation/en/validation.php`
+needs those three added, or those failures render as the raw key.
+
+## Unreleased
+
 ### Builder nodes moved out of `Rules\` into `Builder\`
 
 `src/Rules/` now belongs to the extended rule library (`Iban`, `Vin`, `PostalCode`, …).

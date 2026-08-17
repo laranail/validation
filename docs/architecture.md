@@ -12,6 +12,7 @@ so tooling can hook in without reimplementing the stage above it.
 | Layer | Entry point | Responsibility |
 |---|---|---|
 | Builders | `FluentRule` + `Rules\*` | Model a rule chain as a typed object |
+| Schemas | `Schemas\*` | Compose a multi-field concern into a `RuleSet` |
 | Compiler | `RuleSet` | Lower rule objects to native Laravel rules, and extract labels/messages |
 | Execution | `HasFluentRules`, `OptimizedValidator`, `MemoizingValidator` | Run the compiled rules, fast-pathing where the result is provably identical |
 
@@ -19,7 +20,7 @@ so tooling can hook in without reimplementing the stage above it.
 
 `FluentRule` is a static factory, not a class you hold. `FluentRule::string()` returns a
 `Builder\Nodes\StringRule`, `FluentRule::date()` a `Builder\Nodes\DateRule`, and so on across
-the twelve node classes in `src/Builder/Nodes/`. The type-specific surface lives on the
+the seventeen node classes in `src/Builder/Nodes/`. The type-specific surface lives on the
 concrete class, which is what makes the autocompletion narrow — `StringRule` has no `mimes()`
 to offer.
 
@@ -35,6 +36,18 @@ the modifier/conditional surface, `HasEmbeddedRules` for `unique()`/`exists()`/`
 `FluentRule::field()` is the untyped escape hatch. It accepts any modifier, which is why the
 package also ships an opt-in arch test (`Testing\Arch\BansFieldRuleTypeMethods`) to keep
 type-specific calls off it.
+
+### Schemas
+
+A rule object answers for one value. Some concerns are not one value: a person's name is spread
+across however many columns a schema chose, and "at least one of them is filled" is a property
+of the set rather than of any member. `Schemas\*` is where those live.
+
+A schema is a builder that returns a `RuleSet`, not a new kind of rule — so what comes out
+composes with `merge()`, `only()`, `validate()` and the optimized form-request path like
+anything else. `Schemas\PersonNameSchema` is the first, and the shape to copy: the field set is
+the caller's, the defaults are the safe ones, and every option is a copy-on-write method so a
+schema shared between two form requests cannot be mutated by one of them.
 
 ### Compiler
 
@@ -148,19 +161,23 @@ column type needing a different comparison is not a reason to make the general c
 
 ```
 src/
-├── FluentRule.php            static factory — the public entry point
-├── Rules/                    the eleven typed rule classes
-│   └── Concerns/             the shared modifier / embedding / self-validation traits
-├── RuleSet.php               the compiler and its public escape hatches
-├── FastCheckCompiler.php     dispatcher over the per-family closure compilers
-├── FastCheck/                one compiler per rule family
-├── OptimizedValidator.php    wildcard fast-check validator subclass
-├── MemoizingValidator.php    rule-parse memoizing validator subclass
-├── BatchDatabaseChecker.php  collapses per-item exists/unique into one query
-├── HasFluentRules.php        form-request trait; activates the optimized path
-├── HasFluentValidation.php   Livewire equivalent
-├── Internal/                 per-item loop, caches, reducers — not public API
-└── Testing/                  FluentRulesTester, Pest expectations, arch helper
+├── FluentRule.php                static factory — the public entry point
+├── Builder/Nodes/                the seventeen typed builder nodes
+├── Builder/Concerns/             the shared modifier / embedding / self-validation traits
+├── Rules/                        the extended rule library — Iban, Vin, PostalCode, …
+├── Schemas/                      composed multi-field rule sets — PersonNameSchema
+├── Contracts/                    FluentRuleContract, ClientCheckable, the email seams
+├── RuleSet.php                   the compiler and its public escape hatches
+├── FastCheckCompiler.php         dispatcher over the per-family closure compilers
+├── FastCheck/                    one compiler per rule family
+├── OptimizedValidator.php        wildcard fast-check validator subclass
+├── MemoizingValidator.php        rule-parse memoizing validator subclass
+├── BatchDatabaseChecker.php      collapses per-item exists/unique into one query
+├── HasFluentRules.php            form-request trait; activates the optimized path
+├── HasFluentValidation.php       Livewire equivalent
+├── ValidationServiceProvider.php config, translations, opt-in string aliases
+├── Internal/                     per-item loop, caches, reducers — not public API
+└── Testing/                      FluentRulesTester, Pest expectations, arch helper
 ```
 
 Everything under `Internal/` is marked `@internal`: it is reachable, but not covered by the
@@ -173,16 +190,42 @@ The laranail convention requires every name a package registers into a host-owne
 carry both the vendor and the package slug, because those registries are flat maps: a second
 package claiming the same key silently replaces the first.
 
-On the Laravel side this package registers **nothing**. It ships no service provider, so there
-is no config key, view namespace, translation namespace, Blade component prefix, middleware
-alias, Artisan command, publish tag, or container binding to namespace. It is a library of
-value objects plus two traits a host class opts into by `use`-ing it, and PHP's own namespacing
-already keeps those unambiguous.
+The builders themselves register nothing. They are value objects plus two traits a host class
+opts into by `use`-ing, and PHP's own namespacing already keeps those unambiguous.
+
+`ValidationServiceProvider` is the part that reaches into the host, and every name it writes
+carries the vendor and the slug:
+
+| Registry | Registered name |
+|---|---|
+| Config key | `laranail.validation`, from `config/laranail-validation.php` |
+| Translation namespace | `laranail-validation` |
+| Publish tags | `laranail::validation-config`, `laranail::validation-translations` |
+| Validator extensions | `laranail_<rule>` — opt-in, off by default |
+
+The config key and the file name deliberately differ. `hasConfigFile()` derives one from the
+other, which would yield `laranail.validation.laranail-validation`, so the merge is written out
+by hand instead: the file has to be prefixed or `vendor:publish` clobbers an application's own
+`config/validation.php`, and the key has to be flat to match the family convention.
+
+The string rule aliases are the case worth reading twice. Laravel's validator extension map is
+a flat, last-writer-wins registry, so a library claiming `iban`, `slug` or `username` unasked
+would be precisely the collision this convention exists to prevent. They are therefore off by
+default, prefixed when enabled, and the prefix is configurable so an application that already
+owns a name can move ours rather than fight it.
+
+The three container bindings — `Contracts\Email\DisposableDomainList`, `RoleAccountList` and
+`DnsResolver` — are keyed by interface FQCN, which PHP already namespaces, and are bound with
+`singletonIf` so `laranail/email` wins whichever provider registers first.
+
+No view namespace, Blade component prefix, middleware alias or Artisan command is registered,
+because the package ships none of those. `tests/NamingConventionTest.php` asserts this by
+reading the live registries rather than the registration code.
 
 `Macroable` is carried by `FluentRule`, `RuleSet`, `FluentSchema` and each `Rules\*` class, but
 the package defines no macros of its own — that registry belongs to the consuming application.
 
-There is one registry it does write to. `resources/boost/skills/` ships four skills that
+One more registry sits outside Laravel entirely. `resources/boost/skills/` ships four skills that
 `boost sync` copies into the consuming application's `.claude/skills/<name>/`,
 `.agents/skills/<name>/`, and equivalents. That directory is flat, host-owned, and keyed by the
 bare skill name — the engine adds no vendor prefix of its own, which is why the shared catalog
@@ -197,10 +240,6 @@ So the four skills carry the vendor and slug themselves:
 | `laranail-validation-livewire` | `HasFluentValidation` in Livewire components |
 | `laranail-validation-optimize` | Finding conversion opportunities in existing validation |
 | `laranail-validation-migrate-messages` | Moving `messages(): array` to inline `message:` |
-
-The practical consequence for the Laravel side: adding a service provider later is not a small
-change. It is the point at which the rest of the convention starts to apply, and every name it
-registers would need the `laranail-validation` prefix from its first release.
 
 ---
 

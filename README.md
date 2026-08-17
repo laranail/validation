@@ -86,8 +86,10 @@ Full documentation is at
 ### Reference
 
 - [Rule reference](docs/tools/fluent-rule.md) — every entry point, modifier, conditional, and macro hook
-- [Rule library](docs/tools/rule-library.md) — the 49 extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
+- [Rule library](docs/tools/rule-library.md) — the extended rules: IBAN, IMEI, postal codes, IP classification, and the rest
 - [Phone rule](docs/tools/phone-rule.md) — countries, line types, strictness, and E.164-normalised uniqueness
+- [Person names](docs/tools/person-name.md) — any number of name fields, several names in one field, and "at least one"
+- [Identity and network fields](docs/tools/identity-and-network.md) — usernames, URLs, IP and MAC addresses, and the email additions
 - [`RuleSet`](docs/tools/rule-set.md) — build, compose, inspect, export, and validate
 - [Array validation](docs/tools/array-validation.md) — `each()` for wildcards, `children()` for fixed keys
 - [Error messages](docs/tools/error-messages.md) — labels and per-rule messages on the rule itself
