@@ -196,6 +196,10 @@ Domain and mailbox rules. Deliverability needs DNS, so it lives in the Network t
   no call site changes.
 - **`NotRoleEmail`** — rejects shared mailboxes (`info@`, `sales@`, `postmaster@`). Strips a
   plus tag first, since `info+signup@` is still the `info` mailbox.
+- **`NoSubaddressing`** — rejects `user+tag@example.com`. Off by default and it should stay off
+  nearly everywhere: subaddressing is a legitimate feature people use to filter their own mail. It
+  earns its place on the one kind of field that grants something per account, where one mailbox
+  minting unlimited distinct addresses is how a single person takes a free trial repeatedly.
 
 ## Fiscal
 
@@ -301,8 +305,11 @@ failing the input would blame the user for it.
 | `DomainName` | `bool $requireTld = true` | `domain_name` | `domain_name` |
 | `Subdomain` | — | `subdomain` | `subdomain` |
 | `Cidr` | — | `cidr` | `cidr` |
+| `InCidrRange` | `list<string> $networks` | `in_cidr_range` | `in_cidr_range` |
 | `PublicIp` | — | `public_ip` | `public_ip` |
 | `PrivateIp` | — | `private_ip` | `private_ip` |
+| `MacAddress` | formats, bytes, unicast, universal, OUIs | `mac_address` | `mac_address.*` |
+| `Url` | schemes, hosts, ports, credentials, … | — (see below) | `url.*` |
 
 - **`DomainName`** — a fully-qualified domain name per RFC 1035 as amended by RFC 5891 for
   internationalised names, so an A-label (`xn--`) is validated as one rather than as an
@@ -316,9 +323,28 @@ failing the input would blame the user for it.
   it resolves IPv4-mapped IPv6 (`::ffff:127.0.0.1`) before classifying — the mapped form is the
   standard bypass for a naive check.
 
-> `PublicIp` validates an **address**, not a URL, and does not resolve hostnames. A URL whose
-> host is a name still has to be resolved, and a name can resolve differently between your
-> check and your request. That rule belongs to the Network tier and is not built yet.
+- **`InCidrRange`** — membership of one or more CIDR networks. Comparison is on packed bytes, so
+  a prefix that does not land on a byte boundary works, the two address families never match each
+  other, and IPv4-mapped v6 is unwrapped first. A malformed network in the list matches nothing
+  rather than everything: an allow-list with a typo should fail closed.
+- **`MacAddress`** — notation (`colon`, `hyphen`, `dotted`, `bare`), EUI-48 vs EUI-64, the I/G and
+  U/L bits, and OUI prefixes. Refuses broadcast and null outright, and says which rather than
+  blaming a bit. `MacAddress::normalise()` converts any notation to the canonical colon form.
+- **`Url`** — the parts Laravel's `url` does not look at: scheme, host allow/deny lists (the same
+  matcher the email domain rules use), port, `user:pass@` credentials, IP-literal hosts, query and
+  fragment, and length. Internationalised hosts are converted to A-label form so the Unicode and
+  Punycode spellings agree.
+
+> **`Url` has no string alias, on purpose.** It carries eleven settings, four of them lists, and a
+> rule string is a flat positional tail — there is no honest way to write
+> `hostIs(['*.example.com']) + port([80, 443]) + publicHost()` in one. An alias exposing only the
+> schemes would be the dangerous half: the shape check without the host and credential checks
+> anyone reading `laranail_url` would assume it had. Use `FluentRule::url()`.
+
+> **`Url::publicHost()` and `PublicIp` are hygiene, not an SSRF boundary.** Both validate an
+> **address** and neither resolves a hostname. A URL whose host is a name still has to be resolved,
+> and a name can resolve differently between the check and the request. A real defence resolves at
+> request time, pins the address it validated, and refuses redirects.
 
 ## Network
 

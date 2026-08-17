@@ -24,6 +24,7 @@ use Simtabi\Laranail\Validation\Rules\Database\Authorized;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
+use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
 use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
@@ -39,9 +40,12 @@ use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
 use Simtabi\Laranail\Validation\Rules\Markup\Xml;
 use Simtabi\Laranail\Validation\Rules\Net\Cidr;
 use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
+use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
 use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Net\Url;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
@@ -99,6 +103,13 @@ final class RuleAliases
         Delimited::class,
         NoProfanity::class,
         SubmissionTiming::class,
+        // Url carries eleven settings, four of them lists. A rule string is a
+        // flat, positional, comma-separated tail — there is no honest way to
+        // write `hostIs(['*.example.com']) + port([80, 443]) + publicHost()`
+        // in one, and an alias that exposed only the schemes would be the
+        // dangerous half of the rule: the shape check without the host and
+        // credential checks anyone reading `laranail_url` would assume.
+        Url::class,
     ];
 
     /**
@@ -142,6 +153,11 @@ final class RuleAliases
             'public_ip' => static fn (): ValidationRule => new PublicIp(),
             'private_ip' => static fn (): ValidationRule => new PrivateIp(),
             'domain_name' => static fn (array $p): ValidationRule => new DomainName(...self::flags($p)),
+            'mac_address' => static fn (): ValidationRule => new MacAddress(),
+            // The networks are the whole rule, so the parameters are the list:
+            // `laranail_in_cidr_range:10.0.0.0/8,192.168.0.0/16`.
+            'in_cidr_range' => static fn (array $p): ValidationRule => new InCidrRange(self::strings($p)),
+            'no_subaddressing' => static fn (): ValidationRule => new NoSubaddressing(),
 
             // Text
             'slug' => static fn (): ValidationRule => new Slug(),
