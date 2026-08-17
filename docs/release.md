@@ -36,9 +36,32 @@ Run the gates locally and read the output; CI runs the same ones.
 composer test              # Pest suite
 composer phpstan           # level max, plus type coverage
 vendor/bin/pint --test     # style, reported not applied
+composer tag-currency      # is the tag consumers resolve still on main?
 ```
 
 Then check that anything user-facing that changed is reflected in `docs/`.
+
+### The tag check is not optional, and it is not only for release day
+
+`composer tag-currency` answers the question the moving-tag convention creates: is the tag a
+consumer on `^0.1` resolves actually pointing at `main`? It checks three things — every tag is
+reachable from `main`, the tag on the line `extra.branch-alias` declares live is current, and the
+highest tag overall (what an unconstrained `composer require` installs) is too.
+
+**The failure it exists for is silent.** A commit lands on `main`, the moving tag stays where it
+was, and every consumer keeps resolving the code from before. Nothing errors. The package looks
+released and is not.
+
+It runs in CI on every push to `main` — which is exactly when a tag falls behind — on pull
+requests, and weekly, since a tag can also be moved on the remote without any push here. See
+`.github/workflows/tag-currency.yml`.
+
+> It used to call GitHub's `compare` API to test ancestry, and that endpoint 404s under a token
+> without the right scope — for every repository, `laravel/framework` included. The script read
+> the 404 as "this tag points at abandoned history", so the healthy state produced a red error
+> about discarded history. A check that cries wolf on the correct case is worse than no check; it
+> teaches you to skip it. It now uses `git merge-base --is-ancestor` against a freshly fetched
+> remote, which answers the same question with no API scope and no rate limit.
 
 ## Cutting the release
 
