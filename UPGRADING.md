@@ -4,6 +4,51 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 
 ## Unreleased
 
+### The optimized pipeline now agrees with Laravel where it silently did not (P1–P5)
+
+Five fast-path defects made `RuleSet::validate()` (and FormRequests using the optimizer) return a
+different verdict from a vanilla Laravel validator. Each is now byte-identical to Laravel, which
+means previously-accepted input can now fail — if data relied on the old behaviour, it was relying
+on the bug:
+
+- **`regex` on a PCRE error fails (P1, security).** A pattern that aborts mid-match (backtrack
+  limit, malformed pattern) was treated as passing, so a ReDoS-shaped input sailed past a regex
+  deny-list. Laravel rejects on a PCRE error; the fast path now agrees. `not_regex` never
+  fabricates a verdict on an error either — the server's (Laravel-identical) answer stands.
+- **`required` rejects whitespace-only strings (P2).** `"   "` and `"\t\n"` passed the fast path;
+  Laravel's `required` trims. A form that accepted whitespace-only input now reports the missing
+  field it always should have.
+- **`date_equals` compares the full timestamp (P3).** `date_equals:2030-01-01` accepted
+  `"2030-01-01 08:00:00"` by reducing both sides to the calendar day. It now fails, as it always
+  did in Laravel.
+- **`in:`/`not_in:` compare loosely (P4).** The fast path compared strictly, so `not_in:10`
+  accepted `"10.0"` and `"1e1"` — values Laravel's deny-list rejects. Both now match Laravel's
+  loose comparison exactly.
+- **`exists` + `unique->ignore()` on one field batch correctly (P5).** The edit-form idiom —
+  the value must exist AND be unique ignoring the row being edited — could fail a valid submission
+  (or admit a duplicate, with a non-batchable second rule) because both rules were answered from
+  one shared lookup. Such columns now fall back to per-item verification; the verdict matches
+  Laravel, at the cost of batching for that column only.
+
+### Anchored patterns reject trailing newlines (P6, P7)
+
+Every anchored single-line pattern in the rule library now carries the `D` modifier, closing the
+PCRE quirk where `$` also matches just before a final `"\n"`. `"my-slug\n"` no longer passes
+`Slug`, `"admin\n"` no longer slips past `Username`'s reserved list (or a `unique` index holding
+`"admin"`), and the same applies to `Jwt`, `DomainName`, `PersonName`, `EthereumAddress`, `SemVer`,
+`Subdomain`, `MacAddress`, `CaseStyle`, `Vin`, `Iban`, `Bic`, `Isin`, `Isbn`, `Issn`,
+`VendorIdentifier`, `Parity`, `NationalIdentifier`, `SubmissionTiming` and the postal-code
+patterns. Rules that normalize input by design (`PostalCode`, `CssColor`, `MonetaryAmount`,
+`Parity`, `NationalIdentifier` trim before matching) still tolerate surrounding whitespace — that
+tolerance is deliberate and now pinned by tests. If a stored value carries a trailing newline it
+was stored with the bug; trim it on the way in.
+
+### `date_format` combined with a date comparison uses the slow path
+
+`date_format:Y-m-d|after:2029-06-15` fast-accepted any value that merely matched the format — the
+comparison never ran. The combination no longer compiles to a fast check and is decided by
+Laravel itself. No API change; only wrong verdicts change.
+
 ### `FluentRule::url()`, `ip()`, `ipv4()`, `ipv6()` and `macAddress()` return their own node
 
 They returned `StringRule` and now return `UrlRule`, `IpAddressRule` and `MacAddressRule`. The
