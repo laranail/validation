@@ -97,6 +97,13 @@ final class RuleAliases
      *
      * Use the rule object for all three.
      *
+     * The `Telecom` family (`Phone`, `UniquePhone`) is deliberately NOT
+     * listed here either: its rules ride the optional `laranail/phone`
+     * dependency, and this constant stays free of references to an optional
+     * family. The exception lives as `EXTERNALLY_ALIASED_NAMESPACES` in
+     * `tests/RuleAliasesTest.php`, where the same completeness guard that
+     * enforces this list enforces that one.
+     *
      * @var list<class-string<ValidationRule>>
      */
     public const array UNALIASED = [
