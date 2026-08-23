@@ -89,7 +89,7 @@
         "spaze/phpstan-disallowed-calls": "^4.10",
         "symplify/phpstan-extensions": "^12.0.2",
         "tomasvotruba/cognitive-complexity": "^1.1",
-        "tomasvotruba/type-coverage": "^2.1",
+        "tomasvotruba/type-coverage": "^2.3.4",
         "laranail/phone": "^0.1@dev"
     },
     "suggest": {
