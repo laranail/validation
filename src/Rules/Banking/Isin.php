@@ -20,7 +20,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Isin implements ValidationRule
 {
-    private const string PATTERN = '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/';
+    private const string PATTERN = '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/D';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

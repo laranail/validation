@@ -85,6 +85,6 @@ final readonly class Parity implements ValidationRule
 
         // ctype_digit would reject "-4" and accept "0004"; a bounded pattern
         // says exactly what is meant.
-        return preg_match('/^[+-]?\d+$/', $trimmed) === 1 ? (int) $trimmed : null;
+        return preg_match('/^[+-]?\d+$/D', $trimmed) === 1 ? (int) $trimmed : null;
     }
 }

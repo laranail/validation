@@ -23,7 +23,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final readonly class Vin implements ValidationRule
 {
     /** I, O and Q never appear in a VIN. */
-    private const string PATTERN = '/^[A-HJ-NPR-Z0-9]{17}$/';
+    private const string PATTERN = '/^[A-HJ-NPR-Z0-9]{17}$/D';
 
     /**
      * Letter values for the check-digit sum. There is no arithmetic shortcut:

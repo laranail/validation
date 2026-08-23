@@ -17,7 +17,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Issn implements ValidationRule
 {
-    private const string PATTERN = '/^[0-9]{4}-?[0-9]{3}[0-9X]$/';
+    private const string PATTERN = '/^[0-9]{4}-?[0-9]{3}[0-9X]$/D';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

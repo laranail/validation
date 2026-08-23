@@ -32,7 +32,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  */
 final class EthereumAddress implements ClientCheckable, ValidationRule
 {
-    private const string PATTERN = '/^0x[0-9a-fA-F]{40}$/';
+    private const string PATTERN = '/^0x[0-9a-fA-F]{40}$/D';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

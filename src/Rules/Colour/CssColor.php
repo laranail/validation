@@ -89,7 +89,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
             // 3, 4, 6 and 8 digits: the 4- and 8-digit forms carry alpha.
             // Anything else — 5 digits, 7 digits — is not a colour, and a
             // pattern of {3,8} would accept them.
-            self::HEX => preg_match('/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i', $value) === 1,
+            self::HEX => preg_match('/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/iD', $value) === 1,
             self::RGB => self::functional($value, 'rgba?', 3),
             self::HSL => self::functional($value, 'hsla?', 3),
             self::HSV => self::functional($value, 'hsva?', 3),
@@ -116,7 +116,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
         $body = $component . str_repeat($separator . $component, $components - 1);
         $alpha = '(?:\s*(?:,|\/)\s*' . $component . ')?';
 
-        return preg_match('/^' . $function . '\(\s*' . $body . $alpha . '\s*\)$/i', $value) === 1;
+        return preg_match('/^' . $function . '\(\s*' . $body . $alpha . '\s*\)$/iD', $value) === 1;
     }
 
     /**
@@ -152,7 +152,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
             $branches[] = $branch;
         }
 
-        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . implode('|', $branches) . ')$/i']]];
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . implode('|', $branches) . ')$/iD']]];
     }
 
     /** The unanchored body for one notation, or null if there is no such notation. */

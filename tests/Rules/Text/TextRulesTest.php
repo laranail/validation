@@ -129,6 +129,24 @@ it('rejects a reserved name however it is punctuated', function (string $value):
     expect(ruleAccepts(new Username(), $value))->toBeFalse();
 })->with(['admin', 'ADMIN', 'Admin', 'a.d.m.i.n', 'ad-min', 'ad_min', 'support', 'api', 'root']);
 
+it('rejects a username with a trailing newline — the reserved-list bypass', function (string $value): void {
+    // Without the `D` modifier, `$` also matches just before a final "\n",
+    // so "admin\n" passed the shape check AND slipped past the reserved
+    // comparison (the raw value "admin\n" !== "admin") — and can dodge a
+    // `unique` index already holding "admin". Renders as "admin".
+    expect(ruleAccepts(new Username(), $value))->toBeFalse()
+        ->and(Username::passes($value))->toBeFalse();
+})->with(["admin\n", "alice\n", "support\n", "a.d.m.i.n\n"]);
+
+it('normalizes before the reserved comparison', function (): void {
+    // isReserved() is a public predicate callable on its own — it must not
+    // be fooled by surrounding whitespace even when the shape check that
+    // normally precedes it is skipped.
+    expect(Username::isReserved("admin\n", Username::DEFAULT_RESERVED))->toBeTrue()
+        ->and(Username::isReserved(' admin ', Username::DEFAULT_RESERVED))->toBeTrue()
+        ->and(Username::isReserved('alice', Username::DEFAULT_RESERVED))->toBeFalse();
+});
+
 it('takes a replacement reserved list, and an empty one turns the check off', function (): void {
     expect(ruleAccepts(new Username(reserved: ['boss']), 'admin'))->toBeTrue()
         ->and(ruleAccepts(new Username(reserved: ['boss']), 'boss'))->toBeFalse()

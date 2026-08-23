@@ -30,31 +30,31 @@ final class Patterns
     private const array BY_PATTERN = [
         'AD, AS, BA, CU, DE, DZ, EE, ES, FI, FM, FR, GF, GP, GU, HR, IC, ID, IT, KR, LT,' .
         'MA, MC, ME, MH, MP, MQ, MY, NC, PK, PR, PW, RE, RS, SM, TH, TR, UA, US, VI, XK,' .
-        'YT' => '/^[0-9]{5}$/',
+        'YT' => '/^[0-9]{5}$/D',
         'AM, AR, AT, AU, BD, BE, BG, CH, CY, DK, GE, GL, HU, LI, LU, LV, MD, MK, NO, NZ,' .
-        'PH, SI, TN, ZA' => '/^[0-9]{4}$/',
-        'BY, CN, EC, IN, KG, KZ, RO, RU, SG, TJ' => '/^[0-9]{6}$/',
-        'CZ, GR, SE, SK' => '/^[0-9]{3} [0-9]{2}$/',
-        'FO, IS, MG, PG' => '/^[0-9]{3}$/',
-        'GG, JE' => '/^[a-z]{2}[0-9][0-9]? [0-9][a-z]{2}$/i',
-        'MV, MX' => '/^[0-9]{4}[0-9]?$/',
-        'AZ' => '/^[0-9]{4}([0-9]{2})?$/',
-        'BN' => '/^[a-z]{2}[0-9]{4}$/i',
-        'BR' => '/^[0-9]{5}(-?[0-9]{3})?$/',
+        'PH, SI, TN, ZA' => '/^[0-9]{4}$/D',
+        'BY, CN, EC, IN, KG, KZ, RO, RU, SG, TJ' => '/^[0-9]{6}$/D',
+        'CZ, GR, SE, SK' => '/^[0-9]{3} [0-9]{2}$/D',
+        'FO, IS, MG, PG' => '/^[0-9]{3}$/D',
+        'GG, JE' => '/^[a-z]{2}[0-9][0-9]? [0-9][a-z]{2}$/iD',
+        'MV, MX' => '/^[0-9]{4}[0-9]?$/D',
+        'AZ' => '/^[0-9]{4}([0-9]{2})?$/D',
+        'BN' => '/^[a-z]{2}[0-9]{4}$/iD',
+        'BR' => '/^[0-9]{5}(-?[0-9]{3})?$/D',
         // Corrected from the source table, which made the final digit optional
         // and so accepted the five-character 'K1A 0B'. A Canadian postal code is
         // always A1A 1A1. Canada Post also excludes D, F, I, O, Q and U in every
         // position, and W and Z as the first letter.
-        'CA' => '/^[ABCEGHJ-NPRSTVXY][0-9][ABCEGHJ-NPRSTV-Z] ?[0-9][ABCEGHJ-NPRSTV-Z][0-9]$/i',
-        'GB' => '/^(([a-z][0-9])|([a-z][0-9]{2})|([a-z][0-9][a-z])|([a-z]{2}[0-9])|([a-z]{2}[0-9]{2})|([a-z]{2}[0-9][a-z])) [0-9][a-z]{2}$/i',
-        'IL' => '/^[0-9]{5}([0-9]{2})?$/',
-        'JP' => '/^[0-9]{3}-[0-9]{4}$/',
-        'MN' => '/^[0-9]{5}[0-9]?$/',
-        'NL' => '/^[0-9]{4}( [a-z]{2})?$/i',
-        'PL' => '/^[0-9]{2}-[0-9]{3}$/',
-        'PT' => '/^[0-9]{4}(-[0-9]{3})?$/',
-        'SZ' => '/^[a-z]{1}[0-9]{3}$/i',
-        'TW' => '/^[0-9]{3}([0-9]{2})?$/',
+        'CA' => '/^[ABCEGHJ-NPRSTVXY][0-9][ABCEGHJ-NPRSTV-Z] ?[0-9][ABCEGHJ-NPRSTV-Z][0-9]$/iD',
+        'GB' => '/^(([a-z][0-9])|([a-z][0-9]{2})|([a-z][0-9][a-z])|([a-z]{2}[0-9])|([a-z]{2}[0-9]{2})|([a-z]{2}[0-9][a-z])) [0-9][a-z]{2}$/iD',
+        'IL' => '/^[0-9]{5}([0-9]{2})?$/D',
+        'JP' => '/^[0-9]{3}-[0-9]{4}$/D',
+        'MN' => '/^[0-9]{5}[0-9]?$/D',
+        'NL' => '/^[0-9]{4}( [a-z]{2})?$/iD',
+        'PL' => '/^[0-9]{2}-[0-9]{3}$/D',
+        'PT' => '/^[0-9]{4}(-[0-9]{3})?$/D',
+        'SZ' => '/^[a-z]{1}[0-9]{3}$/iD',
+        'TW' => '/^[0-9]{3}([0-9]{2})?$/D',
     ];
 
     /**

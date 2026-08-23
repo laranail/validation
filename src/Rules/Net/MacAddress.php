@@ -144,16 +144,16 @@ final readonly class MacAddress implements ValidationRule
     public static function formatOf(string $value): ?string
     {
         return match (true) {
-            preg_match('/^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$/i', $value) === 1,
-            preg_match('/^[0-9a-f]{2}(?::[0-9a-f]{2}){7}$/i', $value) === 1 => self::COLON,
+            preg_match('/^[0-9a-f]{2}(?::[0-9a-f]{2}){5}$/iD', $value) === 1,
+            preg_match('/^[0-9a-f]{2}(?::[0-9a-f]{2}){7}$/iD', $value) === 1 => self::COLON,
 
-            preg_match('/^[0-9a-f]{2}(?:-[0-9a-f]{2}){5}$/i', $value) === 1,
-            preg_match('/^[0-9a-f]{2}(?:-[0-9a-f]{2}){7}$/i', $value) === 1 => self::HYPHEN,
+            preg_match('/^[0-9a-f]{2}(?:-[0-9a-f]{2}){5}$/iD', $value) === 1,
+            preg_match('/^[0-9a-f]{2}(?:-[0-9a-f]{2}){7}$/iD', $value) === 1 => self::HYPHEN,
 
-            preg_match('/^[0-9a-f]{4}(?:\.[0-9a-f]{4}){2}$/i', $value) === 1,
-            preg_match('/^[0-9a-f]{4}(?:\.[0-9a-f]{4}){3}$/i', $value) === 1 => self::DOTTED,
+            preg_match('/^[0-9a-f]{4}(?:\.[0-9a-f]{4}){2}$/iD', $value) === 1,
+            preg_match('/^[0-9a-f]{4}(?:\.[0-9a-f]{4}){3}$/iD', $value) === 1 => self::DOTTED,
 
-            preg_match('/^(?:[0-9a-f]{12}|[0-9a-f]{16})$/i', $value) === 1 => self::BARE,
+            preg_match('/^(?:[0-9a-f]{12}|[0-9a-f]{16})$/iD', $value) === 1 => self::BARE,
 
             default => null,
         };

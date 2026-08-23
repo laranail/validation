@@ -85,7 +85,7 @@ final readonly class SubmissionTiming implements ValidationRule
             return null;
         }
 
-        if (preg_match('/^\d+$/', $issued) !== 1) {
+        if (preg_match('/^\d+$/D', $issued) !== 1) {
             return null;
         }
 

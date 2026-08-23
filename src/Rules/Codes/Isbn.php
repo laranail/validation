@@ -68,7 +68,7 @@ final readonly class Isbn implements ValidationRule
      */
     private static function isbn10IsValid(string $isbn): bool
     {
-        if (preg_match('/^[0-9]{9}[0-9X]$/', $isbn) !== 1) {
+        if (preg_match('/^[0-9]{9}[0-9X]$/D', $isbn) !== 1) {
             return false;
         }
 

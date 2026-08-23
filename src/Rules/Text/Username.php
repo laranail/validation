@@ -122,16 +122,19 @@ final readonly class Username implements ClientCheckable, ValidationRule
     ): string {
         $alphabet = $lowercase ? 'a-z0-9' : 'a-zA-Z0-9';
 
+        // The `D` modifier is load-bearing: without it `$` also matches just
+        // before a final "\n", so "admin\n" passed the shape AND slipped past
+        // the reserved list and any unique index holding "admin".
         if ($separators === '') {
             // No separators at all — a flat alphanumeric handle. The general
             // pattern below would still work, but this reads as what it is.
-            return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+$/';
+            return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+$/D';
         }
 
         $class = self::escapeForCharacterClass($separators);
 
         // Alphanumeric at both ends; separators only between, never doubled.
-        return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+(?:[' . $class . '][' . $alphabet . ']+)*$/';
+        return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+(?:[' . $class . '][' . $alphabet . ']+)*$/D';
     }
 
     /**
@@ -148,6 +151,11 @@ final readonly class Username implements ClientCheckable, ValidationRule
         if ($reserved === []) {
             return false;
         }
+
+        // Normalize first: this predicate is public and callable on its own,
+        // so it must not be fooled by surrounding whitespace even though the
+        // shape check that normally precedes it now rejects it anyway.
+        $value = trim($value);
 
         $stripped = strtolower($separators === ''
             ? $value

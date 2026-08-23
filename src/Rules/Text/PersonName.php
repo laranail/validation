@@ -155,8 +155,8 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
     private static function characterPattern(bool $allowDigits): string
     {
         return $allowDigits
-            ? '/^[\p{L}\p{M}\p{N} \'\-.]+$/u'
-            : '/^[\p{L}\p{M} \'\-.]+$/u';
+            ? '/^[\p{L}\p{M}\p{N} \'\-.]+$/uD'
+            : '/^[\p{L}\p{M} \'\-.]+$/uD';
     }
 
     private static function countNames(string $value): int
@@ -183,6 +183,6 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
         $gaps = max(1, $this->minNames) - 1;
         $limit = $this->maxNames === null ? '' : (string) ($this->maxNames - 1);
 
-        return '/^\s*\S+(?:\s+\S+){' . $gaps . ',' . $limit . '}\s*$/u';
+        return '/^\s*\S+(?:\s+\S+){' . $gaps . ',' . $limit . '}\s*$/uD';
     }
 }

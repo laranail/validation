@@ -34,7 +34,7 @@ final readonly class DomainName implements ValidationRule
 
     private const int MAX_LABEL_LENGTH = 63;
 
-    private const string NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
+    private const string NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/iD';
 
     /**
      * @param  bool  $requireTld  Reject single-label names such as `localhost`.
@@ -134,6 +134,6 @@ final readonly class DomainName implements ValidationRule
 
     private static function isAscii(string $value): bool
     {
-        return preg_match('/^[\x00-\x7F]*$/', $value) === 1;
+        return preg_match('/^[\x00-\x7F]*$/D', $value) === 1;
     }
 }
