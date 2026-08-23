@@ -81,20 +81,23 @@ it('answers exists + unique->ignore() on the same field like Laravel, in either 
     // fails one of them depending on declaration order.
     $data = ['items' => [['email' => 'own@example.com']]];
 
-    expect(existsUniqueVanillaVerdict($rules, $data))->toBeTrue();
-    expect(existsUniqueRuleSetVerdict($rules, $data))->toBeTrue();
+    expect(existsUniqueVanillaVerdict($rules, $data))->toBeTrue()
+        ->and(existsUniqueRuleSetVerdict($rules, $data))
+        ->toBeTrue();
 
     // A genuinely taken email (another row's) must still FAIL unique.
     $taken = ['items' => [['email' => 'other@example.com']]];
 
-    expect(existsUniqueVanillaVerdict($rules, $taken))->toBeFalse();
-    expect(existsUniqueRuleSetVerdict($rules, $taken))->toBeFalse();
+    expect(existsUniqueVanillaVerdict($rules, $taken))->toBeFalse()
+        ->and(existsUniqueRuleSetVerdict($rules, $taken))
+        ->toBeFalse();
 
     // A non-existent email must still FAIL exists.
     $missing = ['items' => [['email' => 'nobody@example.com']]];
 
-    expect(existsUniqueVanillaVerdict($rules, $missing))->toBeFalse();
-    expect(existsUniqueRuleSetVerdict($rules, $missing))->toBeFalse();
+    expect(existsUniqueVanillaVerdict($rules, $missing))->toBeFalse()
+        ->and(existsUniqueRuleSetVerdict($rules, $missing))
+        ->toBeFalse();
 })->with(['exists first' => [true], 'unique first' => [false]]);
 
 it('does not let a batched lookup hijack a non-batchable rule on the same table:column', function (): void {
@@ -116,12 +119,14 @@ it('does not let a batched lookup hijack a non-batchable rule on the same table:
     // Editing row 1 with its own email: Laravel passes.
     $own = ['items' => [['email' => 'own@example.com']]];
 
-    expect(existsUniqueVanillaVerdict($rules, $own))->toBeTrue();
-    expect(existsUniqueRuleSetVerdict($rules, $own))->toBeTrue();
+    expect(existsUniqueVanillaVerdict($rules, $own))->toBeTrue()
+        ->and(existsUniqueRuleSetVerdict($rules, $own))
+        ->toBeTrue();
 
     // Another row's email: unique must fail.
     $taken = ['items' => [['email' => 'other@example.com']]];
 
-    expect(existsUniqueVanillaVerdict($rules, $taken))->toBeFalse();
-    expect(existsUniqueRuleSetVerdict($rules, $taken))->toBeFalse();
+    expect(existsUniqueVanillaVerdict($rules, $taken))->toBeFalse()
+        ->and(existsUniqueRuleSetVerdict($rules, $taken))
+        ->toBeFalse();
 });

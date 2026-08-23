@@ -106,7 +106,7 @@ final class DatabaseClaimScanner
         // way Laravel will infer the column from the attribute leaf.
         $column = BatchDatabaseChecker::getVerifierColumn($rule);
 
-        if ($column === null || $column === '' || $column === 'NULL') {
+        if (in_array($column, [null, '', 'NULL'], true)) {
             $column = self::leafAttribute($field);
         }
 

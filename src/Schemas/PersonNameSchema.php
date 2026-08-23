@@ -55,9 +55,6 @@ final class PersonNameSchema
 {
     use Macroable;
 
-    /** @var list<string> */
-    private array $fields;
-
     /** @var array<string, string> */
     private array $labels = [];
 
@@ -81,9 +78,8 @@ final class PersonNameSchema
     private ?int $maxListNames = null;
 
     /** @param  list<string>  $fields */
-    private function __construct(array $fields)
+    private function __construct(private array $fields)
     {
-        $this->fields = $fields;
     }
 
     /**
@@ -268,7 +264,7 @@ final class PersonNameSchema
         $normalised = [];
 
         foreach ($this->fields as $field) {
-            $normalised[$field] = self::trimmedOrNull($input[$field] ?? null);
+            $normalised[$field] = $this->trimmedOrNull($input[$field] ?? null);
         }
 
         return $normalised;
@@ -283,7 +279,7 @@ final class PersonNameSchema
     public function normaliseList(array $names): array
     {
         return array_values(array_filter(
-            array_map(self::trimmedOrNull(...), $names),
+            array_map($this->trimmedOrNull(...), $names),
             static fn (?string $name): bool => $name !== null,
         ));
     }
@@ -297,7 +293,7 @@ final class PersonNameSchema
      * Anything that is not a scalar — an array, an object, a file — is not a
      * name and becomes null, which the presence rule then reports properly.
      */
-    private static function trimmedOrNull(mixed $value): ?string
+    private function trimmedOrNull(mixed $value): ?string
     {
         if (! is_scalar($value)) {
             return null;

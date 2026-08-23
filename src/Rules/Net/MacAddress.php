@@ -98,13 +98,13 @@ final readonly class MacAddress implements ValidationRule
         // perfectly ordinary address and neither names a device — reporting
         // "must be unicast" for the broadcast address would be true and
         // useless.
-        if (self::isBroadcast($octets)) {
+        if ($this->isBroadcast($octets)) {
             $fail('laranail-validation::validation.mac_address.broadcast')->translate();
 
             return;
         }
 
-        if (self::isNull($octets)) {
+        if ($this->isNull($octets)) {
             $fail('laranail-validation::validation.mac_address.null')->translate();
 
             return;
@@ -122,7 +122,7 @@ final readonly class MacAddress implements ValidationRule
             return;
         }
 
-        if ($this->ouis !== [] && ! self::matchesAnyOui($octets, $this->ouis)) {
+        if ($this->ouis !== [] && ! $this->matchesAnyOui($octets, $this->ouis)) {
             $fail('laranail-validation::validation.mac_address.oui')
                 ->translate(['ouis' => implode(', ', $this->ouis)]);
         }
@@ -200,7 +200,7 @@ final readonly class MacAddress implements ValidationRule
     }
 
     /** @param  list<int>  $octets */
-    private static function isBroadcast(array $octets): bool
+    private function isBroadcast(array $octets): bool
     {
         return $octets !== [] && ! in_array(false, array_map(
             static fn (int $octet): bool => $octet === 0xFF,
@@ -209,7 +209,7 @@ final readonly class MacAddress implements ValidationRule
     }
 
     /** @param  list<int>  $octets */
-    private static function isNull(array $octets): bool
+    private function isNull(array $octets): bool
     {
         return $octets !== [] && ! in_array(false, array_map(
             static fn (int $octet): bool => $octet === 0x00,
@@ -221,7 +221,7 @@ final readonly class MacAddress implements ValidationRule
      * @param  list<int>  $octets
      * @param  list<string>  $ouis
      */
-    private static function matchesAnyOui(array $octets, array $ouis): bool
+    private function matchesAnyOui(array $octets, array $ouis): bool
     {
         foreach ($ouis as $oui) {
             // The OUI may be written in any notation and may be a prefix of

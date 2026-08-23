@@ -114,7 +114,7 @@ final readonly class Url implements ValidationRule
             return;
         }
 
-        if ($this->publicHostOnly && ! self::isPublicHost($host)) {
+        if ($this->publicHostOnly && ! $this->isPublicHost($host)) {
             $fail('laranail-validation::validation.url.private_host')->translate();
 
             return;
@@ -175,7 +175,7 @@ final readonly class Url implements ValidationRule
             return null;
         }
 
-        $ascii = self::toAscii($value);
+        $ascii = $this->toAscii($value);
 
         if ($ascii === null || filter_var($ascii, FILTER_VALIDATE_URL) === false) {
             return null;
@@ -197,7 +197,7 @@ final readonly class Url implements ValidationRule
      * Running `idn_to_ascii` over the whole URL would mangle the path, and
      * percent-encoding the host would produce a name DNS cannot resolve.
      */
-    private static function toAscii(string $url): ?string
+    private function toAscii(string $url): ?string
     {
         if (mb_check_encoding($url, 'ASCII')) {
             return $url;
@@ -284,7 +284,7 @@ final readonly class Url implements ValidationRule
      * validated, and refuses redirects. Treating this rule as that defence is
      * the mistake it is documented to prevent.
      */
-    private static function isPublicHost(string $host): bool
+    private function isPublicHost(string $host): bool
     {
         if (in_array($host, self::LOOPBACK_NAMES, true)) {
             return false;

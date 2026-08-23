@@ -189,7 +189,8 @@ it('P1: regex fast path fails closed when PCRE aborts, matching Laravel', functi
 
     try {
         // Precondition: this cell really is the PCRE-error path, not a match.
-        expect(preg_match($pattern, $value))->toBe(false)
+        expect(preg_match($pattern, $value))
+            ->toBeFalse()
             ->and(preg_last_error())->not->toBe(PREG_NO_ERROR);
 
         // Laravel rejects on PCRE error…
@@ -216,7 +217,8 @@ it('P1: not_regex fast path matches Laravel when PCRE aborts', function (): void
     ini_set('pcre.backtrack_limit', '100');
 
     try {
-        expect(preg_match($pattern, $value))->toBe(false);
+        expect(preg_match($pattern, $value))
+            ->toBeFalse();
 
         assertVerdictParity('required|string|not_regex:' . $pattern, $value);
     } finally {
