@@ -142,6 +142,16 @@ it('restricts the port', function (): void {
         ->and(urlCheck(FluentRule::url()->port([80, 443]), 'https://example.com:80/'))->toBeTrue();
 });
 
+it('resolves an omitted port to the scheme default before the allow-list', function (): void {
+    // Almost every real URL omits the port. `https://example.com/` IS port
+    // 443 — treating the missing component as port 0 rejected effectively
+    // every URL the moment an allow-list was configured.
+    expect(urlCheck(FluentRule::url()->port(443), 'https://example.com/'))->toBeTrue()
+        ->and(urlCheck(FluentRule::url()->port(80), 'http://example.com/'))->toBeTrue()
+        ->and(urlCheck(FluentRule::url()->port(8443), 'https://example.com/'))->toBeFalse()
+        ->and(urlCheck(FluentRule::url()->port([80, 443]), 'https://example.com/'))->toBeTrue();
+});
+
 it('can refuse a query string or a fragment', function (): void {
     expect(urlCheck(FluentRule::url()->withoutQuery(), 'https://example.com/?a=b'))->toBeFalse()
         ->and(urlCheck(FluentRule::url()->withoutQuery(), 'https://example.com/'))->toBeTrue()

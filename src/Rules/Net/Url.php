@@ -49,6 +49,15 @@ final readonly class Url implements ValidationRule
     private const array LOOPBACK_NAMES = ['localhost', 'localhost.localdomain', 'ip6-localhost', 'ip6-loopback'];
 
     /**
+     * What an omitted port MEANS, per scheme. `https://example.com/` is port
+     * 443 — almost every real URL omits the port, so an allow-list that read
+     * the missing component as 0 rejected effectively everything.
+     *
+     * @var array<string, int>
+     */
+    private const array DEFAULT_PORTS = ['http' => 80, 'https' => 443, 'ftp' => 21, 'ftps' => 990, 'ws' => 80, 'wss' => 443];
+
+    /**
      * @param  list<string>  $schemes  Accepted schemes, lowercase, without `://`.
      * @param  list<string>  $hosts  Allow-list; `*.example.com` matches subdomains only.
      * @param  list<string>  $blockedHosts  Deny-list, same syntax, applied after the allow-list.
@@ -134,7 +143,13 @@ final readonly class Url implements ValidationRule
             return;
         }
 
-        if ($this->ports !== [] && ! in_array((int) ($parts['port'] ?? 0), $this->ports, true)) {
+        // An omitted port resolves to the scheme's default before the
+        // allow-list applies. A scheme with no known default cannot prove it
+        // uses an allowed port, so it fails — same closed posture as the
+        // rest of this rule.
+        $effectivePort = (int) ($parts['port'] ?? self::DEFAULT_PORTS[$scheme] ?? 0);
+
+        if ($this->ports !== [] && ! in_array($effectivePort, $this->ports, true)) {
             $fail('laranail-validation::validation.url.port')
                 ->translate(['ports' => implode(', ', array_map(strval(...), $this->ports))]);
 
