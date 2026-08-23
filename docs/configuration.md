@@ -60,6 +60,23 @@ An alias naming a model rejects a class that is not an Eloquent model, so a typo
 `laranail_models_exist:App\Models\Tags` fails with a message naming that class rather than the
 bare class-not-found the rule would otherwise raise when it instantiated it.
 
+## The DNS cache TTL
+
+`dns.ttl` is how long a domain's MX result is cached, in seconds (default `3600`). The same
+handful of domains dominates any signup form, so this is what keeps `DeliverableEmail` from
+issuing a lookup per submission. It is only read when the bundled `CachedDnsResolver` is in
+use — binding your own `DnsResolver` implementation makes caching that implementation's
+business.
+
+## Environment variables
+
+Two settings read from the environment, so a deploy can flip them without a config publish:
+
+| Variable | Config key | Default |
+|---|---|---|
+| `LARANAIL_VALIDATION_ALIASES` | `laranail-validation.aliases.enabled` | `false` |
+| `LARANAIL_VALIDATION_DNS_TTL` | `laranail-validation.dns.ttl` | `3600` |
+
 ## The batch query cap
 
 `BatchDatabaseChecker::$maxValuesPerGroup` caps how many distinct values a single batched

@@ -486,6 +486,34 @@ It reports which item failed, not just that one did. This is the one rule with *
 alias**: it takes a nested rule set, and `delimited:email|min:3` cannot survive the pipe
 splitting that produced it. Use the object.
 
+## Telecom
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Phone` | `string\|array $countries = [], ?string $countryField = null` + fluent modifiers | *(none — see below)* | `phone.*` |
+| `UniquePhone` | `string $table, string $column = 'phone'` + the `Phone` surface | *(none — see below)* | `unique_phone` |
+
+Both **require [`laranail/phone`](https://github.com/laranail/phone)**, which is a `suggest`
+rather than a `require`: it pulls libphonenumber's numbering-plan metadata (megabytes an app
+with no phone field should not carry). Constructing either rule without it throws with the
+install command in the message.
+
+**`Phone`** checks a number against Google's numbering-plan metadata — IO tier, not a regex,
+because no pattern can know that `+254712345678` is an allocated Kenyan mobile range while
+`+254012345678` is not. The default is `valid` (the range is actually allocated);
+`possibleOnly()` relaxes to a shape check for signup-style forms where turning away a
+newly-allocated range costs more than precision. A bare national number needs a country: pass a
+fixed list, or `countryField('country')` to read the picker beside the input.
+
+**`UniquePhone`** enforces uniqueness on the **E.164 normalisation**, not the raw string —
+`0712 345 678`, `+254712345678` and `254712345678` are one number and collide as one. A raw
+`unique:` on the column treats them as three distinct values, which is how duplicate accounts
+happen.
+
+Neither rule has a string alias, and the exception is enforced where the alias completeness
+test lives (`EXTERNALLY_ALIASED_NAMESPACES`): their surfaces ride the optional dependency, so
+the alias map stays free of references to it.
+
 ## Text
 
 | Rule | Parameters | Alias | Message key |
@@ -594,7 +622,7 @@ Only English ships. The package deliberately does not carry translations it cann
 | Password strength, common-password rejection | `laranail/toolkit` |
 | Captcha verification | `laranail/captcha` |
 | Licence keys | `laranail/license-kit` |
-| Phone numbers | `laranail/phone` |
+| Phone-number engine (metadata, formatting, types) | `laranail/phone` — the validation rules for it ship HERE ([Telecom](#telecom)), riding that package |
 | Maintained disposable / role lists, and a production DNS resolver | `laranail/email` |
 
 `ulid`, `uuid`, `url`, `hex_color`, `mac_address`, `timezone`, `ascii`, `lowercase`,

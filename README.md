@@ -102,6 +102,7 @@ Full documentation is at
 - [Migrate existing rules](docs/recipes/migrate-existing-rules.md) — convert incrementally; both forms coexist
 - [Extend parent form-request rules](docs/recipes/extend-parent-form-request-rules.md) — add to or override inherited rules
 - [Validate a phone number](docs/recipes/validate-a-phone-number.md) — country, line type, and the duplicate a plain `unique` misses
+- [Reject profanity](docs/recipes/reject-profanity.md) — your word list, the package's matching
 
 ### Project
 

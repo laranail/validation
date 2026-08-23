@@ -92,8 +92,6 @@ The `person_name` translation key is unchanged; `person_name_min`, `person_name_
 `person_name_required` are new. A published `lang/vendor/laranail-validation/en/validation.php`
 needs those three added, or those failures render as the raw key.
 
-## Unreleased
-
 ### Builder nodes moved out of `Rules\` into `Builder\`
 
 `src/Rules/` now belongs to the extended rule library (`Iban`, `Vin`, `PostalCode`, …).

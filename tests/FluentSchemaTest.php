@@ -218,13 +218,9 @@ it('forwards every non-default argument identically to FluentRule', function (Cl
 ]);
 
 it('forwards anyOf to FluentRule when AnyOf is available', function (): void {
-    if (! class_exists(AnyOf::class)) {
-        $this->markTestSkipped('AnyOf requires Laravel 13+.');
-    }
-
     expect(new FluentSchema()->anyOf([FluentRule::string(), FluentRule::integer()]))
         ->toBeInstanceOf(AnyOf::class);
-})->skip(! class_exists(AnyOf::class), 'AnyOf requires Laravel 13+.');
+});
 
 // =========================================================================
 // RuleSet::define()

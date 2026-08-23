@@ -56,6 +56,12 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      # PostalCodeTest legitimately skips without ext-intl, so if setup-php
+      # ever stopped shipping it the suite would go green while the postal
+      # coverage silently vanished. Fail the cell instead.
+      - name: Assert ext-intl is loaded
+        run: php -r 'extension_loaded("intl") or exit(1);'
+
       - name: Install dependencies
         run: |
           # AI authoring tooling (boost-skills / package-boost-laravel) and
