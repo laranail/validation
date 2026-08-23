@@ -20,7 +20,8 @@ it('finds the private property the wildcard path writes via reflection', functio
 
     // Untyped in the framework; the shape contract is its array default —
     // the package writes array<pattern, list<expanded-attribute>>.
-    expect($property->getDefaultValue())->toBe([]);
+    expect($property->getDefaultValue())
+        ->toBeEmpty();
 });
 
 it('is still consulted for attribute resolution when written — the write is load-bearing', function (): void {

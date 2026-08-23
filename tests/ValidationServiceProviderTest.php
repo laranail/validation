@@ -22,6 +22,7 @@ function bootAliasProvider(string $prefix = 'laranail_'): void
 
     app()->register(ValidationServiceProvider::class, force: true);
 }
+
 it('merges config under the flat laranail.validation key', function (): void {
     // hasConfigFile() would have produced laranail.validation.laranail-validation;
     // the explicit mergeConfigFrom is what keeps the key flat. Read it live.
@@ -32,7 +33,7 @@ it('merges config under the flat laranail.validation key', function (): void {
 
 it('binds the bundled email fallbacks only when nothing else has', function (): void {
     // The default: bundled implementations answer the contracts.
-    expect(app(DisposableDomainList::class))->toBeInstanceOf(BundledDisposableDomainList::class);
+    expect(resolve(DisposableDomainList::class))->toBeInstanceOf(BundledDisposableDomainList::class);
 
     // The laranail/email scenario: a consumer (or sibling package) bound the
     // contract FIRST. Re-registering this provider must leave it alone —
@@ -47,9 +48,9 @@ it('binds the bundled email fallbacks only when nothing else has', function (): 
     app()->singleton(DisposableDomainList::class, fn () => $replacement);
     app()->register(ValidationServiceProvider::class, force: true);
 
-    expect(app(DisposableDomainList::class))->toBe($replacement)
-        ->and(app(RoleAccountList::class))->not->toBeNull()
-        ->and(app(DnsResolver::class))->not->toBeNull();
+    expect(resolve(DisposableDomainList::class))->toBe($replacement)
+        ->and(resolve(RoleAccountList::class))->not->toBeNull()
+        ->and(resolve(DnsResolver::class))->not->toBeNull();
 });
 
 it('applies the batch limit at boot, and ignores an unusable value', function (): void {
@@ -81,12 +82,12 @@ it('lands an alias failure on the snake/studly round-trip message key', function
     // `myApp_iban` → studly `MyAppIban` → snake `my_app_iban`.
     bootAliasProvider('myApp_');
 
-    $validator = Validator::make(['account' => 'not-an-iban'], ['account' => 'myApp_iban']);
+    $validator = Validator::make(['account' => 'not-an-iban'], ['account' => ['myApp_iban']]);
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->first('account'))
         ->not->toContain('validation.')
-        ->and($validator->errors()->first('account'))->not->toBe('');
+        ->and($validator->errors()->first('account'))->not->toBeEmpty();
 });
 
 it('drops non-scalar alias parameters rather than fataling on a cast', function (): void {
@@ -94,7 +95,7 @@ it('drops non-scalar alias parameters rather than fataling on a cast', function 
 
     // A hand-built validator can smuggle an array into the parameter list;
     // `(string) []` is fatal, so the narrowing must drop it instead.
-    $validator = Validator::make(['code' => 'ABC'], ['code' => 'laranail_parity:even']);
+    $validator = Validator::make(['code' => 'ABC'], ['code' => ['laranail_parity:even']]);
 
     expect($validator->fails())->toBeTrue();
 });
