@@ -78,9 +78,7 @@ final class PersonNameSchema
     private ?int $maxListNames = null;
 
     /** @param  list<string>  $fields */
-    private function __construct(private array $fields)
-    {
-    }
+    private function __construct(private array $fields) {}
 
     /**
      * A name split across named fields, defaulting to the common three.

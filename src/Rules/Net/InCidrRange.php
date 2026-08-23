@@ -51,7 +51,8 @@ final readonly class InCidrRange implements ValidationRule
         if (! is_string($value) || ! IpClassifier::isValid($value)) {
             return false;
         }
-        return array_any($networks, fn(string $network) => self::contains($network, $value));
+
+        return array_any($networks, fn (string $network) => self::contains($network, $value));
     }
 
     /**
