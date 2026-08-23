@@ -65,10 +65,12 @@ requests, and weekly, since a tag can also be moved on the remote without any pu
 
 ## Cutting the release
 
-1. Tag the release commit with the bare version — `0.1.0`, no `v` prefix. Composer reads the
-   tag. Pre-1.0 this means moving the existing tag; use `git tag -f 0.1.0` and force-push it.
-2. Create the GitHub release against that tag. Title it with the `v` prefix (`v0.1.0`); that
-   part is cosmetic.
+1. Tag the release commit with the `v`-prefixed version — `v0.1.1`. Composer reads either
+   form, and the `v` prefix is what the repo's existing tags, the org convention, and the
+   tag-currency check (`verify-tag-currency.sh` filters on `^v`) all agree on. This page once
+   said "bare version"; that sentence contradicted all three and the script never matched it.
+   Releases are real SemVer points — the pre-1.0 moving-tag model is retired for this package.
+2. Create the GitHub release against that tag, titled the same (`v0.1.1`).
 3. Write a real description in the release body. Summarise what changed and why, in prose — an
    empty body or a bare "see CHANGELOG" is not a release description. This body becomes the
    changelog entry, so it is the version's permanent record.

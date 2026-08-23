@@ -20,6 +20,11 @@ return [
     |
     */
 
+    'aliases' => [
+        'enabled' => env('LARANAIL_VALIDATION_ALIASES', false),
+        'prefix' => 'laranail_',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Deliverability lookups
@@ -34,11 +39,6 @@ return [
 
     'dns' => [
         'ttl' => env('LARANAIL_VALIDATION_DNS_TTL', 3600),
-    ],
-
-    'aliases' => [
-        'enabled' => env('LARANAIL_VALIDATION_ALIASES', false),
-        'prefix' => 'laranail_',
     ],
 
     /*
