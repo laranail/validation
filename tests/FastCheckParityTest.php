@@ -40,6 +40,10 @@ function parityValues(): array
         'https://ok.test',
         // A value that only differs under str_getcsv vs explode(',').
         'a,b',
+        // Loose-comparison shapes: Laravel's in/not_in compare loosely, so
+        // '10.0' and '1e1' both match an in:10 entry.
+        '10.0',
+        '1e1',
         0,
         1,
         5,
@@ -80,6 +84,8 @@ function parityRules(): array
         'date',
         'in:a,b,c',
         'not_in:x,y',
+        'in:10,20',
+        'not_in:10,20',
         'alpha',
         'alpha_dash',
         'alpha_num',
