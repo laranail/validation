@@ -327,6 +327,9 @@ final class ItemRuleCompiler
             return null;
         }
 
-        return BatchDatabaseChecker::buildVerifier($groups);
+        return BatchDatabaseChecker::buildVerifier(
+            $groups,
+            DatabaseClaimScanner::findPoisonedTableColumns($slowRules),
+        );
     }
 }

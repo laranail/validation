@@ -189,7 +189,13 @@ trait PreparesOptimizedRules
             return null;
         }
 
-        return BatchDatabaseChecker::buildVerifier($groups);
+        // Scan ALL prepared rules, not just the wildcard subset: the verifier
+        // is set on the whole validator, so a non-wildcard rule targeting a
+        // batched table:column would consult the lookup too.
+        return BatchDatabaseChecker::buildVerifier(
+            $groups,
+            DatabaseClaimScanner::findPoisonedTableColumns($preparedRules),
+        );
     }
 
     /**
