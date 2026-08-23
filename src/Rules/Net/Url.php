@@ -244,7 +244,7 @@ final readonly class Url implements ValidationRule
 
     private function hostShapeIsValid(string $host): bool
     {
-        $ip = self::hostAsIp($host);
+        $ip = $this->hostAsIp($host);
 
         if ($ip !== null) {
             return $this->allowIpHost;
@@ -260,7 +260,7 @@ final readonly class Url implements ValidationRule
      * accept the brackets, so an unbracketed check would read every v6 host as
      * a name and skip the IP rules entirely.
      */
-    private static function hostAsIp(string $host): ?string
+    private function hostAsIp(string $host): ?string
     {
         $candidate = str_starts_with($host, '[') && str_ends_with($host, ']')
             ? substr($host, 1, -1)
@@ -290,7 +290,7 @@ final readonly class Url implements ValidationRule
             return false;
         }
 
-        $ip = self::hostAsIp($host);
+        $ip = $this->hostAsIp($host);
 
         return $ip === null || IpClassifier::isPubliclyRoutable($ip);
     }
