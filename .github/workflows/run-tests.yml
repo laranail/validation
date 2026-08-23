@@ -60,7 +60,7 @@ jobs:
       # ever stopped shipping it the suite would go green while the postal
       # coverage silently vanished. Fail the cell instead.
       - name: Assert ext-intl is loaded
-        run: php -r "exit(extension_loaded('intl') ? 0 : 1);"
+        run: php -r 'extension_loaded("intl") or exit(1);'
 
       - name: Install dependencies
         run: |

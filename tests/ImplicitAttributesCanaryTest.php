@@ -19,8 +19,11 @@ it('finds the private property the wildcard path writes via reflection', functio
     $property = new ReflectionProperty(Validator::class, 'implicitAttributes');
 
     // Untyped in the framework; the shape contract is its array default —
-    // the package writes array<pattern, list<expanded-attribute>>.
+    // the package writes array<pattern, list<expanded-attribute>>. Both
+    // halves matter: `toBeEmpty()` alone would also accept null, which is
+    // exactly the silent shape change this canary exists to catch.
     expect($property->getDefaultValue())
+        ->toBeArray()
         ->toBeEmpty();
 });
 
