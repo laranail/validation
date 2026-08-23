@@ -21,6 +21,7 @@ use Simtabi\Laranail\Validation\Tests\Fixtures\TestArrayKeyEnum;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
+use Symfony\Component\VarDumper\VarDumper;
 
 // =========================================================================
 // BooleanRule
@@ -323,7 +324,7 @@ it('validates anyOf passes when any rule matches', function (): void {
         ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])]
     );
     expect($v->passes())->toBeTrue();
-})->skip(! class_exists(AnyOf::class), 'AnyOf requires Laravel 13+');
+});
 
 it('validates anyOf fails when no rule matches', function (): void {
     $validator = makeValidator(
@@ -331,7 +332,7 @@ it('validates anyOf fails when no rule matches', function (): void {
         ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])]
     );
     expect($validator->passes())->toBeFalse();
-})->skip(! class_exists(AnyOf::class), 'AnyOf requires Laravel 13+');
+});
 
 // =========================================================================
 // Presence handling — optional fields (no modifier)
@@ -1965,7 +1966,7 @@ it('validates doesntContain on array', function (): void {
         ['tags' => FluentRule::array()->doesntContain('php')]
     );
     expect($v->passes())->toBeFalse();
-})->skip(! method_exists(Validator::class, 'validateDoesntContain'), 'doesnt_contain requires Laravel 12+'); // @phpstan-ignore function.alreadyNarrowedType
+});
 
 // -------------------------------------------------------------------------
 // contains/doesntContain — object-form parity with Rule::contains()
@@ -2062,13 +2063,7 @@ it('doesntContain ->message() binds to the "doesnt_contain" rule key', function 
     $rule = FluentRule::array()->doesntContain('banned')->message('Must not contain banned.');
 
     expect($rule->getCustomMessages())->toBe(['doesnt_contain' => 'Must not contain banned.']);
-})->skip(! class_exists(DoesntContain::class), 'doesnt_contain requires Laravel 12+');
-
-it('doesntContain on Laravel 11 throws RuntimeException', function (): void {
-    FluentRule::array()->doesntContain('banned');
-})
-    ->throws(RuntimeException::class, 'doesntContain() requires Laravel 12+.')
-    ->skip(class_exists(DoesntContain::class), 'Only applies on Laravel <12');
+});
 
 it('doesntContain preserves value containing a comma (CSV-quoted)', function (): void {
     $v = makeValidator(
@@ -2082,7 +2077,7 @@ it('doesntContain preserves value containing a comma (CSV-quoted)', function ():
         ['tags' => FluentRule::array()->doesntContain('a,b')]
     );
     expect($v->passes())->toBeFalse();
-})->skip(! class_exists(DoesntContain::class), 'doesnt_contain requires Laravel 12+');
+});
 
 it('doesntContain accepts BackedEnum by its value', function (): void {
     $v = makeValidator(
@@ -2096,7 +2091,7 @@ it('doesntContain accepts BackedEnum by its value', function (): void {
         ['statuses' => FluentRule::array()->doesntContain(TestStringEnum::Active)]
     );
     expect($v->passes())->toBeFalse();
-})->skip(! class_exists(DoesntContain::class), 'doesnt_contain requires Laravel 12+');
+});
 
 it('doesntContain accepts Arrayable + single-array input', function (): void {
     $arrayable = new class implements Arrayable {
@@ -2119,7 +2114,7 @@ it('doesntContain accepts Arrayable + single-array input', function (): void {
         ['tags' => FluentRule::array()->doesntContain(['banned', 'evil'])]
     );
     expect($v->passes())->toBeTrue();
-})->skip(! class_exists(DoesntContain::class), 'doesnt_contain requires Laravel 12+');
+});
 
 it('contains handles variadic BackedEnum values', function (): void {
     $v = makeValidator(
@@ -2148,8 +2143,7 @@ it('contains rejects multi-array varargs with a clear error', function (): void 
 it('doesntContain rejects multi-array varargs with a clear error', function (): void {
     FluentRule::array()->doesntContain(['a'], ['b']);
 })
-    ->throws(InvalidArgumentException::class, 'does not accept multiple array or Arrayable arguments')
-    ->skip(! class_exists(DoesntContain::class), 'doesnt_contain requires Laravel 12+');
+    ->throws(InvalidArgumentException::class, 'does not accept multiple array or Arrayable arguments');
 
 it('contains messageFor("contains", ...) surfaces in live validation', function (): void {
     // Distinct path from ->message(): messageFor writes directly to
@@ -2191,7 +2185,7 @@ it('contains produces a Contains object equivalent to Rule::contains() for every
     'UnitEnum single' => fn () => TestUnitEnum::Foo,
     'embedded comma' => 'a,b',
     'embedded quote' => 'he said "hi"',
-])->skip(! class_exists(Contains::class), 'Rule::contains()/Rules\\Contains require Laravel 12+');
+]);
 
 // =========================================================================
 // Convenience factory shortcuts
@@ -2429,7 +2423,7 @@ it('validates encoding', function (): void {
         ['name' => FluentRule::string()->encoding('UTF-8')]
     );
     expect($v->passes())->toBeTrue();
-})->skip(! method_exists(Validator::class, 'validateEncoding'), 'encoding requires Laravel 12+'); // @phpstan-ignore function.alreadyNarrowedType
+});
 
 it('compiles encoding', function (): void {
     expect(FluentRule::string()->encoding('UTF-8')->toArray())
@@ -2468,12 +2462,24 @@ it('RuleSet dump returns rules messages and attributes', function (): void {
 });
 
 it('dump is chainable on rules', function (): void {
-    // dump() should return $this for chaining
-    $rule = FluentRule::string()->required();
-    ob_start();
-    $result = $rule->dump();
-    ob_end_clean();
-    expect($result)->toBe($rule);
+    // Swap VarDumper's handler rather than ob_start(): the CLI dumper
+    // writes to the terminal stream directly, past output buffering, and
+    // leaked a raw dump into every suite run. The swap also lets the test
+    // assert WHAT was dumped, not just that the call chains.
+    $dumped = [];
+    VarDumper::setHandler(function (mixed $var) use (&$dumped): void {
+        $dumped[] = $var;
+    });
+
+    try {
+        $rule = FluentRule::string()->required();
+        $result = $rule->dump();
+    } finally {
+        VarDumper::setHandler(null);
+    }
+
+    expect($result)->toBe($rule)
+        ->and($dumped)->toBe([['required', 'string']]);
 });
 
 // =========================================================================

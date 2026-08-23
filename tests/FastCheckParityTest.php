@@ -131,11 +131,40 @@ function parityGrid(): array
     return $grid;
 }
 
+/**
+ * The value-only grid rules that DELIBERATELY do not compile, with the
+ * reason. The grid's runtime skip below is only allowed for these — a rule
+ * that silently stops (or starts) compiling changes the parity surface, and
+ * the pinning test underneath turns that into a red build instead of a
+ * quietly skipped cell.
+ *
+ * @return list<string>
+ */
+function notFastCheckableRules(): array
+{
+    return [
+        // `sometimes` needs to distinguish an ABSENT attribute from a
+        // present-null one, and a value closure only ever sees the value.
+        'sometimes|string',
+        'sometimes|required|string',
+    ];
+}
+
+it('compiles exactly the rules the grid documents as fast-checkable', function (): void {
+    $actual = array_values(array_filter(
+        parityRules(),
+        static fn (string $rule): bool => ! FastCheckCompiler::compile($rule) instanceof Closure,
+    ));
+
+    expect($actual)->toBe(notFastCheckableRules());
+});
+
 it('fast-check closure verdict matches Laravel validator', function (string $rule, mixed $value): void {
     $closure = FastCheckCompiler::compile($rule);
 
     if (! $closure instanceof Closure) {
-        // Rule not fast-checkable — nothing to compare.
+        // Allowed only for the pinned set above; the pinning test fails
+        // first if this ever covers anything else.
         $this->markTestSkipped('Rule not fast-checkable — no closure to compare.');
 
     }
