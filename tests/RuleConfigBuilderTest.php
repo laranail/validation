@@ -123,8 +123,13 @@ it('ItemContextCompiler bails on date_format + date_equals:field combo', functio
 });
 
 /**
- * Counter-checks: date_format with a date LITERAL (not field ref) is fine.
+ * date_format with a date LITERAL bails too: the compiled closure's format
+ * branch decided on format validity alone and returned, so the comparison
+ * never ran — `date_format:Y-m-d|after:2029-06-15` fast-accepted
+ * '2028-01-01'. Laravel parses both sides through the format AND applies
+ * the comparison; until the closure does the same, the slow path is the
+ * only faithful answer. (Verdict drift proven by RuleSetParityHarnessTest.)
  */
-it('ItemContextCompiler accepts date_format with literal-only after', function (): void {
-    expect(ItemContextCompiler::compile('required|date|date_format:Y-m-d|after:2030-01-01'))->toBeInstanceOf(Closure::class);
+it('ItemContextCompiler bails on date_format with literal-only after', function (): void {
+    expect(ItemContextCompiler::compile('required|date|date_format:Y-m-d|after:2030-01-01'))->toBeNull();
 });

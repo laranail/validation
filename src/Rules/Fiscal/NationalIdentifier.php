@@ -112,7 +112,7 @@ final readonly class NationalIdentifier implements ValidationRule
 
         // 11111111111 and friends satisfy the arithmetic but are not issued;
         // every published implementation rejects them explicitly.
-        if (preg_match('/^(\d)\1{10}$/', $digits) === 1) {
+        if (preg_match('/^(\d)\1{10}$/D', $digits) === 1) {
             return false;
         }
 
@@ -142,7 +142,7 @@ final readonly class NationalIdentifier implements ValidationRule
     {
         $value = trim($value);
 
-        if (preg_match('/^(\d{3})-?(\d{2})-?(\d{4})$/', $value, $m) !== 1) {
+        if (preg_match('/^(\d{3})-?(\d{2})-?(\d{4})$/D', $value, $m) !== 1) {
             return false;
         }
 
@@ -165,7 +165,7 @@ final readonly class NationalIdentifier implements ValidationRule
 
         // D, F, I, Q, U and V are never used in either prefix letter; O is
         // never the second. The final letter is A-D, or absent.
-        if (preg_match('/^[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\d{6}[A-D]?$/', $value) !== 1) {
+        if (preg_match('/^[ABCEGHJ-PRSTW-Z][ABCEGHJ-NPRSTW-Z]\d{6}[A-D]?$/D', $value) !== 1) {
             return false;
         }
 
@@ -183,7 +183,7 @@ final readonly class NationalIdentifier implements ValidationRule
     {
         $value = mb_strtoupper(preg_replace('/\s+/', '', trim($value)) ?? '');
 
-        if (preg_match('/^([12]\d{2}(?:0[1-9]|1[0-2]|[2-9]\d)(?:2[AB]|\d{2})\d{6})(\d{2})$/', $value, $m) !== 1) {
+        if (preg_match('/^([12]\d{2}(?:0[1-9]|1[0-2]|[2-9]\d)(?:2[AB]|\d{2})\d{6})(\d{2})$/D', $value, $m) !== 1) {
             return false;
         }
 
@@ -191,7 +191,7 @@ final readonly class NationalIdentifier implements ValidationRule
 
         $number = str_replace(['2A', '2B'], ['19', '18'], $number);
 
-        if (preg_match('/^\d{13}$/', $number) !== 1) {
+        if (preg_match('/^\d{13}$/D', $number) !== 1) {
             return false;
         }
 

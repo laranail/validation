@@ -50,13 +50,29 @@ final class RuleMessagesResolveTest extends TestCase
         $this->assertSame($slashed, trans($slashed), 'The slashed namespace resolved, so both are registered.');
     }
 
+    /**
+     * The one message that is about SEVERAL fields rather than one.
+     *
+     * `PersonNameSchema`'s at-least-one requirement is attached to a single
+     * field for the mundane reason that attaching it to all of them reports one
+     * mistake three times — but what it asks for is any of them. Naming the
+     * carrier would be worse than naming none: "The first name field: please
+     * provide at least one of first name, middle name or last name" tells the
+     * user to fill in the box they just declined to fill in. It names every
+     * field through `:values` instead.
+     */
+    private const string NAMES_SEVERAL_FIELDS = 'laranail-validation::validation.person_name_required';
+
     public function test_no_message_is_left_as_a_placeholder(): void
     {
         foreach ($this->keysReferencedInSource() as $key) {
             $message = trans($key);
 
             $this->assertIsString($message, "{$key} did not resolve to a string.");
-            $this->assertStringContainsString(':attribute', $message, "{$key} never names the field it is about.");
+
+            $names = $key === self::NAMES_SEVERAL_FIELDS ? ':values' : ':attribute';
+
+            $this->assertStringContainsString($names, $message, "{$key} never names the field it is about.");
         }
     }
 

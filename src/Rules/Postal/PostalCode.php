@@ -197,7 +197,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
             $patterns,
         ));
 
-        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/']]];
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/D']]];
     }
 
     /**
@@ -206,7 +206,10 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
      */
     private static function inlineFlags(string $pattern): string
     {
-        if (preg_match('#^/(.*)/([a-z]*)$#s', $pattern, $m) !== 1) {
+        // [a-zA-Z]: PCRE modifiers are mixed-case (`D` in particular), and a
+        // pattern this parser fails to recognise is embedded RAW — delimiters
+        // and all — which corrupts the combined alternation.
+        if (preg_match('#^/(.*)/([a-zA-Z]*)$#s', $pattern, $m) !== 1) {
             return $pattern;
         }
 

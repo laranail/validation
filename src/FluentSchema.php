@@ -16,10 +16,14 @@ use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
 
 /**
  * Instance-based mirror of the {@see FluentRule} static factory.
@@ -113,7 +117,7 @@ final class FluentSchema
         return FluentRule::password($min, $label, $defaults);
     }
 
-    public function url(?string $label = null, ?string $message = null): StringRule
+    public function url(?string $label = null, ?string $message = null): UrlRule
     {
         return FluentRule::url($label, $message);
     }
@@ -128,24 +132,39 @@ final class FluentSchema
         return FluentRule::ulid($label, $message);
     }
 
-    public function ip(?string $label = null, ?string $message = null): StringRule
+    public function ip(?string $label = null, ?string $message = null): IpAddressRule
     {
         return FluentRule::ip($label, $message);
     }
 
-    public function ipv4(?string $label = null, ?string $message = null): StringRule
+    public function ipv4(?string $label = null, ?string $message = null): IpAddressRule
     {
         return FluentRule::ipv4($label, $message);
     }
 
-    public function ipv6(?string $label = null, ?string $message = null): StringRule
+    public function ipv6(?string $label = null, ?string $message = null): IpAddressRule
     {
         return FluentRule::ipv6($label, $message);
     }
 
-    public function macAddress(?string $label = null, ?string $message = null): StringRule
+    public function macAddress(?string $label = null, ?string $message = null): MacAddressRule
     {
         return FluentRule::macAddress($label, $message);
+    }
+
+    public function username(int $min = 3, int $max = 32, ?string $label = null, ?string $message = null): UsernameRule
+    {
+        return FluentRule::username($min, $max, $label, $message);
+    }
+
+    public function subdomain(?string $label = null, ?string $message = null): StringRule
+    {
+        return FluentRule::subdomain($label, $message);
+    }
+
+    public function domainName(bool $requireTld = true, ?string $label = null, ?string $message = null): StringRule
+    {
+        return FluentRule::domainName($requireTld, $label, $message);
     }
 
     public function json(?string $label = null, ?string $message = null): StringRule

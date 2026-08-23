@@ -44,6 +44,10 @@ final class CoreValueCompiler
             return null;
         }
 
+        if (! RuleConfigBuilder::validateCompilableCombinations($config)) {
+            return null;
+        }
+
         return RuleConfigBuilder::buildValueClosure($config);
     }
 }

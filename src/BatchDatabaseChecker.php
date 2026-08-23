@@ -151,6 +151,17 @@ final class BatchDatabaseChecker
     }
 
     /**
+     * A batchable rule's full query-shape signature — two rules with equal
+     * signatures would query identically and may share a lookup. Used by
+     * {@see Internal\DatabaseClaimScanner} to decide which table:columns are
+     * safe to batch.
+     */
+    public static function batchableSignature(Exists|Unique $rule, string $table, string $column): string
+    {
+        return self::groupKey($table, $column, $rule);
+    }
+
+    /**
      * Find batchable Exists/Unique rules in a set of compiled rules.
      *
      * @param  array<string, mixed>  $rules
@@ -346,10 +357,12 @@ final class BatchDatabaseChecker
      * own the dedup). Canonical order is filter → dedup → cap check → query.
      *
      * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups
+     * @param  array<string, true>  $poisonedTableColumns  Extra table:columns that must not
+     *                                                     register a lookup ({@see findPoisonedTableColumns})
      *
      * @throws BatchLimitExceededException When any group's value count exceeds `$maxValuesPerGroup`.
      */
-    public static function buildVerifier(array $groups): ?PrecomputedPresenceVerifier
+    public static function buildVerifier(array $groups, array $poisonedTableColumns = []): ?PrecomputedPresenceVerifier
     {
         self::assertWithinCap($groups);
 
@@ -362,7 +375,7 @@ final class BatchDatabaseChecker
         }
 
         $verifier = self::makeVerifier($fallback instanceof PresenceVerifierInterface ? $fallback : null);
-        $complete = self::registerLookups($verifier, $groups);
+        $complete = self::registerLookups($verifier, $groups, $poisonedTableColumns);
 
         // A group skipped for safety is answered by the fallback verifier.
         // With no fallback bound, PrecomputedPresenceVerifier::getCount()
@@ -420,12 +433,16 @@ final class BatchDatabaseChecker
      * perf hit — exists and unique on the same (table, column) is unusual.
      *
      * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups  Keyed by "table:column:ruleType"
+     * @param  array<string, true>  $poisonedTableColumns  Table:columns claimed by rules the
+     *                                                     collectors never saw (a field's second DB rule,
+     *                                                     non-batchable or string-form rules) — treated
+     *                                                     exactly like a detected group conflict.
      * @return bool  False if any group was skipped, so the caller knows a
      *               fallback verifier is required to answer it.
      */
-    public static function registerLookups(PrecomputedPresenceVerifier $verifier, array $groups): bool
+    public static function registerLookups(PrecomputedPresenceVerifier $verifier, array $groups, array $poisonedTableColumns = []): bool
     {
-        $conflicting = self::findConflictingTableColumns($groups);
+        $conflicting = self::findConflictingTableColumns($groups) + $poisonedTableColumns;
         $complete = true;
 
         foreach ($groups as $key => $group) {

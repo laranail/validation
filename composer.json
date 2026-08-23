@@ -89,7 +89,7 @@
         "spaze/phpstan-disallowed-calls": "^4.10",
         "symplify/phpstan-extensions": "^12.0.2",
         "tomasvotruba/cognitive-complexity": "^1.1",
-        "tomasvotruba/type-coverage": "^2.1",
+        "tomasvotruba/type-coverage": "^2.3.4",
         "laranail/phone": "^0.1@dev"
     },
     "suggest": {
@@ -120,6 +120,7 @@
         "phpstan": "vendor/bin/phpstan analyse --memory-limit=2G",
         "phpstan-simplified": "vendor/bin/phpstan analyse --memory-limit=2G --error-format symplify",
         "phpstan-clear-cache": "vendor/bin/phpstan clear-result-cache",
+        "tag-currency": "bash scripts/verify-tag-currency.sh",
         "format": "vendor/bin/pint",
         "rector": "vendor/bin/rector process",
         "test": "vendor/bin/pest",

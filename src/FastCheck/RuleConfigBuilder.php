@@ -5,6 +5,7 @@ namespace Simtabi\Laranail\Validation\FastCheck;
 use Closure;
 use DateTime;
 use Illuminate\Support\Str;
+use Simtabi\Laranail\Validation\FastCheck\Shared\LaravelEmptiness;
 
 /**
  * Single source of truth for fast-check rule parsing and value-closure
@@ -133,6 +134,36 @@ final class RuleConfigBuilder
     }
 
     /**
+     * Rule combinations the closure cannot evaluate faithfully must not
+     * compile at all — the slow path is the only correct answer for them.
+     *
+     *  - `date_format:` + any date comparison: the closure's format branch
+     *    returns on format validity alone, but Laravel additionally applies
+     *    the comparisons (parsing both sides through the format).
+     *  - `array` + `in:`/`not_in:`: Laravel's Array-rule branch switches to
+     *    loose subset semantics (array_diff), which the scalar closure
+     *    cannot reproduce.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    public static function validateCompilableCombinations(array $config): bool
+    {
+        // Every key exists — both compilers start from initialConfig().
+        $comparisonKeys = [
+            'after', 'afterOrEqual', 'before', 'beforeOrEqual', 'dateEquals',
+            'afterField', 'afterOrEqualField', 'beforeField', 'beforeOrEqualField', 'dateEqualsField',
+        ];
+        $hasDateComparison = array_any($comparisonKeys, static fn (string $key): bool => $config[$key] !== null);
+
+        if ($config['dateFormat'] !== null && $hasDateComparison) {
+            return false;
+        }
+
+        return $config['array'] !== true
+            || ($config['in'] === null && $config['notIn'] === null);
+    }
+
+    /**
      * Build the value-only closure from a parsed config. ItemContextCompiler
      * wraps the result in an item-aware closure for cross-field comparisons.
      *
@@ -175,10 +206,12 @@ final class RuleConfigBuilder
             $in, $notIn, $regex, $notRegex, $hasInRegex,
             $checks
         ): bool {
-            // Presence gates (inlined for hot-path perf).
-            // Explicit === comparisons beat in_array() here — avoids allocating
-            // the [null, '', []] literal array on every closure call.
-            if ($required && (in_array($value, [null, '', []], true))) {
+            // Presence gate: Laravel's validateRequired() also rejects
+            // whitespace-only strings (trim() === '') and empty Countables,
+            // so the shared emptiness predicate is the only faithful check —
+            // an inline [null, '', []] comparison passes '   ' that Laravel
+            // fails.
+            if ($required && LaravelEmptiness::isEmpty($value)) {
                 return false;
             }
 
@@ -223,22 +256,40 @@ final class RuleConfigBuilder
             if ($hasInRegex) {
                 $isScalar = is_scalar($value);
 
+                // Laravel's in/not_in comparison changed INSIDE the supported
+                // range: loose through v13.25, strict from v13.26
+                // (in_array((string) $value, $parameters, true)). The fast
+                // path therefore decides only where the two agree and hands
+                // the boundary to the installed Laravel:
+                //   - `in` fast-passes only on a STRICT match — a strict
+                //     match also matches loosely, so both eras accept it.
+                //   - `not_in` fast-passes only on a loose NON-match — no
+                //     loose match means no strict match either, so both eras
+                //     accept it. (Fast-passing on "no strict match" was the
+                //     deny-list bypass: '10.0' slipped a loose-era not_in:10.)
+                //   - A loose-only match ('10.0' vs 10) falls back, and the
+                //     installed Laravel's own semantics decide.
                 if ($in !== null && (! $isScalar || ! in_array((string) $value, $in, true))) {
                     return false;
                 }
 
-                if ($notIn !== null && $isScalar && in_array((string) $value, $notIn, true)) {
+                if ($notIn !== null && $isScalar && self::matchesLoosely((string) $value, $notIn)) {
                     return false;
                 }
 
                 if ($regex !== null || $notRegex !== null) {
                     $stringOrNumeric = is_string($value) || is_numeric($value);
 
-                    if ($regex !== null && (! $stringOrNumeric || preg_match($regex, (string) $value) === 0)) {
+                    // Only a definite verdict may keep the fast path: a PCRE
+                    // error (backtrack/recursion limit, malformed pattern)
+                    // returns false, which must fall back to Laravel — never
+                    // count as "didn't fail". Treating "not 0" as a match let
+                    // a ReDoS-shaped input pass a regex deny-list.
+                    if ($regex !== null && (! $stringOrNumeric || preg_match($regex, (string) $value) !== 1)) {
                         return false;
                     }
 
-                    if ($notRegex !== null && (! $stringOrNumeric || preg_match($notRegex, (string) $value) === 1)) {
+                    if ($notRegex !== null && (! $stringOrNumeric || preg_match($notRegex, (string) $value) !== 0)) {
                         return false;
                     }
                 }
@@ -304,6 +355,21 @@ final class RuleConfigBuilder
         return $number === floor($number) && abs($number) <= PHP_INT_MAX
             ? (int) $number
             : $number;
+    }
+
+    /**
+     * PHP's loose `in_array` over string haystacks — what Laravel's
+     * validateIn did through v13.25 (v13.26 went strict). Two numeric
+     * strings compare numerically ('10.0' == '10'), everything else as
+     * text. `<=>` performs the identical smart string comparison, expressed
+     * through a strict-comparison-friendly operator. Used to detect the
+     * loose/strict DISAGREEMENT zone the fast path must not decide.
+     *
+     * @param  list<string>  $haystack
+     */
+    private static function matchesLoosely(string $needle, array $haystack): bool
+    {
+        return array_any($haystack, static fn (string $candidate): bool => ($candidate <=> $needle) === 0);
     }
 
     /**
@@ -452,14 +518,13 @@ final class RuleConfigBuilder
         $beforeOrEqual = $c['beforeOrEqual'] ?? null;
         /** @var ?int $dateEquals */
         $dateEquals = $c['dateEquals'] ?? null;
-        $dateEqualsStr = $dateEquals !== null ? date('Y-m-d', $dateEquals) : null;
 
         $hasDateChecks = $isDate || $dateFormat !== null || $after !== null
             || $afterOrEqual !== null || $before !== null || $beforeOrEqual !== null
             || $dateEquals !== null;
 
         if ($hasDateChecks) {
-            $checks[] = static function (mixed $v) use ($isDate, $dateFormat, $after, $afterOrEqual, $before, $beforeOrEqual, $dateEqualsStr): bool {
+            $checks[] = static function (mixed $v) use ($isDate, $dateFormat, $after, $afterOrEqual, $before, $beforeOrEqual, $dateEquals): bool {
                 if (! is_string($v)) {
                     return false;
                 }
@@ -474,32 +539,39 @@ final class RuleConfigBuilder
 
                 if ($ts === false) {
                     return ! $isDate && $after === null && $afterOrEqual === null
-                        && $before === null && $beforeOrEqual === null && $dateEqualsStr === null;
+                        && $before === null && $beforeOrEqual === null && $dateEquals === null;
                 }
 
-                if ($after !== null && $ts <= $after) {
-                    return false;
-                }
-
-                if ($afterOrEqual !== null && $ts < $afterOrEqual) {
-                    return false;
-                }
-
-                if ($before !== null && $ts >= $before) {
-                    return false;
-                }
-
-                if ($beforeOrEqual !== null && $ts > $beforeOrEqual) {
-                    return false;
-                }
-
-                if ($dateEqualsStr !== null && date('Y-m-d', $ts) !== $dateEqualsStr) {
-                    return false;
-                }
-
-                return true;
+                return self::timestampWithinBounds($ts, $after, $afterOrEqual, $before, $beforeOrEqual, $dateEquals);
             };
         }
+    }
+
+    /**
+     * Apply the compiled date-comparison bounds to a resolved timestamp.
+     *
+     * `dateEquals` compares the FULL timestamp, exactly as after/before do —
+     * Laravel's compareDates('=') resolves both sides to timestamps, so
+     * '2030-01-01 08:00:00' does NOT equal a '2030-01-01' parameter.
+     * Reducing to the calendar day fast-accepted values Laravel rejects.
+     */
+    private static function timestampWithinBounds(
+        int $ts,
+        ?int $after,
+        ?int $afterOrEqual,
+        ?int $before,
+        ?int $beforeOrEqual,
+        ?int $dateEquals,
+    ): bool {
+        if (($after !== null && $ts <= $after) || ($afterOrEqual !== null && $ts < $afterOrEqual)) {
+            return false;
+        }
+
+        if (($before !== null && $ts >= $before) || ($beforeOrEqual !== null && $ts > $beforeOrEqual)) {
+            return false;
+        }
+
+        return $dateEquals === null || $ts === $dateEquals;
     }
 
     /**

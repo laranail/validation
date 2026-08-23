@@ -1,0 +1,44 @@
+name: Tag currency
+
+permissions:
+  contents: read
+
+# The check exists because this package has shipped a stale tag more than once.
+# It had also been sitting in `scripts/` unwired, which is the same failure one
+# level up: a check nobody runs is a check nobody has.
+#
+# On every push to main, because that is exactly when the tag falls behind —
+# the commit lands and the moving tag stays where it was. And on a schedule,
+# because a tag can also be moved or deleted directly on the remote, which no
+# push to this repository would notice.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Monday 06:00 America/New_York, matching the Dependabot window. Cron has no
+    # timezone, so this is 11:00 UTC and drifts an hour with DST — which does
+    # not matter for a weekly check and is not worth a workaround.
+    - cron: '0 11 * * 1'
+  workflow_dispatch:
+
+jobs:
+  tag-currency:
+    name: tag currency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The whole history and every tag. The default shallow checkout has
+          # neither, and `git merge-base --is-ancestor` on a graph that stops at
+          # one commit answers "not an ancestor" for tags that are perfectly
+          # fine — the same false alarm that made the previous version of this
+          # check unusable.
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Verify the tag consumers resolve is on main
+        run: bash scripts/verify-tag-currency.sh main origin

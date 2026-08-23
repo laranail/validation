@@ -18,7 +18,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  */
 final class Slug implements ClientCheckable, ValidationRule
 {
-    private const string PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
+    private const string PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

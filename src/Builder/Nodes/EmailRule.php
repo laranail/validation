@@ -13,8 +13,10 @@ use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
+use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
 use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 
 class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -110,6 +112,59 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     public function domainIsNot(array|string $domains, ?string $message = null): static
     {
         return $this->rule(new EmailDomainIsNot((array) $domains), $message);
+    }
+
+    /**
+     * The domain can actually receive mail — one DNS lookup for its MX record.
+     *
+     * **Network tier**, and different from `validateMxRecord()` above in the
+     * way that matters operationally: that one compiles to Laravel's
+     * `email:dns`, which calls egulias' DNSCheckValidation directly and is
+     * therefore neither cached, injectable nor fakeable. This goes through
+     * {@see DnsResolver}, so the same handful of domains that dominate any
+     * signup form are looked up once, and a test does not have to reach the
+     * network to run.
+     *
+     * It also skips itself during a precognitive request. Without that, a
+     * debounced email field issues a DNS lookup per keystroke.
+     *
+     * A lookup that fails for any reason PASSES — a DNS outage rejecting every
+     * signup is the worse error. It is a quality filter, not a boundary.
+     */
+    public function deliverable(?string $message = null): static
+    {
+        return $this->rule(new DeliverableEmail(), $message);
+    }
+
+    /**
+     * Reject `user+tag@example.com`.
+     *
+     * Subaddressing is a legitimate feature and this is off by default. It is
+     * worth turning on for exactly one thing: a signup form where one mailbox
+     * can mint unlimited distinct addresses, which is how a single person
+     * takes a free trial repeatedly. Turning it on elsewhere annoys the people
+     * who use it to filter their own mail.
+     *
+     * `+` is the separator every major provider uses; a provider using
+     * something else is not covered, and pretending otherwise would be worse
+     * than the stated limit.
+     */
+    public function withoutSubaddressing(?string $message = null): static
+    {
+        return $this->rule(new NoSubaddressing(), $message);
+    }
+
+    /**
+     * The RFC 5321 ceiling — 254 characters for the whole address.
+     *
+     * Not a default, because most columns are narrower and the rule that
+     * matters is the column's. Worth stating when the column is not: a longer
+     * address is not deliverable, so accepting it stores something that can
+     * never be written to.
+     */
+    public function maxRfcLength(?string $message = null): static
+    {
+        return $this->max(254, $message);
     }
 
     public function max(int $value, ?string $message = null): static

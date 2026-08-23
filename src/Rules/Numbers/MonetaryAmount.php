@@ -77,7 +77,7 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
         $sign = $allowNegative ? '[+-]?' : '\\+?';
         $fraction = $decimals > 0 ? '(?:\\.\\d{1,' . $decimals . '})?' : '';
 
-        return '/^' . $sign . '\\d+' . $fraction . '$/';
+        return '/^' . $sign . '\\d+' . $fraction . '$/D';
     }
 
     /**

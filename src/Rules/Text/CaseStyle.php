@@ -39,12 +39,12 @@ final readonly class CaseStyle implements ClientCheckable, ValidationRule
      * separators.
      */
     private const array PATTERNS = [
-        self::CAMEL => '/^[a-z][a-zA-Z0-9]*$/',
-        self::PASCAL => '/^[A-Z][a-zA-Z0-9]*$/',
-        self::SNAKE => '/^[a-z0-9]+(?:_[a-z0-9]+)*$/',
-        self::KEBAB => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+        self::CAMEL => '/^[a-z][a-zA-Z0-9]*$/D',
+        self::PASCAL => '/^[A-Z][a-zA-Z0-9]*$/D',
+        self::SNAKE => '/^[a-z0-9]+(?:_[a-z0-9]+)*$/D',
+        self::KEBAB => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D',
         // Each space-separated word starts with a capital. Digits may follow.
-        self::TITLE => '/^[A-Z][a-z0-9]*(?: [A-Z][a-z0-9]*)*$/',
+        self::TITLE => '/^[A-Z][a-z0-9]*(?: [A-Z][a-z0-9]*)*$/D',
     ];
 
     public function __construct(private string $style) {}

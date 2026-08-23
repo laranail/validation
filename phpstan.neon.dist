@@ -25,16 +25,19 @@ parameters:
         declare: 100
 
     # type-perfect ships inside tomasvotruba/type-coverage (it absorbed the
-    # standalone rector/type-perfect package). The bundled copy demotes the four
+    # standalone rector/type-perfect package). The bundled copy demotes the
     # object-misuse rules below from always-on to opt-in, so they are enabled
     # explicitly here to keep the coverage the standalone package gave us.
+    # 2.3.4 removed NoArrayAccessOnObjectRule and its
+    # `no_array_access_on_object` key outright — the schema rejects the key,
+    # so it cannot stay even as a no-op; composer.json's floor is ^2.3.4 to
+    # keep every resolution on the schema this block is written against.
     type_perfect:
         null_over_false: true
         no_mixed: false
         narrow_param: false
         narrow_return: true
         no_param_type_removal: true
-        no_array_access_on_object: true
         no_isset_on_object: true
         no_empty_on_object: true
 

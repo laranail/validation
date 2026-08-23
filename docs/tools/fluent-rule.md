@@ -40,7 +40,9 @@ FluentRule::string()->distinct()                             // for `'tags.*'` r
 ```
 
 > [!TIP]
-> Top-level shortcuts for the most common single-rule strings: `FluentRule::url()`, `uuid()`, `ulid()`, `ip()`, `ipv4()`, `ipv6()`, `macAddress()`, `json()`, `timezone()`, `hexColor()`, `activeUrl()`, `regex($pattern)`. All accept an optional `$label`. Each is `FluentRule::string()->X()`; use the shortcut when the string type is the only constraint beyond the format.
+> Top-level shortcuts for the most common single-rule strings: `uuid()`, `ulid()`, `json()`, `timezone()`, `hexColor()`, `activeUrl()`, `regex($pattern)`, `subdomain()`, `domainName()`. All accept an optional `$label`. Each is `FluentRule::string()->X()`; use the shortcut when the string type is the only constraint beyond the format.
+>
+> `url()`, `ip()`, `ipv4()`, `ipv6()`, `macAddress()` and `username()` are **not** shortcuts — each returns its own node with a surface specific to the field, so a URL field offers schemes and hosts rather than `hexColor()`. See [Identity and network fields](identity-and-network.md).
 
 </details>
 

@@ -10,20 +10,18 @@ parameters:
 		# (validateDate also runs checkdate, not just strtotime) and
 		# parseSize() (min:/max: must keep fractional precision). Both are
 		# extracted helpers, so addDateChecks() stayed under its own limit.
+		# Lowered 120 -> 118 by the Phase-0a verdict-parity fixes (P1-P4):
+		# the compile-combination guard is lean, timestampWithinBounds()
+		# was extracted, and addDateChecks() dropped under its own limit —
+		# its entry is gone.
 		-
-			rawMessage: 'Class cognitive complexity is 120, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 118, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/FastCheck/RuleConfigBuilder.php
 
 		-
 			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::buildValueClosure()" is 52, keep it under 20'
-			identifier: complexity.functionLike
-			count: 1
-			path: src/FastCheck/RuleConfigBuilder.php
-
-		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::addDateChecks()" is 23, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/FastCheck/RuleConfigBuilder.php

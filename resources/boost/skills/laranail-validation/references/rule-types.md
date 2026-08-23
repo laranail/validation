@@ -101,12 +101,40 @@ All comparison methods accept `DateTimeInterface|string`:
 - `unique($table, $column?, $callback?)`, `exists($table, $column?, $callback?)` — callback for `->where()`, `->ignore()`, `->withoutTrashed()`
 - `enum($class, $callback?)` — callback receives the `Illuminate\Validation\Rules\Enum` instance
 
+## Identity and Network Types
+
+These return their own node, not a `StringRule`, so the surface is narrow and the package's own
+rules are reachable from the chain. See `docs/tools/identity-and-network.md`.
+
+- `FluentRule::url()` → `UrlRule`. Defaults to `http`/`https`, a real host, and no `user:pass@`.
+  `->secure()`, `->scheme([...])`, `->hostIs(['*.example.com'])`, `->hostIsNot([...])`,
+  `->port(443)`, `->publicHost()`, `->withoutIpHost()`, `->allowCredentials()`,
+  `->allowSingleLabelHost()`, `->withoutQuery()`, `->withoutFragment()`, `->maxLength()`,
+  `->active()` (DNS — network tier).
+  `publicHost()` is hygiene, NOT an SSRF boundary: it cannot see where a name resolves.
+- `FluentRule::ip()` → `IpAddressRule`. `->v4()`, `->v6()`, `->public()`, `->private()`,
+  `->inRange(['10.0.0.0/8'])`. `ipv4()`/`ipv6()` are `ip()->v4()`/`->v6()`.
+- `FluentRule::macAddress()` → `MacAddressRule`. `->colon()`, `->hyphen()`, `->dotted()`,
+  `->bare()`, `->eui48()`, `->eui64()`, `->unicast()`, `->universal()`, `->oui([...])`.
+  `universal()` is the one that matters: it separates a manufacturer's address from a phone's
+  randomised one.
+- `FluentRule::username($min = 3, $max = 32)` → `UsernameRule`. `->lowercase()`,
+  `->separators('_')`, `->reserved([])`, `->alsoReserved([...])`, `->length($min, $max)`.
+  A reserved-name list is ON by default — `admin`, `api`, `root` and about thirty more, matched
+  case-insensitively with separators stripped.
+
+Email gained three: `->deliverable()` (cached, fakeable MX lookup — prefer it over
+`->validateMxRecord()`), `->withoutSubaddressing()`, `->maxRfcLength()`.
+
 ## Convenience Shortcuts
 
-- `FluentRule::url()` — shorthand for `FluentRule::string()->url()`
+Still plain `StringRule` chains, because the format is the whole rule:
+
 - `FluentRule::uuid()` — shorthand for `FluentRule::string()->uuid()`
 - `FluentRule::ulid()` — shorthand for `FluentRule::string()->ulid()`
-- `FluentRule::ip()` — shorthand for `FluentRule::string()->ip()`
+- `FluentRule::json()`, `timezone()`, `hexColor()`, `activeUrl()`, `regex($pattern)`
+- `FluentRule::subdomain()` — one DNS label, Punycode rejected
+- `FluentRule::domainName($requireTld = true)` — a full domain, IDN included
 - All accept an optional `?string $label` parameter
 
 ## Combinators

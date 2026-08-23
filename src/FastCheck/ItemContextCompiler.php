@@ -98,7 +98,8 @@ final class ItemContextCompiler
             $config = $result;
         }
 
-        if (! RuleConfigBuilder::validateSizeRuleHasType($config)) {
+        if (! RuleConfigBuilder::validateSizeRuleHasType($config)
+            || ! RuleConfigBuilder::validateCompilableCombinations($config)) {
             return null;
         }
 

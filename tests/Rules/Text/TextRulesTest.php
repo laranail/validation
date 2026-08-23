@@ -116,9 +116,63 @@ it('rejects usernames outside the length bounds', function (): void {
 });
 
 it('rejects non-ASCII usernames to prevent homograph impersonation', function (): void {
-    // `аdmin` with a Cyrillic а is visually identical to `admin`.
-    expect(ruleAccepts(new Username(), "\u{0430}dmin"))->toBeFalse()
-        ->and(ruleAccepts(new Username(), 'admin'))->toBeTrue();
+    // `аlice` with a Cyrillic а is visually identical to `alice`. The ASCII
+    // control is deliberately not `admin` — that one is now refused for a
+    // different reason and would prove nothing about the alphabet.
+    expect(ruleAccepts(new Username(), "\u{0430}lice"))->toBeFalse()
+        ->and(ruleAccepts(new Username(), 'alice'))->toBeTrue();
+});
+
+it('rejects a reserved name however it is punctuated', function (string $value): void {
+    // Comparing the literal value would let every one of these through, and
+    // they are the same claim to anyone reading a profile page.
+    expect(ruleAccepts(new Username(), $value))->toBeFalse();
+})->with(['admin', 'ADMIN', 'Admin', 'a.d.m.i.n', 'ad-min', 'ad_min', 'support', 'api', 'root']);
+
+it('rejects a username with a trailing newline — the reserved-list bypass', function (string $value): void {
+    // Without the `D` modifier, `$` also matches just before a final "\n",
+    // so "admin\n" passed the shape check AND slipped past the reserved
+    // comparison (the raw value "admin\n" !== "admin") — and can dodge a
+    // `unique` index already holding "admin". Renders as "admin".
+    expect(ruleAccepts(new Username(), $value))->toBeFalse()
+        ->and(Username::passes($value))->toBeFalse();
+})->with(["admin\n", "alice\n", "support\n", "a.d.m.i.n\n"]);
+
+it('normalizes before the reserved comparison', function (): void {
+    // isReserved() is a public predicate callable on its own — it must not
+    // be fooled by surrounding whitespace even when the shape check that
+    // normally precedes it is skipped.
+    expect(Username::isReserved("admin\n", Username::DEFAULT_RESERVED))->toBeTrue()
+        ->and(Username::isReserved(' admin ', Username::DEFAULT_RESERVED))->toBeTrue()
+        ->and(Username::isReserved('alice', Username::DEFAULT_RESERVED))->toBeFalse();
+});
+
+it('takes a replacement reserved list, and an empty one turns the check off', function (): void {
+    expect(ruleAccepts(new Username(reserved: ['boss']), 'admin'))->toBeTrue()
+        ->and(ruleAccepts(new Username(reserved: ['boss']), 'boss'))->toBeFalse()
+        ->and(ruleAccepts(new Username(reserved: []), 'admin'))->toBeTrue();
+});
+
+it('can require a lowercase handle', function (): void {
+    expect(ruleAccepts(new Username(lowercase: true), 'alice'))->toBeTrue()
+        ->and(ruleAccepts(new Username(lowercase: true), 'Alice'))->toBeFalse()
+        ->and(ruleAccepts(new Username(), 'Alice'))->toBeTrue();
+});
+
+it('takes a narrowed separator set', function (): void {
+    expect(ruleAccepts(new Username(separators: '_'), 'alice_b'))->toBeTrue()
+        ->and(ruleAccepts(new Username(separators: '_'), 'alice-b'))->toBeFalse()
+        ->and(ruleAccepts(new Username(separators: ''), 'aliceb'))->toBeTrue()
+        ->and(ruleAccepts(new Username(separators: ''), 'alice_b'))->toBeFalse();
+});
+
+it('escapes the separator set instead of compiling it into a range', function (): void {
+    // A bare `-` between two characters in a character class is a RANGE. With
+    // `.-_` unescaped the class reads as "dot through underscore", which
+    // silently admits `/`, every digit, `:` and `@`.
+    expect(ruleAccepts(new Username(separators: '.-_'), 'alice/b'))->toBeFalse()
+        ->and(ruleAccepts(new Username(separators: '.-_'), 'alice@b'))->toBeFalse()
+        ->and(ruleAccepts(new Username(separators: '.-_'), 'alice-b'))->toBeTrue();
 });
 
 // =========================================================================

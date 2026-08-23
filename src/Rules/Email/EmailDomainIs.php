@@ -5,6 +5,7 @@ namespace Simtabi\Laranail\Validation\Rules\Email;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
+use Simtabi\Laranail\Validation\Rules\Net\Support\HostPattern;
 
 /**
  * The address is at one of the given domains.
@@ -49,36 +50,15 @@ final readonly class EmailDomainIs implements ValidationRule
     }
 
     /**
+     * The matching itself lives in {@see HostPattern}, because the URL rules
+     * need exactly these semantics for their host lists. Two copies of an
+     * allow-list matcher is two chances to leave a gap, and a gap in one would
+     * be a bypass in the other.
+     *
      * @param  list<string>  $patterns
      */
     public static function matches(string $domain, array $patterns): bool
     {
-        $domain = strtolower(trim($domain));
-
-        foreach ($patterns as $pattern) {
-            $pattern = strtolower(trim($pattern));
-
-            if ($pattern === '') {
-                continue;
-            }
-
-            if (str_starts_with($pattern, '*.')) {
-                $parent = substr($pattern, 2);
-
-                // The leading dot is the whole point: without it,
-                // `evilexample.com` matches `*.example.com`.
-                if ($parent !== '' && str_ends_with($domain, '.' . $parent)) {
-                    return true;
-                }
-
-                continue;
-            }
-
-            if ($domain === $pattern) {
-                return true;
-            }
-        }
-
-        return false;
+        return HostPattern::matches($domain, $patterns);
     }
 }

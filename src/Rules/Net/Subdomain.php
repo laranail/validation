@@ -23,7 +23,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  */
 final class Subdomain implements ClientCheckable, ValidationRule
 {
-    private const string PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/i';
+    private const string PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/iD';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

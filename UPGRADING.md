@@ -4,6 +4,96 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 
 ## Unreleased
 
+### The optimized pipeline now agrees with Laravel where it silently did not (P1–P5)
+
+Five fast-path defects made `RuleSet::validate()` (and FormRequests using the optimizer) return a
+different verdict from a vanilla Laravel validator. Each is now byte-identical to Laravel, which
+means previously-accepted input can now fail — if data relied on the old behaviour, it was relying
+on the bug:
+
+- **`regex` on a PCRE error fails (P1, security).** A pattern that aborts mid-match (backtrack
+  limit, malformed pattern) was treated as passing, so a ReDoS-shaped input sailed past a regex
+  deny-list. Laravel rejects on a PCRE error; the fast path now agrees. `not_regex` never
+  fabricates a verdict on an error either — the server's (Laravel-identical) answer stands.
+- **`required` rejects whitespace-only strings (P2).** `"   "` and `"\t\n"` passed the fast path;
+  Laravel's `required` trims. A form that accepted whitespace-only input now reports the missing
+  field it always should have.
+- **`date_equals` compares the full timestamp (P3).** `date_equals:2030-01-01` accepted
+  `"2030-01-01 08:00:00"` by reducing both sides to the calendar day. It now fails, as it always
+  did in Laravel.
+- **`in:`/`not_in:` never out-decide the installed Laravel (P4).** The fast path compared
+  strictly, so on Laravel ≤ 13.25 (loose comparison) `not_in:10` fast-accepted `"10.0"` and
+  `"1e1"` — values that deny-list rejects. Laravel itself then went strict in v13.26, inside this
+  package's supported range, so no single comparison is right on both. The fast path now decides
+  only where loose and strict agree — `in` fast-passes on a strict match, `not_in` on a loose
+  non-match — and hands the boundary cases to the installed Laravel, whose own semantics are the
+  verdict.
+- **`exists` + `unique->ignore()` on one field batch correctly (P5).** The edit-form idiom —
+  the value must exist AND be unique ignoring the row being edited — could fail a valid submission
+  (or admit a duplicate, with a non-batchable second rule) because both rules were answered from
+  one shared lookup. Such columns now fall back to per-item verification; the verdict matches
+  Laravel, at the cost of batching for that column only.
+
+### Anchored patterns reject trailing newlines (P6, P7)
+
+Every anchored single-line pattern in the rule library now carries the `D` modifier, closing the
+PCRE quirk where `$` also matches just before a final `"\n"`. `"my-slug\n"` no longer passes
+`Slug`, `"admin\n"` no longer slips past `Username`'s reserved list (or a `unique` index holding
+`"admin"`), and the same applies to `Jwt`, `DomainName`, `PersonName`, `EthereumAddress`, `SemVer`,
+`Subdomain`, `MacAddress`, `CaseStyle`, `Vin`, `Iban`, `Bic`, `Isin`, `Isbn`, `Issn`,
+`VendorIdentifier`, `Parity`, `NationalIdentifier`, `SubmissionTiming` and the postal-code
+patterns. Rules that normalize input by design (`PostalCode`, `CssColor`, `MonetaryAmount`,
+`Parity`, `NationalIdentifier` trim before matching) still tolerate surrounding whitespace — that
+tolerance is deliberate and now pinned by tests. If a stored value carries a trailing newline it
+was stored with the bug; trim it on the way in.
+
+### `date_format` combined with a date comparison uses the slow path
+
+`date_format:Y-m-d|after:2029-06-15` fast-accepted any value that merely matched the format — the
+comparison never ran. The combination no longer compiles to a fast check and is decided by
+Laravel itself. No API change; only wrong verdicts change.
+
+### `FluentRule::url()`, `ip()`, `ipv4()`, `ipv6()` and `macAddress()` return their own node
+
+They returned `StringRule` and now return `UrlRule`, `IpAddressRule` and `MacAddressRule`. The
+surface each offers is narrower and specific to the field — which is the package's whole premise,
+and these five were the places it was not being kept.
+
+Existing chains are unaffected: `FluentRule::url()->required()->max(255)` compiles to the same
+rules it always did. Two things break:
+
+- **A type hint or an assignment declared as `StringRule`.** Change it to the new node, or to
+  `Contracts\FluentRuleContract`, which all of them implement.
+- **A call to a `StringRule` method that never applied to the field** — `->hexColor()` on an IP
+  field, `->uuid()` on a URL. Those were always meaningless and now do not exist.
+
+`FluentRule::url()` also gains defaults it did not have: `http`/`https` only, and no `user:pass@`
+in the authority. A form that legitimately accepts `ftp://` needs `->scheme(['ftp'])`, and one that
+accepts credentials needs `->allowCredentials()`. Both were previously accepted silently, which is
+the reason for the change rather than an argument against it.
+
+### `Rules\Text\Username` rejects reserved names by default
+
+`admin`, `support`, `api`, `root` and about thirty more — every one a name that breaks something
+concrete rather than merely being undesirable. Matching is case-insensitive and ignores separators,
+so `a.d.m.i.n` and `ad-min` are refused too.
+
+Restore the old behaviour with `new Username(reserved: [])`, or
+`FluentRule::username()->reserved([])`. To keep the list and add to it, use
+`->alsoReserved(['acme'])`.
+
+### `Rules\Text\PersonName` accepts several names in one field
+
+It always did — the change is that the count is now bounded on request rather than unbounded
+always, and that a count failure reports the count instead of the character message. Nothing that
+passed before fails now. `PersonName::single()` is the opt-in to the strict single-token reading.
+
+The `person_name` translation key is unchanged; `person_name_min`, `person_name_max` and
+`person_name_required` are new. A published `lang/vendor/laranail-validation/en/validation.php`
+needs those three added, or those failures render as the raw key.
+
+## Unreleased
+
 ### Builder nodes moved out of `Rules\` into `Builder\`
 
 `src/Rules/` now belongs to the extended rule library (`Iban`, `Vin`, `PostalCode`, …).

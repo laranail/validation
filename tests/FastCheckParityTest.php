@@ -40,6 +40,10 @@ function parityValues(): array
         'https://ok.test',
         // A value that only differs under str_getcsv vs explode(',').
         'a,b',
+        // Loose-comparison shapes: Laravel's in/not_in compare loosely, so
+        // '10.0' and '1e1' both match an in:10 entry.
+        '10.0',
+        '1e1',
         0,
         1,
         5,
@@ -78,6 +82,12 @@ function parityRules(): array
         'uuid',
         'ulid',
         'date',
+        // in/not_in appear only with NON-numeric lists here: Laravel's
+        // comparison changed loose→strict inside 13.x (v13.26), so a cell
+        // like `in:10 × '10.0'` has a version-dependent Laravel verdict this
+        // closure-equality contract cannot pin. The fast path defers exactly
+        // those cells to the installed Laravel; RuleSetParityHarnessTest
+        // asserts the END verdict matches on whichever version is installed.
         'in:a,b,c',
         'not_in:x,y',
         'alpha',

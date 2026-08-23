@@ -16,10 +16,17 @@ use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
+use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 
 class FluentRule
 {
@@ -215,9 +222,30 @@ class FluentRule
         return $label !== null ? $passwordRule->label($label) : $passwordRule;
     }
 
-    public static function url(?string $label = null, ?string $message = null): StringRule
+    /**
+     * A URL, with the parts Laravel's `url` rule does not look at.
+     *
+     * Defaults to `http`/`https`, a real host, and no `user:password@`.
+     * Narrow it with {@see UrlRule::secure()}, {@see UrlRule::hostIs()},
+     * {@see UrlRule::publicHost()} and the rest.
+     *
+     * Returned a {@see StringRule} before, which meant a URL field
+     * autocompleted `hexColor()` and `dateFormat()` while offering nothing
+     * about schemes or hosts. A chain that only called `->url()->max(255)`
+     * still compiles the same way.
+     */
+    public static function url(?string $label = null, ?string $message = null): UrlRule
     {
-        return self::string($label)->url($message);
+        $urlRule = new UrlRule();
+        if ($label !== null) {
+            $urlRule->label($label);
+        }
+
+        if ($message !== null) {
+            $urlRule->message($message);
+        }
+
+        return $urlRule;
     }
 
     public static function uuid(?string $label = null, ?string $message = null): StringRule
@@ -230,24 +258,95 @@ class FluentRule
         return self::string($label)->ulid($message);
     }
 
-    public static function ip(?string $label = null, ?string $message = null): StringRule
+    /**
+     * An IP address of either family.
+     *
+     * {@see IpAddressRule::public()}, {@see IpAddressRule::private()} and
+     * {@see IpAddressRule::inRange()} are the reason this is its own node: the
+     * package already carried a careful classifier — including the
+     * IPv4-mapped-v6 unwrapping most SSRF filters miss — and none of it was
+     * reachable from a `StringRule`.
+     */
+    public static function ip(?string $label = null, ?string $message = null): IpAddressRule
     {
-        return self::string($label)->ip($message);
+        $ipRule = new IpAddressRule();
+        if ($label !== null) {
+            $ipRule->label($label);
+        }
+
+        if ($message !== null) {
+            $ipRule->message($message);
+        }
+
+        return $ipRule;
     }
 
-    public static function ipv4(?string $label = null, ?string $message = null): StringRule
+    public static function ipv4(?string $label = null, ?string $message = null): IpAddressRule
     {
-        return self::string($label)->ipv4($message);
+        return self::ip($label)->v4($message);
     }
 
-    public static function ipv6(?string $label = null, ?string $message = null): StringRule
+    public static function ipv6(?string $label = null, ?string $message = null): IpAddressRule
     {
-        return self::string($label)->ipv6($message);
+        return self::ip($label)->v6($message);
     }
 
-    public static function macAddress(?string $label = null, ?string $message = null): StringRule
+    /**
+     * A MAC address, with notation, scope and administration.
+     *
+     * See {@see MacAddressRule::universal()} for the one that matters most —
+     * it is what tells a manufacturer's address from a phone's randomised one.
+     */
+    public static function macAddress(?string $label = null, ?string $message = null): MacAddressRule
     {
-        return self::string($label)->macAddress($message);
+        $macRule = new MacAddressRule();
+        if ($label !== null) {
+            $macRule->label($label);
+        }
+
+        if ($message !== null) {
+            $macRule->message($message);
+        }
+
+        return $macRule;
+    }
+
+    /**
+     * A username: letters, digits and single internal separators, ASCII only.
+     *
+     * Carries a reserved-name list by default — see {@see UsernameRule} and
+     * {@see Username::DEFAULT_RESERVED}.
+     */
+    public static function username(int $min = 3, int $max = 32, ?string $label = null, ?string $message = null): UsernameRule
+    {
+        $usernameRule = new UsernameRule($min, $max);
+        if ($label !== null) {
+            $usernameRule->label($label);
+        }
+
+        if ($message !== null) {
+            $usernameRule->message($message);
+        }
+
+        return $usernameRule;
+    }
+
+    /**
+     * A single DNS label, as used for a user-chosen subdomain.
+     *
+     * Rejects Punycode outright — accepting `xn--` from user input invites
+     * homograph impersonation, and a subdomain someone picks for themselves is
+     * exactly where that matters.
+     */
+    public static function subdomain(?string $label = null, ?string $message = null): StringRule
+    {
+        return self::string($label)->rule(new Subdomain(), $message);
+    }
+
+    /** A fully-qualified domain name, internationalised names included. */
+    public static function domainName(bool $requireTld = true, ?string $label = null, ?string $message = null): StringRule
+    {
+        return self::string($label)->rule(new DomainName($requireTld), $message);
     }
 
     public static function json(?string $label = null, ?string $message = null): StringRule

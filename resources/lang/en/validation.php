@@ -54,11 +54,48 @@ return [
     'public_ip' => 'The :attribute must be a publicly routable IP address.',
     'subdomain' => 'The :attribute must be a valid subdomain.',
 
+    //
+    // Several keys rather than one, because "that is not a URL" and "that
+    // scheme is not allowed here" send the reader to different places. A
+    // single message for both makes a working link look broken for no
+    // stated reason.
+    'url' => [
+        'credentials' => 'The :attribute must not contain a username or password.',
+        'fragment' => 'The :attribute must not contain a fragment.',
+        'host' => 'The :attribute must have a valid host.',
+        'host_is' => 'The :attribute must be at one of: :hosts.',
+        'host_is_not' => 'The :attribute must not be at any of: :hosts.',
+        'malformed' => 'The :attribute must be a valid URL.',
+        'port' => 'The :attribute must use one of these ports: :ports.',
+        'private_host' => 'The :attribute must point at a public address.',
+        'query' => 'The :attribute must not contain a query string.',
+        'scheme' => 'The :attribute must use one of these schemes: :schemes.',
+    ],
+
+    'mac_address' => [
+        'broadcast' => 'The :attribute must not be the broadcast address.',
+        'format' => 'The :attribute must be written in one of these notations: :formats.',
+        'length' => 'The :attribute must be :bytes bytes.',
+        'local' => 'The :attribute must be a manufacturer-assigned address, not a randomised one.',
+        'malformed' => 'The :attribute must be a valid MAC address.',
+        'multicast' => 'The :attribute must be a unicast address.',
+        'null' => 'The :attribute must not be the null address.',
+        'oui' => 'The :attribute must begin with one of: :ouis.',
+    ],
+
+    'in_cidr_range' => 'The :attribute must be within one of these networks: :networks.',
+
     'slug' => 'The :attribute must be a URL slug: lowercase letters, digits and single hyphens, with no hyphen at the start or end.',
 
     'username' => 'The :attribute may contain letters, digits, and single dots, hyphens or underscores between them — not at the start, at the end, or doubled.',
+    'username_reserved' => 'The :attribute is reserved. Please choose another.',
 
+    // Three keys rather than one. A field whose characters were fine and whose count was not gets
+    // sent looking for a bad character that is not there.
     'person_name' => 'The :attribute must be a name: letters, marks, spaces, apostrophes and hyphens.',
+    'person_name_min' => 'The :attribute must contain at least :min names.',
+    'person_name_max' => 'The :attribute must not contain more than :max names.',
+    'person_name_required' => 'Please provide at least one of :values.',
 
     'html_clean' => 'The :attribute must not contain HTML tags.',
 
@@ -78,6 +115,7 @@ return [
         'domain_is_not' => 'The :attribute must not be at any of: :domains.',
         'malformed' => 'The :attribute must be a valid email address.',
         'role' => 'The :attribute must belong to a person, not a shared mailbox.',
+        'subaddress' => 'The :attribute must not contain a plus tag.',
         'undeliverable' => 'The :attribute is at a domain that cannot receive mail.',
     ],
 
