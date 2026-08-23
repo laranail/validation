@@ -21,9 +21,13 @@ on the bug:
 - **`date_equals` compares the full timestamp (P3).** `date_equals:2030-01-01` accepted
   `"2030-01-01 08:00:00"` by reducing both sides to the calendar day. It now fails, as it always
   did in Laravel.
-- **`in:`/`not_in:` compare loosely (P4).** The fast path compared strictly, so `not_in:10`
-  accepted `"10.0"` and `"1e1"` — values Laravel's deny-list rejects. Both now match Laravel's
-  loose comparison exactly.
+- **`in:`/`not_in:` never out-decide the installed Laravel (P4).** The fast path compared
+  strictly, so on Laravel ≤ 13.25 (loose comparison) `not_in:10` fast-accepted `"10.0"` and
+  `"1e1"` — values that deny-list rejects. Laravel itself then went strict in v13.26, inside this
+  package's supported range, so no single comparison is right on both. The fast path now decides
+  only where loose and strict agree — `in` fast-passes on a strict match, `not_in` on a loose
+  non-match — and hands the boundary cases to the installed Laravel, whose own semantics are the
+  verdict.
 - **`exists` + `unique->ignore()` on one field batch correctly (P5).** The edit-form idiom —
   the value must exist AND be unique ignoring the row being edited — could fail a valid submission
   (or admit a duplicate, with a non-batchable second rule) because both rules were answered from

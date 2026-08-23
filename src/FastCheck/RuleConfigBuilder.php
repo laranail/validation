@@ -256,11 +256,20 @@ final class RuleConfigBuilder
             if ($hasInRegex) {
                 $isScalar = is_scalar($value);
 
-                // Loose comparison on the stringified value — Laravel's own
-                // validateIn semantics, so '10.0' matches an in:10 entry
-                // exactly when Laravel says it does. Strict comparison here
-                // fast-accepted values a not_in deny-list rejects.
-                if ($in !== null && (! $isScalar || ! self::matchesLoosely((string) $value, $in))) {
+                // Laravel's in/not_in comparison changed INSIDE the supported
+                // range: loose through v13.25, strict from v13.26
+                // (in_array((string) $value, $parameters, true)). The fast
+                // path therefore decides only where the two agree and hands
+                // the boundary to the installed Laravel:
+                //   - `in` fast-passes only on a STRICT match — a strict
+                //     match also matches loosely, so both eras accept it.
+                //   - `not_in` fast-passes only on a loose NON-match — no
+                //     loose match means no strict match either, so both eras
+                //     accept it. (Fast-passing on "no strict match" was the
+                //     deny-list bypass: '10.0' slipped a loose-era not_in:10.)
+                //   - A loose-only match ('10.0' vs 10) falls back, and the
+                //     installed Laravel's own semantics decide.
+                if ($in !== null && (! $isScalar || ! in_array((string) $value, $in, true))) {
                     return false;
                 }
 
@@ -349,12 +358,12 @@ final class RuleConfigBuilder
     }
 
     /**
-     * PHP's loose `in_array` over string haystacks — exactly what Laravel's
-     * validateIn does with `in_array((string) $value, $params)`. Two numeric
-     * strings compare numerically ('10.0' == '10'), everything else as text.
-     * `<=>` performs the identical smart string comparison, expressed through
-     * a strict-comparison-friendly operator: the parity contract REQUIRES
-     * the loose semantics.
+     * PHP's loose `in_array` over string haystacks — what Laravel's
+     * validateIn did through v13.25 (v13.26 went strict). Two numeric
+     * strings compare numerically ('10.0' == '10'), everything else as
+     * text. `<=>` performs the identical smart string comparison, expressed
+     * through a strict-comparison-friendly operator. Used to detect the
+     * loose/strict DISAGREEMENT zone the fast path must not decide.
      *
      * @param  list<string>  $haystack
      */

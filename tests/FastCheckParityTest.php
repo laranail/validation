@@ -82,10 +82,14 @@ function parityRules(): array
         'uuid',
         'ulid',
         'date',
+        // in/not_in appear only with NON-numeric lists here: Laravel's
+        // comparison changed loose→strict inside 13.x (v13.26), so a cell
+        // like `in:10 × '10.0'` has a version-dependent Laravel verdict this
+        // closure-equality contract cannot pin. The fast path defers exactly
+        // those cells to the installed Laravel; RuleSetParityHarnessTest
+        // asserts the END verdict matches on whichever version is installed.
         'in:a,b,c',
         'not_in:x,y',
-        'in:10,20',
-        'not_in:10,20',
         'alpha',
         'alpha_dash',
         'alpha_num',
