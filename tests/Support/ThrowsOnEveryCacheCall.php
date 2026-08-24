@@ -2,6 +2,8 @@
 
 namespace Simtabi\Laranail\Validation\Tests\Support;
 
+use DateInterval;
+use UnitEnum;
 use Closure;
 use RuntimeException;
 
@@ -20,7 +22,7 @@ trait ThrowsOnEveryCacheCall
         throw new RuntimeException("cache backend is broken ({$name})");
     }
 
-    /** @param \UnitEnum|array<array-key, mixed>|string $key */
+    /** @param UnitEnum|array<array-key, mixed>|string $key */
     public function pull($key, $default = null): mixed
     {
         throw new RuntimeException('cache backend is broken (pull)');
@@ -81,7 +83,7 @@ trait ThrowsOnEveryCacheCall
         throw new RuntimeException('cache backend is broken (get)');
     }
 
-    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         throw new RuntimeException('cache backend is broken (set)');
     }
@@ -103,7 +105,7 @@ trait ThrowsOnEveryCacheCall
     }
 
     /** @param iterable<mixed> $values */
-    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
         throw new RuntimeException('cache backend is broken (setMultiple)');
     }
