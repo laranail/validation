@@ -2,9 +2,6 @@
 
 namespace Simtabi\Laranail\Validation;
 
-use Simtabi\Laranail\Validation\Commands\RulesCommand;
-use Simtabi\Laranail\Validation\Commands\DoctorCommand;
-use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\InvokableValidationRule;
@@ -12,6 +9,9 @@ use Illuminate\Validation\Validator as ValidationValidator;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
+use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
+use Simtabi\Laranail\Validation\Commands\DoctorCommand;
+use Simtabi\Laranail\Validation\Commands\RulesCommand;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
