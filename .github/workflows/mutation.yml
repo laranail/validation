@@ -6,7 +6,9 @@ name: mutation
 # scoped to the fast-check compiler where a missed mutant means a wrong
 # verdict shipped as a fast path (§9 of the 1.0 plan). Pest's native
 # mutation testing, not Infection: Infection 0.35 dropped its pest
-# framework adapter.
+# framework adapter. No positional test paths: paratest accepts only
+# one, and --covered-only already narrows each mutant to its covering
+# tests through the coverage map.
 on:
   workflow_dispatch:
   schedule:
@@ -32,7 +34,5 @@ jobs:
         run: >
           vendor/bin/pest --mutate --covered-only --parallel
           --path=src/FastCheck --path=src/FastCheckCompiler.php
-          tests/FastCheckParityTest.php
-          tests/MemoizingValidatorParityTest.php
         env:
           XDEBUG_MODE: coverage
