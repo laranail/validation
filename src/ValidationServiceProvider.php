@@ -15,6 +15,7 @@ use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
+use Simtabi\Laranail\Validation\Support\RuleRegistrar;
 use Stringable;
 
 /**
@@ -57,6 +58,11 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->mergeConfigFrom($this->configPath(), 'laranail.validation');
 
         $this->bindEmailListFallbacks();
+
+        // One registry for the whole application: the alias wiring, the
+        // console command and the docs tooling all read this singleton, and
+        // a consumer's provider registers into the same one.
+        $this->app->singletonIf(RuleRegistrar::class);
     }
 
     /**
@@ -132,8 +138,18 @@ class ValidationServiceProvider extends PackageServiceProvider
         $prefix = config('laranail.validation.aliases.prefix');
         $prefix = is_string($prefix) ? $prefix : 'laranail_';
 
-        foreach (RuleAliases::map() as $suffix => $factory) {
-            $alias = $prefix . $suffix;
+        // Consumer-registered aliases ride the same extension mechanism.
+        // Their names are used AS GIVEN — the consumer owns vendor-scoping
+        // them (`acme_thing`), per the org naming convention: the extension
+        // map is a flat registry where the last writer silently wins.
+        $factories = RuleAliases::map();
+
+        foreach ($this->app->make(RuleRegistrar::class)->aliasFactories() as $alias => $factory) {
+            $factories[$alias] = $factory;
+        }
+
+        foreach ($factories as $suffix => $factory) {
+            $alias = array_key_exists($suffix, RuleAliases::map()) ? $prefix . $suffix : $suffix;
 
             // The key Laravel will look the message up under. It studly-cases
             // the rule string to dispatch and snake-cases it again to format,
