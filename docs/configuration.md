@@ -74,8 +74,8 @@ Two settings read from the environment, so a deploy can flip them without a conf
 
 | Variable | Config key | Default |
 |---|---|---|
-| `LARANAIL_VALIDATION_ALIASES` | `laranail-validation.aliases.enabled` | `false` |
-| `LARANAIL_VALIDATION_DNS_TTL` | `laranail-validation.dns.ttl` | `3600` |
+| `LARANAIL_VALIDATION_ALIASES` | `laranail.validation.aliases.enabled` | `false` |
+| `LARANAIL_VALIDATION_DNS_TTL` | `laranail.validation.dns.ttl` | `3600` |
 
 ## The batch query cap
 
