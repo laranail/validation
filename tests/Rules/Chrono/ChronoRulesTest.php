@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
 use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
@@ -12,7 +12,7 @@ use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
 use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
 
 afterEach(function (): void {
-    Carbon::setTestNow();
+    Date::setTestNow();
 });
 
 // =========================================================================
@@ -185,7 +185,7 @@ it('rejects identifiers and unknown abbreviations', function (mixed $value): voi
 // =========================================================================
 
 it('measures age in completed years', function (): void {
-    Carbon::setTestNow('2026-08-24 12:00:00');
+    Date::setTestNow('2026-08-24 12:00:00');
 
     expect(ruleAccepts(new MinimumAge(18), '2000-01-01'))->toBeTrue()
         ->and(ruleAccepts(new MinimumAge(18), '2008-08-24'))->toBeTrue()    // 18 today
@@ -199,7 +199,7 @@ it('measures age in completed years', function (): void {
 it('answers in the timezone it is told to', function (): void {
     // 20:00 UTC on the 23rd is already the 24th in Auckland: the same
     // person is 17 in London and 18 at home.
-    Carbon::setTestNow('2026-08-23 20:00:00');
+    Date::setTestNow('2026-08-23 20:00:00');
 
     expect(ruleAccepts(new MinimumAge(18, timezone: 'UTC'), '2008-08-24'))->toBeFalse()
         ->and(ruleAccepts(new MinimumAge(18, timezone: 'Pacific/Auckland'), '2008-08-24'))->toBeTrue();

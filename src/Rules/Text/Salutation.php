@@ -24,7 +24,7 @@ use Simtabi\Laranail\Validation\Support\I18n\CodeFile;
 final class Salutation implements ValidationRule
 {
     /** @var array<string, true>|null */
-    private ?array $accepted;
+    private readonly ?array $accepted;
 
     /** @var array<string, true>|null */
     private static ?array $bundled = null;

@@ -21,12 +21,12 @@ use LogicException;
  *
  * Pure tier — no IO.
  */
-final class MinuteIn implements ValidationRule
+final readonly class MinuteIn implements ValidationRule
 {
     /**
      * @param  list<int>  $minutes  Allowed minute values, each 0–59.
      */
-    public function __construct(private readonly array $minutes)
+    public function __construct(private array $minutes)
     {
         if ($minutes === []) {
             throw new LogicException('MinuteIn needs at least one allowed minute.');

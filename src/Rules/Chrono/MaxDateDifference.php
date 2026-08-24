@@ -45,9 +45,9 @@ final class MaxDateDifference implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $reference = $this->reference();
-        $subject = is_string($value) ? self::parse($value) : null;
+        $subject = is_string($value) ? $this->parse($value) : null;
 
-        if ($reference === null || $subject === null
+        if (! $reference instanceof DateTimeImmutable || ! $subject instanceof DateTimeImmutable
             || abs($subject->getTimestamp() - $reference->getTimestamp()) > $this->hours * 3600) {
             $fail('laranail-validation::validation.max_date_difference')
                 ->translate(['hours' => $this->hours]);
@@ -63,13 +63,13 @@ final class MaxDateDifference implements DataAwareRule, ValidationRule
         if (str_starts_with($this->from, '@')) {
             $sibling = Arr::get($this->data, substr($this->from, 1));
 
-            return is_string($sibling) ? self::parse($sibling) : null;
+            return is_string($sibling) ? $this->parse($sibling) : null;
         }
 
-        return self::parse($this->from);
+        return $this->parse($this->from);
     }
 
-    private static function parse(string $value): ?DateTimeImmutable
+    private function parse(string $value): ?DateTimeImmutable
     {
         try {
             return new DateTimeImmutable($value);

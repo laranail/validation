@@ -21,9 +21,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class UnixTimestamp implements ValidationRule
+final readonly class UnixTimestamp implements ValidationRule
 {
-    public function __construct(private readonly bool $allowNegative = false) {}
+    public function __construct(private bool $allowNegative = false) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

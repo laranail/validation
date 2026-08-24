@@ -17,9 +17,9 @@ use LogicException;
  *
  * Pure tier — no IO.
  */
-final class MaxWords implements ValidationRule
+final readonly class MaxWords implements ValidationRule
 {
-    public function __construct(private readonly int $max)
+    public function __construct(private int $max)
     {
         if ($max < 1) {
             throw new LogicException('MaxWords needs a positive bound — a maximum of zero words is `prohibited`.');

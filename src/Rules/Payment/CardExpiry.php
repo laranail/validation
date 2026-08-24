@@ -23,14 +23,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class CardExpiry implements ValidationRule
+final readonly class CardExpiry implements ValidationRule
 {
     private const string SHAPE =
         '/^(?:(?<m1>0?[1-9]|1[0-2])[\/-](?<y1>\d{2}|\d{4})|(?<y2>\d{4})-(?<m2>0[1-9]|1[0-2]))$/D';
 
     public function __construct(
-        private readonly ?string $timezone = null,
-        private readonly int $maxYearsAhead = 20,
+        private ?string $timezone = null,
+        private int $maxYearsAhead = 20,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

@@ -19,6 +19,7 @@ use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
 use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
+use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 use Simtabi\Laranail\Validation\Support\I18n\BundledCountryDataset;
@@ -27,6 +28,7 @@ use Simtabi\Laranail\Validation\Support\I18n\BundledLanguageDataset;
 use Simtabi\Laranail\Validation\Support\Payment\BundledCardBrandCatalogue;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
 use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Support\Text\DefaultReservedUsernameList;
 use Stringable;
 
 /**
@@ -106,6 +108,7 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->app->singletonIf(CurrencyDataset::class, BundledCurrencyDataset::class);
         $this->app->singletonIf(LanguageDataset::class, BundledLanguageDataset::class);
         $this->app->singletonIf(CardBrandCatalogue::class, BundledCardBrandCatalogue::class);
+        $this->app->singletonIf(ReservedUsernameList::class, DefaultReservedUsernameList::class);
     }
 
     public function bootingPackage(): void

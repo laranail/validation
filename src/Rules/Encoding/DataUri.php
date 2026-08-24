@@ -24,7 +24,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class DataUri implements ValidationRule
+final readonly class DataUri implements ValidationRule
 {
     private const string SHAPE =
         '/^data:(?<media>[\w!#$&^.+-]+\/[\w!#$&^.+-]+(?:;[\w-]+=[^;,]+)*)?(?<b64>;base64)?,(?<data>.*)$/isD';
@@ -34,7 +34,7 @@ final class DataUri implements ValidationRule
     /**
      * @param  list<string>  $mediaTypes  Accepted declared types, exact or `family/*`.
      */
-    public function __construct(private readonly array $mediaTypes = []) {}
+    public function __construct(private array $mediaTypes = []) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

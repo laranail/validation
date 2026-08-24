@@ -23,11 +23,11 @@ use Illuminate\Support\Facades\Storage;
  * cheap; on an S3-style disk this is a network round-trip per validated
  * value — know which disk the rule points at.
  */
-final class FileExistsOnDisk implements ValidationRule
+final readonly class FileExistsOnDisk implements ValidationRule
 {
     public function __construct(
-        private readonly string $disk,
-        private readonly string $directory = '',
+        private string $disk,
+        private string $directory = '',
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

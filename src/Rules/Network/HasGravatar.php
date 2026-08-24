@@ -30,11 +30,11 @@ use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
  *
  * Network tier — skipped during precognition.
  */
-final class HasGravatar implements PrecognitionSkippable, ValidationRule
+final readonly class HasGravatar implements PrecognitionSkippable, ValidationRule
 {
     use SkipsPrecognition;
 
-    public function __construct(private readonly int $timeoutSeconds = 3) {}
+    public function __construct(private int $timeoutSeconds = 3) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

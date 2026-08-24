@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
 use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
+use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 
 /**
  * A payment card number: brand identified by IIN range (via the
@@ -58,7 +59,7 @@ final class CardNumber implements ValidationRule
 
         $brand = $this->catalogue()->identify($digits);
 
-        if ($brand === null) {
+        if (! $brand instanceof CardBrand) {
             $this->fail($fail, 'card_number');
 
             return;

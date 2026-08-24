@@ -23,7 +23,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  * This proves shape, not provenance: a well-formed digest says nothing about
  * what was hashed. Pure tier — no IO.
  */
-final class HashDigest implements ClientCheckable, ValidationRule
+final readonly class HashDigest implements ClientCheckable, ValidationRule
 {
     /** Hex-digest widths per admitted algorithm. */
     private const array LENGTHS = [
@@ -57,7 +57,7 @@ final class HashDigest implements ClientCheckable, ValidationRule
         'xxh128' => 32,
     ];
 
-    private readonly int $length;
+    private int $length;
 
     public function __construct(string $algorithm)
     {

@@ -23,11 +23,11 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class MinimumAge implements ValidationRule
+final readonly class MinimumAge implements ValidationRule
 {
     public function __construct(
-        private readonly int $years,
-        private readonly ?string $timezone = null,
+        private int $years,
+        private ?string $timezone = null,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

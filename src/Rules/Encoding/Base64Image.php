@@ -26,14 +26,14 @@ use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
  *
  * Pure tier — the sniff reads the in-memory buffer; nothing touches disk.
  */
-final class Base64Image implements ValidationRule
+final readonly class Base64Image implements ValidationRule
 {
     /**
      * @param  list<string>  $mimes  Accepted `image/*` subtypes.
      */
     public function __construct(
-        private readonly array $mimes = ['jpeg', 'png', 'gif', 'webp', 'bmp'],
-        private readonly ?int $maxBytes = null,
+        private array $mimes = ['jpeg', 'png', 'gif', 'webp', 'bmp'],
+        private ?int $maxBytes = null,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

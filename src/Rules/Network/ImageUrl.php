@@ -31,7 +31,7 @@ use Simtabi\Laranail\Validation\Rules\Net\Support\IpClassifier;
  *
  * Network tier — skipped during precognition.
  */
-final class ImageUrl implements PrecognitionSkippable, ValidationRule
+final readonly class ImageUrl implements PrecognitionSkippable, ValidationRule
 {
     use SkipsPrecognition;
 
@@ -41,8 +41,8 @@ final class ImageUrl implements PrecognitionSkippable, ValidationRule
      * @param  list<string>  $mimes  Accepted `image/*` subtypes; empty accepts any image.
      */
     public function __construct(
-        private readonly array $mimes = [],
-        private readonly int $timeoutSeconds = 3,
+        private array $mimes = [],
+        private int $timeoutSeconds = 3,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

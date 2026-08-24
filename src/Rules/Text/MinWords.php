@@ -15,9 +15,9 @@ use LogicException;
  *
  * Pure tier — no IO.
  */
-final class MinWords implements ValidationRule
+final readonly class MinWords implements ValidationRule
 {
-    public function __construct(private readonly int $min)
+    public function __construct(private int $min)
     {
         if ($min < 1) {
             throw new LogicException('MinWords needs a positive bound — a minimum of zero words is no rule at all.');

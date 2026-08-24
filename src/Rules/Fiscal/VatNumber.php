@@ -24,7 +24,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  * registry) can say a number is issued and active, and that is a network
  * question this pure-tier rule deliberately does not ask.
  */
-final class VatNumber implements ValidationRule
+final readonly class VatNumber implements ValidationRule
 {
     /** National tail formats, keyed by prefix. */
     private const array PATTERNS = [
@@ -61,7 +61,7 @@ final class VatNumber implements ValidationRule
     /**
      * @param  list<string>|null  $countries  Accepted prefixes; null accepts every known one.
      */
-    public function __construct(private readonly ?array $countries = null) {}
+    public function __construct(private ?array $countries = null) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -90,20 +90,20 @@ final class VatNumber implements ValidationRule
         }
 
         return match ($country) {
-            'NL' => self::dutch($normalised, $tail),
+            'NL' => $this->dutch($normalised, $tail),
             'BE' => (int) substr($tail, 8, 2) === 97 - ((int) substr($tail, 0, 8) % 97),
-            'DE' => self::germanMod11x10($tail),
-            'IT' => self::italianLuhn($tail),
-            'SE' => str_ends_with($tail, '01') && self::luhnPasses(substr($tail, 0, 10)),
-            'EL' => self::greekPowerSum($tail),
+            'DE' => $this->germanMod11x10($tail),
+            'IT' => $this->italianLuhn($tail),
+            'SE' => str_ends_with($tail, '01') && $this->luhnPasses(substr($tail, 0, 10)),
+            'EL' => $this->greekPowerSum($tail),
             'LU' => (int) substr($tail, 6, 2) === (int) substr($tail, 0, 6) % 89,
-            'FR' => self::frenchKey($tail),
+            'FR' => $this->frenchKey($tail),
             default => true,
         };
     }
 
     /** The 11-proef, or the 2020 sole-proprietor mod-97 form. */
-    private static function dutch(string $full, string $tail): bool
+    private function dutch(string $full, string $tail): bool
     {
         $sum = 0;
 
@@ -132,7 +132,7 @@ final class VatNumber implements ValidationRule
     }
 
     /** ISO 7064 MOD 11,10 over the nine digits. */
-    private static function germanMod11x10(string $digits): bool
+    private function germanMod11x10(string $digits): bool
     {
         $product = 10;
 
@@ -152,7 +152,7 @@ final class VatNumber implements ValidationRule
     }
 
     /** Odd positions as-is, even doubled with the 9-fold — total mod 10 is zero. */
-    private static function italianLuhn(string $digits): bool
+    private function italianLuhn(string $digits): bool
     {
         $sum = 0;
 
@@ -173,7 +173,7 @@ final class VatNumber implements ValidationRule
         return $sum % 10 === 0;
     }
 
-    private static function greekPowerSum(string $digits): bool
+    private function greekPowerSum(string $digits): bool
     {
         $sum = 0;
 
@@ -185,7 +185,7 @@ final class VatNumber implements ValidationRule
     }
 
     /** The numeric control key; keys containing letters pass on format alone. */
-    private static function frenchKey(string $tail): bool
+    private function frenchKey(string $tail): bool
     {
         $key = substr($tail, 0, 2);
 
@@ -196,7 +196,7 @@ final class VatNumber implements ValidationRule
         return (int) $key === (12 + 3 * ((int) substr($tail, 2) % 97)) % 97;
     }
 
-    private static function luhnPasses(string $digits): bool
+    private function luhnPasses(string $digits): bool
     {
         $sum = 0;
         $double = false;

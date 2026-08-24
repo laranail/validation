@@ -5,6 +5,7 @@ namespace Simtabi\Laranail\Validation\Rules\Text;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 
 /**
  * A username: letters, digits, and single internal separators.
@@ -27,6 +28,9 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  * and `new` collide with the conventional sub-paths of a profile URL. It is a
  * floor, not a policy — pass `reserved:` to replace it, and keep a product's
  * own list in the application where it can change without a release here.
+ * Application-wide policy binds the {@see ReservedUsernameList} contract
+ * instead — the bundled ExtendedReservedUsernameList is the opt-in wider
+ * set; `reserved:` on one rule instance still wins over the binding.
  *
  * Matching is case-insensitive and runs against the value with its separators
  * stripped, because `a-d-m-i-n` and `ad.min` are the same claim.
@@ -77,7 +81,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
             return;
         }
 
-        if (self::isReserved($value, $this->reserved ?? self::DEFAULT_RESERVED, $this->separators)) {
+        if (self::isReserved($value, $this->reserved ?? $this->boundReserved(), $this->separators)) {
             $fail('laranail-validation::validation.username_reserved')->translate();
         }
     }
@@ -100,6 +104,23 @@ final readonly class Username implements ClientCheckable, ValidationRule
         }
 
         return ! self::isReserved($value, $reserved ?? self::DEFAULT_RESERVED, $separators);
+    }
+
+    /**
+     * The application-bound list, or the floor when no container is booted —
+     * a rule set built in a queued job or plain unit test still validates.
+     * Uncached on purpose: this class is readonly, and the container binding
+     * may legitimately change between validations in long-lived workers.
+     *
+     * @return list<string>
+     */
+    private function boundReserved(): array
+    {
+        if (function_exists('app') && app()->bound(ReservedUsernameList::class)) {
+            return resolve(ReservedUsernameList::class)->names();
+        }
+
+        return self::DEFAULT_RESERVED;
     }
 
     /**

@@ -818,9 +818,9 @@ Only English ships. The package deliberately does not carry translations it cann
 
 | You want | It lives in |
 |---|---|
-| Country / currency / language codes | `laranail/atlas` |
+| Country / currency / language **data** (names, regions, coordinates) | `laranail/atlas` — the code rules ship here ([I18n](#i18n)) and atlas can rebind their datasets |
 | Enum values, names, transitions | `laranail/enumerator` |
-| Timezones, date existence and ambiguity | `laranail/chrono` |
+| Timezone identifiers, date existence and ambiguity | `laranail/chrono` — the everyday time rules ship here ([Chrono](#chrono)) |
 | Password strength, common-password rejection | `laranail/toolkit` |
 | Captcha verification | `laranail/captcha` |
 | Licence keys | `laranail/license-kit` |

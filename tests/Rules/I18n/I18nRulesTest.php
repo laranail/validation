@@ -148,8 +148,8 @@ it('honours a bound CurrencyDataset', function (): void {
 // =========================================================================
 
 it('keeps the generated datasets in step with their committed sources', function (): void {
-    $php = (string) (new PhpExecutableFinder())->find();
-    expect($php)->not->toBe('');
+    $php = (string) new PhpExecutableFinder()->find();
+    expect($php)->not->toBeEmpty();
 
     $process = new Process(
         [$php, dirname(__DIR__, 3) . '/tools/build-datasets.php', '--check'],

@@ -31,7 +31,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class HtmlClean implements ValidationRule
+final readonly class HtmlClean implements ValidationRule
 {
     /**
      * `mustContainHtml:` inverts the rule: the value must contain at least
@@ -39,7 +39,7 @@ final class HtmlClean implements ValidationRule
      * the editor failed to load. The same subtleties hold mirrored: encoded
      * markup and a bare `<` are prose, so they do not satisfy it.
      */
-    public function __construct(private readonly bool $mustContainHtml = false) {}
+    public function __construct(private bool $mustContainHtml = false) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

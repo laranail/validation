@@ -241,6 +241,47 @@ So the four skills carry the vendor and slug themselves:
 | `laranail-validation-optimize` | Finding conversion opportunities in existing validation |
 | `laranail-validation-migrate-messages` | Moving `messages(): array` to inline `message:` |
 
+## Not in this library — and why
+
+The migration audit swept every feature of the legacy packages (`enekia` v1/v2). Most were
+ported, usually improved; the rest were dropped or relocated **on purpose**, and this section
+is the durable record of each decision so nobody re-litigates them one at a time.
+
+- **`RemoteRule`** (a rule POSTing the value to a DB-configured URL) — dropped as designed.
+  A validation rule that ships user input to a runtime-configurable endpoint is an SSRF and
+  exfiltration hazard wearing a helpful name. The sanctioned shapes are a container-resolved
+  invokable rule (your code, your endpoint) or the validation-js transport layer, which is
+  security-reviewed before any dynamic endpoint ships.
+- **SMTP deep-check verification** — `laranail/email`'s scope. `Networking\DeliverableEmail`
+  answers the narrower MX question here; an SMTP conversation needs sending infrastructure a
+  validation library must not own.
+- **zxcvbn strength scoring / password history** — their own packages
+  (`laranail/password-strength`, `laranail/password-history`), bridged into `password()` via
+  guarded macros and listed under `suggest` only.
+- **Disposable-phone lists** — `laranail/phone`'s scope, beside the phone metadata they
+  describe.
+- **The framework-free PHP tier** — enekia v1's vanilla validators are not restored. The
+  successor is Laravel-coupled by design; the portable role belongs to the JS engine, which is
+  framework-free from the ground up.
+- **`is*()`/`assert*()` magic statics** — replaced by the typed fluent API and the explicit
+  `Check::` statics, which give the same one-liner ergonomics with real signatures.
+- **`Transfigure`'s ~55 type predicates** — a utility library that lived inside a validation
+  package; neither ported nor replaced, because type predicates are not validation rules.
+- **`Str` contains-all/contains-any rules** — deferred, not refused: core `contains` plus the
+  string builder cover the common cases, and the dedicated rules land if real demand appears.
+- **`MissingFromDB`** — expressible as `Rule::unique` directly; a wrapper would rename a core
+  rule without changing it.
+- **JAN and UPC-A** — documented onto `Ean` and `Gtin` rather than duplicated: each IS the
+  other rule with a prefix, and a prefix-only class would restate a checksum to say less.
+
+Two probes the plan recommended dropping were instead **redesigned and implemented** by owner
+decision — `Networking\ImageUrl` (guarded, redirect-refusing, fail-closed) and
+`Networking\HasGravatar` (https, sha256, fail-open, privacy cost documented). The enekia
+v1-only rules all resolve to core or existing successors: `Equals` → `same`, `Coordinate` →
+`Geo\LatLng`, `Timezone` → core `timezone` (identifiers) + `Chrono\TimezoneAbbreviation`
+(abbreviations), `IsAStateInNorthAmerica` → `Geo\UsState` / `Geo\CaProvince`,
+`IncludesHtml` → `Text\HtmlClean`'s `mustContainHtml:` flag.
+
 ---
 
 [← Docs index](../README.md#documentation)

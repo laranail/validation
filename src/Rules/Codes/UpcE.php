@@ -41,7 +41,7 @@ final class UpcE implements ValidationRule
 
         // GS1's zero-suppression patterns, keyed by the sixth data digit.
         $body = match (true) {
-            $selector === '0' || $selector === '1' || $selector === '2' => $numberSystem . substr($data, 0, 2) . $selector . '0000' . substr($data, 2, 3),
+            in_array($selector, ['0', '1', '2'], true) => $numberSystem . substr($data, 0, 2) . $selector . '0000' . substr($data, 2, 3),
             $selector === '3' => $numberSystem . substr($data, 0, 3) . '00000' . substr($data, 3, 2),
             $selector === '4' => $numberSystem . substr($data, 0, 4) . '00000' . $data[4],
             default => $numberSystem . substr($data, 0, 5) . '0000' . $selector,

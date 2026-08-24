@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
@@ -9,7 +9,7 @@ use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 
 afterEach(function (): void {
-    Carbon::setTestNow();
+    Date::setTestNow();
 });
 
 // =========================================================================
@@ -77,6 +77,7 @@ it('separates the failure messages a cardholder can act on', function (): void {
 
 it('honours a bound catalogue', function (): void {
     $this->app->instance(CardBrandCatalogue::class, new class implements CardBrandCatalogue {
+        /** @return list<CardBrand> */
         public function brands(): array
         {
             return [$this->store()];
@@ -130,13 +131,13 @@ it('narrows to the brand of a sibling card number', function (): void {
 // =========================================================================
 
 it('accepts current and future expiries in the common spellings', function (string $value): void {
-    Carbon::setTestNow('2026-08-24 12:00:00');
+    Date::setTestNow('2026-08-24 12:00:00');
 
     expect(ruleAccepts(new CardExpiry(), $value))->toBeTrue();
 })->with(['08/26', '09/26', '12/2027', '08-26', '11-2030', '2027-03', '8/27']);
 
 it('rejects past, malformed and implausibly distant expiries', function (mixed $value): void {
-    Carbon::setTestNow('2026-08-24 12:00:00');
+    Date::setTestNow('2026-08-24 12:00:00');
 
     expect(ruleAccepts(new CardExpiry(), $value))->toBeFalse();
 })->with([
@@ -153,7 +154,7 @@ it('rejects past, malformed and implausibly distant expiries', function (mixed $
 
 it('treats the current month as valid until it ends, in the given timezone', function (): void {
     // 23:30 UTC on Aug 31 is already September in Nairobi.
-    Carbon::setTestNow('2026-08-31 23:30:00');
+    Date::setTestNow('2026-08-31 23:30:00');
 
     expect(ruleAccepts(new CardExpiry(timezone: 'UTC'), '08/26'))->toBeTrue()
         ->and(ruleAccepts(new CardExpiry(timezone: 'Africa/Nairobi'), '08/26'))->toBeFalse();

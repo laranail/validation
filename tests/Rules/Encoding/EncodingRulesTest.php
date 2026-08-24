@@ -61,10 +61,10 @@ it('bridges a validated image to an UploadedFile for Laravel file rules', functi
         ->and($file->getSize())->toBe(70)
         ->and(Validator::make(
             ['f' => $file],
-            ['f' => 'image'],
-        )->passes())->toBeTrue();
-
-    expect(Base64File::toUploadedFile('not base64'))->toBeNull();
+            ['f' => ['image']],
+        )->passes())->toBeTrue()
+        ->and(Base64File::toUploadedFile('not base64'))
+        ->toBeNull();
 });
 
 // =========================================================================

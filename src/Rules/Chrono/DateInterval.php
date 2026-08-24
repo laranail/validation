@@ -18,9 +18,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class DateInterval implements ValidationRule
+final readonly class DateInterval implements ValidationRule
 {
-    public function __construct(private readonly bool $positive = false) {}
+    public function __construct(private bool $positive = false) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

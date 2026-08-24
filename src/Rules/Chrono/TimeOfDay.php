@@ -20,11 +20,11 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  * Pure tier — no IO.
  */
-final class TimeOfDay implements ValidationRule
+final readonly class TimeOfDay implements ValidationRule
 {
     public function __construct(
-        private readonly bool $twelveHour = false,
-        private readonly string $separator = ':',
+        private bool $twelveHour = false,
+        private string $separator = ':',
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

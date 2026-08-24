@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
+use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 
 /**
  * A card security code. Alone, 3 or 4 digits; given `numberField:`, the
@@ -59,7 +60,7 @@ final class CardCvc implements DataAwareRule, ValidationRule
             if (is_string($number)) {
                 $brand = $this->catalogue()->identify(str_replace([' ', '-'], '', $number));
 
-                if ($brand !== null) {
+                if ($brand instanceof CardBrand) {
                     return $brand->cvcLengths;
                 }
             }
