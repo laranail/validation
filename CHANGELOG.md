@@ -10,6 +10,8 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## Unreleased
 
+## v1.0.1 - 2026-08-24
+
 ### Added
 
 - The password sister packages are cross-linked: `laranail/password-tools`
@@ -17,6 +19,12 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   join `suggest`, and the `password()` reference documents both — resolving the two
   "not in this library" rows the 1.0 plan recorded. The coupling is entirely theirs:
   this package carries no `class_exists` checks and no optional imports.
+
+### Changed
+
+- GitHub Actions are pinned to commit SHAs across every workflow (org supply-chain rule);
+  `release-benchmark.yml` gains a `workflow_dispatch` so the benchmark table can be injected
+  into tag-driven releases, whose workflow-token events fire no release-event workflows.
 
 ## v1.0.0 - 2026-08-24
 

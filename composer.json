@@ -75,6 +75,8 @@
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.3",
+        "laranail/phone": "^0.1@dev",
+        "laranail/validation-js": "dev-main",
         "larastan/larastan": "^3.9.3",
         "laravel/pao": "^1.1",
         "laravel/pint": "^1.29",
@@ -95,9 +97,7 @@
         "spaze/phpstan-disallowed-calls": "^4.10",
         "symplify/phpstan-extensions": "^12.0.2",
         "tomasvotruba/cognitive-complexity": "^1.1",
-        "tomasvotruba/type-coverage": "^2.3.4",
-        "laranail/phone": "^0.1@dev",
-        "laranail/validation-js": "dev-main"
+        "tomasvotruba/type-coverage": "^2.3.4"
     },
     "suggest": {
         "laranail/email": "^0.1 — maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",

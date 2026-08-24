@@ -1,0 +1,38 @@
+name: mutation
+
+# Mutation testing is minutes-per-run, so it guards on a weekly cadence
+# and on demand rather than on every PR — the parity suites stay the
+# per-commit gate; this is the deeper audit of THOSE suites' teeth,
+# scoped to the fast-check compiler where a missed mutant means a wrong
+# verdict shipped as a fast path (§9 of the 1.0 plan). Pest's native
+# mutation testing, not Infection: Infection 0.35 dropped its pest
+# framework adapter.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  pest-mutate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: "8.5"
+          coverage: xdebug
+          extensions: dom, curl, libxml, mbstring, zip, fileinfo, intl
+
+      - run: composer update --prefer-dist --no-interaction
+
+      - name: Mutate the fast-check compiler against the parity suites
+        run: >
+          vendor/bin/pest --mutate --covered-only --parallel
+          --path=src/FastCheck --path=src/FastCheckCompiler.php
+          tests/FastCheckParityTest.php
+          tests/MemoizingValidatorParityTest.php
+        env:
+          XDEBUG_MODE: coverage
