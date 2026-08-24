@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Download benchmark result
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: benchmark-result
           run-id: ${{ github.event.workflow_run.id }}
@@ -31,7 +31,7 @@ jobs:
           tail -n +2 benchmark-result.md > benchmark-comment.md
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@v4
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
         id: find
         with:
           issue-number: ${{ steps.meta.outputs.number }}
@@ -39,7 +39,7 @@ jobs:
           body-includes: '${{ steps.meta.outputs.heading }}'
 
       - name: Post or update comment
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           issue-number: ${{ steps.meta.outputs.number }}
           comment-id: ${{ steps.find.outputs.comment-id }}
