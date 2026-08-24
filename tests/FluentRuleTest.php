@@ -1560,7 +1560,7 @@ it('compileToArrays handles mixed fluent and string rules', function (): void {
 });
 
 // =========================================================================
-// ArrayRule — getEachListRule / getEachKeyedRules / getEachRules / withoutEachRules
+// ArrayRule — getEachListRule / getEachKeyedRules / withoutEachRules
 // =========================================================================
 
 it('returns null from both narrow getters when no each() set', function (): void {
@@ -1585,15 +1585,15 @@ it('withoutEachRules returns clone with both narrow getters null', function (): 
         ->and($arrayRule->getEachListRule())->not->toBeNull();
 });
 
-it('getEachRules() returns keyed map only — list-form surfaces null', function (): void {
+it('getEachKeyedRules() returns the keyed map only — list-form surfaces null', function (): void {
     $stringRule = FluentRule::string()->required();
 
-    expect(FluentRule::array()->getEachRules())->toBeNull()
+    expect(FluentRule::array()->getEachKeyedRules())->toBeNull()
         ->and(FluentRule::array()->each($stringRule)
-            ->getEachRules())
+            ->getEachKeyedRules())
         ->toBeNull()
         ->and(FluentRule::array()->each(['name' => $stringRule])
-            ->getEachRules())
+            ->getEachKeyedRules())
         ->toBe(['name' => $stringRule]);
 });
 

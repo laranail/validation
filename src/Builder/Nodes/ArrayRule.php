@@ -13,7 +13,6 @@ use Illuminate\Validation\Rules\Contains;
 use Illuminate\Validation\Rules\DoesntContain;
 use InvalidArgumentException;
 use LogicException;
-use RuntimeException;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
@@ -85,24 +84,11 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     }
 
     /**
-     * Keyed sub-rule map set via `each(['key' => $rule, ...])`. Alias of
-     * `getEachKeyedRules()`. Returns null when `each()` was never called or
-     * the current state is list-shaped — list-form retrieval lives on
-     * `getEachListRule()`.
-     *
-     * @return array<string, ValidationRule>|null
-     */
-    public function getEachRules(): ?array
-    {
-        return $this->eachRules;
-    }
-
-    /**
      * Keyed sub-rule map set via `each(['key' => $rule, ...])`.
      *
      * Returns null when `each()` was never called OR the current state is
-     * list-shaped (set via `each(VR)`). Narrow-typed replacement for
-     * `getEachRules()` in the keyed-form case.
+     * list-shaped (set via `each(VR)`) — list-form retrieval lives on
+     * `getEachListRule()`.
      *
      * @return array<string, ValidationRule>|null
      */
@@ -116,8 +102,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * item is validated as a scalar against this rule.
      *
      * Returns null when `each()` was never called OR the current state is
-     * keyed (set via `each([...])`). Narrow-typed replacement for the
-     * `ValidationRule` branch of `getEachRules()`.
+     * keyed (set via `each([...])`).
      */
     public function getEachListRule(): ?ValidationRule
     {
@@ -270,48 +255,13 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      */
     public function contains(Arrayable|UnitEnum|array|string|int ...$values): static
     {
-        $resolved = $this->flattenContainsValues($values);
-
-        if (class_exists(Contains::class)) {
-            return $this->addRule(new Contains($resolved));
-        }
-
-        // Laravel 11: `Rules\Contains` class shipped in L12. Fall back to
-        // the pipe-string form with CSV-quoting that mirrors Contains::__toString.
-        return $this->addRule('contains:' . $this->serializeContainsValues($resolved));
+        return $this->addRule(new Contains($this->flattenContainsValues($values)));
     }
 
     /** @param Arrayable<array-key, mixed>|UnitEnum|array<int, mixed>|string|int ...$values */
     public function doesntContain(Arrayable|UnitEnum|array|string|int ...$values): static
     {
-        if (! class_exists(DoesntContain::class)) {
-            throw new RuntimeException('doesntContain() requires Laravel 12+.');
-        }
-
         return $this->addRule(new DoesntContain($this->flattenContainsValues($values)));
-    }
-
-    /**
-     * CSV-quote + escape each value. Mirrors upstream `Rules\Contains::__toString()`
-     * for the Laravel 11 fallback path.
-     *
-     * @param  array<int, mixed>  $values
-     */
-    private function serializeContainsValues(array $values): string
-    {
-        $serialized = array_map(static function (mixed $value): string {
-            // Mirror Laravel's enum_value(): BackedEnum → value, UnitEnum → name.
-            if ($value instanceof BackedEnum) {
-                $value = $value->value;
-            } elseif ($value instanceof UnitEnum) {
-                $value = $value->name;
-            }
-
-            /** @var scalar $value */
-            return '"' . str_replace('"', '""', (string) $value) . '"';
-        }, $values);
-
-        return implode(',', $serialized);
     }
 
     /**

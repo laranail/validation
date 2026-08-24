@@ -125,11 +125,6 @@ trait HasFieldModifiers
 
         if (is_object($rules)) {
             $this->rules[] = $rules;
-            // Compared by string class-name to avoid autoload-fatal on
-            // Laravel versions that lack a given rule class (Contains /
-            // DoesntContain are L12+; instanceof would trigger autoload
-            // on L11 and throw "class not found").
-            $rulesClass = $rules::class;
 
             $this->lastConstraint = match (true) {
                 $rules instanceof RequiredIf => 'required',
@@ -142,8 +137,8 @@ trait HasFieldModifiers
                 $rules instanceof NotIn => 'not_in',
                 $rules instanceof Unique => 'unique',
                 $rules instanceof Exists => 'exists',
-                $rulesClass === Contains::class => 'contains',
-                $rulesClass === DoesntContain::class => 'doesnt_contain',
+                $rules instanceof Contains => 'contains',
+                $rules instanceof DoesntContain => 'doesnt_contain',
                 default => lcfirst(class_basename($rules)),
             };
         } else {
@@ -274,10 +269,12 @@ trait HasFieldModifiers
     public function requiredUnless(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
     {
         if ($field instanceof Closure || is_bool($field)) {
-            // RequiredUnless class only exists in Laravel 12+. Invert to RequiredIf.
-            $inverted = $field instanceof Closure ? static fn (): bool => ! $field() : ! $field;
-
-            return $this->addRule(new RequiredIf($inverted));
+            // A closure/bool has no field name to build `required_unless:f,v`
+            // from, so the string form cannot express it — the RULE OBJECT is
+            // the only spelling. (An earlier comment blamed a Laravel-version
+            // gap and inverted into RequiredIf; the class takes the
+            // condition directly.)
+            return $this->addRule(new RequiredUnless($field));
         }
 
         return $this->addRule('required_unless:' . $field . ',' . self::serializeValues($values));
@@ -367,10 +364,10 @@ trait HasFieldModifiers
     public function prohibitedUnless(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
     {
         if ($field instanceof Closure || is_bool($field)) {
-            // ProhibitedUnless only exists in Laravel 12+. Invert to ProhibitedIf.
-            $inverted = $field instanceof Closure ? static fn (): bool => ! $field() : ! $field;
-
-            return $this->addRule(new ProhibitedIf($inverted));
+            // Same shape as requiredUnless(): no field name, so the rule
+            // object is the only spelling — and the class takes the
+            // condition directly.
+            return $this->addRule(new ProhibitedUnless($field));
         }
 
         return $this->addRule('prohibited_unless:' . $field . ',' . self::serializeValues($values));

@@ -19,6 +19,8 @@ use Stringable;
  *
  * Falls back to the original verifier for lookups that weren't pre-computed
  * (e.g., rules with closure callbacks that couldn't be batched).
+ *
+ * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
  */
 final class PrecomputedPresenceVerifier implements DatabasePresenceVerifierInterface
 {

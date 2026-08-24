@@ -110,10 +110,16 @@ Full documentation is at
 
 ## Stability
 
-Pre-1.0. The builder surface — `FluentRule`, `FluentSchema`, `RuleSet` and
-`Contracts\FluentRuleContract` — is settled and is what the documentation describes. The
-extended rule library under `Rules\` is newer; its rules are stable in behaviour but their
-constructor signatures may still gain parameters.
+Pre-1.0. The **stable surface** — what 1.0 will cover under SemVer — is: `FluentRule`,
+`FluentSchema`, `RuleSet` (including its events and `before()`/`after()` hooks), the rule
+classes and their constructor signatures, the contracts (`ClientCheckable`,
+`PrecognitionSkippable`, `TermList`, `FluentRuleContract`), `Check`, `Regex`,
+`Validation::fake()`, `RuleRegistrar`, the console commands, and the `laranail.validation.*`
+config keys.
+
+Everything marked `@internal` — the fast-check compiler, the optimizer validators, the batch
+machinery, everything under `Internal\` — may change in a minor, and an arch test enforces the
+boundary. Build on the stable list; the optimizer is an implementation detail behind it.
 
 Constrain to `^0.1` and read [UPGRADING.md](UPGRADING.md) before moving between versions: this
 package fixes divergences from Laravel's own validator, and a fix can mean input an application
