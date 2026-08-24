@@ -61,8 +61,12 @@ parameters:
 		# Dropped 145 -> 135 by the php84 Rector sweep, which replaced several
 		# foreach loops with array_any()/array_all(). validateInternal() fell
 		# below 20 in the same pass and its entry is gone entirely.
+		# Raised 135 -> 140 by the Phase-1 extension seams: the §5.6 event
+		# lifecycle (compiling mutation, starting/completed/failed) plus the
+		# before()/after() hooks in runValidateInternal(). The after() route
+		# itself lives in Internal\VanillaAfterRoute, not here.
 		-
-			rawMessage: 'Class cognitive complexity is 135, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 140, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/RuleSet.php

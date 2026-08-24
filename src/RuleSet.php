@@ -18,11 +18,16 @@ use LogicException;
 use ReflectionProperty;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Events\RuleSetCompiling;
+use Simtabi\Laranail\Validation\Events\ValidationCompleted;
+use Simtabi\Laranail\Validation\Events\ValidationFailed;
+use Simtabi\Laranail\Validation\Events\ValidationStarting;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 use Simtabi\Laranail\Validation\Internal\BatchLimitRemap;
 use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
 use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
 use Simtabi\Laranail\Validation\Internal\ItemValidator;
+use Simtabi\Laranail\Validation\Internal\VanillaAfterRoute;
 use Traversable;
 
 /**
@@ -44,6 +49,12 @@ final class RuleSet implements Arrayable, IteratorAggregate
     private bool $stopOnFirstFailure = false;
 
     private ?string $errorBag = null;
+
+    /** @var list<Closure(array<string, mixed>): (array<string, mixed>|null)> */
+    private array $beforeCallbacks = [];
+
+    /** @var list<Closure> */
+    private array $afterCallbacks = [];
 
     private readonly ItemRuleCompiler $ruleCompiler;
 
@@ -296,6 +307,43 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
+     * Run a closure over the data before validation. Returning an array
+     * replaces the data for this run; returning null leaves it unchanged.
+     * Callbacks run in registration order, each seeing the previous one's
+     * output — trimming, casting, or normalising input belongs here.
+     *
+     * @param  Closure(array<string, mixed>): (array<string, mixed>|null)  $callback
+     */
+    public function before(Closure $callback): self
+    {
+        $this->beforeCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register an after-validation callback with Laravel's own `after()`
+     * semantics: it receives the validator once the rules have run and may
+     * add errors (`$validator->errors()->add(...)`), turning a pass into a
+     * failure.
+     *
+     * The cost is stated rather than hidden: error-adding is a whole-run
+     * concern the per-item fast paths cannot honour, so registering ANY
+     * after callback routes the run through one vanilla Laravel validator —
+     * full wildcard support, byte-identical verdicts, none of the optimizer
+     * shortcuts. Hooks trade speed for the full Laravel feature; a rule set
+     * without them keeps the fast engine.
+     *
+     * @param  Closure(\Illuminate\Validation\Validator): void  $callback
+     */
+    public function after(Closure $callback): self
+    {
+        $this->afterCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Route the thrown `ValidationException` into a named error bag.
      *
      * Mirrors `Validator::validateWithBag($name, ...)` — useful when multiple
@@ -518,18 +566,82 @@ final class RuleSet implements Arrayable, IteratorAggregate
      */
     private function runValidateInternal(array $data, array $messages, array $attributes): array
     {
+        // The mutation seam: listeners may reshape rules, messages,
+        // attributes and data for THIS run. The rule-set instance itself is
+        // never mutated — the (possibly changed) rules are swapped in for
+        // the duration of the call and restored in the finally.
+        $compiling = new RuleSetCompiling($this, $this->fields, $messages, $attributes, $data);
+        event($compiling);
+
+        $data = $compiling->data;
+        $messages = $compiling->messages;
+        $attributes = $compiling->attributes;
+
+        foreach ($this->beforeCallbacks as $callback) {
+            $replacement = $callback($data);
+
+            if (is_array($replacement)) {
+                $data = $replacement;
+            }
+        }
+
+        event(new ValidationStarting($this, $data));
+
+        $originalFields = $this->fields;
+        $this->fields = $compiling->rules;
+
         // PHPStan can't trace `BatchLimitExceededException` through the facade
         // chain (Validator::make -> ItemValidator -> ItemRuleCompiler::buildBatchVerifier
         // -> BatchDatabaseChecker::buildVerifier), but the catch is reachable —
         // Phase 2 tests prove it via RuleSet::validate() + hard-cap breach.
         try {
-            return $this->validateInternal($data, $messages, $attributes);
-        } catch (BatchLimitExceededException $batchLimitExceededException) { // @phpstan-ignore catch.neverThrown
-            throw BatchLimitRemap::toValidationException(
+            $validated = $this->afterCallbacks === []
+                ? $this->validateInternal($data, $messages, $attributes)
+                : $this->validateWithAfterCallbacks($data, $messages, $attributes);
+
+            event(new ValidationCompleted($this, $data, $validated));
+
+            return $validated;
+        } catch (BatchLimitExceededException $batchLimitExceededException) {
+            $converted = BatchLimitRemap::toValidationException(
                 $batchLimitExceededException,
                 $batchLimitExceededException->attribute ?? array_key_first($this->fields) ?? 'items',
             );
+
+            event(new ValidationFailed($this, $data, $converted->validator->errors(), $converted));
+
+            throw $converted;
+        } catch (ValidationException $validationException) {
+            event(new ValidationFailed($this, $data, $validationException->validator->errors(), $validationException));
+
+            throw $validationException;
+        } finally {
+            $this->fields = $originalFields;
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
+     * @return array<string, mixed>
+     *
+     * @throws ValidationException
+     */
+    private function validateWithAfterCallbacks(array $data, array $messages, array $attributes): array
+    {
+        $flat = $this->flatten();
+        [$ruleMessages, $ruleAttributes] = self::extractMetadata($flat);
+
+        return VanillaAfterRoute::validate(
+            self::compile($flat),
+            $data,
+            $messages + $ruleMessages,
+            $attributes + $ruleAttributes,
+            $this->stopOnFirstFailure,
+            $this->dropUnknownFields,
+            $this->afterCallbacks,
+        );
     }
 
     /**
