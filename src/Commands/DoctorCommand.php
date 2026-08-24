@@ -25,7 +25,7 @@ final class DoctorCommand extends Command
 
     protected $signature = 'laranail::validation.doctor';
 
-    protected $description = 'Check the package\'s wiring, contracts and datasets in this application.';
+    protected $description = "Check the package's wiring, contracts and datasets in this application.";
 
     public function handle(RuleRegistrar $registrar): int
     {

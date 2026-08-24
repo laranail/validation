@@ -19,16 +19,16 @@ beforeEach(function (): void {
     app()->register(AcmeServiceProvider::class);
 });
 
-it('validates through the consumer rule\'s vendor-scoped alias', function (): void {
+it("validates through the consumer rule's vendor-scoped alias", function (): void {
     config()->set('laranail.validation.aliases.enabled', true);
     app()->register(ValidationServiceProvider::class, force: true);
 
-    expect(Validator::make(['n' => 4], ['n' => 'acme_even'])->passes())->toBeTrue()
-        ->and(Validator::make(['n' => 3], ['n' => 'acme_even'])->passes())->toBeFalse();
+    expect(Validator::make(['n' => 4], ['n' => ['acme_even']])->passes())->toBeTrue()
+        ->and(Validator::make(['n' => 3], ['n' => ['acme_even']])->passes())->toBeFalse();
 });
 
 it('feeds the consumer dataset through the contract', function (): void {
-    $rule = new NoProfanity(app(TermList::class));
+    $rule = new NoProfanity(resolve(TermList::class));
 
     expect(ruleAccepts($rule, 'a clean sentence'))->toBeTrue()
         ->and(ruleAccepts($rule, 'totally acmeforbidden content'))->toBeFalse();

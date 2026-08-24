@@ -29,7 +29,7 @@ it('picks a delimiter the pattern does not contain', function (): void {
     // Wrapping 'a/b' with '/' would need escaping; picking '#' does not.
     $compiled = Regex::of('^a/b$')->compile();
 
-    expect(preg_match($compiled, 'a/b'))->toBe(1)
+    expect('a/b')->toMatch($compiled)
         ->and(preg_match($compiled, "a/b\n"))->toBe(0);
 });
 
@@ -44,7 +44,7 @@ it('refuses a raw pattern that does not compile', function (): void {
 it('builds the canonical part-number pattern, anchored with D by default', function (): void {
     $compiled = Regex::build()->digits(3)->literal('-')->letters(2)->compile();
 
-    expect(preg_match($compiled, '123-Ab'))->toBe(1)
+    expect('123-Ab')->toMatch($compiled)
         ->and(preg_match($compiled, "123-Ab\n"))->toBe(0)   // D — the P6/P7 class
         ->and(preg_match($compiled, 'x123-Ab'))->toBe(0)    // anchored
         ->and(preg_match($compiled, '123-Abx'))->toBe(0);
@@ -53,16 +53,16 @@ it('builds the canonical part-number pattern, anchored with D by default', funct
 it('escapes literals, so metacharacters mean themselves', function (): void {
     $compiled = Regex::build()->literal('a.b')->compile();
 
-    expect(preg_match($compiled, 'a.b'))->toBe(1)
+    expect('a.b')->toMatch($compiled)
         ->and(preg_match($compiled, 'axb'))->toBe(0);
 });
 
 it('offers oneOf with escaped alternatives', function (): void {
     $compiled = Regex::build()->oneOf('cat', 'dog', 'a.b')->compile();
 
-    expect(preg_match($compiled, 'cat'))->toBe(1)
+    expect('cat')->toBe(1)
         ->and(preg_match($compiled, 'dog'))->toBe(1)
-        ->and(preg_match($compiled, 'a.b'))->toBe(1)
+        ->and(preg_match($compiled, 'a.b'))->toMatch($compiled)
         ->and(preg_match($compiled, 'axb'))->toBe(0)
         ->and(preg_match($compiled, 'cow'))->toBe(0);
 });
@@ -74,26 +74,26 @@ it('supports optional and oneOrMore groups', function (): void {
         ->optional(fn (Regex $r): Regex => $r->literal('.')->digits())
         ->compile();
 
-    expect(preg_match($compiled, 'v1'))->toBe(1)
-        ->and(preg_match($compiled, 'v1.2'))->toBe(1)
+    expect('v1')->toBe(1)
+        ->and(preg_match($compiled, 'v1.2'))->toMatch($compiled)
         ->and(preg_match($compiled, 'v1.'))->toBe(0);
 
     $repeated = Regex::build()
         ->oneOrMore(fn (Regex $r): Regex => $r->letters(1)->digits(1))
         ->compile();
 
-    expect(preg_match($repeated, 'a1b2'))->toBe(1)
+    expect('a1b2')->toMatch($repeated)
         ->and(preg_match($repeated, ''))->toBe(0);
 });
 
 it('supports case-insensitive compilation and unanchored opt-out', function (): void {
     $ci = Regex::build()->literal('hello')->caseInsensitive()->compile();
 
-    expect(preg_match($ci, 'HELLO'))->toBe(1);
+    expect('HELLO')->toMatch($ci);
 
     $unanchored = Regex::build()->digits(3)->unanchored()->compile();
 
-    expect(preg_match($unanchored, 'abc123def'))->toBe(1);
+    expect('abc123def')->toMatch($unanchored);
 });
 
 it('refuses unbounded quantifiers nested inside unbounded groups', function (): void {
@@ -108,7 +108,7 @@ it('allows the nested-unbounded shape only behind the explicit opt-in', function
         ->oneOrMore(fn (Regex $r): Regex => $r->oneOrMore(fn (Regex $inner): Regex => $inner->letters(1)))
         ->compile();
 
-    expect(preg_match($compiled, 'abc'))->toBe(1);
+    expect('abc')->toMatch($compiled);
 });
 
 // ---------------------------------------------------------------------------

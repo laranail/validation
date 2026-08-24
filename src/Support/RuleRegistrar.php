@@ -60,7 +60,7 @@ final class RuleRegistrar
             $this->registered[] = $rule;
         }
 
-        if ($alias !== null && $factory !== null) {
+        if ($alias !== null && $factory instanceof Closure) {
             $this->aliasFactories[$alias] = $factory;
         }
 

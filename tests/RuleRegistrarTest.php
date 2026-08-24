@@ -18,7 +18,7 @@ use Simtabi\Laranail\Validation\ValidationServiceProvider;
  * registers additions without touching core.
  */
 it('discovers every shipped rule class', function (): void {
-    $classes = app(RuleRegistrar::class)->classes();
+    $classes = resolve(RuleRegistrar::class)->classes();
 
     expect($classes)->toContain(Iban::class)
         ->toContain(Phone::class)
@@ -26,32 +26,32 @@ it('discovers every shipped rule class', function (): void {
 });
 
 it('accepts a consumer registration with an alias factory', function (): void {
-    app(RuleRegistrar::class)->register(
+    resolve(RuleRegistrar::class)->register(
         EvenNumber::class,
         alias: 'acme_even',
         factory: fn (array $parameters): EvenNumber => new EvenNumber(),
     );
 
-    expect(app(RuleRegistrar::class)->classes())->toContain(EvenNumber::class);
+    expect(resolve(RuleRegistrar::class)->classes())->toContain(EvenNumber::class);
 
     // Re-registering the provider wires the custom alias into the live
     // validator registry, beside the package's own prefixed aliases.
     config()->set('laranail.validation.aliases.enabled', true);
     app()->register(ValidationServiceProvider::class, force: true);
 
-    expect(Validator::make(['n' => 4], ['n' => 'acme_even'])->passes())->toBeTrue()
-        ->and(Validator::make(['n' => 3], ['n' => 'acme_even'])->passes())->toBeFalse();
+    expect(Validator::make(['n' => 4], ['n' => ['acme_even']])->passes())->toBeTrue()
+        ->and(Validator::make(['n' => 3], ['n' => ['acme_even']])->passes())->toBeFalse();
 });
 
 it('merges rule classes tagged into the container', function (): void {
     app()->bind(EvenNumber::class);
     app()->tag([EvenNumber::class], 'laranail.validation.rules');
 
-    expect(app(RuleRegistrar::class)->classes())->toContain(EvenNumber::class);
+    expect(resolve(RuleRegistrar::class)->classes())->toContain(EvenNumber::class);
 });
 
 it('reports which registered rules advertise a browser form', function (): void {
-    $clientCheckable = app(RuleRegistrar::class)->clientCheckable();
+    $clientCheckable = resolve(RuleRegistrar::class)->clientCheckable();
 
     expect($clientCheckable)->toContain(Slug::class)
         ->not->toContain(Iban::class)
@@ -59,10 +59,10 @@ it('reports which registered rules advertise a browser form', function (): void 
 });
 
 it('is one singleton, so every consumer sees the same registry', function (): void {
-    app(RuleRegistrar::class)->register(EvenNumber::class);
+    resolve(RuleRegistrar::class)->register(EvenNumber::class);
 
-    expect(app(RuleRegistrar::class)->classes())->toContain(EvenNumber::class)
-        ->and(in_array(EvenNumber::class, app(RuleRegistrar::class)->classes(), true))->toBeTrue();
+    expect(resolve(RuleRegistrar::class)->classes())->toContain(EvenNumber::class)
+        ->and(in_array(EvenNumber::class, resolve(RuleRegistrar::class)->classes(), true))->toBeTrue();
 });
 
 it('implementing ClientCheckable is the whole browser opt-in for a custom rule', function (): void {

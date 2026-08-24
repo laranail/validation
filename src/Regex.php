@@ -145,7 +145,7 @@ final class Regex implements Stringable
     public function raw(string $fragment): self
     {
         $this->fragments[] = $fragment;
-        $this->hasUnbounded = $this->hasUnbounded || self::looksUnbounded($fragment);
+        $this->hasUnbounded = $this->hasUnbounded || $this->looksUnbounded($fragment);
 
         return $this;
     }
@@ -224,7 +224,7 @@ final class Regex implements Stringable
     {
         $inner = $this->innerPattern($part);
 
-        if ($forbidUnbounded && self::looksUnbounded($inner)) {
+        if ($forbidUnbounded && $this->looksUnbounded($inner)) {
             throw new LogicException(
                 'An unbounded quantifier inside an unbounded group is the catastrophic-backtracking shape. '
                 . 'Bound the inner part, or opt in explicitly with dangerouslyUnbounded().',
@@ -242,6 +242,7 @@ final class Regex implements Stringable
 
         $sub = new self();
         $sub->allowUnbounded = $this->allowUnbounded;
+
         $built = $part($sub);
 
         if (! $built instanceof self) {
@@ -252,7 +253,7 @@ final class Regex implements Stringable
     }
 
     /** Whether a fragment carries an unbounded quantifier (`+`, `*`, `{n,}`). */
-    private static function looksUnbounded(string $fragment): bool
+    private function looksUnbounded(string $fragment): bool
     {
         return preg_match('/(?<!\\\\)[+*]|\{\d+,\}/', $fragment) === 1;
     }

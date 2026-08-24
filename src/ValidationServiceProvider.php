@@ -2,6 +2,9 @@
 
 namespace Simtabi\Laranail\Validation;
 
+use Simtabi\Laranail\Validation\Commands\RulesCommand;
+use Simtabi\Laranail\Validation\Commands\DoctorCommand;
+use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\InvokableValidationRule;
@@ -95,9 +98,9 @@ class ValidationServiceProvider extends PackageServiceProvider
             );
 
             $this->commands([
-                Commands\RulesCommand::class,
-                Commands\DoctorCommand::class,
-                Commands\BenchmarkCommand::class,
+                RulesCommand::class,
+                DoctorCommand::class,
+                BenchmarkCommand::class,
             ]);
         }
     }

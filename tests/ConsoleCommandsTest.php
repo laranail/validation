@@ -16,7 +16,7 @@ it('lists the live registry through laranail::validation.rules', function (): vo
 });
 
 it('includes an application-registered rule in the listing', function (): void {
-    app(RuleRegistrar::class)->register(EvenNumber::class);
+    resolve(RuleRegistrar::class)->register(EvenNumber::class);
 
     $this->artisan('laranail::validation.rules')
         ->expectsOutputToContain('EvenNumber')

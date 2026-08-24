@@ -25,8 +25,8 @@ it('lets a RuleSetCompiling listener mutate the rules before validation', functi
         RuleSet::from(['name' => 'required|string'])->validate(['name' => 'Ada']);
 
         $this->fail('The listener-added rule was expected to fail validation.');
-    } catch (ValidationException $e) {
-        expect($e->errors())->toHaveKey('added_by_listener');
+    } catch (ValidationException $validationException) {
+        expect($validationException->errors())->toHaveKey('added_by_listener');
     }
 });
 
@@ -40,8 +40,8 @@ it('lets a RuleSetCompiling listener mutate messages and attributes', function (
         RuleSet::from(['email' => 'required|email'])->validate([]);
 
         $this->fail('Validation was expected to fail.');
-    } catch (ValidationException $e) {
-        expect($e->errors()['email'][0])->toBe('The work email is mandatory.');
+    } catch (ValidationException $validationException) {
+        expect($validationException->errors()['email'][0])->toBe('The work email is mandatory.');
     }
 });
 
@@ -50,7 +50,7 @@ it('does not permanently mutate the rule set through the event', function (): vo
     $calls = 0;
 
     Event::listen(RuleSetCompiling::class, function (RuleSetCompiling $event) use (&$calls): void {
-        $calls++;
+        ++$calls;
 
         if ($calls === 1) {
             $event->rules['once_only'] = 'required';
@@ -120,7 +120,7 @@ it('before() transforms the data ahead of validation', function (): void {
     expect($validated)->toBe(['name' => 'Ada']);
 });
 
-it('after() receives the validator and can add an error, like Laravel\'s own', function (): void {
+it("after() receives the validator and can add an error, like Laravel's own", function (): void {
     $ruleSet = RuleSet::from(['name' => 'required|string'])
         ->after(function (Validator $validator): void {
             $validator->errors()->add('name', 'Rejected after the rules ran.');
@@ -130,8 +130,8 @@ it('after() receives the validator and can add an error, like Laravel\'s own', f
         $ruleSet->validate(['name' => 'Ada']);
 
         $this->fail('The after() hook was expected to fail the run.');
-    } catch (ValidationException $e) {
-        expect($e->errors()['name'][0])->toBe('Rejected after the rules ran.');
+    } catch (ValidationException $validationException) {
+        expect($validationException->errors()['name'][0])->toBe('Rejected after the rules ran.');
     }
 });
 

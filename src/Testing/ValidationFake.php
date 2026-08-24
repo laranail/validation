@@ -40,7 +40,7 @@ final class ValidationFake
     /** @param  Closure(array<string, mixed>): bool|null  $matching */
     public function assertValidated(?Closure $matching = null): void
     {
-        if ($matching === null) {
+        if (!$matching instanceof Closure) {
             Assert::assertNotEmpty($this->completed, 'Expected at least one passing validation run; none happened.');
 
             return;
@@ -55,7 +55,7 @@ final class ValidationFake
     /** @param  Closure(MessageBag): bool|null  $matching */
     public function assertFailed(?Closure $matching = null): void
     {
-        if ($matching === null) {
+        if (!$matching instanceof Closure) {
             Assert::assertNotEmpty($this->failed, 'Expected at least one failing validation run; none happened.');
 
             return;

@@ -159,7 +159,7 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
      */
     public function regex(string|Regex|Closure $pattern, ?string $message = null): static
     {
-        return $this->addRule('regex:' . (is_string($pattern) ? $pattern : self::compileRegex($pattern)), $message);
+        return $this->addRule('regex:' . (is_string($pattern) ? $pattern : $this->compileRegex($pattern)), $message);
     }
 
     /**
@@ -180,13 +180,13 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
     {
         $compiled = is_string($pattern)
             ? Regex::of($pattern)->compile()
-            : self::compileRegex($pattern);
+            : $this->compileRegex($pattern);
 
         return $this->addRule('regex:' . $compiled, $message);
     }
 
     /** @param  Regex|Closure(Regex): Regex  $pattern */
-    private static function compileRegex(Regex|Closure $pattern): string
+    private function compileRegex(Regex|Closure $pattern): string
     {
         if ($pattern instanceof Closure) {
             $built = $pattern(Regex::build());
