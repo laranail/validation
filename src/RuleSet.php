@@ -28,6 +28,7 @@ use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
 use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
 use Simtabi\Laranail\Validation\Internal\ItemValidator;
 use Simtabi\Laranail\Validation\Internal\VanillaAfterRoute;
+use Simtabi\Laranail\ValidationJs\RuleExporter;
 use Traversable;
 
 /**
@@ -497,6 +498,43 @@ final class RuleSet implements Arrayable, IteratorAggregate
     public function expandWildcards(array $data): array
     {
         return $this->expand($data)[0];
+    }
+
+    /**
+     * Export this rule set as the wire schema `laranail/validation-js`'s
+     * browser runner consumes — one call, so a PHP consumer never touches
+     * `RuleExporter` directly:
+     *
+     *     $schema = RuleSet::from($rules)->toSchema();
+     *
+     * Requires `laranail/validation-js` (a suggest, not a require — most
+     * consumers never export). Missing it is a wiring error, so this fails
+     * fast at the call site with the install command rather than returning
+     * an empty schema a browser would silently treat as "nothing to check".
+     *
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
+     * @return array{version: int, fields: array<string, array{attribute: string|null, client: list<array{rule: string, params: array<array-key, string>}>, server: list<string>}>, messages: array<string, string>, messageVariants: array<string, array<string, string>>}
+     *
+     * @throws LogicException When laranail/validation-js is not installed.
+     */
+    public function toSchema(array $messages = [], array $attributes = []): array
+    {
+        if (! class_exists(RuleExporter::class)) {
+            throw new LogicException(
+                'toSchema() exports the wire schema through laranail/validation-js, which is not installed. '
+                . 'Install it with `composer require laranail/validation-js`.',
+            );
+        }
+
+        $flat = $this->flatten();
+        [$ruleMessages, $ruleAttributes] = self::extractMetadata($flat);
+
+        return resolve(RuleExporter::class)->export(
+            self::compile($flat),
+            $messages + $ruleMessages,
+            $attributes + $ruleAttributes,
+        );
     }
 
     /**

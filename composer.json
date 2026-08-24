@@ -23,10 +23,14 @@
         {
             "type": "vcs",
             "url": "https://github.com/laranail/enumerator"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/validation-js"
         }
     ],
     "name": "laranail/validation",
-    "description": "Fluent validation rule builders for Laravel \u2014 type-aware rule objects, structured array validation, and an optimized wildcard validator.",
+    "description": "Fluent validation rule builders for Laravel — type-aware rule objects, structured array validation, and an optimized wildcard validator.",
     "keywords": [
         "laravel",
         "laranail",
@@ -90,12 +94,13 @@
         "symplify/phpstan-extensions": "^12.0.2",
         "tomasvotruba/cognitive-complexity": "^1.1",
         "tomasvotruba/type-coverage": "^2.3.4",
-        "laranail/phone": "^0.1@dev"
+        "laranail/phone": "^0.1@dev",
+        "laranail/validation-js": "dev-main"
     },
     "suggest": {
-        "laranail/email": "^0.1 \u2014 maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
-        "laranail/phone": "^0.1 \u2014 required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
-        "nikic/php-parser": "^5.0 \u2014 required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
+        "laranail/email": "^0.1 — maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
+        "laranail/phone": "^0.1 — required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
+        "nikic/php-parser": "^5.0 — required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
     },
     "autoload": {
         "psr-4": {
