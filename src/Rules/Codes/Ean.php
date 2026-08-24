@@ -13,6 +13,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
  * domain calls it, and because accepting a 12- or 14-digit GTIN where an EAN
  * is meant lets a shipping-carton code through as a retail one.
  *
+ * A JAN (Japanese Article Number) is exactly an EAN-13 whose GS1 prefix is
+ * 45 or 49 — validate it with this rule; there is deliberately no separate
+ * `Jan` class restating the same checksum for a prefix.
+ *
  * Pure tier — no IO.
  */
 final class Ean implements ValidationRule

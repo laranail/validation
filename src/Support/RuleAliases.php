@@ -13,10 +13,13 @@ use Simtabi\Laranail\Validation\Rules\Banking\Bic;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
+use Simtabi\Laranail\Validation\Rules\Codes\Asin;
 use Simtabi\Laranail\Validation\Rules\Codes\Ean;
 use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
 use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
+use Simtabi\Laranail\Validation\Rules\Codes\Ismn;
 use Simtabi\Laranail\Validation\Rules\Codes\Issn;
+use Simtabi\Laranail\Validation\Rules\Codes\UpcE;
 use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
 use Simtabi\Laranail\Validation\Rules\Crypto\EthereumAddress;
@@ -139,6 +142,9 @@ final class RuleAliases
             'issn' => static fn (): ValidationRule => new Issn(),
             'isbn' => static fn (array $p): ValidationRule => new Isbn(self::ints($p)),
             'gtin' => static fn (array $p): ValidationRule => new Gtin(self::ints($p)),
+            'asin' => static fn (): ValidationRule => new Asin(),
+            'ismn' => static fn (): ValidationRule => new Ismn(),
+            'upc_e' => static fn (): ValidationRule => new UpcE(),
 
             // Identifiers
             'imei' => static fn (): ValidationRule => new Imei(),

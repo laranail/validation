@@ -21,9 +21,12 @@ return [
     'luhn' => 'The :attribute must pass the Luhn checksum.',
 
     // Codes
+    'asin' => 'The :attribute must be a valid ASIN.',
     'ean' => 'The :attribute must be a valid EAN barcode.',
     'gtin' => 'The :attribute must be a valid GTIN.',
     'isbn' => 'The :attribute must be a valid ISBN.',
+    'ismn' => 'The :attribute must be a valid ISMN.',
+    'upc_e' => 'The :attribute must be a valid UPC-E barcode.',
     'issn' => 'The :attribute must be a valid ISSN.',
 
     // Identifiers

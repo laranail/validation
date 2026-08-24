@@ -87,14 +87,26 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
 | `Ean` | — | `ean` | `ean` |
 | `Isbn` | `array $editions = [10, 13]` | `isbn` | `isbn` |
 | `Issn` | — | `issn` | `issn` |
+| `Asin` | — | `asin` | `asin` |
+| `Ismn` | — | `ismn` | `ismn` |
+| `UpcE` | — | `upc_e` | `upc_e` |
 
 - **`Gtin`** — a GS1 Global Trade Item Number. Pass `$lengths` to accept only some of GTIN-8,
-  -12, -13 and -14: `new Gtin([13])`, or `laranail_gtin:13`.
-- **`Ean`** — a European Article Number, the retail barcode, in its 8 or 13 digit form.
+  -12, -13 and -14: `new Gtin([13])`, or `laranail_gtin:13`. A UPC-A is exactly a GTIN-12 — use
+  this rule for it.
+- **`Ean`** — a European Article Number, the retail barcode, in its 8 or 13 digit form. A JAN
+  (Japanese Article Number) is an EAN-13 with GS1 prefix 45/49 — validate it with this rule.
 - **`Isbn`** — an International Standard Book Number (ISO 2108). Accepts both editions by
   default; `new Isbn([13])` restricts to ISBN-13. ISBN-10's check digit uses mod-11 with `X` as
   the value 10, which is why an `X` in the final position is valid and nowhere else.
 - **`Issn`** — an International Standard Serial Number (ISO 3297), same `X` escape.
+- **`Asin`** — an Amazon Standard Identification Number: `B` + nine uppercase alphanumerics, or
+  a checksum-valid ISBN-10 (book ASINs are the book's ISBN). Amazon publishes no checksum for
+  the `B` form, so only its shape can be verified.
+- **`Ismn`** — an International Standard Music Number (ISO 10957), the current 13-digit `9790…`
+  form with its GTIN-13 check digit; hyphens and spaces in the printed form are ignored.
+- **`UpcE`** — the 8-digit zero-suppressed UPC. The check digit is verified against the
+  **expanded** UPC-A, which is the part quick implementations get wrong.
 
 ## Colour
 
