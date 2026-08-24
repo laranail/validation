@@ -107,7 +107,7 @@ FluentRule::password()->confirmed('Passwords do not match.') // custom mismatch 
 
 Two sister packages extend this node when installed — the methods simply do not exist
 otherwise, and this library carries no knowledge of them:
-[`laranail/password-strength`](https://github.com/laranail/password-strength) adds
+[`laranail/password-tools`](https://github.com/laranail/password-tools) adds
 `->strength(3)` (zxcvbn scoring with translated feedback) and
 [`laranail/password-history`](https://github.com/laranail/password-history) adds
 `->notReused()` (rejects the user's current and last-N passwords). Strength scoring and

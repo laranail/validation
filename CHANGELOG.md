@@ -12,7 +12,7 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ### Added
 
-- The password sister packages are cross-linked: `laranail/password-strength`
+- The password sister packages are cross-linked: `laranail/password-tools`
   (`password()->strength()`) and `laranail/password-history` (`password()->notReused()`)
   join `suggest`, and the `password()` reference documents both — resolving the two
   "not in this library" rows the 1.0 plan recorded. The coupling is entirely theirs:
