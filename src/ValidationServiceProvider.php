@@ -93,6 +93,12 @@ class ValidationServiceProvider extends PackageServiceProvider
                 [$this->configPath() => config_path('laranail-validation.php')],
                 $this->package->getNamespacedPublishTag('config'),
             );
+
+            $this->commands([
+                Commands\RulesCommand::class,
+                Commands\DoctorCommand::class,
+                Commands\BenchmarkCommand::class,
+            ]);
         }
     }
 
