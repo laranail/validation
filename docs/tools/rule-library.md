@@ -29,9 +29,9 @@ The email rules also have named methods on the email node — see [Fluent rule](
 | **Alias** | The [opt-in string form](../configuration.md#string-rule-aliases-are-opt-in), behind the `laranail_` prefix. Off by default |
 | **Message key** | Under `laranail-validation::validation.`, overridable per application |
 
-Every rule here is **Pure tier** except the two in `Database`, which perform one indexed read
-each, and the one in `Network`, which performs a cached DNS lookup. No rule in this library
-writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
+Every rule here is **Pure tier** except the `Database` family (one indexed read each), the
+`Storage` rule (one disk-metadata read), and the `Network` family (DNS or HTTP probes, each
+skipped during a precognitive request). No rule in this library writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
 that enforce them.
 
 ## Anti-spam
@@ -69,6 +69,7 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
 | `Bic` | — | `bic` | `bic` |
 | `Isin` | — | `isin` | `isin` |
 | `Luhn` | — | `luhn` | `luhn` |
+| `BsbNumber` | — | `bsb_number` | `bsb_number` |
 
 - **`Iban`** — an International Bank Account Number (ISO 13616). Checks the country's declared
   length before the ISO 7064 MOD-97-10 checksum, so a truncated number fails as a length error
@@ -78,6 +79,9 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
   prefix, nine alphanumerics, Luhn check digit over the letter-expanded string.
 - **`Luhn`** — the bare Luhn mod-10 checksum (ISO/IEC 7812-1), for card numbers and anything
   else carrying one. It checks the checksum only; it does not identify a card brand.
+- **`BsbNumber`** — an Australian Bank State Branch number, `062-000` or `062000`. Format-only
+  and honestly so: BSBs carry no check digit, and the live-prefix register churns as banks
+  merge, so existence is the payment network's question.
 
 ## Codes
 
@@ -87,14 +91,65 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
 | `Ean` | — | `ean` | `ean` |
 | `Isbn` | `array $editions = [10, 13]` | `isbn` | `isbn` |
 | `Issn` | — | `issn` | `issn` |
+| `Asin` | — | `asin` | `asin` |
+| `Ismn` | — | `ismn` | `ismn` |
+| `UpcE` | — | `upc_e` | `upc_e` |
 
 - **`Gtin`** — a GS1 Global Trade Item Number. Pass `$lengths` to accept only some of GTIN-8,
-  -12, -13 and -14: `new Gtin([13])`, or `laranail_gtin:13`.
-- **`Ean`** — a European Article Number, the retail barcode, in its 8 or 13 digit form.
+  -12, -13 and -14: `new Gtin([13])`, or `laranail_gtin:13`. A UPC-A is exactly a GTIN-12 — use
+  this rule for it.
+- **`Ean`** — a European Article Number, the retail barcode, in its 8 or 13 digit form. A JAN
+  (Japanese Article Number) is an EAN-13 with GS1 prefix 45/49 — validate it with this rule.
 - **`Isbn`** — an International Standard Book Number (ISO 2108). Accepts both editions by
   default; `new Isbn([13])` restricts to ISBN-13. ISBN-10's check digit uses mod-11 with `X` as
   the value 10, which is why an `X` in the final position is valid and nowhere else.
 - **`Issn`** — an International Standard Serial Number (ISO 3297), same `X` escape.
+- **`Asin`** — an Amazon Standard Identification Number: `B` + nine uppercase alphanumerics, or
+  a checksum-valid ISBN-10 (book ASINs are the book's ISBN). Amazon publishes no checksum for
+  the `B` form, so only its shape can be verified.
+- **`Ismn`** — an International Standard Music Number (ISO 10957), the current 13-digit `9790…`
+  form with its GTIN-13 check digit; hyphens and spaces in the printed form are ignored.
+- **`UpcE`** — the 8-digit zero-suppressed UPC. The check digit is verified against the
+  **expanded** UPC-A, which is the part quick implementations get wrong.
+
+## Chrono
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Rfc3339` | — | `rfc3339` | `rfc3339` |
+| `TimeOfDay` | `bool $twelveHour = false, string $separator = ':'` | `time_of_day` | `time_of_day` |
+| `UnixTimestamp` | `bool $allowNegative = false` | `unix_timestamp` | `unix_timestamp` |
+| `DateInterval` | `bool $positive = false` | `date_interval` | `date_interval` / `date_interval_positive` |
+| `MinuteIn` | `array $minutes` | `minute_in` | `minute_in` |
+| `MaxDateDifference` | `int $hours, DateTimeInterface\|string $from` | `max_date_difference` | `max_date_difference` |
+| `TimezoneAbbreviation` | — | `timezone_abbreviation` | `timezone_abbreviation` |
+| `MinimumAge` | `int $years, ?string $timezone = null` | `minimum_age` | `minimum_age` |
+
+- **`Rfc3339`** — a full RFC 3339 timestamp, including the forms PHP's own
+  `createFromFormat(RFC3339, …)` fumbles: `Z`, lowercase `t`/`z`, fractional seconds, and the
+  leap second `:60`. The date part is checked against the calendar, so `2023-02-29` fails as a
+  date, not passes as a shape. Laravel's `date_format` cannot express "either `Z` or an offset".
+- **`TimeOfDay`** — `23:59` / `23:59:59`, or with `twelveHour: true` the meridiem form
+  (`9:05 PM`, meridiem required — a bare `9:05` on a 12-hour form is ambiguous). `$separator`
+  covers locales that write `23.59`.
+- **`UnixTimestamp`** — a canonical integer timestamp: no floats, no leading zeros, no `+`, no
+  `1e9` (all of which `is_numeric` waves through). Pre-epoch values are opt-in
+  (`allowNegative: true`). Deliberately no range cap — plausibility is the field's business
+  rule, not the encoding's.
+- **`DateInterval`** — an ISO 8601 duration as PHP's own `DateInterval` parses it.
+  `positive: true` also rejects the zero duration (`P0Y`), the retention-period-of-nothing case.
+- **`MinuteIn`** — the minute component is in the allowed set: `new MinuteIn([0, 15, 30, 45])`
+  for quarter-hour scheduling. Takes a bare time or a full datetime.
+- **`MaxDateDifference`** — the value lies within `$hours` of a reference, in either direction.
+  The reference is a date, a `DateTimeInterface`, or `@field` to read a sibling
+  (`new MaxDateDifference(48, '@start_at')`). A missing or unparseable reference **fails** the
+  value — a bound that silently stopped binding is the worse outcome.
+- **`TimezoneAbbreviation`** — `EST`, `CET`, `EAT`: the abbreviation set from PHP's own
+  timezone database, which Laravel's identifier-validating `timezone` rule rejects. Prefer
+  identifiers in new schemas; validate existing data as what it is.
+- **`MinimumAge`** — a date of birth at least `$years` completed years ago. Age is
+  timezone-dependent (at 20:00 UTC on the 23rd it is already the 24th in Auckland), so
+  `$timezone` names whose midnight the birthday ticks over at. A future date of birth fails.
 
 ## Colour
 
@@ -155,12 +210,13 @@ Hex alone overlaps Laravel's native `hex_color` — use the native rule if that 
 
 ## Database
 
-The only two rules that touch the database. One indexed read each, no writes.
+The only rules that touch the database. One indexed read each, no writes.
 
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `Authorized` | `string $ability, string $model, ?string $guard = null, array $arguments = []` | `authorized` | `authorized` |
 | `ModelsExist` | `string $model, ?string $column = null` | `models_exist` | `models_exist.array`, `models_exist.missing` |
+| `CompareToColumn` | `string $table, string $column, Comparison $operator, string $keyColumn, int\|float\|string $key` | `compare_to_column` | `compare_to_column` |
 
 - **`Authorized`** — resolves the submitted identifier to a model, then asks the Gate. This is
   the difference from the native `Rule::can()`, which hands the policy the raw submitted value:
@@ -172,6 +228,15 @@ The only two rules that touch the database. One indexed read each, no writes.
   "one of these does not exist" is not actionable when fifty were submitted. Duplicates in the
   input are counted once: a repeated selection is a UI artefact, not a missing record.
   `$column` defaults to the model's route key.
+
+**`CompareToColumn`** — the value compared against a column looked up in another row:
+`new CompareToColumn('products', 'max_quantity', Comparison::LessThanOrEqual, 'id',
+'@product_id')` — "quantity may not exceed THIS product's max". The key is a literal or
+`@field` for a sibling; the operator is the `Comparison` enum
+(`laranail_compare_to_column:products,max_quantity,lte,id,@product_id`), replacing the legacy
+five-class family. Comparison is numeric when both sides are numeric — `'9' < '10'`, not the
+lexicographic lie. A missing row **fails** the value: the bound could not be checked, and that
+is the moment enforcement matters.
 
 ## Email
 
@@ -201,11 +266,36 @@ Domain and mailbox rules. Deliverability needs DNS, so it lives in the Network t
   earns its place on the one kind of field that grants something per account, where one mailbox
   minting unlimited distinct addresses is how a single person takes a free trial repeatedly.
 
+## Encoding
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Base64` | — | `base64` | `base64` |
+| `Base64Image` | `array $mimes = ['jpeg','png','gif','webp','bmp'], ?int $maxBytes = null` | *(none)* | `base64_image` / `base64_image_size` |
+| `DataUri` | `array $mediaTypes = []` | *(none)* | `data_uri` |
+
+- **`Base64`** — canonical base64, verified by strict decode + re-encode round trip. The round
+  trip catches what a charset regex cannot: missing padding, embedded whitespace, and padding
+  with non-zero discarded bits (`aGVsbG9=` decodes, but nothing encodes *to* it).
+- **`Base64Image`** — the payload a JavaScript cropper or `canvas.toDataURL()` posts, bare or
+  as a full data URI. Validates the **decoded bytes**: canonical base64, then the MIME type
+  sniffed from content (never from the attacker-written data-URI label). `$maxBytes` caps the
+  decoded size, and its message states the limit in human units ("2 MB"). To run Laravel's own
+  file rules (`dimensions`, `File::image()`) on the same payload, bridge it with
+  `Support\Encoding\Base64File::toUploadedFile()` — that writes a temp file, which is why it
+  lives outside `Rules\`.
+- **`DataUri`** — an RFC 2397 data URI. The payload is validated for what the header claims:
+  strict base64 when flagged, URL-encoded text otherwise. `$mediaTypes` restricts the declared
+  type, exact or by family (`image/*`); a restriction requires a *declared* type, because the
+  RFC's implied `text/plain` default is what omitting the header gets for free. It checks the
+  declaration, not the content — use `Base64Image` when the bytes are the question.
+
 ## Fiscal
 
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `NationalIdentifier` | `string $country` | `national_identifier` | `national_identifier` |
+| `VatNumber` | `?array $countries = null` | `vat_number` | `vat_number` |
 
 **`NationalIdentifier`** validates a national identification number in a particular country's
 scheme. One rule parameterised by country, because the field always means "this person's
@@ -218,6 +308,7 @@ national id" and which scheme applies is a property of the country.
 | `FR` | NIR / numéro de sécurité sociale | mod-97 key |
 | `US` | Social Security Number | format and unissued ranges — **no checksum exists** |
 | `GB` | National Insurance number | format and reserved prefixes — **no checksum exists** |
+| `VN` | CCCD citizen identification | structure (province 001-096, 12 digits) — **no checksum exists** |
 
 Where a scheme has a checksum it is computed, not pattern-matched: the entire value of these
 numbers is that a transposed pair fails arithmetic instead of sailing through a regex. Where a
@@ -238,6 +329,15 @@ Two details these get wrong when written quickly:
 None of these can tell you a number was **issued** — only that it is well-formed. That needs
 the issuing authority.
 
+**`VatNumber`** validates an EU-style VAT identifier by its country prefix: the national
+format, and the national checksum where one is defined (NL 11-proef or the 2020 mod-97 form,
+BE, DE, IT, SE, EL, LU, and FR's numeric key — each computed, not pattern-matched). ES, GB and
+the other letter-scheme countries are format-only, and the class docblock says exactly which.
+Spaces, dots and hyphens are stripped (`BE 0423.456.765` is how invoices write it);
+`laranail_vat_number:NL,BE` restricts countries. Format validity is not registration — only
+VIES or the national registry can say a number is issued, and this pure-tier rule deliberately
+does not ask the network.
+
 ## Geo
 
 | Rule | Parameters | Alias | Message key |
@@ -254,8 +354,37 @@ the issuing authority.
   adds PR, GU, VI and the rest; `laranail_us_state:true`.
 - **`CaProvince`** — a Canadian province or territory, by code or full name.
 
-Country, currency and language codes are **not** here — they live in `laranail/atlas`, which
-owns that dataset.
+Country, currency and language **codes** live in the I18n family below; `laranail/atlas` owns
+the richer per-country dataset (names, regions, coordinates) and can replace the bundled code
+sets by binding the same contracts.
+
+## I18n
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `CountryCode` | `bool $alpha3 = false, bool $caseInsensitive = false` | `country_code` | `country_code` |
+| `CurrencyCode` | `bool $numeric = false, bool $symbol = false, bool $caseInsensitive = false` | `currency_code` | `currency_code` / `currency_code_numeric` / `currency_symbol` |
+| `LanguageCode` | `bool $caseInsensitive = false` | `language_code` | `language_code` |
+
+- **`CountryCode`** — an assigned ISO 3166-1 code: alpha-2 (`KE`) by default, alpha-3 (`KEN`)
+  with `alpha3: true` (`laranail_country_code:true`). The bundled set is the full registry —
+  the 249 assigned alpha-2 codes plus the user-assigned `XK`, which real address data needs
+  and which deliberately has no alpha-3.
+- **`CurrencyCode`** — a **current** ISO 4217 identifier: the alpha code (`USD`) by default,
+  the numeric code (`840`) with `numeric: true`, or a recognised symbol (`€`) with
+  `symbol: true`. One representation per instance — asking for two throws. Retired codes
+  (`HRK`, `SLL`, `ZWL`) fail; the bundled data is generated from the official registry and a
+  suite test pins it to its committed source.
+- **`LanguageCode`** — an assigned ISO 639-1 code, lowercase canonical (`en`, `sw`).
+
+All three are strict about case by default because they usually guard a column an exact-match
+lookup reads later; `caseInsensitive: true` folds before checking (it validates the folded
+code — it does not rewrite the stored value).
+
+The code sets are container contracts (`Contracts\I18n\CountryDataset`, `CurrencyDataset`,
+`LanguageDataset`) with bundled full-registry defaults bound `singletonIf`. Bind your own to
+narrow (the locales an app actually ships) or extend (a ledger accepting historical currency
+codes) without touching the rules.
 
 ## Identifiers
 
@@ -263,6 +392,7 @@ owns that dataset.
 |---|---|---|---|
 | `Imei` | — | `imei` | `imei` |
 | `Vin` | `bool $checkDigit = false` | `vin` | `vin` |
+| `HashDigest` | `string $algorithm` | `hash_digest` | `hash_digest` |
 | `SemVer` | — | `semver` | `semver` |
 | `Jwt` | — | `jwt` | `jwt` |
 
@@ -272,6 +402,11 @@ owns that dataset.
   the North American position-9 check digit, which is **off by default** because it is not
   applied worldwide and would reject valid non-NA numbers.
 - **`SemVer`** — a Semantic Versioning 2.0.0 string, including prerelease and build metadata.
+- **`HashDigest`** — a hex digest of a named algorithm (`new HashDigest('sha256')`,
+  `laranail_hash_digest:sha256`): hex in either case at exactly the algorithm's width, from a
+  table of 28 admitted algorithms. An unknown name throws at construction with the known names
+  in the message. Shape, not provenance — a well-formed digest says nothing about what was
+  hashed.
 - **`Jwt`** — a JSON Web Token in JWS compact serialisation (RFC 7515 §3.1). Structural only:
   three base64url segments with a decodable JSON header. It does **not** verify the signature
   and is not an authentication check.
@@ -353,6 +488,8 @@ The only tier that performs IO, and the only rules skipped during a precognitive
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `DeliverableEmail` | `?DnsResolver $resolver = null` | `deliverable_email` | `email.undeliverable`, `email.malformed` |
+| `ImageUrl` | `array $mimes = [], int $timeoutSeconds = 3` | `image_url` | `image_url` |
+| `HasGravatar` | `int $timeoutSeconds = 3` | `has_gravatar` | `has_gravatar` |
 
 **`DeliverableEmail`** — the address's domain can actually receive mail. One DNS lookup, behind
 the `DnsResolver` contract so it is injectable, cached and fakeable; Laravel's own `email:dns`
@@ -381,6 +518,31 @@ that a debounced email field would issue one DNS lookup per keystroke.
 The bundled `Actions\CachedDnsResolver` is bound only if nothing else has bound the contract,
 so `laranail/email` can replace it without any call site changing. Cache lifetime is
 `laranail.validation.dns.ttl`, default one hour.
+
+**`ImageUrl`** — the URL currently serves an image: a HEAD probe expecting 200 with an
+`image/*` content type (optionally restricted, `mimes: ['png']`). The probe IS the rule, so
+unreachable **fails** — expect that trade before using it. Guards: http/https only, loopback
+names and non-routable IP literals refused before any request, redirects never followed,
+bounded timeout. Hygiene, not an SSRF boundary — a public name resolving to a private address
+needs an egress-layer defence; do not point this at hostile input without one.
+
+**`HasGravatar`** — the email address has a Gravatar, probed over https with the sha256 hash
+against the `d=404` endpoint. Unreachable **passes** (the `DeliverableEmail` posture: a third
+party's outage must not turn away users). Privacy is the cost and the function: a hash of the
+email goes to gravatar.com at validation time — name it in your privacy policy, and prefer
+probing after signup when the avatar is a nicety rather than a requirement.
+
+## Storage
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `FileExistsOnDisk` | `string $disk, string $directory = ''` | `file_exists_on_disk` | `file_exists_on_disk` |
+
+**`FileExistsOnDisk`** — the value names a file on a Laravel disk, optionally scoped to a
+directory (`laranail_file_exists_on_disk:uploads,avatars`). The scope is a security boundary:
+`..` segments, absolute paths, backslashes and null bytes are refused outright rather than
+normalised — `../top-level.txt` may well exist, which is exactly the point. One metadata read;
+on an S3-style disk that is a network round trip per validated value.
 
 ## Vendor identifiers
 
@@ -441,6 +603,36 @@ What ships is the **matching**, which is the part naive implementations get wron
 It is a filter, not a moderation system. Anyone determined to get a word past it will; the
 point is to catch the careless case without insulting the innocent one. There is no string
 alias — a rule string cannot carry a word list.
+
+## Payment
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `CardNumber` | `?array $brands = null` | `card_number` | `card_number` / `card_number_brand` / `card_number_length` / `card_number_checksum` |
+| `CardCvc` | `?string $numberField = null` | `card_cvc` | `card_cvc` |
+| `CardExpiry` | `?string $timezone = null, int $maxYearsAhead = 20` | `card_expiry` | `card_expiry` |
+
+- **`CardNumber`** — brand identified by IIN range, length checked against what *that* brand
+  issues, Luhn verified where the brand carries it (UnionPay does not, so it is a brand
+  property, not an assumption). Spaces and hyphens are stripped. `brands: ['visa',
+  'mastercard']` (`laranail_card_number:visa,mastercard`) is the "we only take" case. The
+  legacy engine's typed exceptions survive as distinct message keys — a wrong length and a
+  failed checksum send the cardholder to different corrections.
+- **`CardCvc`** — 3 or 4 digits alone; `numberField: 'card_number'` narrows to the sibling
+  number's brand (Visa 3, Amex 3 or 4). An unrecognisable sibling falls back to 3-or-4 rather
+  than failing: the number field's own rule reports the bad number.
+- **`CardExpiry`** — `08/26`, `8/26`, `12/2027`, `08-26`, `2027-03`; valid through the end of
+  the stated month in the named timezone. `$maxYearsAhead` rejects the implausibly distant
+  typo (`08/47`).
+
+The brand data is the `Contracts\Payment\CardBrandCatalogue` contract with a bundled
+14-brand default (the legacy engine's set, its range bugs fixed — see
+`Support\Payment\BundledCardBrandCatalogue`). Bind your own to add a store card or trim to
+what the processor accepts.
+
+> **Validity is not authorisation, and a PAN is cardholder data.** These rules prove shape;
+> they say nothing about the account, and validating a number does not license storing or
+> logging it. No failure message echoes the value.
 
 ## Postal
 
@@ -522,8 +714,11 @@ the alias map stays free of references to it.
 | `Username` | `int $min = 3, int $max = 32` | `username` | `username` |
 | `PersonName` | `bool $allowDigits = false` | `person_name` | `person_name` |
 | `CaseStyle` | `string $style` | `case_style` | `case_style.{style}` |
-| `HtmlClean` | — | `html_clean` | `html_clean` |
+| `HtmlClean` | `bool $mustContainHtml = false` | `html_clean` | `html_clean` / `contains_html` |
 | `WithoutSpaces` | — | `without_spaces` | `without_spaces` |
+| `MaxWords` | `int $max` | `max_words` | `max_words` |
+| `MinWords` | `int $min` | `min_words` | `min_words` |
+| `Salutation` | `?array $accepted = null` | `salutation` | `salutation` |
 
 - **`Slug`** — lowercase alphanumerics separated by single hyphens, no leading or trailing one.
 - **`Username`** — letters, digits and single internal separators, within `$min`..`$max`;
@@ -536,6 +731,13 @@ the alias map stays free of references to it.
   `SNAKE`, `TITLE`; as a string, `laranail_case_style:camel`.
 - **`HtmlClean`** — the value contains no HTML markup. A rejection, not a sanitiser: it tells
   the user their input was not accepted rather than silently rewriting it.
+  `mustContainHtml: true` (`laranail_html_clean:true`) inverts it — a rich-text field whose
+  plain-text submission means the editor never loaded.
+- **`MaxWords`** / **`MinWords`** — word-count bounds. A word is a run of letters, numbers or
+  apostrophes in any script; hyphenated compounds split. `laranail_max_words:200`.
+- **`Salutation`** — a recognised honorific (`Mr`, `Prof.`, `Madame`), case- and dot-insensitive.
+  The bundled list is a curated everyday set; pass your own `$accepted` (lowercase, no dots) to
+  replace it — that is also the localisation hook.
 - **`WithoutSpaces`** — no whitespace of any kind, including the Unicode separators a
   `\s`-based check misses.
 
@@ -616,9 +818,9 @@ Only English ships. The package deliberately does not carry translations it cann
 
 | You want | It lives in |
 |---|---|
-| Country / currency / language codes | `laranail/atlas` |
+| Country / currency / language **data** (names, regions, coordinates) | `laranail/atlas` — the code rules ship here ([I18n](#i18n)) and atlas can rebind their datasets |
 | Enum values, names, transitions | `laranail/enumerator` |
-| Timezones, date existence and ambiguity | `laranail/chrono` |
+| Timezone identifiers, date existence and ambiguity | `laranail/chrono` — the everyday time rules ship here ([Chrono](#chrono)) |
 | Password strength, common-password rejection | `laranail/toolkit` |
 | Captcha verification | `laranail/captcha` |
 | Licence keys | `laranail/license-kit` |

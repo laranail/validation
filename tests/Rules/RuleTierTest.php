@@ -4,6 +4,7 @@ use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 // =========================================================================
@@ -56,10 +57,20 @@ function tierOf(string $path): string
     return explode('/', substr($path, $position + strlen($marker)))[0];
 }
 
-arch('pure-tier rules never reach the database, the gate or the network')
+arch('pure-tier rules never reach the database or the gate')
     ->expect('Simtabi\Laranail\Validation\Rules')
-    ->not->toUse([DB::class, Gate::class, Http::class, HttpFactory::class])
+    ->not->toUse([DB::class, Gate::class])
     ->ignoring('Simtabi\Laranail\Validation\Rules\Database');
+
+arch('HTTP stays in the Network tier')
+    ->expect('Simtabi\Laranail\Validation\Rules')
+    ->not->toUse([Http::class, HttpFactory::class])
+    ->ignoring('Simtabi\Laranail\Validation\Rules\Network');
+
+arch('disk access stays in the Storage tier')
+    ->expect('Simtabi\Laranail\Validation\Rules')
+    ->not->toUse([Storage::class])
+    ->ignoring('Simtabi\Laranail\Validation\Rules\Storage');
 
 it('has no rule that writes', function (): void {
     // Read-only is the strongest claim the library makes about itself: a rule

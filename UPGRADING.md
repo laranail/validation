@@ -4,6 +4,12 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 
 ## Unreleased
 
+### The PHP floor is now `^8.5`
+
+The package requires PHP 8.5. The `Rules/Chrono/` family and the 1.0 platform work target the
+8.5 runtime, and the test matrix runs 8.5 only. Applications on PHP 8.4 must upgrade the runtime
+before taking this version; no code changes are required beyond that.
+
 ### `ArrayRule::getEachRules()` is removed
 
 It was an exact alias of `getEachKeyedRules()` — same body, wider advertised type. Replace

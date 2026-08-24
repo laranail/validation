@@ -16,17 +16,22 @@ return [
 
     // Banking
     'bic' => 'The :attribute must be a valid BIC/SWIFT code.',
+    'bsb_number' => 'The :attribute must be a valid BSB number.',
     'iban' => 'The :attribute must be a valid IBAN.',
     'isin' => 'The :attribute must be a valid ISIN.',
     'luhn' => 'The :attribute must pass the Luhn checksum.',
 
     // Codes
+    'asin' => 'The :attribute must be a valid ASIN.',
     'ean' => 'The :attribute must be a valid EAN barcode.',
     'gtin' => 'The :attribute must be a valid GTIN.',
     'isbn' => 'The :attribute must be a valid ISBN.',
+    'ismn' => 'The :attribute must be a valid ISMN.',
+    'upc_e' => 'The :attribute must be a valid UPC-E barcode.',
     'issn' => 'The :attribute must be a valid ISSN.',
 
     // Identifiers
+    'hash_digest' => 'The :attribute must be a :length-character hex digest.',
     'imei' => 'The :attribute must be a valid IMEI.',
     'jwt' => 'The :attribute must be a valid JSON Web Token.',
     'semver' => 'The :attribute must be a valid semantic version.',
@@ -97,9 +102,52 @@ return [
     'person_name_max' => 'The :attribute must not contain more than :max names.',
     'person_name_required' => 'Please provide at least one of :values.',
 
+    'contains_html' => 'The :attribute must contain HTML markup.',
     'html_clean' => 'The :attribute must not contain HTML tags.',
+    'max_words' => 'The :attribute must not contain more than :max words.',
+    'min_words' => 'The :attribute must contain at least :min words.',
+    'salutation' => 'The :attribute must be a recognised salutation.',
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
+
+    // Storage
+    'file_exists_on_disk' => 'The :attribute must name an existing file.',
+
+    // Networking probes
+    'has_gravatar' => 'The :attribute must have a Gravatar.',
+    'image_url' => 'The :attribute must be a URL serving an image.',
+
+    // Payment
+    'card_cvc' => 'The :attribute must be a valid security code.',
+    'card_expiry' => 'The :attribute must be a valid expiry date that has not passed.',
+    'card_number' => 'The :attribute is not a recognised card number.',
+    'card_number_brand' => 'The :attribute must be one of these card brands: :brands.',
+    'card_number_checksum' => 'The :attribute fails the card number check digit.',
+    'card_number_length' => 'The :attribute must be :lengths digits for :brand.',
+
+    // Chrono
+    'date_interval' => 'The :attribute must be an ISO 8601 duration.',
+    'date_interval_positive' => 'The :attribute must be a non-zero ISO 8601 duration.',
+    'max_date_difference' => 'The :attribute must be within :hours hours of the reference date.',
+    'minimum_age' => 'The :attribute must be a date of birth at least :years years ago.',
+    'minute_in' => 'The :attribute must be a time whose minutes are one of: :minutes.',
+    'rfc3339' => 'The :attribute must be an RFC 3339 timestamp.',
+    'time_of_day' => 'The :attribute must be a valid time of day.',
+    'timezone_abbreviation' => 'The :attribute must be a timezone abbreviation.',
+    'unix_timestamp' => 'The :attribute must be a Unix timestamp.',
+
+    // Encoding
+    'base64' => 'The :attribute must be a base64-encoded value.',
+    'base64_image' => 'The :attribute must be a base64-encoded image of an accepted type.',
+    'base64_image_size' => 'The :attribute must be an image no larger than :max.',
+    'data_uri' => 'The :attribute must be a valid data URI.',
+
+    // I18n
+    'country_code' => 'The :attribute must be a valid ISO 3166-1 country code.',
+    'currency_code' => 'The :attribute must be a valid ISO 4217 currency code.',
+    'currency_code_numeric' => 'The :attribute must be a valid ISO 4217 numeric currency code.',
+    'currency_symbol' => 'The :attribute must be a recognised currency symbol.',
+    'language_code' => 'The :attribute must be a valid ISO 639-1 language code.',
 
     // Geo
     'ca_province' => 'The :attribute must be a Canadian province or territory.',
@@ -121,6 +169,7 @@ return [
 
     // Database
     'authorized' => 'The selected :attribute is invalid.',
+    'compare_to_column' => 'The :attribute is outside the allowed bound.',
     'models_exist' => [
         'array' => 'The :attribute must be a list of identifiers.',
         'missing' => 'The :attribute contains values that do not exist: :values.',
@@ -167,6 +216,7 @@ return [
     'vendor_identifier' => 'The :attribute must be a valid :vendor identifier.',
 
     // Fiscal
+    'vat_number' => 'The :attribute must be a valid VAT number.',
     'national_identifier' => 'The :attribute must be a valid :country national identification number.',
 
     // Profanity

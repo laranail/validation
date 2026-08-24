@@ -10,29 +10,51 @@ use Simtabi\Laranail\Validation\Contracts\TermList;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
+use Simtabi\Laranail\Validation\Rules\Banking\BsbNumber;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
+use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
+use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
+use Simtabi\Laranail\Validation\Rules\Chrono\Rfc3339;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimeOfDay;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
+use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
+use Simtabi\Laranail\Validation\Rules\Codes\Asin;
 use Simtabi\Laranail\Validation\Rules\Codes\Ean;
 use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
 use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
+use Simtabi\Laranail\Validation\Rules\Codes\Ismn;
 use Simtabi\Laranail\Validation\Rules\Codes\Issn;
+use Simtabi\Laranail\Validation\Rules\Codes\UpcE;
 use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
 use Simtabi\Laranail\Validation\Rules\Crypto\EthereumAddress;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
+use Simtabi\Laranail\Validation\Rules\Database\CompareToColumn;
+use Simtabi\Laranail\Validation\Rules\Database\Comparison;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
 use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Rules\Encoding\Base64;
+use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
+use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
+use Simtabi\Laranail\Validation\Rules\Fiscal\VatNumber;
 use Simtabi\Laranail\Validation\Rules\Geo\CaProvince;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
 use Simtabi\Laranail\Validation\Rules\Geo\UsState;
+use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
+use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
+use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
+use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
 use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
@@ -47,14 +69,23 @@ use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Net\Url;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
+use Simtabi\Laranail\Validation\Rules\Network\HasGravatar;
+use Simtabi\Laranail\Validation\Rules\Network\ImageUrl;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
+use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
+use Simtabi\Laranail\Validation\Rules\Payment\CardExpiry;
+use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
+use Simtabi\Laranail\Validation\Rules\Storage\FileExistsOnDisk;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
+use Simtabi\Laranail\Validation\Rules\Text\MaxWords;
+use Simtabi\Laranail\Validation\Rules\Text\MinWords;
 use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Simtabi\Laranail\Validation\Rules\Text\Salutation;
 use Simtabi\Laranail\Validation\Rules\Text\Slug;
 use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Rules\Text\WithoutSpaces;
@@ -117,6 +148,12 @@ final class RuleAliases
         // dangerous half of the rule: the shape check without the host and
         // credential checks anyone reading `laranail_url` would assume.
         Url::class,
+        // Base64Image mixes a subtype list with a byte cap and DataUri takes
+        // a media-type list — same flat-tail problem as Url, and an alias
+        // exposing only the defaults would invite `laranail_base64_image`
+        // with the caller assuming their own constraints somehow apply.
+        Base64Image::class,
+        DataUri::class,
     ];
 
     /**
@@ -130,18 +167,23 @@ final class RuleAliases
             'bic' => static fn (): ValidationRule => new Bic(),
             'isin' => static fn (): ValidationRule => new Isin(),
             'luhn' => static fn (): ValidationRule => new Luhn(),
+            'bsb_number' => static fn (): ValidationRule => new BsbNumber(),
 
             // Codes — the parameters narrow which lengths/editions are accepted.
             'ean' => static fn (): ValidationRule => new Ean(),
             'issn' => static fn (): ValidationRule => new Issn(),
             'isbn' => static fn (array $p): ValidationRule => new Isbn(self::ints($p)),
             'gtin' => static fn (array $p): ValidationRule => new Gtin(self::ints($p)),
+            'asin' => static fn (): ValidationRule => new Asin(),
+            'ismn' => static fn (): ValidationRule => new Ismn(),
+            'upc_e' => static fn (): ValidationRule => new UpcE(),
 
             // Identifiers
             'imei' => static fn (): ValidationRule => new Imei(),
             'jwt' => static fn (): ValidationRule => new Jwt(),
             'semver' => static fn (): ValidationRule => new SemVer(),
             'vin' => static fn (array $p): ValidationRule => new Vin(...self::flags($p)),
+            'hash_digest' => static fn (array $p): ValidationRule => new HashDigest(self::str($p, 0)),
 
             // Geo
             'latitude' => static fn (): ValidationRule => new Latitude(),
@@ -153,6 +195,52 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // Database — `laranail_compare_to_column:products,max_quantity,lte,id,@product_id`
+            'compare_to_column' => static fn (array $p): ValidationRule => new CompareToColumn(
+                self::str($p, 0), self::str($p, 1),
+                Comparison::from(self::str($p, 2, 'eq')),
+                self::str($p, 3), self::str($p, 4),
+            ),
+
+            // Storage — `laranail_file_exists_on_disk:uploads,avatars`
+            'file_exists_on_disk' => static fn (array $p): ValidationRule => new FileExistsOnDisk(self::str($p, 0), self::str($p, 1)),
+
+            // Networking probes
+            'image_url' => static fn (array $p): ValidationRule => new ImageUrl(self::strings($p)),
+            'has_gravatar' => static fn (): ValidationRule => new HasGravatar(),
+
+            // Payment — `laranail_card_number:visa,mastercard` restricts
+            // brands; `laranail_card_cvc:card_number` names the sibling
+            // number field; `laranail_card_expiry:Europe/Berlin` the zone.
+            'card_number' => static fn (array $p): ValidationRule => new CardNumber(self::strings($p) === [] ? null : self::strings($p)),
+            'card_cvc' => static fn (array $p): ValidationRule => new CardCvc(self::nullableStr($p, 0)),
+            'card_expiry' => static fn (array $p): ValidationRule => new CardExpiry(self::nullableStr($p, 0)),
+
+            // Chrono
+            'rfc3339' => static fn (): ValidationRule => new Rfc3339(),
+            // `laranail_time_of_day:true` = 12-hour; second parameter is the
+            // separator (`laranail_time_of_day:false,.` for `23.59`).
+            'time_of_day' => static fn (array $p): ValidationRule => new TimeOfDay(self::flags($p)[0] ?? false, self::str($p, 1, ':')),
+            'unix_timestamp' => static fn (array $p): ValidationRule => new UnixTimestamp(...self::flags($p)),
+            'date_interval' => static fn (array $p): ValidationRule => new DateInterval(...self::flags($p)),
+            'minute_in' => static fn (array $p): ValidationRule => new MinuteIn(self::ints($p)),
+            // `laranail_max_date_difference:48,@start_at` — hours, then the
+            // reference (a date, or @field for a sibling).
+            'max_date_difference' => static fn (array $p): ValidationRule => new MaxDateDifference((int) self::str($p, 0, '0'), self::str($p, 1)),
+            'timezone_abbreviation' => static fn (): ValidationRule => new TimezoneAbbreviation(),
+            'minimum_age' => static fn (array $p): ValidationRule => new MinimumAge((int) self::str($p, 0, '0'), self::nullableStr($p, 1)),
+
+            // Encoding — Base64Image and DataUri take lists and a byte cap,
+            // which a flat rule string cannot spell honestly (see UNALIASED).
+            'base64' => static fn (): ValidationRule => new Base64(),
+
+            // I18n — positional flags mirror the constructors:
+            // `laranail_country_code:true` is alpha-3 mode,
+            // `laranail_currency_code:true` numeric, `:false,true` symbol.
+            'country_code' => static fn (array $p): ValidationRule => new CountryCode(...self::flags($p)),
+            'currency_code' => static fn (array $p): ValidationRule => new CurrencyCode(...self::flags($p)),
+            'language_code' => static fn (array $p): ValidationRule => new LanguageCode(...self::flags($p)),
 
             // Net
             'cidr' => static fn (): ValidationRule => new Cidr(),
@@ -168,7 +256,11 @@ final class RuleAliases
 
             // Text
             'slug' => static fn (): ValidationRule => new Slug(),
-            'html_clean' => static fn (): ValidationRule => new HtmlClean(),
+            // `laranail_html_clean:true` inverts the rule: markup required.
+            'html_clean' => static fn (array $p): ValidationRule => new HtmlClean(...self::flags($p)),
+            'max_words' => static fn (array $p): ValidationRule => new MaxWords(...self::ints($p)),
+            'min_words' => static fn (array $p): ValidationRule => new MinWords(...self::ints($p)),
+            'salutation' => static fn (): ValidationRule => new Salutation(),
             'without_spaces' => static fn (): ValidationRule => new WithoutSpaces(),
             'case_style' => static fn (array $p): ValidationRule => new CaseStyle(self::str($p, 0)),
             'person_name' => static fn (array $p): ValidationRule => new PersonName(...self::flags($p)),
@@ -181,6 +273,8 @@ final class RuleAliases
 
             // Fiscal
             'national_identifier' => static fn (array $p): ValidationRule => new NationalIdentifier(self::str($p, 0)),
+            // `laranail_vat_number:NL,BE` restricts the accepted countries.
+            'vat_number' => static fn (array $p): ValidationRule => new VatNumber(self::strings($p) === [] ? null : self::strings($p)),
 
             // Markup
             'xml' => static fn (array $p): ValidationRule => new Xml(self::nullableStr($p, 0)),
