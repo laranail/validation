@@ -70,6 +70,8 @@ final class RulesCommand extends Command
             'minute_in' => ['0', '15', '30', '45'],
             'max_date_difference' => ['48', '2026-08-24 00:00:00'],
             'minimum_age' => ['18'],
+            'compare_to_column' => ['posts', 'owner_id', 'gte', 'id', '1'],
+            'file_exists_on_disk' => ['local'],
             'hash_digest' => ['sha256'],
             'max_words' => ['200'],
             'min_words' => ['2'],

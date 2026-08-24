@@ -29,9 +29,9 @@ The email rules also have named methods on the email node — see [Fluent rule](
 | **Alias** | The [opt-in string form](../configuration.md#string-rule-aliases-are-opt-in), behind the `laranail_` prefix. Off by default |
 | **Message key** | Under `laranail-validation::validation.`, overridable per application |
 
-Every rule here is **Pure tier** except the two in `Database`, which perform one indexed read
-each, and the one in `Network`, which performs a cached DNS lookup. No rule in this library
-writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
+Every rule here is **Pure tier** except the `Database` family (one indexed read each), the
+`Storage` rule (one disk-metadata read), and the `Network` family (DNS or HTTP probes, each
+skipped during a precognitive request). No rule in this library writes. See [Architecture](../architecture.md) for what the tiers guarantee and the arch tests
 that enforce them.
 
 ## Anti-spam
@@ -210,12 +210,13 @@ Hex alone overlaps Laravel's native `hex_color` — use the native rule if that 
 
 ## Database
 
-The only two rules that touch the database. One indexed read each, no writes.
+The only rules that touch the database. One indexed read each, no writes.
 
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `Authorized` | `string $ability, string $model, ?string $guard = null, array $arguments = []` | `authorized` | `authorized` |
 | `ModelsExist` | `string $model, ?string $column = null` | `models_exist` | `models_exist.array`, `models_exist.missing` |
+| `CompareToColumn` | `string $table, string $column, Comparison $operator, string $keyColumn, int\|float\|string $key` | `compare_to_column` | `compare_to_column` |
 
 - **`Authorized`** — resolves the submitted identifier to a model, then asks the Gate. This is
   the difference from the native `Rule::can()`, which hands the policy the raw submitted value:
@@ -227,6 +228,15 @@ The only two rules that touch the database. One indexed read each, no writes.
   "one of these does not exist" is not actionable when fifty were submitted. Duplicates in the
   input are counted once: a repeated selection is a UI artefact, not a missing record.
   `$column` defaults to the model's route key.
+
+**`CompareToColumn`** — the value compared against a column looked up in another row:
+`new CompareToColumn('products', 'max_quantity', Comparison::LessThanOrEqual, 'id',
+'@product_id')` — "quantity may not exceed THIS product's max". The key is a literal or
+`@field` for a sibling; the operator is the `Comparison` enum
+(`laranail_compare_to_column:products,max_quantity,lte,id,@product_id`), replacing the legacy
+five-class family. Comparison is numeric when both sides are numeric — `'9' < '10'`, not the
+lexicographic lie. A missing row **fails** the value: the bound could not be checked, and that
+is the moment enforcement matters.
 
 ## Email
 
@@ -478,6 +488,8 @@ The only tier that performs IO, and the only rules skipped during a precognitive
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `DeliverableEmail` | `?DnsResolver $resolver = null` | `deliverable_email` | `email.undeliverable`, `email.malformed` |
+| `ImageUrl` | `array $mimes = [], int $timeoutSeconds = 3` | `image_url` | `image_url` |
+| `HasGravatar` | `int $timeoutSeconds = 3` | `has_gravatar` | `has_gravatar` |
 
 **`DeliverableEmail`** — the address's domain can actually receive mail. One DNS lookup, behind
 the `DnsResolver` contract so it is injectable, cached and fakeable; Laravel's own `email:dns`
@@ -506,6 +518,31 @@ that a debounced email field would issue one DNS lookup per keystroke.
 The bundled `Actions\CachedDnsResolver` is bound only if nothing else has bound the contract,
 so `laranail/email` can replace it without any call site changing. Cache lifetime is
 `laranail.validation.dns.ttl`, default one hour.
+
+**`ImageUrl`** — the URL currently serves an image: a HEAD probe expecting 200 with an
+`image/*` content type (optionally restricted, `mimes: ['png']`). The probe IS the rule, so
+unreachable **fails** — expect that trade before using it. Guards: http/https only, loopback
+names and non-routable IP literals refused before any request, redirects never followed,
+bounded timeout. Hygiene, not an SSRF boundary — a public name resolving to a private address
+needs an egress-layer defence; do not point this at hostile input without one.
+
+**`HasGravatar`** — the email address has a Gravatar, probed over https with the sha256 hash
+against the `d=404` endpoint. Unreachable **passes** (the `DeliverableEmail` posture: a third
+party's outage must not turn away users). Privacy is the cost and the function: a hash of the
+email goes to gravatar.com at validation time — name it in your privacy policy, and prefer
+probing after signup when the avatar is a nicety rather than a requirement.
+
+## Storage
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `FileExistsOnDisk` | `string $disk, string $directory = ''` | `file_exists_on_disk` | `file_exists_on_disk` |
+
+**`FileExistsOnDisk`** — the value names a file on a Laravel disk, optionally scoped to a
+directory (`laranail_file_exists_on_disk:uploads,avatars`). The scope is a security boundary:
+`..` segments, absolute paths, backslashes and null bytes are refused outright rather than
+normalised — `../top-level.txt` may well exist, which is exactly the point. One metadata read;
+on an S3-style disk that is a network round trip per validated value.
 
 ## Vendor identifiers
 

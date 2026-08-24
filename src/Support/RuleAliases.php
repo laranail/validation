@@ -33,6 +33,8 @@ use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Crypto\BitcoinAddress;
 use Simtabi\Laranail\Validation\Rules\Crypto\EthereumAddress;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
+use Simtabi\Laranail\Validation\Rules\Database\CompareToColumn;
+use Simtabi\Laranail\Validation\Rules\Database\Comparison;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
@@ -67,6 +69,8 @@ use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Net\Url;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
+use Simtabi\Laranail\Validation\Rules\Network\HasGravatar;
+use Simtabi\Laranail\Validation\Rules\Network\ImageUrl;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
 use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
@@ -74,6 +78,7 @@ use Simtabi\Laranail\Validation\Rules\Payment\CardExpiry;
 use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
+use Simtabi\Laranail\Validation\Rules\Storage\FileExistsOnDisk;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
@@ -190,6 +195,20 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // Database — `laranail_compare_to_column:products,max_quantity,lte,id,@product_id`
+            'compare_to_column' => static fn (array $p): ValidationRule => new CompareToColumn(
+                self::str($p, 0), self::str($p, 1),
+                Comparison::from(self::str($p, 2, 'eq')),
+                self::str($p, 3), self::str($p, 4),
+            ),
+
+            // Storage — `laranail_file_exists_on_disk:uploads,avatars`
+            'file_exists_on_disk' => static fn (array $p): ValidationRule => new FileExistsOnDisk(self::str($p, 0), self::str($p, 1)),
+
+            // Networking probes
+            'image_url' => static fn (array $p): ValidationRule => new ImageUrl(self::strings($p)),
+            'has_gravatar' => static fn (): ValidationRule => new HasGravatar(),
 
             // Payment — `laranail_card_number:visa,mastercard` restricts
             // brands; `laranail_card_cvc:card_number` names the sibling

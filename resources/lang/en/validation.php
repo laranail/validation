@@ -110,6 +110,13 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // Storage
+    'file_exists_on_disk' => 'The :attribute must name an existing file.',
+
+    // Networking probes
+    'has_gravatar' => 'The :attribute must have a Gravatar.',
+    'image_url' => 'The :attribute must be a URL serving an image.',
+
     // Payment
     'card_cvc' => 'The :attribute must be a valid security code.',
     'card_expiry' => 'The :attribute must be a valid expiry date that has not passed.',
@@ -162,6 +169,7 @@ return [
 
     // Database
     'authorized' => 'The selected :attribute is invalid.',
+    'compare_to_column' => 'The :attribute is outside the allowed bound.',
     'models_exist' => [
         'array' => 'The :attribute must be a list of identifiers.',
         'missing' => 'The :attribute contains values that do not exist: :values.',

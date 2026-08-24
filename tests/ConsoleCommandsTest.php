@@ -11,7 +11,7 @@ use Simtabi\Laranail\Validation\Tests\Fixtures\Registry\EvenNumber;
  */
 it('lists the live registry through laranail::validation.rules', function (): void {
     $this->artisan('laranail::validation.rules')
-        ->expectsOutputToContain('80 rules')
+        ->expectsOutputToContain('84 rules')
         ->assertSuccessful();
 });
 
