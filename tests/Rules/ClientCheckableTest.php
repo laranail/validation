@@ -5,6 +5,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
+use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
@@ -29,6 +30,7 @@ function clientCheckableArguments(): array
     return [
         CaseStyle::class => [CaseStyle::KEBAB],
         VendorIdentifier::class => [VendorIdentifier::AWS_REGION],
+        HashDigest::class => ['sha256'],
     ];
 }
 

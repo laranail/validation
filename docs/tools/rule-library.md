@@ -69,6 +69,7 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
 | `Bic` | — | `bic` | `bic` |
 | `Isin` | — | `isin` | `isin` |
 | `Luhn` | — | `luhn` | `luhn` |
+| `BsbNumber` | — | `bsb_number` | `bsb_number` |
 
 - **`Iban`** — an International Bank Account Number (ISO 13616). Checks the country's declared
   length before the ISO 7064 MOD-97-10 checksum, so a truncated number fails as a length error
@@ -78,6 +79,9 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
   prefix, nine alphanumerics, Luhn check digit over the letter-expanded string.
 - **`Luhn`** — the bare Luhn mod-10 checksum (ISO/IEC 7812-1), for card numbers and anything
   else carrying one. It checks the checksum only; it does not identify a card brand.
+- **`BsbNumber`** — an Australian Bank State Branch number, `062-000` or `062000`. Format-only
+  and honestly so: BSBs carry no check digit, and the live-prefix register churns as banks
+  merge, so existence is the payment network's question.
 
 ## Codes
 
@@ -304,6 +308,7 @@ codes) without touching the rules.
 |---|---|---|---|
 | `Imei` | — | `imei` | `imei` |
 | `Vin` | `bool $checkDigit = false` | `vin` | `vin` |
+| `HashDigest` | `string $algorithm` | `hash_digest` | `hash_digest` |
 | `SemVer` | — | `semver` | `semver` |
 | `Jwt` | — | `jwt` | `jwt` |
 
@@ -313,6 +318,11 @@ codes) without touching the rules.
   the North American position-9 check digit, which is **off by default** because it is not
   applied worldwide and would reject valid non-NA numbers.
 - **`SemVer`** — a Semantic Versioning 2.0.0 string, including prerelease and build metadata.
+- **`HashDigest`** — a hex digest of a named algorithm (`new HashDigest('sha256')`,
+  `laranail_hash_digest:sha256`): hex in either case at exactly the algorithm's width, from a
+  table of 28 admitted algorithms. An unknown name throws at construction with the known names
+  in the message. Shape, not provenance — a well-formed digest says nothing about what was
+  hashed.
 - **`Jwt`** — a JSON Web Token in JWS compact serialisation (RFC 7515 §3.1). Structural only:
   three base64url segments with a decodable JSON header. It does **not** verify the signature
   and is not an authentication check.

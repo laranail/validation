@@ -34,6 +34,7 @@ function sampleParameters(): array
         'parity' => ['even'],
         'vendor_identifier' => ['aws_region'],
         'national_identifier' => ['nl'],
+        'hash_digest' => ['sha256'],
         'max_words' => ['200'],
         'min_words' => ['2'],
     ];

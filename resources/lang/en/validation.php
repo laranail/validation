@@ -16,6 +16,7 @@ return [
 
     // Banking
     'bic' => 'The :attribute must be a valid BIC/SWIFT code.',
+    'bsb_number' => 'The :attribute must be a valid BSB number.',
     'iban' => 'The :attribute must be a valid IBAN.',
     'isin' => 'The :attribute must be a valid ISIN.',
     'luhn' => 'The :attribute must pass the Luhn checksum.',
@@ -30,6 +31,7 @@ return [
     'issn' => 'The :attribute must be a valid ISSN.',
 
     // Identifiers
+    'hash_digest' => 'The :attribute must be a :length-character hex digest.',
     'imei' => 'The :attribute must be a valid IMEI.',
     'jwt' => 'The :attribute must be a valid JSON Web Token.',
     'semver' => 'The :attribute must be a valid semantic version.',

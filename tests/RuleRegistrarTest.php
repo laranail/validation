@@ -22,7 +22,7 @@ it('discovers every shipped rule class', function (): void {
 
     expect($classes)->toContain(Iban::class)
         ->toContain(Phone::class)
-        ->and(count($classes))->toBe(63);
+        ->and(count($classes))->toBe(65);
 });
 
 it('accepts a consumer registration with an alias factory', function (): void {
@@ -55,7 +55,7 @@ it('reports which registered rules advertise a browser form', function (): void 
 
     expect($clientCheckable)->toContain(Slug::class)
         ->not->toContain(Iban::class)
-        ->and(count($clientCheckable))->toBe(14);
+        ->and(count($clientCheckable))->toBe(16);
 });
 
 it('is one singleton, so every consumer sees the same registry', function (): void {

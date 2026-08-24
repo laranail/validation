@@ -19,7 +19,7 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   Pest testing helpers.
 - Four Laravel Boost skills shipped under `resources/boost/skills/`, namespaced
   `laranail-validation*`.
-- An extended rule library under `Rules\`: 63 rules across AntiSpam, Banking, Codes, Colour,
+- An extended rule library under `Rules\`: 65 rules across AntiSpam, Banking, Codes, Colour,
   Crypto, Database, Email, Fiscal, Geo, I18n, Identifiers, Markup, Net, Network, Numbers, Postal,
   Profanity, Structure, Telecom, Text and Vendor. Each is a plain `ValidationRule`
   usable on its own, in a rule array, or through the builder's `rule()` escape hatch. See
@@ -45,7 +45,7 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   regex contorted into a numeric range. Implemented by `Text\Slug`, `Text\WithoutSpaces`,
   `Identifiers\SemVer`, `Net\Subdomain`, `Crypto\EthereumAddress`, `Text\CaseStyle`,
   `Text\Username`, `Text\PersonName`, `Numbers\MonetaryAmount`, `Vendor\VendorIdentifier`,
-  `Postal\PostalCode`,
+  `Postal\PostalCode`, `Banking\BsbNumber`, `Identifiers\HashDigest`,
   `Geo\Latitude`, `Geo\Longitude` and `Colour\CssColor` — the rules whose entire check is a pattern, which they return so there is no second
   implementation to drift. `PostalCode` sends only the named countries' patterns and nothing at
   all when the country comes from a sibling field.

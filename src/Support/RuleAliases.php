@@ -10,6 +10,7 @@ use Simtabi\Laranail\Validation\Contracts\TermList;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
+use Simtabi\Laranail\Validation\Rules\Banking\BsbNumber;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
@@ -39,6 +40,7 @@ use Simtabi\Laranail\Validation\Rules\Geo\UsState;
 use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
 use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
 use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
+use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
 use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
@@ -139,6 +141,7 @@ final class RuleAliases
             'bic' => static fn (): ValidationRule => new Bic(),
             'isin' => static fn (): ValidationRule => new Isin(),
             'luhn' => static fn (): ValidationRule => new Luhn(),
+            'bsb_number' => static fn (): ValidationRule => new BsbNumber(),
 
             // Codes — the parameters narrow which lengths/editions are accepted.
             'ean' => static fn (): ValidationRule => new Ean(),
@@ -154,6 +157,7 @@ final class RuleAliases
             'jwt' => static fn (): ValidationRule => new Jwt(),
             'semver' => static fn (): ValidationRule => new SemVer(),
             'vin' => static fn (array $p): ValidationRule => new Vin(...self::flags($p)),
+            'hash_digest' => static fn (array $p): ValidationRule => new HashDigest(self::str($p, 0)),
 
             // Geo
             'latitude' => static fn (): ValidationRule => new Latitude(),
