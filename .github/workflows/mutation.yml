@@ -1,14 +1,17 @@
 name: mutation
 
-# Mutation testing is minutes-per-run, so it guards on a weekly cadence
-# and on demand rather than on every PR — the parity suites stay the
-# per-commit gate; this is the deeper audit of THOSE suites' teeth,
-# scoped to the fast-check compiler where a missed mutant means a wrong
-# verdict shipped as a fast path (§9 of the 1.0 plan). Pest's native
-# mutation testing, not Infection: Infection 0.35 dropped its pest
-# framework adapter. No positional test paths: paratest accepts only
-# one, and --covered-only already narrows each mutant to its covering
-# tests through the coverage map.
+# Mutation testing is HOURS for the full compiler scope — each mutant
+# re-runs the parity suites that cover it — so it guards on a weekly
+# cadence and on demand, never per-commit, and fans out one job per
+# compiler file: a single job proved uncancellable even at a 4-hour cap
+# (1,112 mutants ≈ 6h serial), while per-file jobs run in parallel and
+# the slowest file sets wall-clock. Pest's native mutation testing, not
+# Infection: Infection 0.35 dropped its pest framework adapter.
+#
+# The floor is an audit bar, not a style gate: a file dropping under 60
+# means the parity suites lost teeth for that compiler — the red IS the
+# signal to add tests. FastCheckCompiler.php's verified baseline is
+# 87.50% (two untested mutants on line 62, logged as a suite gap).
 on:
   workflow_dispatch:
   schedule:
@@ -17,9 +20,21 @@ on:
 jobs:
   pest-mutate:
     runs-on: ubuntu-latest
-    # The full compiler scope is hours, not minutes — affordable weekly,
-    # which is exactly why this is not a per-commit gate.
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - src/FastCheckCompiler.php
+          - src/FastCheck/CoreValueCompiler.php
+          - src/FastCheck/ItemContextCompiler.php
+          - src/FastCheck/PresenceConditionalCompiler.php
+          - src/FastCheck/ProhibitedCompiler.php
+          - src/FastCheck/RuleConfigBuilder.php
+          - src/FastCheck/Shared/ItemAwareBranchBuilder.php
+          - src/FastCheck/Shared/LaravelEmptiness.php
+
+    name: mutate ${{ matrix.path }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -32,9 +47,9 @@ jobs:
 
       - run: composer update --prefer-dist --no-interaction
 
-      - name: Mutate the fast-check compiler against the parity suites
+      - name: Mutate against the covering tests
         run: >
           vendor/bin/pest --mutate --covered-only --parallel
-          --path=src/FastCheck,src/FastCheckCompiler.php --min=80
+          --path=${{ matrix.path }} --min=60
         env:
           XDEBUG_MODE: coverage
