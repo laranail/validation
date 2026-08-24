@@ -33,6 +33,6 @@ jobs:
       - name: Mutate the fast-check compiler against the parity suites
         run: >
           vendor/bin/pest --mutate --covered-only --parallel
-          --path=src/FastCheck --path=src/FastCheckCompiler.php
+          --path=src/FastCheck,src/FastCheckCompiler.php --min=80
         env:
           XDEBUG_MODE: coverage
