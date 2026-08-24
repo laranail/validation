@@ -1,11 +1,13 @@
 <?php declare(strict_types=1);
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
+use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
 use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
@@ -105,6 +107,21 @@ it('leaves an already-bound resolver alone', function (): void {
 
     expect(resolve(DnsResolver::class))->toBe($fake);
 });
+
+it('answers even when the cache backend itself is broken', function (): void {
+    // The uncertainty contract again, one layer down: "no cache configured"
+    // was handled, but a cache that RESOLVES and then throws — a database
+    // store whose table was never migrated is the canonical case — crashed
+    // the lookup mid-validation. A caching layer is an optimization; its
+    // infrastructure failing must cost speed, never a verdict.
+    $broken = new class implements Repository {
+        use ThrowsOnEveryCacheCall;
+    };
+
+    $resolver = new CachedDnsResolver(cache: $broken);
+
+    expect($resolver->hasMailExchanger('nonexistent-domain.invalid'))->toBeFalse();
+})->skip(fn (): bool => ! @checkdnsrr('a.root-servers.net', 'A'), 'needs working DNS');
 
 it('reports a domain as reachable when the lookup itself fails', function (): void {
     // The uncertainty rule, stated in the contract: an unreachable resolver is

@@ -146,7 +146,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "1.0.x-dev"
         }
     },
     "config": {

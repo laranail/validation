@@ -22,13 +22,28 @@ jobs:
         with:
           ref: main
 
+      # release.yml SOURCES the release body from the CHANGELOG, so on the
+      # normal path the section already exists — inserting it again would
+      # duplicate it. This job only backfills a release authored by hand.
+      - name: Check whether the section already exists
+        id: existing
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          if grep -qE "^## (\[)?v?${VERSION#v}([] ]|$)" CHANGELOG.md; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update Changelog
+        if: steps.existing.outputs.present == 'false'
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ github.event.release.tag_name }}
           release-notes: ${{ github.event.release.body }}
 
       - name: Commit updated CHANGELOG
+        if: steps.existing.outputs.present == 'false'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           branch: main

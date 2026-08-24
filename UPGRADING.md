@@ -2,7 +2,14 @@
 
 Breaking changes, and what to do about them. Versions not listed here need no action.
 
-## Unreleased
+## v1.0.0 - 2026-08-24
+
+The mechanical break below (`getEachRules()`) can be applied automatically:
+
+```bash
+vendor/bin/rector process --config vendor/laranail/validation/rector-migrate-1.0.php
+```
+
 
 ### The PHP floor is now `^8.5`
 

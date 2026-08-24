@@ -10,6 +10,19 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## Unreleased
 
+## v1.0.0 - 2026-08-24
+
+The 1.0 major: the package graduates to real SemVer, the README's stability contract becomes
+binding (stable surfaces break only in a major; deprecations live at least one minor), and the
+`rector-migrate-1.0.php` set auto-migrates the one mechanical break. See `UPGRADING.md`.
+
+### Fixed
+
+- `CachedDnsResolver` crashed mid-validation when the cache backend resolved but could not
+  answer — a database store with no migrated cache table being the canonical case. The store
+  erroring now falls back to a direct lookup, the same contract as having no cache at all: an
+  optimization's infrastructure failure costs speed, never a verdict.
+
 ### Added
 
 - Initial laranail release. Type-aware fluent rule builders (`FluentRule` and the twelve

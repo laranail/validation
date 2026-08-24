@@ -76,11 +76,19 @@ final readonly class CachedDnsResolver implements DnsResolver
             return $callback();
         }
 
-        $value = $store->remember(
-            self::CACHE_PREFIX . $domain,
-            $this->ttl ?? $this->configuredTtl(),
-            static fn (): bool => $callback(),
-        );
+        try {
+            $value = $store->remember(
+                self::CACHE_PREFIX . $domain,
+                $this->ttl ?? $this->configuredTtl(),
+                static fn (): bool => $callback(),
+            );
+        } catch (Throwable) {
+            // A store that RESOLVES and then cannot answer — a database
+            // cache with no migrated table, Redis with the server down.
+            // The cache is an optimization; its infrastructure failing
+            // costs speed, never a verdict. Same contract as no cache.
+            return $callback();
+        }
 
         return (bool) $value;
     }

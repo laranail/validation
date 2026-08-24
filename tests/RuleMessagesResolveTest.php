@@ -51,6 +51,34 @@ final class RuleMessagesResolveTest extends TestCase
     }
 
     /**
+     * Every shipped locale carries every key the English file does — the
+     * §14.11 completeness bar. A partial translation is a red build, not a
+     * file that quietly falls back to English for half its rules. Trivial
+     * while only `en` ships; binding the day a contributed locale lands.
+     */
+    public function test_every_shipped_locale_is_complete(): void
+    {
+        $root = dirname(__DIR__) . '/resources/lang';
+        $reference = require $root . '/en/validation.php';
+        $this->assertIsArray($reference);
+
+        $locales = glob($root . '/*', GLOB_ONLYDIR);
+        $this->assertNotFalse($locales);
+
+        foreach ($locales as $localeDir) {
+            $locale = basename($localeDir);
+            $messages = require $localeDir . '/validation.php';
+            $this->assertIsArray($messages, "{$locale}/validation.php did not return an array.");
+
+            $missing = array_diff(array_keys($reference), array_keys($messages));
+            $extra = array_diff(array_keys($messages), array_keys($reference));
+
+            $this->assertSame([], array_values($missing), "Locale {$locale} is missing keys.");
+            $this->assertSame([], array_values($extra), "Locale {$locale} has keys en does not — add them to en first.");
+        }
+    }
+
+    /**
      * The one message that is about SEVERAL fields rather than one.
      *
      * `PersonNameSchema`'s at-least-one requirement is attached to a single

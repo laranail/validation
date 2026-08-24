@@ -1,0 +1,46 @@
+name: "Release"
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The release body IS the CHANGELOG section for this version — a
+      # release without a real description is incomplete (org standard).
+      # The benchmark table is injected afterwards by
+      # release-benchmark.yml, which listens for the released event.
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v ver="$VERSION" '
+            $0 ~ "^## (\\[)?(v)?"ver"([] ]|$)" { grab = 1; next }
+            grab && /^## / { exit }
+            grab { print }
+          ' CHANGELOG.md > release-body.md
+          if ! [ -s release-body.md ]; then
+            echo "No CHANGELOG section found for ${VERSION}" >&2
+            exit 1
+          fi
+          # release-benchmark.yml injects the benchmark table between
+          # these markers after publish — never paste numbers by hand.
+          printf '\n<!-- benchmark-start -->\n<!-- benchmark-end -->\n' >> release-body.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-body.md \
+            --generate-notes
