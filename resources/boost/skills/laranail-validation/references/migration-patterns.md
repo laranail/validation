@@ -206,7 +206,7 @@ Don't use `mergeRecursive` — it deconstructs objects.
 
 #### Extending a parent's `each([...])` / `children([...])` shape
 
-When the parent defines a keyed `each()` or `children()` map and the child needs to add one sub-rule, use the extend helpers instead of `getEachRules()` + `Arr::wrap()` round-trips:
+When the parent defines a keyed `each()` or `children()` map and the child needs to add one sub-rule, use the extend helpers instead of read-modify-write round-trips over the raw map:
 
 ```php
 // Parent: SaveQuestionRequest
@@ -235,7 +235,7 @@ public function rules(): RuleSet
 - `mergeEachRules($rules)` / `mergeChildRules($rules)` — later-wins merge primitive (what `modifyEach` / `modifyChildren` wrap).
 - Base constraints (`nullable`, `max:20`, `required`, etc.) on the ArrayRule/FieldRule survive every call.
 - `addEachRule` / `mergeEachRules` / `modifyEach` throw `CannotExtendListShapedEach` when invoked on a rule whose `each()` was set to a single `ValidationRule` (list form, e.g. `each(FluentRule::string())`). Convert to keyed form first: `each(['key' => FluentRule::…])`.
-- Reading the stored shape: prefer the narrow getters `ArrayRule::getEachKeyedRules(): ?array<string, ValidationRule>` + `ArrayRule::getEachListRule(): ?ValidationRule`. The legacy union-returning `getEachRules()` is `@deprecated` since 1.24.0 — its list-form branch is scheduled for removal in 1.25.0.
+- Reading the stored shape: the narrow getters `ArrayRule::getEachKeyedRules(): ?array<string, ValidationRule>` + `ArrayRule::getEachListRule(): ?ValidationRule` are the only getters. (A `getEachRules()` alias existed pre-1.0 and was removed for it; a stale note here once invented a 1.24/1.25 deprecation history for a package that had never passed v0.1 — corrected.)
 
 ### Password rules trait (Fortify/Breeze)
 

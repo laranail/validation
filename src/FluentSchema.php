@@ -6,7 +6,6 @@ use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\Rules\AnyOf;
-use RuntimeException;
 use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
@@ -210,8 +209,6 @@ final class FluentSchema
 
     /**
      * @param  array<int, mixed>  $rules
-     *
-     * @throws RuntimeException If AnyOf is not available (requires Laravel 13+)
      */
     public function anyOf(array $rules): AnyOf
     {
