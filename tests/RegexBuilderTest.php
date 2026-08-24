@@ -60,9 +60,9 @@ it('escapes literals, so metacharacters mean themselves', function (): void {
 it('offers oneOf with escaped alternatives', function (): void {
     $compiled = Regex::build()->oneOf('cat', 'dog', 'a.b')->compile();
 
-    expect('cat')->toBe(1)
-        ->and(preg_match($compiled, 'dog'))->toBe(1)
-        ->and(preg_match($compiled, 'a.b'))->toMatch($compiled)
+    expect('cat')->toMatch($compiled)
+        ->and('dog')->toMatch($compiled)
+        ->and('a.b')->toMatch($compiled)
         ->and(preg_match($compiled, 'axb'))->toBe(0)
         ->and(preg_match($compiled, 'cow'))->toBe(0);
 });
@@ -74,8 +74,8 @@ it('supports optional and oneOrMore groups', function (): void {
         ->optional(fn (Regex $r): Regex => $r->literal('.')->digits())
         ->compile();
 
-    expect('v1')->toBe(1)
-        ->and(preg_match($compiled, 'v1.2'))->toMatch($compiled)
+    expect('v1')->toMatch($compiled)
+        ->and('v1.2')->toMatch($compiled)
         ->and(preg_match($compiled, 'v1.'))->toBe(0);
 
     $repeated = Regex::build()

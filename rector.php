@@ -13,6 +13,7 @@ use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use RectorLaravel\Set\LaravelSetList;
+use RectorPest\Rules\UseToMatchRector;
 use RectorPest\Set\PestSetList;
 
 return RectorConfig::configure()
@@ -66,6 +67,12 @@ return RectorConfig::configure()
         PrivatizeFinalClassMethodRector::class,
         RemoveUselessParamTagRector::class,
         RemoveUselessReturnTagRector::class,
+        // Rewrites expect(preg_match($p, 'x'))->toBe(1) into expect('x')
+        // ->toMatch($p), but on chained expectations it swaps the head
+        // subject while leaving ->toBe(1) behind and converts ->and()
+        // links without changing their subject — both produce failing
+        // (or nonsensical) assertions. mrpunyapal/rector-pest 0.2.17.
+        UseToMatchRector::class,
         // Hot-path closure allocates a literal array on every invocation
         // when in_array() is used. Explicit === comparisons avoid that.
         RepeatedOrEqualToInArrayRector::class => [
