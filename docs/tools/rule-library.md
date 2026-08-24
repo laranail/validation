@@ -112,6 +112,45 @@ Cheap first filters. Neither replaces a CAPTCHA — `laranail/captcha` is that.
 - **`UpcE`** — the 8-digit zero-suppressed UPC. The check digit is verified against the
   **expanded** UPC-A, which is the part quick implementations get wrong.
 
+## Chrono
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Rfc3339` | — | `rfc3339` | `rfc3339` |
+| `TimeOfDay` | `bool $twelveHour = false, string $separator = ':'` | `time_of_day` | `time_of_day` |
+| `UnixTimestamp` | `bool $allowNegative = false` | `unix_timestamp` | `unix_timestamp` |
+| `DateInterval` | `bool $positive = false` | `date_interval` | `date_interval` / `date_interval_positive` |
+| `MinuteIn` | `array $minutes` | `minute_in` | `minute_in` |
+| `MaxDateDifference` | `int $hours, DateTimeInterface\|string $from` | `max_date_difference` | `max_date_difference` |
+| `TimezoneAbbreviation` | — | `timezone_abbreviation` | `timezone_abbreviation` |
+| `MinimumAge` | `int $years, ?string $timezone = null` | `minimum_age` | `minimum_age` |
+
+- **`Rfc3339`** — a full RFC 3339 timestamp, including the forms PHP's own
+  `createFromFormat(RFC3339, …)` fumbles: `Z`, lowercase `t`/`z`, fractional seconds, and the
+  leap second `:60`. The date part is checked against the calendar, so `2023-02-29` fails as a
+  date, not passes as a shape. Laravel's `date_format` cannot express "either `Z` or an offset".
+- **`TimeOfDay`** — `23:59` / `23:59:59`, or with `twelveHour: true` the meridiem form
+  (`9:05 PM`, meridiem required — a bare `9:05` on a 12-hour form is ambiguous). `$separator`
+  covers locales that write `23.59`.
+- **`UnixTimestamp`** — a canonical integer timestamp: no floats, no leading zeros, no `+`, no
+  `1e9` (all of which `is_numeric` waves through). Pre-epoch values are opt-in
+  (`allowNegative: true`). Deliberately no range cap — plausibility is the field's business
+  rule, not the encoding's.
+- **`DateInterval`** — an ISO 8601 duration as PHP's own `DateInterval` parses it.
+  `positive: true` also rejects the zero duration (`P0Y`), the retention-period-of-nothing case.
+- **`MinuteIn`** — the minute component is in the allowed set: `new MinuteIn([0, 15, 30, 45])`
+  for quarter-hour scheduling. Takes a bare time or a full datetime.
+- **`MaxDateDifference`** — the value lies within `$hours` of a reference, in either direction.
+  The reference is a date, a `DateTimeInterface`, or `@field` to read a sibling
+  (`new MaxDateDifference(48, '@start_at')`). A missing or unparseable reference **fails** the
+  value — a bound that silently stopped binding is the worse outcome.
+- **`TimezoneAbbreviation`** — `EST`, `CET`, `EAT`: the abbreviation set from PHP's own
+  timezone database, which Laravel's identifier-validating `timezone` rule rejects. Prefer
+  identifiers in new schemas; validate existing data as what it is.
+- **`MinimumAge`** — a date of birth at least `$years` completed years ago. Age is
+  timezone-dependent (at 20:00 UTC on the 23rd it is already the 24th in Auckland), so
+  `$timezone` names whose midnight the birthday ticks over at. A future date of birth fails.
+
 ## Colour
 
 | Rule | Parameters | Alias | Message key |

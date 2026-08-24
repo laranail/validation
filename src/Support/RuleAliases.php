@@ -14,6 +14,14 @@ use Simtabi\Laranail\Validation\Rules\Banking\BsbNumber;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
+use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
+use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
+use Simtabi\Laranail\Validation\Rules\Chrono\Rfc3339;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimeOfDay;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
+use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
 use Simtabi\Laranail\Validation\Rules\Codes\Asin;
 use Simtabi\Laranail\Validation\Rules\Codes\Ean;
 use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
@@ -178,6 +186,20 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // Chrono
+            'rfc3339' => static fn (): ValidationRule => new Rfc3339(),
+            // `laranail_time_of_day:true` = 12-hour; second parameter is the
+            // separator (`laranail_time_of_day:false,.` for `23.59`).
+            'time_of_day' => static fn (array $p): ValidationRule => new TimeOfDay(self::flags($p)[0] ?? false, self::str($p, 1, ':')),
+            'unix_timestamp' => static fn (array $p): ValidationRule => new UnixTimestamp(...self::flags($p)),
+            'date_interval' => static fn (array $p): ValidationRule => new DateInterval(...self::flags($p)),
+            'minute_in' => static fn (array $p): ValidationRule => new MinuteIn(self::ints($p)),
+            // `laranail_max_date_difference:48,@start_at` — hours, then the
+            // reference (a date, or @field for a sibling).
+            'max_date_difference' => static fn (array $p): ValidationRule => new MaxDateDifference((int) self::str($p, 0, '0'), self::str($p, 1)),
+            'timezone_abbreviation' => static fn (): ValidationRule => new TimezoneAbbreviation(),
+            'minimum_age' => static fn (array $p): ValidationRule => new MinimumAge((int) self::str($p, 0, '0'), self::nullableStr($p, 1)),
 
             // Encoding — Base64Image and DataUri take lists and a byte cap,
             // which a flat rule string cannot spell honestly (see UNALIASED).

@@ -110,6 +110,17 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // Chrono
+    'date_interval' => 'The :attribute must be an ISO 8601 duration.',
+    'date_interval_positive' => 'The :attribute must be a non-zero ISO 8601 duration.',
+    'max_date_difference' => 'The :attribute must be within :hours hours of the reference date.',
+    'minimum_age' => 'The :attribute must be a date of birth at least :years years ago.',
+    'minute_in' => 'The :attribute must be a time whose minutes are one of: :minutes.',
+    'rfc3339' => 'The :attribute must be an RFC 3339 timestamp.',
+    'time_of_day' => 'The :attribute must be a valid time of day.',
+    'timezone_abbreviation' => 'The :attribute must be a timezone abbreviation.',
+    'unix_timestamp' => 'The :attribute must be a Unix timestamp.',
+
     // Encoding
     'base64' => 'The :attribute must be a base64-encoded value.',
     'base64_image' => 'The :attribute must be a base64-encoded image of an accepted type.',
