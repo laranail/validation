@@ -21,8 +21,6 @@ use Stringable;
  * references, etc.) fall through to parent::validateAttribute() transparently
  * — and, via {@see MemoizingValidator}, their rule-string parsing is memoized
  * across the whole worker, so the residual slow path is cheaper too.
- *
- * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
  */
 class OptimizedValidator extends MemoizingValidator
 {

@@ -7,15 +7,17 @@
  * without the right marker fails here, so the 1.0 SemVer promise stays a
  * property of the code instead of a paragraph in the README.
  */
+// BatchDatabaseChecker, FluentValidator, OptimizedValidator and
+// PreparedRules are deliberately NOT here: each has a consumer-facing
+// surface (the documented boot-time batch knob, the subclassable
+// validators, prepare()'s return type) that a class-level @internal
+// would contradict. Their innards remain non-contractual; the classes
+// themselves stay reachable.
 const INTERNAL_TOP_LEVEL = [
-    'src/OptimizedValidator.php',
     'src/MemoizingValidator.php',
-    'src/BatchDatabaseChecker.php',
     'src/PrecomputedPresenceVerifier.php',
-    'src/FluentValidator.php',
     'src/FastCheckCompiler.php',
     'src/WildcardExpander.php',
-    'src/PreparedRules.php',
     'src/PresenceConditionalReducer.php',
     'src/ValueConditionalReducer.php',
 ];
@@ -42,11 +44,15 @@ const STABLE_SURFACE = [
 ];
 
 it('marks every Internal\\ and FastCheck\\ class @internal', function (): void {
-    $files = [
-        ...glob(dirname(__DIR__) . '/src/Internal/*.php') ?: [],
-        ...glob(dirname(__DIR__) . '/src/FastCheck/*.php') ?: [],
-        ...glob(dirname(__DIR__) . '/src/FastCheck/Shared/*.php') ?: [],
+    $globs = [
+        glob(dirname(__DIR__) . '/src/Internal/*.php'),
+        glob(dirname(__DIR__) . '/src/FastCheck/*.php'),
+        glob(dirname(__DIR__) . '/src/FastCheck/Shared/*.php'),
     ];
+    $files = array_merge(...array_map(
+        static fn (array|false $found): array => $found === false ? [] : $found,
+        $globs,
+    ));
 
     expect($files)->not->toBeEmpty();
 
@@ -73,7 +79,8 @@ it('never marks the stable surface @internal at class level', function (): void 
         // mark an individual method @internal. Inspect the source up to the
         // first class/trait/interface declaration.
         preg_match('/^(?:final |abstract |readonly )*(?:class|trait|interface|enum) /m', $source, $m, PREG_OFFSET_CAPTURE);
-        $head = $m === [] ? $source : substr($source, 0, (int) $m[0][1]);
+        $offset = $m === [] ? null : $m[0][1];
+        $head = $offset === null ? $source : substr($source, 0, $offset);
 
         expect(str_contains($head, '@internal'))->toBeFalse(
             $path . ' is on the §12.1 stable list — a class-level @internal there breaks the SemVer promise.',

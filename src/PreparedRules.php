@@ -8,8 +8,6 @@ namespace Simtabi\Laranail\Validation;
  *
  *     $prepared = RuleSet::from($rules)->prepare($data);
  *     $validator = Validator::make($data, $prepared->rules, $prepared->messages, $prepared->attributes);
- *
- * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
  */
 final readonly class PreparedRules
 {

@@ -41,7 +41,7 @@ final class AcmeServiceProvider extends ServiceProvider
         // The notification seam: route failures wherever the app's
         // monitoring policy wants them.
         Event::listen(ValidationFailed::class, function (ValidationFailed $event): void {
-            self::$observedFailures = [...self::$observedFailures, ...$event->errors->keys()];
+            self::$observedFailures = array_values([...self::$observedFailures, ...$event->errors->keys()]);
         });
     }
 }
