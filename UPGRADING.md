@@ -4,6 +4,28 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 
 ## Unreleased
 
+### `ArrayRule::getEachRules()` is removed
+
+It was an exact alias of `getEachKeyedRules()` — same body, wider advertised type. Replace
+calls one-for-one:
+
+| Before | After |
+|---|---|
+| `$rule->getEachRules()` | `$rule->getEachKeyedRules()` |
+
+The narrow getters carry the whole surface: `getEachKeyedRules(): ?array` for the keyed form,
+`getEachListRule(): ?ValidationRule` for the list form.
+
+### The Laravel-11 compatibility branches are gone
+
+`contains()` always constructs `Rules\Contains` (the pipe-string fallback and its serializer
+are removed), `doesntContain()` no longer throws a `RuntimeException` that could not occur on
+the supported floor, and `requiredUnless()`/`prohibitedUnless()` with a closure or bool now
+construct `RequiredUnless`/`ProhibitedUnless` directly instead of inverting into the `If`
+twins. Verdicts are unchanged; only unreachable code and misleading comments went away. If an
+application type-checked against the inverted `RequiredIf` instance, match on
+`RequiredUnless` instead.
+
 ### The optimized pipeline now agrees with Laravel where it silently did not (P1–P5)
 
 Five fast-path defects made `RuleSet::validate()` (and FormRequests using the optimizer) return a

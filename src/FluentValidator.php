@@ -27,6 +27,8 @@ use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
  * for wildcard patterns — instead of handing fully-expanded rules to a plain
  * `Illuminate\Validation\Validator` and paying its O(n²) conditional
  * resolution.
+ *
+ * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
  */
 abstract class FluentValidator extends OptimizedValidator
 {

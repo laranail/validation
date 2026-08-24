@@ -26,6 +26,12 @@ use Attribute;
  *
  * The attribute has no runtime effect, and nothing in this package reads
  * it — it exists purely as a marker for external tooling.
+ *
+ * DECISION (1.0 planning, §14.13): KEPT. The inertness is the design, not
+ * an accident — dropping a documented external-tooling contract at 1.0
+ * would be a silent break for exactly the tools it exists to serve, and it
+ * costs nothing to keep. Removing it later is a major-version decision
+ * carried through UPGRADING.md, not a cleanup.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FluentRules {}

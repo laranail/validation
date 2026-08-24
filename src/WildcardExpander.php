@@ -2,6 +2,9 @@
 
 namespace Simtabi\Laranail\Validation;
 
+/**
+ * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
+ */
 class WildcardExpander
 {
     /**

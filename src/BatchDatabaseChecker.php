@@ -26,6 +26,8 @@ use Throwable;
  *
  * Only batchable for rules without closure callbacks. Rules with
  * queryCallbacks() fall through to per-item validation as before.
+ *
+ * @internal Optimizer machinery — not SemVer-covered; may change in a minor. (§12.1)
  */
 final class BatchDatabaseChecker
 {
