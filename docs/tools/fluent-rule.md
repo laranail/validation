@@ -105,6 +105,15 @@ FluentRule::password()->confirmed('Passwords do not match.') // custom mismatch 
 
 `FluentRule::password()` uses your app's `Password::default()` configuration (set via `Password::defaults()` in AppServiceProvider). Pass `defaults: false` for a plain `Password::min(8)`: `FluentRule::password(defaults: false)`.
 
+Two sister packages extend this node when installed — the methods simply do not exist
+otherwise, and this library carries no knowledge of them:
+[`laranail/password-strength`](https://github.com/laranail/password-strength) adds
+`->strength(3)` (zxcvbn scoring with translated feedback) and
+[`laranail/password-history`](https://github.com/laranail/password-history) adds
+`->notReused()` (rejects the user's current and last-N passwords). Strength scoring and
+reuse history are deliberately not in this library: one carries a ~1 MB scoring dictionary,
+the other owns a table, a migration and a scheduled command.
+
 </details>
 
 <details>

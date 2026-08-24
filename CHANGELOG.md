@@ -10,6 +10,14 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## Unreleased
 
+### Added
+
+- The password sister packages are cross-linked: `laranail/password-strength`
+  (`password()->strength()`) and `laranail/password-history` (`password()->notReused()`)
+  join `suggest`, and the `password()` reference documents both — resolving the two
+  "not in this library" rows the 1.0 plan recorded. The coupling is entirely theirs:
+  this package carries no `class_exists` checks and no optional imports.
+
 ## v1.0.0 - 2026-08-24
 
 The 1.0 major: the package graduates to real SemVer, the README's stability contract becomes

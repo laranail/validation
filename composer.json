@@ -102,7 +102,9 @@
     "suggest": {
         "laranail/email": "^0.1 — maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
         "laranail/phone": "^0.1 — required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
-        "nikic/php-parser": "^5.0 — required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder."
+        "nikic/php-parser": "^5.0 — required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder.",
+        "laranail/password-strength": "^0.1 — zxcvbn strength scoring: password()->strength(3) appears when installed.",
+        "laranail/password-history": "^0.1 — reuse prevention: password()->notReused() appears when installed."
     },
     "autoload": {
         "psr-4": {
