@@ -12,10 +12,15 @@ jobs:
       contents: write
 
     steps:
+      # Always main: the CHANGELOG lives there, and a release in this repo
+      # may legitimately TARGET a commit behind main (a patch tag cut from
+      # a verified sha) — the release's target_commitish is then a bare
+      # sha, which is not a branch anything can commit to. That is exactly
+      # how the v0.1.1 run failed.
       - name: Checkout code
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: main
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
@@ -26,6 +31,6 @@ jobs:
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          branch: ${{ github.event.release.target_commitish }}
+          branch: main
           commit_message: Update CHANGELOG
           file_pattern: CHANGELOG.md

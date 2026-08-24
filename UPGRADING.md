@@ -32,6 +32,8 @@ twins. Verdicts are unchanged; only unreachable code and misleading comments wen
 application type-checked against the inverted `RequiredIf` instance, match on
 `RequiredUnless` instead.
 
+## v0.1.1 - 2026-08-24
+
 ### The optimized pipeline now agrees with Laravel where it silently did not (P1–P5)
 
 Five fast-path defects made `RuleSet::validate()` (and FormRequests using the optimizer) return a
@@ -119,6 +121,8 @@ passed before fails now. `PersonName::single()` is the opt-in to the strict sing
 The `person_name` translation key is unchanged; `person_name_min`, `person_name_max` and
 `person_name_required` are new. A published `lang/vendor/laranail-validation/en/validation.php`
 needs those three added, or those failures render as the raw key.
+
+## v0.1.0 - 2026-08-15
 
 ### Builder nodes moved out of `Rules\` into `Builder\`
 

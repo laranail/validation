@@ -92,4 +92,52 @@ before upgrading.
 - A per-item validator reused across array items carried its `$excludeAttributes` forward, so
   once one item excluded a field, every later item skipped it too.
 
+## v0.1.1 - 2026-08-24
+
+A security and correctness patch: the optimized pipeline's verdict is now byte-identical to a
+vanilla Laravel validator, guarded by a new end-to-end parity harness that runs every cell
+through both.
+
+The headline fix is security-graded: a PCRE error — the ReDoS shape, where a catastrophic
+pattern aborts mid-match — made the regex fast path treat "not zero" as a match, so a regex
+deny-list accepted input Laravel rejects. The fast path now keeps only a definite match and
+fails closed on errors, exactly as Laravel does. Alongside it: `required` rejects
+whitespace-only strings again, `date_equals` compares full timestamps, `in`/`not_in` never
+out-decide the installed Laravel (the framework itself changed loose→strict comparison inside
+13.x — the optimizer now defers every boundary case to whichever version is installed), and the
+edit-form idiom of `exists` + `unique->ignore()` on one field batches correctly instead of
+answering both rules from one shared lookup.
+
+Every anchored pattern in the rule library now carries the `D` modifier, closing the trailing
+newline bypass: `"admin\n"` no longer slips past `Username`'s reserved list or a unique index
+holding `"admin"`, and the same applies across `Slug`, `Jwt`, the banking and code checksums,
+and the postal patterns. A configured URL port allow-list now resolves an omitted port to the
+scheme default instead of rejecting effectively every real URL.
+
+Verdict changes are breaking by design — input the optimizer wrongly accepted now fails as it
+always did in vanilla Laravel. Every one is documented with before/after guidance in
+`UPGRADING.md`. This release also carries the URL/IP/MAC/username builder split and
+`PersonNameSchema` from the feature branch; those API changes are in `UPGRADING.md` too.
+
+The hygiene pass rides along: a canary for the package's one reflection into Laravel internals,
+dedicated service-provider tests, dead version-gate skips deleted, prose counts pinned to the
+source by tests, the whole Telecom family documented in the rule reference, a bindable
+`InlineTermList` with a profanity recipe, and an ext-intl assertion in CI.
+
+
+---
+
+<!-- benchmark-start -->
+### Benchmark results
+
+| Scenario | Optimizations | Native Laravel | Optimized | Speedup |
+|----------|---------------|---------------:|----------:|--------:|
+| Product import — 500 items, simple rules | Wildcard, fast-check | 192.2ms | 3.5ms | **~54x** |
+| Nested order lines — 1000 orders × 5 line items | Wildcard, fast-check (nested) | 1312.2ms | 20.0ms | **~66x** |
+| Event scheduling — 100 items, field-ref dates | Wildcard, partial fast-check | 33.5ms | 1.4ms | **~25x** |
+| Article submission — 50 items, custom Rule objects | Wildcard only | 10.8ms | 3.3ms | **~3x** |
+| Conditional import — 100 items, 47 conditional fields | Wildcard, pre-evaluation | 4200.0ms | 55.0ms | **~76x** |
+| Login form — 3 fields, no wildcards | Fast-check (flat) | 0.2ms | 0.0ms | **~18x** |
+<!-- benchmark-end -->
+
 [Unreleased]: https://github.com/laranail/validation/commits/main
