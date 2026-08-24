@@ -33,8 +33,24 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class HtmlClean implements ValidationRule
 {
+    /**
+     * `mustContainHtml:` inverts the rule: the value must contain at least
+     * one real tag — a rich-text field whose empty-looking submission means
+     * the editor failed to load. The same subtleties hold mirrored: encoded
+     * markup and a bare `<` are prose, so they do not satisfy it.
+     */
+    public function __construct(private readonly bool $mustContainHtml = false) {}
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if ($this->mustContainHtml) {
+            if (! is_string($value) || self::passes($value)) {
+                $fail('laranail-validation::validation.contains_html')->translate();
+            }
+
+            return;
+        }
+
         if (! self::passes($value)) {
             $fail('laranail-validation::validation.html_clean')->translate();
         }

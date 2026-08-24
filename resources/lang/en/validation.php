@@ -100,7 +100,11 @@ return [
     'person_name_max' => 'The :attribute must not contain more than :max names.',
     'person_name_required' => 'Please provide at least one of :values.',
 
+    'contains_html' => 'The :attribute must contain HTML markup.',
     'html_clean' => 'The :attribute must not contain HTML tags.',
+    'max_words' => 'The :attribute must not contain more than :max words.',
+    'min_words' => 'The :attribute must contain at least :min words.',
+    'salutation' => 'The :attribute must be a recognised salutation.',
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 

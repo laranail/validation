@@ -60,7 +60,10 @@ use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
+use Simtabi\Laranail\Validation\Rules\Text\MaxWords;
+use Simtabi\Laranail\Validation\Rules\Text\MinWords;
 use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Simtabi\Laranail\Validation\Rules\Text\Salutation;
 use Simtabi\Laranail\Validation\Rules\Text\Slug;
 use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Rules\Text\WithoutSpaces;
@@ -184,7 +187,11 @@ final class RuleAliases
 
             // Text
             'slug' => static fn (): ValidationRule => new Slug(),
-            'html_clean' => static fn (): ValidationRule => new HtmlClean(),
+            // `laranail_html_clean:true` inverts the rule: markup required.
+            'html_clean' => static fn (array $p): ValidationRule => new HtmlClean(...self::flags($p)),
+            'max_words' => static fn (array $p): ValidationRule => new MaxWords(...self::ints($p)),
+            'min_words' => static fn (array $p): ValidationRule => new MinWords(...self::ints($p)),
+            'salutation' => static fn (): ValidationRule => new Salutation(),
             'without_spaces' => static fn (): ValidationRule => new WithoutSpaces(),
             'case_style' => static fn (array $p): ValidationRule => new CaseStyle(self::str($p, 0)),
             'person_name' => static fn (array $p): ValidationRule => new PersonName(...self::flags($p)),

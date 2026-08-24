@@ -563,8 +563,11 @@ the alias map stays free of references to it.
 | `Username` | `int $min = 3, int $max = 32` | `username` | `username` |
 | `PersonName` | `bool $allowDigits = false` | `person_name` | `person_name` |
 | `CaseStyle` | `string $style` | `case_style` | `case_style.{style}` |
-| `HtmlClean` | — | `html_clean` | `html_clean` |
+| `HtmlClean` | `bool $mustContainHtml = false` | `html_clean` | `html_clean` / `contains_html` |
 | `WithoutSpaces` | — | `without_spaces` | `without_spaces` |
+| `MaxWords` | `int $max` | `max_words` | `max_words` |
+| `MinWords` | `int $min` | `min_words` | `min_words` |
+| `Salutation` | `?array $accepted = null` | `salutation` | `salutation` |
 
 - **`Slug`** — lowercase alphanumerics separated by single hyphens, no leading or trailing one.
 - **`Username`** — letters, digits and single internal separators, within `$min`..`$max`;
@@ -577,6 +580,13 @@ the alias map stays free of references to it.
   `SNAKE`, `TITLE`; as a string, `laranail_case_style:camel`.
 - **`HtmlClean`** — the value contains no HTML markup. A rejection, not a sanitiser: it tells
   the user their input was not accepted rather than silently rewriting it.
+  `mustContainHtml: true` (`laranail_html_clean:true`) inverts it — a rich-text field whose
+  plain-text submission means the editor never loaded.
+- **`MaxWords`** / **`MinWords`** — word-count bounds. A word is a run of letters, numbers or
+  apostrophes in any script; hyphenated compounds split. `laranail_max_words:200`.
+- **`Salutation`** — a recognised honorific (`Mr`, `Prof.`, `Madame`), case- and dot-insensitive.
+  The bundled list is a curated everyday set; pass your own `$accepted` (lowercase, no dots) to
+  replace it — that is also the localisation hook.
 - **`WithoutSpaces`** — no whitespace of any kind, including the Unicode separators a
   `\s`-based check misses.
 

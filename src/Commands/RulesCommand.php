@@ -67,6 +67,8 @@ final class RulesCommand extends Command
             'parity' => ['even'],
             'vendor_identifier' => ['aws_region'],
             'national_identifier' => ['nl'],
+            'max_words' => ['200'],
+            'min_words' => ['2'],
         ];
         $index = [];
 
