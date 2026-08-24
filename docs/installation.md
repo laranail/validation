@@ -8,7 +8,7 @@ You can install the package via composer:
 composer require laranail/validation
 ```
 
-Requires PHP 8.4.1+ and Laravel 13.
+Requires PHP 8.5+ and Laravel 13.
 
 > The package is pre-1.0. The public surface is settling, so pin a constraint you are happy to
 > review — `^0.1` tracks the current line.
