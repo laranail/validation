@@ -68,6 +68,9 @@ use Simtabi\Laranail\Validation\Rules\Net\Url;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
+use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
+use Simtabi\Laranail\Validation\Rules\Payment\CardExpiry;
+use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 use Simtabi\Laranail\Validation\Rules\Structure\Delimited;
@@ -186,6 +189,13 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // Payment — `laranail_card_number:visa,mastercard` restricts
+            // brands; `laranail_card_cvc:card_number` names the sibling
+            // number field; `laranail_card_expiry:Europe/Berlin` the zone.
+            'card_number' => static fn (array $p): ValidationRule => new CardNumber(self::strings($p) === [] ? null : self::strings($p)),
+            'card_cvc' => static fn (array $p): ValidationRule => new CardCvc(self::nullableStr($p, 0)),
+            'card_expiry' => static fn (array $p): ValidationRule => new CardExpiry(self::nullableStr($p, 0)),
 
             // Chrono
             'rfc3339' => static fn (): ValidationRule => new Rfc3339(),

@@ -110,6 +110,14 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // Payment
+    'card_cvc' => 'The :attribute must be a valid security code.',
+    'card_expiry' => 'The :attribute must be a valid expiry date that has not passed.',
+    'card_number' => 'The :attribute is not a recognised card number.',
+    'card_number_brand' => 'The :attribute must be one of these card brands: :brands.',
+    'card_number_checksum' => 'The :attribute fails the card number check digit.',
+    'card_number_length' => 'The :attribute must be :lengths digits for :brand.',
+
     // Chrono
     'date_interval' => 'The :attribute must be an ISO 8601 duration.',
     'date_interval_positive' => 'The :attribute must be a non-zero ISO 8601 duration.',

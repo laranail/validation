@@ -556,6 +556,36 @@ It is a filter, not a moderation system. Anyone determined to get a word past it
 point is to catch the careless case without insulting the innocent one. There is no string
 alias — a rule string cannot carry a word list.
 
+## Payment
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `CardNumber` | `?array $brands = null` | `card_number` | `card_number` / `card_number_brand` / `card_number_length` / `card_number_checksum` |
+| `CardCvc` | `?string $numberField = null` | `card_cvc` | `card_cvc` |
+| `CardExpiry` | `?string $timezone = null, int $maxYearsAhead = 20` | `card_expiry` | `card_expiry` |
+
+- **`CardNumber`** — brand identified by IIN range, length checked against what *that* brand
+  issues, Luhn verified where the brand carries it (UnionPay does not, so it is a brand
+  property, not an assumption). Spaces and hyphens are stripped. `brands: ['visa',
+  'mastercard']` (`laranail_card_number:visa,mastercard`) is the "we only take" case. The
+  legacy engine's typed exceptions survive as distinct message keys — a wrong length and a
+  failed checksum send the cardholder to different corrections.
+- **`CardCvc`** — 3 or 4 digits alone; `numberField: 'card_number'` narrows to the sibling
+  number's brand (Visa 3, Amex 3 or 4). An unrecognisable sibling falls back to 3-or-4 rather
+  than failing: the number field's own rule reports the bad number.
+- **`CardExpiry`** — `08/26`, `8/26`, `12/2027`, `08-26`, `2027-03`; valid through the end of
+  the stated month in the named timezone. `$maxYearsAhead` rejects the implausibly distant
+  typo (`08/47`).
+
+The brand data is the `Contracts\Payment\CardBrandCatalogue` contract with a bundled
+14-brand default (the legacy engine's set, its range bugs fixed — see
+`Support\Payment\BundledCardBrandCatalogue`). Bind your own to add a store card or trim to
+what the processor accepts.
+
+> **Validity is not authorisation, and a PAN is cardholder data.** These rules prove shape;
+> they say nothing about the account, and validating a number does not license storing or
+> logging it. No failure message echoes the value.
+
 ## Postal
 
 | Rule | Parameters | Alias | Message key |
