@@ -31,6 +31,9 @@ use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
 use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Rules\Encoding\Base64;
+use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
+use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
 use Simtabi\Laranail\Validation\Rules\Geo\CaProvince;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
@@ -128,6 +131,12 @@ final class RuleAliases
         // dangerous half of the rule: the shape check without the host and
         // credential checks anyone reading `laranail_url` would assume.
         Url::class,
+        // Base64Image mixes a subtype list with a byte cap and DataUri takes
+        // a media-type list — same flat-tail problem as Url, and an alias
+        // exposing only the defaults would invite `laranail_base64_image`
+        // with the caller assuming their own constraints somehow apply.
+        Base64Image::class,
+        DataUri::class,
     ];
 
     /**
@@ -169,6 +178,10 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // Encoding — Base64Image and DataUri take lists and a byte cap,
+            // which a flat rule string cannot spell honestly (see UNALIASED).
+            'base64' => static fn (): ValidationRule => new Base64(),
 
             // I18n — positional flags mirror the constructors:
             // `laranail_country_code:true` is alpha-3 mode,

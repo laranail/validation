@@ -110,6 +110,12 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // Encoding
+    'base64' => 'The :attribute must be a base64-encoded value.',
+    'base64_image' => 'The :attribute must be a base64-encoded image of an accepted type.',
+    'base64_image_size' => 'The :attribute must be an image no larger than :max.',
+    'data_uri' => 'The :attribute must be a valid data URI.',
+
     // I18n
     'country_code' => 'The :attribute must be a valid ISO 3166-1 country code.',
     'currency_code' => 'The :attribute must be a valid ISO 4217 currency code.',

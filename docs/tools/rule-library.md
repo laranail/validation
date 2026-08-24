@@ -217,6 +217,30 @@ Domain and mailbox rules. Deliverability needs DNS, so it lives in the Network t
   earns its place on the one kind of field that grants something per account, where one mailbox
   minting unlimited distinct addresses is how a single person takes a free trial repeatedly.
 
+## Encoding
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `Base64` | — | `base64` | `base64` |
+| `Base64Image` | `array $mimes = ['jpeg','png','gif','webp','bmp'], ?int $maxBytes = null` | *(none)* | `base64_image` / `base64_image_size` |
+| `DataUri` | `array $mediaTypes = []` | *(none)* | `data_uri` |
+
+- **`Base64`** — canonical base64, verified by strict decode + re-encode round trip. The round
+  trip catches what a charset regex cannot: missing padding, embedded whitespace, and padding
+  with non-zero discarded bits (`aGVsbG9=` decodes, but nothing encodes *to* it).
+- **`Base64Image`** — the payload a JavaScript cropper or `canvas.toDataURL()` posts, bare or
+  as a full data URI. Validates the **decoded bytes**: canonical base64, then the MIME type
+  sniffed from content (never from the attacker-written data-URI label). `$maxBytes` caps the
+  decoded size, and its message states the limit in human units ("2 MB"). To run Laravel's own
+  file rules (`dimensions`, `File::image()`) on the same payload, bridge it with
+  `Support\Encoding\Base64File::toUploadedFile()` — that writes a temp file, which is why it
+  lives outside `Rules\`.
+- **`DataUri`** — an RFC 2397 data URI. The payload is validated for what the header claims:
+  strict base64 when flagged, URL-encoded text otherwise. `$mediaTypes` restricts the declared
+  type, exact or by family (`image/*`); a restriction requires a *declared* type, because the
+  RFC's implied `text/plain` default is what omitting the header gets for free. It checks the
+  declaration, not the content — use `Base64Image` when the bytes are the question.
+
 ## Fiscal
 
 | Rule | Parameters | Alias | Message key |
