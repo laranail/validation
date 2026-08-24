@@ -2,10 +2,10 @@
 
 namespace Simtabi\Laranail\Validation\Tests\Support;
 
-use DateInterval;
-use UnitEnum;
 use Closure;
+use DateInterval;
 use RuntimeException;
+use UnitEnum;
 
 /**
  * A cache repository whose every operation fails — the shape of a database
