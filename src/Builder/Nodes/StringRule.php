@@ -2,6 +2,7 @@
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
+use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Traits\Conditionable;
@@ -10,6 +11,7 @@ use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Regex;
 
 class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -147,9 +149,52 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
         return $this->addRule('mac_address', $message);
     }
 
-    public function regex(string $pattern, ?string $message = null): static
+    /**
+     * The Laravel-style entry: a string pattern is used exactly as given
+     * (delimiters, flags and all — your pattern, your responsibility). Also
+     * accepts a {@see Regex} or a builder closure; see {@see matches()} for
+     * the raw-string spelling that adds delimiters and `D` for you.
+     *
+     * @param  string|Regex|Closure(Regex): Regex  $pattern
+     */
+    public function regex(string|Regex|Closure $pattern, ?string $message = null): static
     {
-        return $this->addRule('regex:' . $pattern, $message);
+        return $this->addRule('regex:' . (is_string($pattern) ? $pattern : self::compileRegex($pattern)), $message);
+    }
+
+    /**
+     * Match against a pattern in whichever spelling reads best — all of
+     * these produce the same rule for `^\d{3}-[A-Za-z]{2}$`:
+     *
+     *     ->matches('^\d{3}-[A-Za-z]{2}$')              // raw, UNDELIMITED — delimiters + D added
+     *     ->matches('/^\d{3}-[A-Za-z]{2}$/')            // raw, DELIMITED — used verbatim
+     *     ->matches(Regex::of('^\d{3}-[A-Za-z]{2}$'))   // a pre-built Regex
+     *     ->matches(fn (Regex $r) => $r->digits(3)->literal('-')->letters(2))
+     *
+     * The builder is never required — a team that already has a pattern
+     * just uses it.
+     *
+     * @param  string|Regex|Closure(Regex): Regex  $pattern
+     */
+    public function matches(string|Regex|Closure $pattern, ?string $message = null): static
+    {
+        $compiled = is_string($pattern)
+            ? Regex::of($pattern)->compile()
+            : self::compileRegex($pattern);
+
+        return $this->addRule('regex:' . $compiled, $message);
+    }
+
+    /** @param  Regex|Closure(Regex): Regex  $pattern */
+    private static function compileRegex(Regex|Closure $pattern): string
+    {
+        if ($pattern instanceof Closure) {
+            $built = $pattern(Regex::build());
+
+            return $built->compile();
+        }
+
+        return $pattern->compile();
     }
 
     public function notRegex(string $pattern, ?string $message = null): static
