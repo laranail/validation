@@ -3,9 +3,19 @@ name: Release Benchmark
 on:
   release:
     types: [released]
+  # release.yml creates releases with the workflow GITHUB_TOKEN, whose
+  # events deliberately trigger no other workflows — so the release event
+  # above only fires for hand-published releases. For tag-driven ones,
+  # dispatch this with the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to benchmark and annotate (e.g. v1.0.0)"
+        required: true
+        type: string
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
   benchmark:
@@ -19,7 +29,7 @@ jobs:
       - name: Checkout release
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -36,7 +46,7 @@ jobs:
       - name: Append benchmark to release description
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
           START='<!-- benchmark-start -->'
           END='<!-- benchmark-end -->'
