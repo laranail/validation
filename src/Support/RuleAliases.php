@@ -33,6 +33,9 @@ use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
 use Simtabi\Laranail\Validation\Rules\Geo\UsState;
+use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
+use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
+use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
 use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
@@ -153,6 +156,13 @@ final class RuleAliases
             // Postal — `laranail_postal_code:US`, `:US,CA`, or `:@country`
             // to read the country from a sibling field.
             'postal_code' => self::postalCode(...),
+
+            // I18n — positional flags mirror the constructors:
+            // `laranail_country_code:true` is alpha-3 mode,
+            // `laranail_currency_code:true` numeric, `:false,true` symbol.
+            'country_code' => static fn (array $p): ValidationRule => new CountryCode(...self::flags($p)),
+            'currency_code' => static fn (array $p): ValidationRule => new CurrencyCode(...self::flags($p)),
+            'language_code' => static fn (array $p): ValidationRule => new LanguageCode(...self::flags($p)),
 
             // Net
             'cidr' => static fn (): ValidationRule => new Cidr(),

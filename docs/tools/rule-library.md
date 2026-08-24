@@ -254,8 +254,37 @@ the issuing authority.
   adds PR, GU, VI and the rest; `laranail_us_state:true`.
 - **`CaProvince`** — a Canadian province or territory, by code or full name.
 
-Country, currency and language codes are **not** here — they live in `laranail/atlas`, which
-owns that dataset.
+Country, currency and language **codes** live in the I18n family below; `laranail/atlas` owns
+the richer per-country dataset (names, regions, coordinates) and can replace the bundled code
+sets by binding the same contracts.
+
+## I18n
+
+| Rule | Parameters | Alias | Message key |
+|---|---|---|---|
+| `CountryCode` | `bool $alpha3 = false, bool $caseInsensitive = false` | `country_code` | `country_code` |
+| `CurrencyCode` | `bool $numeric = false, bool $symbol = false, bool $caseInsensitive = false` | `currency_code` | `currency_code` / `currency_code_numeric` / `currency_symbol` |
+| `LanguageCode` | `bool $caseInsensitive = false` | `language_code` | `language_code` |
+
+- **`CountryCode`** — an assigned ISO 3166-1 code: alpha-2 (`KE`) by default, alpha-3 (`KEN`)
+  with `alpha3: true` (`laranail_country_code:true`). The bundled set is the full registry —
+  the 249 assigned alpha-2 codes plus the user-assigned `XK`, which real address data needs
+  and which deliberately has no alpha-3.
+- **`CurrencyCode`** — a **current** ISO 4217 identifier: the alpha code (`USD`) by default,
+  the numeric code (`840`) with `numeric: true`, or a recognised symbol (`€`) with
+  `symbol: true`. One representation per instance — asking for two throws. Retired codes
+  (`HRK`, `SLL`, `ZWL`) fail; the bundled data is generated from the official registry and a
+  suite test pins it to its committed source.
+- **`LanguageCode`** — an assigned ISO 639-1 code, lowercase canonical (`en`, `sw`).
+
+All three are strict about case by default because they usually guard a column an exact-match
+lookup reads later; `caseInsensitive: true` folds before checking (it validates the folded
+code — it does not rewrite the stored value).
+
+The code sets are container contracts (`Contracts\I18n\CountryDataset`, `CurrencyDataset`,
+`LanguageDataset`) with bundled full-registry defaults bound `singletonIf`. Bind your own to
+narrow (the locales an app actually ships) or extend (a ledger accepting historical currency
+codes) without touching the rules.
 
 ## Identifiers
 

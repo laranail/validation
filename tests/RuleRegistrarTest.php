@@ -22,7 +22,7 @@ it('discovers every shipped rule class', function (): void {
 
     expect($classes)->toContain(Iban::class)
         ->toContain(Phone::class)
-        ->and(count($classes))->toBe(54);
+        ->and(count($classes))->toBe(57);
 });
 
 it('accepts a consumer registration with an alias factory', function (): void {

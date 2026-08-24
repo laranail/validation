@@ -101,6 +101,13 @@ return [
 
     'without_spaces' => 'The :attribute must not contain any spaces, including non-breaking and zero-width ones.',
 
+    // I18n
+    'country_code' => 'The :attribute must be a valid ISO 3166-1 country code.',
+    'currency_code' => 'The :attribute must be a valid ISO 4217 currency code.',
+    'currency_code_numeric' => 'The :attribute must be a valid ISO 4217 numeric currency code.',
+    'currency_symbol' => 'The :attribute must be a recognised currency symbol.',
+    'language_code' => 'The :attribute must be a valid ISO 639-1 language code.',
+
     // Geo
     'ca_province' => 'The :attribute must be a Canadian province or territory.',
     'lat_lng' => 'The :attribute must be a latitude,longitude pair.',

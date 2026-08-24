@@ -15,8 +15,14 @@ use Simtabi\Laranail\Validation\Commands\RulesCommand;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
+use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
+use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
+use Simtabi\Laranail\Validation\Support\I18n\BundledCountryDataset;
+use Simtabi\Laranail\Validation\Support\I18n\BundledCurrencyDataset;
+use Simtabi\Laranail\Validation\Support\I18n\BundledLanguageDataset;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
 use Simtabi\Laranail\Validation\Support\RuleRegistrar;
 use Stringable;
@@ -61,6 +67,7 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->mergeConfigFrom($this->configPath(), 'laranail.validation');
 
         $this->bindEmailListFallbacks();
+        $this->bindI18nDatasetFallbacks();
 
         // One registry for the whole application: the alias wiring, the
         // console command and the docs tooling all read this singleton, and
@@ -84,6 +91,18 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->app->singletonIf(DisposableDomainList::class, BundledDisposableDomainList::class);
         $this->app->singletonIf(RoleAccountList::class, BundledRoleAccountList::class);
         $this->app->singletonIf(DnsResolver::class, CachedDnsResolver::class);
+    }
+
+    /**
+     * Bind the bundled ISO datasets, with the same `singletonIf` asymmetry as
+     * the email lists: an application (or laranail/atlas) that binds its own
+     * dataset unconditionally wins regardless of provider order.
+     */
+    private function bindI18nDatasetFallbacks(): void
+    {
+        $this->app->singletonIf(CountryDataset::class, BundledCountryDataset::class);
+        $this->app->singletonIf(CurrencyDataset::class, BundledCurrencyDataset::class);
+        $this->app->singletonIf(LanguageDataset::class, BundledLanguageDataset::class);
     }
 
     public function bootingPackage(): void
