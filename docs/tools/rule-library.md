@@ -285,6 +285,7 @@ Domain and mailbox rules. Deliverability needs DNS, so it lives in the Network t
 | Rule | Parameters | Alias | Message key |
 |---|---|---|---|
 | `NationalIdentifier` | `string $country` | `national_identifier` | `national_identifier` |
+| `VatNumber` | `?array $countries = null` | `vat_number` | `vat_number` |
 
 **`NationalIdentifier`** validates a national identification number in a particular country's
 scheme. One rule parameterised by country, because the field always means "this person's
@@ -297,6 +298,7 @@ national id" and which scheme applies is a property of the country.
 | `FR` | NIR / numéro de sécurité sociale | mod-97 key |
 | `US` | Social Security Number | format and unissued ranges — **no checksum exists** |
 | `GB` | National Insurance number | format and reserved prefixes — **no checksum exists** |
+| `VN` | CCCD citizen identification | structure (province 001-096, 12 digits) — **no checksum exists** |
 
 Where a scheme has a checksum it is computed, not pattern-matched: the entire value of these
 numbers is that a transposed pair fails arithmetic instead of sailing through a regex. Where a
@@ -316,6 +318,15 @@ Two details these get wrong when written quickly:
 
 None of these can tell you a number was **issued** — only that it is well-formed. That needs
 the issuing authority.
+
+**`VatNumber`** validates an EU-style VAT identifier by its country prefix: the national
+format, and the national checksum where one is defined (NL 11-proef or the 2020 mod-97 form,
+BE, DE, IT, SE, EL, LU, and FR's numeric key — each computed, not pattern-matched). ES, GB and
+the other letter-scheme countries are format-only, and the class docblock says exactly which.
+Spaces, dots and hyphens are stripped (`BE 0423.456.765` is how invoices write it);
+`laranail_vat_number:NL,BE` restricts countries. Format validity is not registration — only
+VIES or the national registry can say a number is issued, and this pure-tier rule deliberately
+does not ask the network.
 
 ## Geo
 

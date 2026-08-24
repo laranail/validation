@@ -43,6 +43,7 @@ use Simtabi\Laranail\Validation\Rules\Encoding\Base64;
 use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
 use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
+use Simtabi\Laranail\Validation\Rules\Fiscal\VatNumber;
 use Simtabi\Laranail\Validation\Rules\Geo\CaProvince;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
@@ -253,6 +254,8 @@ final class RuleAliases
 
             // Fiscal
             'national_identifier' => static fn (array $p): ValidationRule => new NationalIdentifier(self::str($p, 0)),
+            // `laranail_vat_number:NL,BE` restricts the accepted countries.
+            'vat_number' => static fn (array $p): ValidationRule => new VatNumber(self::strings($p) === [] ? null : self::strings($p)),
 
             // Markup
             'xml' => static fn (array $p): ValidationRule => new Xml(self::nullableStr($p, 0)),

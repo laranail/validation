@@ -208,6 +208,7 @@ return [
     'vendor_identifier' => 'The :attribute must be a valid :vendor identifier.',
 
     // Fiscal
+    'vat_number' => 'The :attribute must be a valid VAT number.',
     'national_identifier' => 'The :attribute must be a valid :country national identification number.',
 
     // Profanity

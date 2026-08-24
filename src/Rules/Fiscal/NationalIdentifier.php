@@ -44,6 +44,9 @@ final readonly class NationalIdentifier implements ValidationRule
     /** France — NIR / numéro de sécurité sociale, mod-97 key. */
     public const string FR = 'fr';
 
+    /** Vietnam — CCCD citizen identification. Structure only: NO checksum exists. */
+    public const string VN = 'vn';
+
     public function __construct(private string $country) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -66,6 +69,7 @@ final readonly class NationalIdentifier implements ValidationRule
             self::US => self::americanSsn($value),
             self::GB => self::britishNino($value),
             self::FR => self::frenchNir($value),
+            self::VN => self::vietnameseCccd($value),
             default => false,
         };
     }
@@ -196,6 +200,17 @@ final readonly class NationalIdentifier implements ValidationRule
         }
 
         return (int) $key === 97 - ((int) $number % 97);
+    }
+
+    /**
+     * Twelve digits: a 001-096 province code, a gender/century digit, the
+     * two-digit birth year, and six serial digits. The scheme publishes no
+     * check digit, so structure is all that CAN be verified — stated here
+     * rather than faked with an invented checksum.
+     */
+    private static function vietnameseCccd(string $value): bool
+    {
+        return preg_match('/^0(?:0[1-9]|[1-8]\d|9[0-6])\d{9}$/D', $value) === 1;
     }
 
     private static function digits(string $value): string
