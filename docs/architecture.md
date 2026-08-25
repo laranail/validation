@@ -280,7 +280,20 @@ decision — `Networking\ImageUrl` (guarded, redirect-refusing, fail-closed) and
 v1-only rules all resolve to core or existing successors: `Equals` → `same`, `Coordinate` →
 `Geo\LatLng`, `Timezone` → core `timezone` (identifiers) + `Chrono\TimezoneAbbreviation`
 (abbreviations), `IsAStateInNorthAmerica` → `Geo\UsState` / `Geo\CaProvince`,
-`IncludesHtml` → `Text\HtmlClean`'s `mustContainHtml:` flag.
+`IncludesHtml` → `Text\HtmlClean`'s `mustContainHtml:` flag, `EndsWith`/`NotEndsWith`/
+`NotStartsWith` → core `ends_with:` / `doesnt_end_with:` / `doesnt_start_with:` (Laravel
+grew all four affix rules after enekia v1 wrote its own), and `MatchCurrentPassword` →
+core `current_password` via `StringRule::currentPassword()` (the archive copy also never
+autoloaded — a PSR-4 mismatch left it dead in its own repo).
+
+Two adjacent decisions worth stating: the predecessor's **typed card exceptions** do not
+carry over — under this family's failure-handling standard a rule *fails*, it never throws,
+so `Payment\*` report through messages like every other rule and a typed exception hierarchy
+would be surface with no throw site. And the **disposable-phone pipeline** stays out of both
+this package and `laranail/phone`'s validation surface: disposable-number detection is a
+subscription-data problem (ranges churn daily and vendors license the feeds), not a
+validation rule — an application with such a feed wraps it in its own rule against
+`Contracts\` seams.
 
 ---
 
