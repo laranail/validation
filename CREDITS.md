@@ -58,6 +58,19 @@ defined by an ISO standard is not anyone's copyrighted work, but somebody's
 | `Fiscal\NationalIdentifier` | Dutch 11-proef; Brazilian CPF mod-11; French NIR mod-97 (INSEE); US SSA unissued ranges; UK NINO reserved prefixes | Implemented from the published algorithms and verified against published or derived vectors. No national register data is bundled, and none of these can confirm a number was issued. |
 | `Profanity\NoProfanity` | — | Original matching only. **No word list ships** — LGPL sources cannot be used in an MIT package, and the circulating lists record no licence. The application supplies the terms via `Contracts\TermList`. |
 
+
+## Datasets added with the 1.0 rule families (Phase 2)
+
+| Dataset | Source | Licence / status |
+|---|---|---|
+| ISO 3166-1 country codes (`resources/data/`) | ISO 3166 via the pinned registry snapshot in `tools/data-sources/iso-3166.txt`, rebuilt by `tools/build-datasets.php` (a suite test pins generator output to the committed data) | Factual reference data; codes themselves are not copyrightable |
+| ISO 4217 currency codes | ISO 4217 list-one XML snapshot in `tools/data-sources/` | Factual reference data |
+| ISO 639 language codes | ISO 639-2 registry snapshot in `tools/data-sources/` | Factual reference data |
+| IANA timezone identifiers | PHP's own `DateTimeZone::listIdentifiers()` (tzdata) — no bundled copy | tzdata is public domain |
+| Card-brand catalogue (`Support/Payment/CardBrand.php`, `BundledCardBrandCatalogue`) | IIN ranges, lengths and CVC rules compiled from the brands' published numbering plans (ISO/IEC 7812 assignments); written as data, not scraped from any library | Factual reference data; per-range provenance in the class docblocks |
+| VAT number formats and checksums (`Rules/Fiscal/VatNumber`) | Per-country formats from the EU Commission's published VIES structure notes; NL/BE/DE/IT/SE/EL/LU/FR check-digit algorithms implemented from each authority's published specification | Implemented from specifications; no code carried over |
+| Reserved-username lists (`Support/Text/*ReservedUsernameList`) | Compiled from RFC 2142 mailbox names plus commonly reserved route/subdomain terms; original compilation | Original work, MIT with the package |
+
 ## Packages studied but not depended on
 
 - **[`intervention/validation`](https://github.com/Intervention/validation)**

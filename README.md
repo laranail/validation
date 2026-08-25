@@ -111,7 +111,7 @@ Full documentation is at
 
 ## Stability
 
-Pre-1.0. The **stable surface** — what 1.0 will cover under SemVer — is: `FluentRule`,
+1.0 states what SemVer covers. The **stable surface** is: `FluentRule`,
 `FluentSchema`, `RuleSet` (including its events and `before()`/`after()` hooks), the rule
 classes and their constructor signatures, the contracts (`ClientCheckable`,
 `PrecognitionSkippable`, `TermList`, `FluentRuleContract`), `Check`, `Regex`,
@@ -122,9 +122,11 @@ Everything marked `@internal` — the fast-check compiler, the optimizer validat
 machinery, everything under `Internal\` — may change in a minor, and an arch test enforces the
 boundary. Build on the stable list; the optimizer is an implementation detail behind it.
 
-Constrain to `^0.1` and read [UPGRADING.md](UPGRADING.md) before moving between versions: this
-package fixes divergences from Laravel's own validator, and a fix can mean input an application
-previously accepted is now correctly rejected.
+Constrain to `^1.0` and read [UPGRADING.md](UPGRADING.md) before moving between versions —
+`rector-migrate-1.0.php` auto-migrates the mechanical 0.x break. Deprecations post-1.0 are
+marked `@deprecated` with the replacement and removal version, kept for at least one minor,
+and removed only in the next major. Behaviour-correcting fixes can still mean input an
+application previously accepted is now correctly rejected; UPGRADING calls those out.
 
 ## Local development
 

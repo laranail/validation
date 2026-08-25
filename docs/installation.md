@@ -22,8 +22,8 @@ laranail foundation (`package-tools`/`console`) supporting it; a PHP version lea
 when it leaves [php.net's active support](https://www.php.net/supported-versions.php), and
 dropping it from `composer.json` is a major.
 
-> The package is pre-1.0. The public surface is settling, so pin a constraint you are happy to
-> review — `^0.1` tracks the current line.
+> Constrain to `^1.0` — the package follows SemVer from its 1.0 major, and the
+> [stability contract](../README.md#stability) states exactly what that covers.
 
 ## AI-assisted development
 

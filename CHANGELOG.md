@@ -10,6 +10,16 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## Unreleased
 
+### Changed
+
+- The final re-audit against the 1.0 plan closed four release-gate gaps: the README
+  Stability section and installation guide now speak in shipped-1.0 terms (both still said
+  "pre-1.0, pin `^0.1`" after the major); `CREDITS.md` records the Phase-2 datasets (ISO
+  code tables and their pinned registry snapshots, the card-brand catalogue, the VAT
+  format/checksum sources, the reserved-username lists); and `release.yml` generates and
+  attaches a CycloneDX SBOM via `laranail::package-tools.sbom`, the §12.3 item the release
+  had shipped without.
+
 ## v1.0.1 - 2026-08-24
 
 ### Added

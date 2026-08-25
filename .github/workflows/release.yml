@@ -36,6 +36,22 @@ jobs:
           # these markers after publish — never paste numbers by hand.
           printf '\n<!-- benchmark-start -->\n<!-- benchmark-end -->\n' >> release-body.md
 
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: "8.5"
+          coverage: none
+
+      # CycloneDX SBOM via the org's package-tools generator (§12.3). The
+      # generator reads composer.lock from the app base path, which under
+      # the testbench CLI is the skeleton — hence the copy.
+      - name: Generate SBOM
+        run: |
+          composer update --prefer-dist --no-interaction --quiet
+          cp composer.lock vendor/orchestra/testbench-core/laravel/composer.lock
+          printf 'providers:\n  - Simtabi\\Laranail\\Validation\\ValidationServiceProvider\n  - Simtabi\\Laranail\\Package\\Tools\\Providers\\PackageToolsServiceProvider\n' > testbench.yaml
+          vendor/bin/testbench laranail::package-tools.sbom --print > sbom.cdx.json
+          php -r 'json_decode(file_get_contents("sbom.cdx.json"), flags: JSON_THROW_ON_ERROR);'
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,4 +59,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
             --notes-file release-body.md \
-            --generate-notes
+            --generate-notes \
+            sbom.cdx.json
