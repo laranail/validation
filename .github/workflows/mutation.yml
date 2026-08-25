@@ -20,7 +20,10 @@ on:
 jobs:
   pest-mutate:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    # 350: RuleConfigBuilder alone carries 634 mutants (over half the
+    # compiler's surface) and missed a 240-minute cap by minutes; hosted
+    # runners allow 6h.
+    timeout-minutes: 350
     strategy:
       fail-fast: false
       matrix:
