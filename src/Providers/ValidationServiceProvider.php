@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Simtabi\Laranail\Validation;
+namespace Simtabi\Laranail\Validation\Providers;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -9,6 +9,7 @@ use Illuminate\Validation\Validator as ValidationValidator;
 use Simtabi\Laranail\Package\Tools\Package;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
 use Simtabi\Laranail\Validation\Commands\DoctorCommand;
 use Simtabi\Laranail\Validation\Commands\RulesCommand;
@@ -250,6 +251,6 @@ class ValidationServiceProvider extends PackageServiceProvider
 
     private function configPath(): string
     {
-        return dirname(__DIR__) . '/config/laranail-validation.php';
+        return dirname(__DIR__, 2) . '/config/laranail-validation.php';
     }
 }

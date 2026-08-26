@@ -5,8 +5,8 @@ use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
-use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
  * The provider's own behaviour, tested against the BOOTED application rather

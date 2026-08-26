@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
-use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
  * The first Network-tier rule.

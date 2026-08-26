@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\Contracts\TermList;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\Consumer\AcmeServiceProvider;
-use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
  * The Phase-1 exit criterion, end to end: one consumer provider adds a

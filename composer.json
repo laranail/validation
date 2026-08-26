@@ -144,7 +144,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Simtabi\\Laranail\\Validation\\ValidationServiceProvider"
+                "Simtabi\\Laranail\\Validation\\Providers\\ValidationServiceProvider"
             ]
         },
         "branch-alias": {

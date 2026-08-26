@@ -3,13 +3,13 @@
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
 use Simtabi\Laranail\Validation\Rules\Text\Slug;
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Support\RuleRegistrar;
 use Simtabi\Laranail\Validation\Tests\Fixtures\Registry\EvenNumber;
-use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
  * The §5.2.2 registry — one place the alias map, the console command, the

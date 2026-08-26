@@ -48,7 +48,7 @@ jobs:
         run: |
           composer update --prefer-dist --no-interaction --quiet
           cp composer.lock vendor/orchestra/testbench-core/laravel/composer.lock
-          printf 'providers:\n  - Simtabi\\Laranail\\Validation\\ValidationServiceProvider\n  - Simtabi\\Laranail\\Package\\Tools\\Providers\\PackageToolsServiceProvider\n' > testbench.yaml
+          printf 'providers:\n  - Simtabi\\Laranail\\Validation\\Providers\\ValidationServiceProvider\n  - Simtabi\\Laranail\\Package\\Tools\\Providers\\PackageToolsServiceProvider\n' > testbench.yaml
           vendor/bin/testbench laranail::package-tools.sbom --print > sbom.cdx.json
           php -r 'json_decode(file_get_contents("sbom.cdx.json"), flags: JSON_THROW_ON_ERROR);'
 

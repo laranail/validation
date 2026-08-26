@@ -4,8 +4,8 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
-use Simtabi\Laranail\Validation\ValidationServiceProvider;
 
 /**
  * Rule families whose aliases ship with their own package rather than here.
