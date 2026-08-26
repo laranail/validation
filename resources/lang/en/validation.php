@@ -3,7 +3,7 @@
 /*
  * Messages for the extended rule library.
  *
- * Namespaced `laranail-validation::`, so publishing lands in
+ * Namespaced `laranail/validation::`, so publishing lands in
  * lang/vendor/laranail-validation and nothing here can shadow Laravel's own
  * lang/en/validation.php.
  *

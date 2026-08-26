@@ -52,7 +52,7 @@ final readonly class CaseStyle implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->style)) {
-            $fail('laranail-validation::validation.case_style.' . $this->style)->translate();
+            $fail('laranail/validation::validation.case_style.' . $this->style)->translate();
         }
     }
 

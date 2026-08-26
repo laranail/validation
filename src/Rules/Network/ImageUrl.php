@@ -53,7 +53,7 @@ final readonly class ImageUrl implements PrecognitionSkippable, ValidationRule
         }
 
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.image_url')->translate();
+            $fail('laranail/validation::validation.image_url')->translate();
         }
     }
 

@@ -66,7 +66,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->notations)) {
-            $fail('laranail-validation::validation.css_color')
+            $fail('laranail/validation::validation.css_color')
                 ->translate(['notations' => implode(', ', $this->notations)]);
         }
     }

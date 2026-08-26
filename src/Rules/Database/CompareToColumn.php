@@ -53,7 +53,7 @@ final class CompareToColumn implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_scalar($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.compare_to_column')->translate();
+            $fail('laranail/validation::validation.compare_to_column')->translate();
         }
     }
 

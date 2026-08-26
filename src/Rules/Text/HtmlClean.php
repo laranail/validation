@@ -45,14 +45,14 @@ final readonly class HtmlClean implements ValidationRule
     {
         if ($this->mustContainHtml) {
             if (! is_string($value) || self::passes($value)) {
-                $fail('laranail-validation::validation.contains_html')->translate();
+                $fail('laranail/validation::validation.contains_html')->translate();
             }
 
             return;
         }
 
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.html_clean')->translate();
+            $fail('laranail/validation::validation.html_clean')->translate();
         }
     }
 

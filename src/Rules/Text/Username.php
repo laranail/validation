@@ -76,13 +76,13 @@ final readonly class Username implements ClientCheckable, ValidationRule
             // splitting it would produce "must not start with a separator",
             // "must not contain two separators in a row" and three more, each
             // reachable only by fixing the previous one.
-            $fail('laranail-validation::validation.username')->translate();
+            $fail('laranail/validation::validation.username')->translate();
 
             return;
         }
 
         if (self::isReserved($value, $this->reserved ?? $this->boundReserved(), $this->separators)) {
-            $fail('laranail-validation::validation.username_reserved')->translate();
+            $fail('laranail/validation::validation.username_reserved')->translate();
         }
     }
 

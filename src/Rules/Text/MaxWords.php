@@ -29,7 +29,7 @@ final readonly class MaxWords implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || self::count($value) > $this->max) {
-            $fail('laranail-validation::validation.max_words')->translate(['max' => $this->max]);
+            $fail('laranail/validation::validation.max_words')->translate(['max' => $this->max]);
         }
     }
 

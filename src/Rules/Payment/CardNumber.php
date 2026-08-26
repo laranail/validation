@@ -119,6 +119,6 @@ final class CardNumber implements ValidationRule
      */
     private function fail(Closure $fail, string $key, array $parameters = []): void
     {
-        $fail('laranail-validation::validation.' . $key)->translate($parameters);
+        $fail('laranail/validation::validation.' . $key)->translate($parameters);
     }
 }

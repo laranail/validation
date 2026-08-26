@@ -32,7 +32,7 @@ final class CountryCode implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.country_code')->translate();
+            $fail('laranail/validation::validation.country_code')->translate();
 
             return;
         }
@@ -44,7 +44,7 @@ final class CountryCode implements ValidationRule
             : $this->dataset()->isAlpha2($code);
 
         if (! $assigned) {
-            $fail('laranail-validation::validation.country_code')->translate();
+            $fail('laranail/validation::validation.country_code')->translate();
         }
     }
 

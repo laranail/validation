@@ -61,9 +61,9 @@ final class CurrencyCode implements ValidationRule
     private function fail(Closure $fail): void
     {
         $key = match (true) {
-            $this->numeric => 'laranail-validation::validation.currency_code_numeric',
-            $this->symbol => 'laranail-validation::validation.currency_symbol',
-            default => 'laranail-validation::validation.currency_code',
+            $this->numeric => 'laranail/validation::validation.currency_code_numeric',
+            $this->symbol => 'laranail/validation::validation.currency_symbol',
+            default => 'laranail/validation::validation.currency_code',
         };
 
         $fail($key)->translate();

@@ -28,7 +28,7 @@ final class Rfc3339 implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail-validation::validation.rfc3339')->translate();
+            $fail('laranail/validation::validation.rfc3339')->translate();
         }
     }
 

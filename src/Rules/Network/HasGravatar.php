@@ -44,7 +44,7 @@ final readonly class HasGravatar implements PrecognitionSkippable, ValidationRul
         }
 
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.has_gravatar')->translate();
+            $fail('laranail/validation::validation.has_gravatar')->translate();
         }
     }
 

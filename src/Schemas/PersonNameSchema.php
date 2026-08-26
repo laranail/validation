@@ -383,7 +383,7 @@ final class PersonNameSchema
 
         $values = $labels === [] ? $last : implode(', ', $labels) . ' or ' . $last;
 
-        $key = 'laranail-validation::validation.person_name_required';
+        $key = 'laranail/validation::validation.person_name_required';
         $message = trans($key, ['values' => $values]);
 
         // `trans()` hands the key back when the namespace is not registered —
@@ -393,7 +393,7 @@ final class PersonNameSchema
         // RuleMessagesResolveTest; this one is resolved eagerly, at rule-build
         // time, so it needs its own floor. A plain English sentence is a worse
         // translation and a far better thing to show someone than
-        // "laranail-validation::validation.person_name_required".
+        // "laranail/validation::validation.person_name_required".
         return is_string($message) && $message !== $key
             ? $message
             : "Please provide at least one of {$values}.";

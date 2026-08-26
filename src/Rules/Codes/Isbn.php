@@ -40,7 +40,7 @@ final readonly class Isbn implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->editions)) {
-            $fail('laranail-validation::validation.isbn')->translate();
+            $fail('laranail/validation::validation.isbn')->translate();
         }
     }
 

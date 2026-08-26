@@ -30,7 +30,7 @@ final readonly class TimeOfDay implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || preg_match($this->pattern(), $value) !== 1) {
-            $fail('laranail-validation::validation.time_of_day')->translate();
+            $fail('laranail/validation::validation.time_of_day')->translate();
         }
     }
 

@@ -28,7 +28,7 @@ final class Subdomain implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.subdomain')->translate();
+            $fail('laranail/validation::validation.subdomain')->translate();
         }
     }
 

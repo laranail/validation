@@ -42,7 +42,7 @@ final readonly class MinuteIn implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.minute_in')
+            $fail('laranail/validation::validation.minute_in')
                 ->translate(['minutes' => implode(', ', $this->minutes)]);
         }
     }

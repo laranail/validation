@@ -41,7 +41,7 @@ final readonly class ModelsExist implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_array($value)) {
-            $fail('laranail-validation::validation.models_exist.array')->translate();
+            $fail('laranail/validation::validation.models_exist.array')->translate();
 
             return;
         }
@@ -58,7 +58,7 @@ final readonly class ModelsExist implements ValidationRule
 
         foreach ($value as $item) {
             if (! is_string($item) && ! is_int($item)) {
-                $fail('laranail-validation::validation.models_exist.array')->translate();
+                $fail('laranail/validation::validation.models_exist.array')->translate();
 
                 return;
             }
@@ -91,7 +91,7 @@ final readonly class ModelsExist implements ValidationRule
         $missing = array_values(array_diff($identifiers, $found));
 
         if ($missing !== []) {
-            $fail('laranail-validation::validation.models_exist.missing')
+            $fail('laranail/validation::validation.models_exist.missing')
                 ->translate(['values' => implode(', ', $missing)]);
         }
     }

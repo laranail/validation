@@ -357,7 +357,7 @@ it('shows a sentence rather than a raw key if the namespace is not registered', 
     // and a stale bootstrap/cache/packages.php in a consuming application is
     // enough to cause it. Every other message in this package goes out through
     // `$fail(...)->translate()`; this one is resolved at rule-build time, so it
-    // is the one that could put "laranail-validation::validation.…" on a form.
+    // is the one that could put "laranail/validation::validation.…" on a form.
     // A translator with an empty ArrayLoader has no namespaces at all, so
     // trans() hands every key straight back — the same thing a consuming
     // application sees when the package's provider has not been discovered.
@@ -369,6 +369,6 @@ it('shows a sentence rather than a raw key if the namespace is not registered', 
 
     $message = $messages['given_name.required_without_all'] ?? '';
 
-    expect($message)->not->toContain('laranail-validation::')
+    expect($message)->not->toContain('laranail/validation::')
         ->and($message)->toBe('Please provide at least one of given name or family name.');
 });

@@ -82,7 +82,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.postal_code')->translate();
+            $fail('laranail/validation::validation.postal_code')->translate();
 
             return;
         }
@@ -90,7 +90,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
         $countries = $this->resolveCountries($attribute);
 
         if ($countries === []) {
-            $fail('laranail-validation::validation.postal_code')->translate();
+            $fail('laranail/validation::validation.postal_code')->translate();
 
             return;
         }
@@ -103,7 +103,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
             }
         }
 
-        $fail('laranail-validation::validation.postal_code')->translate();
+        $fail('laranail/validation::validation.postal_code')->translate();
     }
 
     /** @return list<string> */

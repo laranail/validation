@@ -41,7 +41,7 @@ final readonly class BitcoinAddress implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->testnet)) {
-            $fail('laranail-validation::validation.bitcoin_address')->translate();
+            $fail('laranail/validation::validation.bitcoin_address')->translate();
         }
     }
 

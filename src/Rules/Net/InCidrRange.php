@@ -38,7 +38,7 @@ final readonly class InCidrRange implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->networks)) {
-            $fail('laranail-validation::validation.in_cidr_range')
+            $fail('laranail/validation::validation.in_cidr_range')
                 ->translate(['networks' => implode(', ', $this->networks)]);
         }
     }

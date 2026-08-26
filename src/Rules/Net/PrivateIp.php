@@ -24,7 +24,7 @@ final class PrivateIp implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! IpClassifier::isReserved($value)) {
-            $fail('laranail-validation::validation.private_ip')->translate();
+            $fail('laranail/validation::validation.private_ip')->translate();
         }
     }
 }

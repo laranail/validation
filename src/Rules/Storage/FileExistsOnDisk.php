@@ -33,7 +33,7 @@ final readonly class FileExistsOnDisk implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.file_exists_on_disk')->translate();
+            $fail('laranail/validation::validation.file_exists_on_disk')->translate();
         }
     }
 

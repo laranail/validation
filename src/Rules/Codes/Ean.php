@@ -24,7 +24,7 @@ final class Ean implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! Gtin::passes($value, [8, 13])) {
-            $fail('laranail-validation::validation.ean')->translate();
+            $fail('laranail/validation::validation.ean')->translate();
         }
     }
 }

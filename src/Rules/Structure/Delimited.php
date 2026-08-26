@@ -75,7 +75,7 @@ final readonly class Delimited implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.delimited.invalid')->translate();
+            $fail('laranail/validation::validation.delimited.invalid')->translate();
 
             return;
         }
@@ -87,19 +87,19 @@ final readonly class Delimited implements ValidationRule
         }
 
         if ($this->min !== null && count($items) < $this->min) {
-            $fail('laranail-validation::validation.delimited.min')->translate(['min' => $this->min]);
+            $fail('laranail/validation::validation.delimited.min')->translate(['min' => $this->min]);
 
             return;
         }
 
         if ($this->max !== null && count($items) > $this->max) {
-            $fail('laranail-validation::validation.delimited.max')->translate(['max' => $this->max]);
+            $fail('laranail/validation::validation.delimited.max')->translate(['max' => $this->max]);
 
             return;
         }
 
         if ($this->distinct && count(array_unique($items)) !== count($items)) {
-            $fail('laranail-validation::validation.delimited.distinct')->translate();
+            $fail('laranail/validation::validation.delimited.distinct')->translate();
 
             return;
         }
@@ -110,14 +110,14 @@ final readonly class Delimited implements ValidationRule
             // points at the punctuation, while running it through the
             // sub-rules would report whatever `email` says about ''.
             if ($item === '') {
-                $fail('laranail-validation::validation.delimited.empty')
+                $fail('laranail/validation::validation.delimited.empty')
                     ->translate(['position' => $index + 1]);
 
                 return;
             }
 
             if (Validator::make(['item' => $item], ['item' => $this->rules])->fails()) {
-                $fail('laranail-validation::validation.delimited.item')
+                $fail('laranail/validation::validation.delimited.item')
                     ->translate(['position' => $index + 1]);
 
                 return;

@@ -88,7 +88,7 @@ final class UniquePhone implements DataAwareRule, ValidationRule
         }
 
         if ($this->query()->where($this->column, $e164)->exists()) {
-            $fail('laranail-validation::validation.phone_unique')->translate();
+            $fail('laranail/validation::validation.phone_unique')->translate();
         }
     }
 

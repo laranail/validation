@@ -24,7 +24,7 @@ final class Asin implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail-validation::validation.asin')->translate();
+            $fail('laranail/validation::validation.asin')->translate();
         }
     }
 

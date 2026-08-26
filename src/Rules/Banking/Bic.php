@@ -29,7 +29,7 @@ final class Bic implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || preg_match(self::PATTERN, strtoupper($value)) !== 1) {
-            $fail('laranail-validation::validation.bic')->translate();
+            $fail('laranail/validation::validation.bic')->translate();
         }
     }
 }

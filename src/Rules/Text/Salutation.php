@@ -40,7 +40,7 @@ final class Salutation implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.salutation')->translate();
+            $fail('laranail/validation::validation.salutation')->translate();
 
             return;
         }
@@ -54,7 +54,7 @@ final class Salutation implements ValidationRule
         $list = $this->accepted ?? self::$bundled ?? [];
 
         if (! isset($list[$normalised])) {
-            $fail('laranail-validation::validation.salutation')->translate();
+            $fail('laranail/validation::validation.salutation')->translate();
         }
     }
 }

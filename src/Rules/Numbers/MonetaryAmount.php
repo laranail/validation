@@ -38,7 +38,7 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->decimals, $this->allowNegative)) {
-            $fail('laranail-validation::validation.monetary_amount')
+            $fail('laranail/validation::validation.monetary_amount')
                 ->translate(['decimals' => $this->decimals]);
         }
     }

@@ -26,7 +26,7 @@ final readonly class DateInterval implements ValidationRule
     {
         if (! is_string($value) || ! $this->passes($value)) {
             $key = $this->positive ? 'date_interval_positive' : 'date_interval';
-            $fail('laranail-validation::validation.' . $key)->translate();
+            $fail('laranail/validation::validation.' . $key)->translate();
         }
     }
 

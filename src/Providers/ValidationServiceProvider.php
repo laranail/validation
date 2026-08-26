@@ -251,6 +251,6 @@ class ValidationServiceProvider extends PackageServiceProvider
 
     private function configPath(): string
     {
-        return dirname(__DIR__, 2) . '/config/laranail-validation.php';
+        return $this->packagePath('config/laranail-validation.php');
     }
 }

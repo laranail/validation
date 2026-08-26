@@ -56,19 +56,19 @@ final readonly class SubmissionTiming implements ValidationRule
             // Undecryptable means tampered or from another key. Same message
             // as too-fast: distinguishing them tells an attacker which lever
             // they pulled.
-            $fail('laranail-validation::validation.submission_timing.too_fast')->translate();
+            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
 
             return;
         }
 
         if ($elapsed < $this->minimumSeconds) {
-            $fail('laranail-validation::validation.submission_timing.too_fast')->translate();
+            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
 
             return;
         }
 
         if ($elapsed > $this->maximumSeconds) {
-            $fail('laranail-validation::validation.submission_timing.expired')->translate();
+            $fail('laranail/validation::validation.submission_timing.expired')->translate();
         }
     }
 

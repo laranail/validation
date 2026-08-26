@@ -10,10 +10,10 @@ use SplFileInfo;
  * Every message key a rule can emit must resolve to a real sentence.
  *
  * This failed silently for the whole life of the package. The provider never
- * called `hasTranslations()`, so `laranail-validation::validation.iban` was
+ * called `hasTranslations()`, so `laranail/validation::validation.iban` was
  * never a registered namespace and `trans()` handed the key straight back —
  * meaning a user who typed a bad IBAN was shown the literal string
- * `laranail-validation::validation.iban`.
+ * `laranail/validation::validation.iban`.
  *
  * Nothing caught it because that *is* a string, so every assertion of the form
  * "the field has an error" still passed.
@@ -33,21 +33,30 @@ final class RuleMessagesResolveTest extends TestCase
         $this->assertSame([], $unresolved, 'These keys returned themselves instead of a message.');
     }
 
-    public function test_the_namespace_is_dashed_not_slashed(): void
+    public function test_the_namespace_is_the_composer_package_name(): void
     {
-        // `lang/vendor/{namespace}` is a single published directory, so a slash
-        // nests the files a level deeper than vendor:publish and every
-        // consumer's override path expect. The rules all say `laranail-`.
+        // Reversed deliberately. The earlier reasoning here was that a slash nests
+        // the published files a level deeper than vendor:publish expects -- but
+        // Laravel interpolates the namespace into the override path itself
+        // (FileLoader::loadNamespaceOverrides reads
+        // {$path}/vendor/{$namespace}/{$locale}/{$group}.php), so the nesting is
+        // exactly where it reads them back from. The slash groups a vendor's
+        // packages under one directory instead of scattering them across the
+        // lang/vendor root, and names the composer package that ships the string.
+        // Botble's CMS has shipped this shape platform-wide for years.
+        //
+        // Blade component tags are the one registry that cannot spell it; this
+        // package registers none.
         //
         // Asserted through trans() in both directions rather than through the
         // translator's hasForLocale(): that method is on the concrete
         // Translator and not on the contract, so reaching it means either a
         // string container key or a type-hint that does not declare it.
-        $dashed = 'laranail-validation::validation.iban';
         $slashed = 'laranail/validation::validation.iban';
+        $dashed = 'laranail-validation::validation.iban';
 
-        $this->assertNotSame($dashed, trans($dashed), 'The dashed namespace did not resolve.');
-        $this->assertSame($slashed, trans($slashed), 'The slashed namespace resolved, so both are registered.');
+        $this->assertNotSame($slashed, trans($slashed), 'The composer-package namespace did not resolve.');
+        $this->assertSame($dashed, trans($dashed), 'The dashed namespace resolved, so both are registered.');
     }
 
     /**
@@ -89,7 +98,7 @@ final class RuleMessagesResolveTest extends TestCase
      * user to fill in the box they just declined to fill in. It names every
      * field through `:values` instead.
      */
-    private const string NAMES_SEVERAL_FIELDS = 'laranail-validation::validation.person_name_required';
+    private const string NAMES_SEVERAL_FIELDS = 'laranail/validation::validation.person_name_required';
 
     public function test_no_message_is_left_as_a_placeholder(): void
     {
@@ -120,7 +129,7 @@ final class RuleMessagesResolveTest extends TestCase
             }
 
             preg_match_all(
-                "/'(laranail-validation::validation\.[a-z_]+)'/",
+                "#'(laranail/validation::validation\.[a-z_]+)'#",
                 (string) file_get_contents($file->getPathname()),
                 $matches,
             );
@@ -132,10 +141,10 @@ final class RuleMessagesResolveTest extends TestCase
 
         // CaseStyle appends its style to the key, so the literal in source is a
         // prefix rather than a whole key. Expanded here rather than skipped.
-        unset($keys['laranail-validation::validation.case_style']);
+        unset($keys['laranail/validation::validation.case_style']);
 
         foreach (['camel', 'kebab', 'pascal', 'snake', 'title'] as $style) {
-            $keys["laranail-validation::validation.case_style.{$style}"] = true;
+            $keys["laranail/validation::validation.case_style.{$style}"] = true;
         }
 
         return array_keys($keys);

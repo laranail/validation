@@ -39,7 +39,7 @@ final readonly class DataUri implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.data_uri')->translate();
+            $fail('laranail/validation::validation.data_uri')->translate();
         }
     }
 

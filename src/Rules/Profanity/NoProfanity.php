@@ -61,7 +61,7 @@ final class NoProfanity implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.no_profanity')->translate();
+            $fail('laranail/validation::validation.no_profanity')->translate();
 
             return;
         }
@@ -70,7 +70,7 @@ final class NoProfanity implements ValidationRule
             // The matched term is deliberately not echoed: repeating it back
             // prints the word on the user's screen, and naming it tells
             // someone probing the filter exactly what to obfuscate next.
-            $fail('laranail-validation::validation.no_profanity')->translate();
+            $fail('laranail/validation::validation.no_profanity')->translate();
         }
     }
 

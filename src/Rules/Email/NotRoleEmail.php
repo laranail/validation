@@ -41,7 +41,7 @@ final class NotRoleEmail implements ValidationRule
         $address = Address::split($value);
 
         if ($address === null) {
-            $fail('laranail-validation::validation.email.malformed')->translate();
+            $fail('laranail/validation::validation.email.malformed')->translate();
 
             return;
         }
@@ -57,7 +57,7 @@ final class NotRoleEmail implements ValidationRule
         }
 
         if ($this->localParts()->contains($localPart)) {
-            $fail('laranail-validation::validation.email.role')->translate();
+            $fail('laranail/validation::validation.email.role')->translate();
         }
     }
 }

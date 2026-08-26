@@ -27,7 +27,7 @@ final readonly class MinWords implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || MaxWords::count($value) < $this->min) {
-            $fail('laranail-validation::validation.min_words')->translate(['min' => $this->min]);
+            $fail('laranail/validation::validation.min_words')->translate(['min' => $this->min]);
         }
     }
 }

@@ -24,7 +24,7 @@ final class LanguageCode implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.language_code')->translate();
+            $fail('laranail/validation::validation.language_code')->translate();
 
             return;
         }
@@ -32,7 +32,7 @@ final class LanguageCode implements ValidationRule
         $code = $this->caseInsensitive ? strtolower($value) : $value;
 
         if (! $this->dataset()->isAlpha2($code)) {
-            $fail('laranail-validation::validation.language_code')->translate();
+            $fail('laranail/validation::validation.language_code')->translate();
         }
     }
 

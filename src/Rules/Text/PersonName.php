@@ -71,7 +71,7 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! self::hasNameCharacters($value, $this->allowDigits)) {
-            $fail('laranail-validation::validation.person_name')->translate();
+            $fail('laranail/validation::validation.person_name')->translate();
 
             return;
         }
@@ -83,13 +83,13 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
         // fine and whose field held one name too many — it sends them looking
         // for a bad character that is not there.
         if ($count < $this->minNames) {
-            $fail('laranail-validation::validation.person_name_min')->translate(['min' => $this->minNames]);
+            $fail('laranail/validation::validation.person_name_min')->translate(['min' => $this->minNames]);
 
             return;
         }
 
         if ($this->maxNames !== null && $count > $this->maxNames) {
-            $fail('laranail-validation::validation.person_name_max')->translate(['max' => $this->maxNames]);
+            $fail('laranail/validation::validation.person_name_max')->translate(['max' => $this->maxNames]);
         }
     }
 

@@ -20,7 +20,7 @@ final class Luhn implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.luhn')->translate();
+            $fail('laranail/validation::validation.luhn')->translate();
         }
     }
 

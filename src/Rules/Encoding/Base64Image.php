@@ -41,13 +41,13 @@ final readonly class Base64Image implements ValidationRule
         $bytes = self::decode($value);
 
         if ($bytes === null) {
-            $fail('laranail-validation::validation.base64_image')->translate();
+            $fail('laranail/validation::validation.base64_image')->translate();
 
             return;
         }
 
         if ($this->maxBytes !== null && strlen($bytes) > $this->maxBytes) {
-            $fail('laranail-validation::validation.base64_image_size')
+            $fail('laranail/validation::validation.base64_image_size')
                 ->translate(['max' => Number::fileSize($this->maxBytes)]);
 
             return;
@@ -60,7 +60,7 @@ final readonly class Base64Image implements ValidationRule
             : null;
 
         if ($subtype === null || ! in_array($subtype, $this->mimes, true)) {
-            $fail('laranail-validation::validation.base64_image')->translate();
+            $fail('laranail/validation::validation.base64_image')->translate();
         }
     }
 

@@ -65,7 +65,7 @@ final readonly class MacAddress implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
-            $fail('laranail-validation::validation.mac_address.malformed')->translate();
+            $fail('laranail/validation::validation.mac_address.malformed')->translate();
 
             return;
         }
@@ -73,13 +73,13 @@ final readonly class MacAddress implements ValidationRule
         $format = self::formatOf($value);
 
         if ($format === null) {
-            $fail('laranail-validation::validation.mac_address.malformed')->translate();
+            $fail('laranail/validation::validation.mac_address.malformed')->translate();
 
             return;
         }
 
         if ($this->formats !== [] && ! in_array($format, $this->formats, true)) {
-            $fail('laranail-validation::validation.mac_address.format')
+            $fail('laranail/validation::validation.mac_address.format')
                 ->translate(['formats' => implode(', ', $this->formats)]);
 
             return;
@@ -88,7 +88,7 @@ final readonly class MacAddress implements ValidationRule
         $octets = self::octets($value);
 
         if ($this->bytes !== null && count($octets) !== $this->bytes) {
-            $fail('laranail-validation::validation.mac_address.length')
+            $fail('laranail/validation::validation.mac_address.length')
                 ->translate(['bytes' => $this->bytes]);
 
             return;
@@ -99,31 +99,31 @@ final readonly class MacAddress implements ValidationRule
         // "must be unicast" for the broadcast address would be true and
         // useless.
         if ($this->isBroadcast($octets)) {
-            $fail('laranail-validation::validation.mac_address.broadcast')->translate();
+            $fail('laranail/validation::validation.mac_address.broadcast')->translate();
 
             return;
         }
 
         if ($this->isNull($octets)) {
-            $fail('laranail-validation::validation.mac_address.null')->translate();
+            $fail('laranail/validation::validation.mac_address.null')->translate();
 
             return;
         }
 
         if ($this->requireUnicast && (($octets[0] & 0b1) !== 0)) {
-            $fail('laranail-validation::validation.mac_address.multicast')->translate();
+            $fail('laranail/validation::validation.mac_address.multicast')->translate();
 
             return;
         }
 
         if ($this->requireUniversal && (($octets[0] & 0b10) !== 0)) {
-            $fail('laranail-validation::validation.mac_address.local')->translate();
+            $fail('laranail/validation::validation.mac_address.local')->translate();
 
             return;
         }
 
         if ($this->ouis !== [] && ! $this->matchesAnyOui($octets, $this->ouis)) {
-            $fail('laranail-validation::validation.mac_address.oui')
+            $fail('laranail/validation::validation.mac_address.oui')
                 ->translate(['ouis' => implode(', ', $this->ouis)]);
         }
     }

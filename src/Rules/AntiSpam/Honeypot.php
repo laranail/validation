@@ -40,7 +40,7 @@ final readonly class Honeypot implements ValidationRule
         if (! self::passes($value)) {
             // Deliberately vague. Telling the sender which field gave them
             // away is telling the bot's author how to pass next time.
-            $fail('laranail-validation::validation.honeypot')->translate();
+            $fail('laranail/validation::validation.honeypot')->translate();
         }
     }
 

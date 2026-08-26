@@ -22,7 +22,7 @@ final class Issn implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.issn')->translate();
+            $fail('laranail/validation::validation.issn')->translate();
         }
     }
 

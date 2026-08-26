@@ -52,7 +52,7 @@ final readonly class NationalIdentifier implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->country)) {
-            $fail('laranail-validation::validation.national_identifier')
+            $fail('laranail/validation::validation.national_identifier')
                 ->translate(['country' => mb_strtoupper(trim($this->country))]);
         }
     }

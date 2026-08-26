@@ -44,13 +44,13 @@ final class NotDisposableEmail implements ValidationRule
         $address = Address::split($value);
 
         if ($address === null) {
-            $fail('laranail-validation::validation.email.malformed')->translate();
+            $fail('laranail/validation::validation.email.malformed')->translate();
 
             return;
         }
 
         if ($this->domains()->contains($address[1])) {
-            $fail('laranail-validation::validation.email.disposable')->translate();
+            $fail('laranail/validation::validation.email.disposable')->translate();
         }
     }
 }

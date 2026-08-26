@@ -18,7 +18,7 @@ final class Longitude implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! Coordinate::isWithin($value, 180.0)) {
-            $fail('laranail-validation::validation.longitude')->translate();
+            $fail('laranail/validation::validation.longitude')->translate();
         }
     }
 

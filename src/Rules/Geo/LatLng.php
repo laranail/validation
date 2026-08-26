@@ -26,7 +26,7 @@ final class LatLng implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.lat_lng')->translate();
+            $fail('laranail/validation::validation.lat_lng')->translate();
         }
     }
 

@@ -89,7 +89,7 @@ final readonly class Url implements ValidationRule
         // allowed here" send the user to different places. A single message
         // for both makes a working link look broken for no stated reason.
         if ($parts === null) {
-            $fail('laranail-validation::validation.url.malformed')->translate();
+            $fail('laranail/validation::validation.url.malformed')->translate();
 
             return;
         }
@@ -97,14 +97,14 @@ final readonly class Url implements ValidationRule
         $scheme = strtolower((string) ($parts['scheme'] ?? ''));
 
         if (! in_array($scheme, $this->schemes, true)) {
-            $fail('laranail-validation::validation.url.scheme')
+            $fail('laranail/validation::validation.url.scheme')
                 ->translate(['schemes' => implode(', ', $this->schemes)]);
 
             return;
         }
 
         if (! $this->allowCredentials && (isset($parts['user']) || isset($parts['pass']))) {
-            $fail('laranail-validation::validation.url.credentials')->translate();
+            $fail('laranail/validation::validation.url.credentials')->translate();
 
             return;
         }
@@ -112,32 +112,32 @@ final readonly class Url implements ValidationRule
         $host = strtolower((string) ($parts['host'] ?? ''));
 
         if ($host === '') {
-            $fail('laranail-validation::validation.url.malformed')->translate();
+            $fail('laranail/validation::validation.url.malformed')->translate();
 
             return;
         }
 
         if (! $this->hostShapeIsValid($host)) {
-            $fail('laranail-validation::validation.url.host')->translate();
+            $fail('laranail/validation::validation.url.host')->translate();
 
             return;
         }
 
         if ($this->publicHostOnly && ! $this->isPublicHost($host)) {
-            $fail('laranail-validation::validation.url.private_host')->translate();
+            $fail('laranail/validation::validation.url.private_host')->translate();
 
             return;
         }
 
         if ($this->hosts !== [] && ! HostPattern::matches($host, $this->hosts)) {
-            $fail('laranail-validation::validation.url.host_is')
+            $fail('laranail/validation::validation.url.host_is')
                 ->translate(['hosts' => implode(', ', $this->hosts)]);
 
             return;
         }
 
         if ($this->blockedHosts !== [] && HostPattern::matches($host, $this->blockedHosts)) {
-            $fail('laranail-validation::validation.url.host_is_not')
+            $fail('laranail/validation::validation.url.host_is_not')
                 ->translate(['hosts' => implode(', ', $this->blockedHosts)]);
 
             return;
@@ -150,20 +150,20 @@ final readonly class Url implements ValidationRule
         $effectivePort = (int) ($parts['port'] ?? self::DEFAULT_PORTS[$scheme] ?? 0);
 
         if ($this->ports !== [] && ! in_array($effectivePort, $this->ports, true)) {
-            $fail('laranail-validation::validation.url.port')
+            $fail('laranail/validation::validation.url.port')
                 ->translate(['ports' => implode(', ', array_map(strval(...), $this->ports))]);
 
             return;
         }
 
         if (! $this->allowQuery && isset($parts['query'])) {
-            $fail('laranail-validation::validation.url.query')->translate();
+            $fail('laranail/validation::validation.url.query')->translate();
 
             return;
         }
 
         if (! $this->allowFragment && isset($parts['fragment'])) {
-            $fail('laranail-validation::validation.url.fragment')->translate();
+            $fail('laranail/validation::validation.url.fragment')->translate();
         }
     }
 

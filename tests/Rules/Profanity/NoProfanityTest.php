@@ -114,7 +114,7 @@ it('never echoes the matched term in its message', function (): void {
         return new PotentiallyTranslatedString('', resolve(Translator::class));
     });
 
-    expect($key)->toBe('laranail-validation::validation.no_profanity')
+    expect($key)->toBe('laranail/validation::validation.no_profanity')
         ->and($key)->not->toContain('badger');
 });
 

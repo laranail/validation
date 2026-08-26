@@ -38,7 +38,7 @@ final readonly class Xml implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || trim($value) === '') {
-            $fail('laranail-validation::validation.xml.malformed')->translate();
+            $fail('laranail/validation::validation.xml.malformed')->translate();
 
             return;
         }
@@ -53,7 +53,7 @@ final readonly class Xml implements ValidationRule
             // LIBXML_NOENT is deliberately NOT set — expanding entities is the
             // XXE vector.
             if ($document->loadXML($value, LIBXML_NONET) === false) {
-                $fail('laranail-validation::validation.xml.malformed')
+                $fail('laranail/validation::validation.xml.malformed')
                     ->translate(['reason' => $this->firstError()]);
 
                 return;
@@ -66,7 +66,7 @@ final readonly class Xml implements ValidationRule
             if ($this->schema === '' || ! is_file($this->schema)) {
                 // A missing schema is a deployment fault, not a bad document.
                 // Failing the input would blame the user for it.
-                $fail('laranail-validation::validation.xml.schema_missing')->translate();
+                $fail('laranail/validation::validation.xml.schema_missing')->translate();
 
                 return;
             }
@@ -74,7 +74,7 @@ final readonly class Xml implements ValidationRule
             libxml_clear_errors();
 
             if (! $document->schemaValidate($this->schema)) {
-                $fail('laranail-validation::validation.xml.schema')
+                $fail('laranail/validation::validation.xml.schema')
                     ->translate(['reason' => $this->firstError()]);
             }
         } finally {

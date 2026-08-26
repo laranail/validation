@@ -28,7 +28,7 @@ final readonly class UnixTimestamp implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! $this->passes($value)) {
-            $fail('laranail-validation::validation.unix_timestamp')->translate();
+            $fail('laranail/validation::validation.unix_timestamp')->translate();
         }
     }
 

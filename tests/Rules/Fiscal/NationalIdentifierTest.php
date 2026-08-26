@@ -151,5 +151,5 @@ it('names the country in its failure, without echoing the number', function (): 
         return new PotentiallyTranslatedString('', resolve(Translator::class));
     });
 
-    expect($message)->toBe('laranail-validation::validation.national_identifier');
+    expect($message)->toBe('laranail/validation::validation.national_identifier');
 });

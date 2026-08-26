@@ -53,7 +53,7 @@ final readonly class UsState implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->includeTerritories)) {
-            $fail('laranail-validation::validation.us_state')->translate();
+            $fail('laranail/validation::validation.us_state')->translate();
         }
     }
 

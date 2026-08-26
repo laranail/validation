@@ -45,7 +45,7 @@ final readonly class Vin implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->checkDigit)) {
-            $fail('laranail-validation::validation.vin')->translate();
+            $fail('laranail/validation::validation.vin')->translate();
         }
     }
 

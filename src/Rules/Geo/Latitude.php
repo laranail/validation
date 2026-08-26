@@ -21,7 +21,7 @@ final class Latitude implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! Coordinate::isWithin($value, 90.0)) {
-            $fail('laranail-validation::validation.latitude')->translate();
+            $fail('laranail/validation::validation.latitude')->translate();
         }
     }
 

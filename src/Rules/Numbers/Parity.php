@@ -34,7 +34,7 @@ final readonly class Parity implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->parity)) {
-            $fail('laranail-validation::validation.parity.' . $this->normalised())->translate();
+            $fail('laranail/validation::validation.parity.' . $this->normalised())->translate();
         }
     }
 

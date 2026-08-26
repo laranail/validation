@@ -72,7 +72,7 @@ final readonly class HashDigest implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || preg_match($this->pattern(), $value) !== 1) {
-            $fail('laranail-validation::validation.hash_digest')->translate(['length' => $this->length]);
+            $fail('laranail/validation::validation.hash_digest')->translate(['length' => $this->length]);
         }
     }
 

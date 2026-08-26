@@ -37,7 +37,7 @@ final class EthereumAddress implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
-            $fail('laranail-validation::validation.ethereum_address')->translate();
+            $fail('laranail/validation::validation.ethereum_address')->translate();
         }
     }
 

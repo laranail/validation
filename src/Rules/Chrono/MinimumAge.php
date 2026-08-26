@@ -33,7 +33,7 @@ final readonly class MinimumAge implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! $this->passes($value)) {
-            $fail('laranail-validation::validation.minimum_age')->translate(['years' => $this->years]);
+            $fail('laranail/validation::validation.minimum_age')->translate(['years' => $this->years]);
         }
     }
 

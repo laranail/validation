@@ -31,7 +31,7 @@ final class TimezoneAbbreviation implements ValidationRule
         self::$abbreviations ??= array_fill_keys(array_keys(DateTimeZone::listAbbreviations()), true);
 
         if (! is_string($value) || ! isset(self::$abbreviations[strtolower($value)])) {
-            $fail('laranail-validation::validation.timezone_abbreviation')->translate();
+            $fail('laranail/validation::validation.timezone_abbreviation')->translate();
         }
     }
 }

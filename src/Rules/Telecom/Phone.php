@@ -68,7 +68,7 @@ final class Phone implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) && ! is_int($value)) {
-            $fail('laranail-validation::validation.phone')->translate();
+            $fail('laranail/validation::validation.phone')->translate();
 
             return;
         }
@@ -76,39 +76,39 @@ final class Phone implements DataAwareRule, ValidationRule
         $number = $this->formatter()->parse((string) $value, $this->resolveCountry());
 
         if ($number->isEmpty()) {
-            $fail('laranail-validation::validation.phone')->translate();
+            $fail('laranail/validation::validation.phone')->translate();
 
             return;
         }
 
         if (! $this->allowExtension && $number->extension !== null) {
-            $fail('laranail-validation::validation.phone_extension')->translate();
+            $fail('laranail/validation::validation.phone_extension')->translate();
 
             return;
         }
 
         if ($this->possibleOnly ? ! $number->isPossible : ! $number->isValid) {
             $fail($this->possibleOnly
-                ? 'laranail-validation::validation.phone_possible'
-                : 'laranail-validation::validation.phone')->translate();
+                ? 'laranail/validation::validation.phone_possible'
+                : 'laranail/validation::validation.phone')->translate();
 
             return;
         }
 
         if ($this->rejectEmergency && $number->type === PhoneNumberType::Emergency) {
-            $fail('laranail-validation::validation.phone_emergency')->translate();
+            $fail('laranail/validation::validation.phone_emergency')->translate();
 
             return;
         }
 
         if ($this->rejectShortNumbers && $number->type === PhoneNumberType::ShortCode) {
-            $fail('laranail-validation::validation.phone_short_code')->translate();
+            $fail('laranail/validation::validation.phone_short_code')->translate();
 
             return;
         }
 
         if (! $this->countryMatches($number)) {
-            $fail('laranail-validation::validation.phone_country')->translate([
+            $fail('laranail/validation::validation.phone_country')->translate([
                 'country' => implode(', ', $this->countries),
             ]);
 
@@ -116,7 +116,7 @@ final class Phone implements DataAwareRule, ValidationRule
         }
 
         if (! $this->typeMatches($number)) {
-            $fail('laranail-validation::validation.phone_type')->translate([
+            $fail('laranail/validation::validation.phone_type')->translate([
                 'type' => implode(', ', array_map(
                     static fn (PhoneNumberType $type): string => strtolower($type->label()),
                     $this->types,

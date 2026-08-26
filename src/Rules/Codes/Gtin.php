@@ -40,7 +40,7 @@ final readonly class Gtin implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->lengths)) {
-            $fail('laranail-validation::validation.gtin')->translate();
+            $fail('laranail/validation::validation.gtin')->translate();
         }
     }
 

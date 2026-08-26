@@ -35,13 +35,13 @@ final class NoSubaddressing implements ValidationRule
         $address = Address::split($value);
 
         if ($address === null) {
-            $fail('laranail-validation::validation.email.malformed')->translate();
+            $fail('laranail/validation::validation.email.malformed')->translate();
 
             return;
         }
 
         if (str_contains($address[0], '+')) {
-            $fail('laranail-validation::validation.email.subaddress')->translate();
+            $fail('laranail/validation::validation.email.subaddress')->translate();
         }
     }
 

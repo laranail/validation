@@ -27,7 +27,7 @@ final class PublicIp implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || ! IpClassifier::isPubliclyRoutable($value)) {
-            $fail('laranail-validation::validation.public_ip')->translate();
+            $fail('laranail/validation::validation.public_ip')->translate();
         }
     }
 }

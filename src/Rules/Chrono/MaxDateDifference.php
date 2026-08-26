@@ -49,7 +49,7 @@ final class MaxDateDifference implements DataAwareRule, ValidationRule
 
         if (! $reference instanceof DateTimeImmutable || ! $subject instanceof DateTimeImmutable
             || abs($subject->getTimestamp() - $reference->getTimestamp()) > $this->hours * 3600) {
-            $fail('laranail-validation::validation.max_date_difference')
+            $fail('laranail/validation::validation.max_date_difference')
                 ->translate(['hours' => $this->hours]);
         }
     }

@@ -50,7 +50,7 @@ final class DeliverableEmail implements PrecognitionSkippable, ValidationRule
         $address = Address::split($value);
 
         if ($address === null) {
-            $fail('laranail-validation::validation.email.malformed')->translate();
+            $fail('laranail/validation::validation.email.malformed')->translate();
 
             return;
         }
@@ -62,7 +62,7 @@ final class DeliverableEmail implements PrecognitionSkippable, ValidationRule
         }
 
         if (! $this->resolver()->hasMailExchanger($address[1])) {
-            $fail('laranail-validation::validation.email.undeliverable')->translate();
+            $fail('laranail/validation::validation.email.undeliverable')->translate();
         }
     }
 

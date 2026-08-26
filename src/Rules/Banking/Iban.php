@@ -53,7 +53,7 @@ final class Iban implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.iban')->translate();
+            $fail('laranail/validation::validation.iban')->translate();
         }
     }
 

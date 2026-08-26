@@ -44,7 +44,7 @@ final readonly class DomainName implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->requireTld)) {
-            $fail('laranail-validation::validation.domain_name')->translate();
+            $fail('laranail/validation::validation.domain_name')->translate();
         }
     }
 

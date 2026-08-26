@@ -25,7 +25,7 @@ final class Isin implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.isin')->translate();
+            $fail('laranail/validation::validation.isin')->translate();
         }
     }
 

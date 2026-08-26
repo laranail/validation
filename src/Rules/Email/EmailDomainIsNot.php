@@ -31,13 +31,13 @@ final readonly class EmailDomainIsNot implements ValidationRule
         $address = Address::split($value);
 
         if ($address === null) {
-            $fail('laranail-validation::validation.email.malformed')->translate();
+            $fail('laranail/validation::validation.email.malformed')->translate();
 
             return;
         }
 
         if (EmailDomainIs::matches($address[1], $this->domains)) {
-            $fail('laranail-validation::validation.email.domain_is_not')
+            $fail('laranail/validation::validation.email.domain_is_not')
                 ->translate(['domains' => implode(', ', $this->domains)]);
         }
     }

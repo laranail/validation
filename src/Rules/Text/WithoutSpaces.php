@@ -25,7 +25,7 @@ final class WithoutSpaces implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) || preg_match(self::WHITESPACE, $value) === 1) {
-            $fail('laranail-validation::validation.without_spaces')->translate();
+            $fail('laranail/validation::validation.without_spaces')->translate();
         }
     }
 

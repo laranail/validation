@@ -65,7 +65,7 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->vendor)) {
-            $fail('laranail-validation::validation.vendor_identifier')
+            $fail('laranail/validation::validation.vendor_identifier')
                 ->translate(['vendor' => str_replace('_', ' ', mb_strtolower(trim($this->vendor)))]);
         }
     }

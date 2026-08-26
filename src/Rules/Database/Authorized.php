@@ -45,7 +45,7 @@ final readonly class Authorized implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value) && ! is_int($value)) {
-            $fail('laranail-validation::validation.authorized')->translate();
+            $fail('laranail/validation::validation.authorized')->translate();
 
             return;
         }
@@ -60,7 +60,7 @@ final readonly class Authorized implements ValidationRule
         // them would let a caller enumerate valid ids by watching which
         // message comes back.
         if (! $record instanceof Model) {
-            $fail('laranail-validation::validation.authorized')->translate();
+            $fail('laranail/validation::validation.authorized')->translate();
 
             return;
         }
@@ -72,7 +72,7 @@ final readonly class Authorized implements ValidationRule
         }
 
         if (! $gate->allows($this->ability, [$record, ...$this->arguments])) {
-            $fail('laranail-validation::validation.authorized')->translate();
+            $fail('laranail/validation::validation.authorized')->translate();
         }
     }
 }

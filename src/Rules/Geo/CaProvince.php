@@ -47,7 +47,7 @@ final class CaProvince implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value)) {
-            $fail('laranail-validation::validation.ca_province')->translate();
+            $fail('laranail/validation::validation.ca_province')->translate();
         }
     }
 

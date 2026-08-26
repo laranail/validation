@@ -47,7 +47,7 @@ final class CardCvc implements DataAwareRule, ValidationRule
     {
         if (! is_string($value) || ! ctype_digit($value)
             || ! in_array(strlen($value), $this->allowedLengths(), true)) {
-            $fail('laranail-validation::validation.card_cvc')->translate();
+            $fail('laranail/validation::validation.card_cvc')->translate();
         }
     }
 
