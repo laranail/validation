@@ -46,7 +46,7 @@ it('ends every provider namespace in Providers', function (): void {
         preg_match('/^namespace\s+([^;]+);/m', (string) file_get_contents((string) $file->getPathname()), $m);
 
         expect($m[1] ?? '')->toEndWith('\\Providers');
-        $checked++;
+        ++$checked;
     }
 
     expect($checked)->toBeGreaterThan(0);
