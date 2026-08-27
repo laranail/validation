@@ -76,7 +76,7 @@
     "require-dev": {
         "driftingly/rector-laravel": "^2.3",
         "laranail/phone": "^0.1@dev",
-        "laranail/validation-js": "dev-main",
+        "laranail/validation-js": "^0.1",
         "larastan/larastan": "^3.9.3",
         "laravel/pao": "^1.1",
         "laravel/pint": "^1.29",
