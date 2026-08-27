@@ -122,8 +122,8 @@ Everything marked `@internal` — the fast-check compiler, the optimizer validat
 machinery, everything under `Internal\` — may change in a minor, and an arch test enforces the
 boundary. Build on the stable list; the optimizer is an implementation detail behind it.
 
-Constrain to `^2.0` and read [UPGRADING.md](UPGRADING.md) before moving between versions —
-`rector-migrate-2.0.php` auto-migrates the mechanical 1.x break (the service provider moved into
+Constrain to `^0.1` and read [UPGRADING.md](UPGRADING.md) before moving between versions —
+`rector-migrate-0.1.php` auto-migrates the mechanical break (the service provider moved into
 `Providers/`), and `rector-migrate-1.0.php` still covers the 0.x one. Deprecations post-1.0 are
 marked `@deprecated` with the replacement and removal version, kept for at least one minor,
 and removed only in the next major. Behaviour-correcting fixes can still mean input an

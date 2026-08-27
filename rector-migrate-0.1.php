@@ -6,17 +6,17 @@ use Rector\Config\RectorConfig;
 use Rector\Renaming\Rector\Name\RenameClassRector;
 
 /**
- * The 1.x → 2.0 migration set (UPGRADING.md, v2.0.0). Run it against an
+ * The v0.1.0 migration set (UPGRADING.md). Run it against an
  * application's own code:
  *
  *   vendor/bin/rector process app/ \
- *       --config vendor/laranail/validation/rector-migrate-2.0.php
+ *       --config vendor/laranail/validation/rector-migrate-0.1.php
  *
  * It applies the mechanical break only — the service provider moved into a
  * `Providers/` sub-namespace, and anything naming the class explicitly needs
  * the new name. Auto-discovered registrations need nothing.
  *
- * The other 2.0 break, the `laranail-validation::` → `laranail/validation::`
+ * The other break, the `laranail-validation::` → `laranail/validation::`
  * translation namespace, is a change to string literals. Rector has no clean
  * rule for that, and a rule that rewrote arbitrary strings would be worse than
  * the find-and-replace UPGRADING.md gives you.

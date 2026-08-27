@@ -8,11 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Entries below `Unreleased` are written by CI from the GitHub release body — see
 [docs/release.md](docs/release.md). Do not hand-edit released sections.
 
+> **One published release: `v0.1.0`.** The org floors every package at `v0.1.0` while pre-stable, so
+> that tag is the only one consumers resolve and it moves as the package moves. Sections under
+> *Internal history* below were cut as tags during development and later withdrawn; their content is
+> part of `v0.1.0`. They are kept for provenance, not because those versions are installable.
+
 ## Unreleased
 
 _Nothing yet._
 
-## v2.0.0 - 2026-08-27
+## v0.1.0 - 2026-08-27
 
 Two breaking changes that landed on `main` during org-wide sweeps and were never written down.
 Both are mechanical; the provider rename is codemod-able.
@@ -38,7 +43,7 @@ Both are mechanical; the provider rename is codemod-able.
 
   Package auto-discovery handles this on its own. Anything that names the class explicitly — a
   Testbench `getPackageProviders()`, a manual entry in `config/app.php`, a `testbench.yaml` — fatals
-  with "class not found" until it is updated. `rector-migrate-2.0.php` rewrites it.
+  with "class not found" until it is updated. `rector-migrate-0.1.php` rewrites it.
 
   The move brings the package in line with the family convention that every provider sits in a
   `Providers/` directory, which Laravel's own skeleton does with `app/Providers`.
@@ -53,6 +58,11 @@ Both are mechanical; the provider rename is codemod-able.
 
 - Package paths resolve through `package-tools`' `packagePath()` rather than hand-counted
   `__DIR__ . '/../..'` strings, which cannot drift when a file moves.
+
+## Internal history (not published)
+
+These were tagged during development and the tags have since been withdrawn. Nothing here is
+separately installable — it all ships inside `v0.1.0` above.
 
 ## v1.0.1 - 2026-08-24
 

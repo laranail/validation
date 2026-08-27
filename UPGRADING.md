@@ -2,12 +2,12 @@
 
 Breaking changes, and what to do about them. Versions not listed here need no action.
 
-## v2.0.0 - 2026-08-27
+## v0.1.0 - 2026-08-27
 
 The provider rename below can be applied automatically:
 
 ```bash
-vendor/bin/rector process app/ --config vendor/laranail/validation/rector-migrate-2.0.php
+vendor/bin/rector process app/ --config vendor/laranail/validation/rector-migrate-0.1.php
 ```
 
 The config declares no paths of its own, so pass them: `app/` at minimum, and usually `tests/` too —

@@ -78,7 +78,7 @@ no such section exists. So there is one order, and tagging is the last step in i
    ```
    Empty output means the release job will fail on its first step.
 3. Commit the changelog entry to `main`.
-4. Tag the release commit with the `v`-prefixed version — `v2.0.0`. Composer reads either form, and
+4. Tag the release commit with the `v`-prefixed version — `v0.1.0`. Composer reads either form, and
    the `v` prefix is what the repo's existing tags, the org convention, and the tag-currency check
    (`verify-tag-currency.sh` filters on `^v`) all agree on. This page once said "bare version"; that
    sentence contradicted all three and the script never matched it. Releases are real SemVer points —
