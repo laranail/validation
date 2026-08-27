@@ -30,7 +30,7 @@
         }
     ],
     "name": "laranail/validation",
-    "description": "Fluent validation rule builders for Laravel — type-aware rule objects, structured array validation, and an optimized wildcard validator.",
+    "description": "Fluent validation rule builders for Laravel \u2014 type-aware rule objects, structured array validation, and an optimized wildcard validator.",
     "keywords": [
         "laravel",
         "laranail",
@@ -91,7 +91,7 @@
         "phpstan/phpstan-deprecation-rules": "^2.0.4",
         "phpstan/phpstan-phpunit": "^2.0.16",
         "phpstan/phpstan-strict-rules": "^2.0.10",
-        "rector/rector": "^2.4.1",
+        "rector/rector": "^2.4.1 <2.6.4",
         "sandermuller/boost-skills": "^2.5",
         "sandermuller/package-boost-laravel": "^1.0",
         "spaze/phpstan-disallowed-calls": "^4.10",
@@ -100,11 +100,11 @@
         "tomasvotruba/type-coverage": "^2.3.4"
     },
     "suggest": {
-        "laranail/email": "^0.1 — maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
-        "laranail/phone": "^0.1 — required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
-        "nikic/php-parser": "^5.0 — required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder.",
-        "laranail/password-history": "^0.1 — reuse prevention: password()->notReused() appears when installed.",
-        "laranail/password-tools": "^0.2 — zxcvbn strength scoring and secure generators: password()->strength(3) appears when installed."
+        "laranail/email": "^0.1 \u2014 maintained disposable-domain and role-account lists plus a production DNS resolver, bound over the Contracts\\Email\\* fallbacks this package ships. Nothing you call changes.",
+        "laranail/phone": "^0.1 \u2014 required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
+        "nikic/php-parser": "^5.0 \u2014 required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder.",
+        "laranail/password-history": "^0.1 \u2014 reuse prevention: password()->notReused() appears when installed.",
+        "laranail/password-tools": "^0.2 \u2014 zxcvbn strength scoring and secure generators: password()->strength(3) appears when installed."
     },
     "autoload": {
         "psr-4": {
@@ -148,7 +148,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-main": "0.1.x-dev"
         }
     },
     "config": {

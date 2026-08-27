@@ -2,6 +2,71 @@
 
 Breaking changes, and what to do about them. Versions not listed here need no action.
 
+## v0.1.0 - 2026-08-27
+
+The provider rename below can be applied automatically:
+
+```bash
+vendor/bin/rector process app/ --config vendor/laranail/validation/rector-migrate-0.1.php
+```
+
+The config declares no paths of its own, so pass them: `app/` at minimum, and usually `tests/` too —
+a Testbench `getPackageProviders()` is the single most common place the old class name survives.
+`config/` and `bootstrap/` are worth a pass. `testbench.yaml` is not PHP, so Rector will not see it;
+grep for the old name there by hand.
+
+The translation-key rename is a string change, which Rector has no clean rule for. It is a
+find-and-replace, described below.
+
+
+### The service provider moved into `Providers/`
+
+| Before | After |
+|---|---|
+| `Simtabi\Laranail\Validation\ValidationServiceProvider` | `Simtabi\Laranail\Validation\Providers\ValidationServiceProvider` |
+
+**Most applications need no change.** Laravel's package auto-discovery finds the provider through
+`composer.json`, which moved with it.
+
+You need this change if you name the class yourself:
+
+- a Testbench `getPackageProviders()` in a test case,
+- a manual entry in `config/app.php` or `bootstrap/providers.php`,
+- a `testbench.yaml` `providers:` list — worth grepping for specifically, since it is neither
+  `.php` nor `.json` and a namespace sweep over source files misses it.
+
+Left unchanged, it fatals with "class not found" the moment the provider is registered — at boot,
+for the whole application.
+
+### The translation namespace is now `laranail/validation::`
+
+| Before | After |
+|---|---|
+| `laranail-validation::validation.iban` | `laranail/validation::validation.iban` |
+| `lang/vendor/laranail-validation/` | `lang/vendor/laranail/validation/` |
+
+**There is no alias.** The old namespace is not registered at all, so a key spelled the old way
+returns *itself* — `laranail-validation::validation.iban` renders where the message should be. No
+exception is raised, which is what makes this worth checking for rather than waiting to notice.
+
+Two places to look:
+
+```bash
+grep -rn 'laranail-validation::' app/ resources/ config/ lang/
+ls lang/vendor/laranail-validation 2>/dev/null   # a published override, now read from elsewhere
+```
+
+If you published the translations, move the directory:
+
+```bash
+mkdir -p lang/vendor/laranail
+git mv lang/vendor/laranail-validation lang/vendor/laranail/validation
+```
+
+That nesting is not incidental — Laravel interpolates the namespace into the override path itself
+(`FileLoader::loadNamespaceOverrides()` reads
+`{$path}/vendor/{$namespace}/{$locale}/{$group}.php`), so the slash is exactly where it looks.
+
 ## v1.0.0 - 2026-08-24
 
 The mechanical break below (`getEachRules()`) can be applied automatically:
