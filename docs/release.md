@@ -70,18 +70,33 @@ requests, and weekly, since a tag can also be moved on the remote without any pu
    tag-currency check (`verify-tag-currency.sh` filters on `^v`) all agree on. This page once
    said "bare version"; that sentence contradicted all three and the script never matched it.
    Releases are real SemVer points — the pre-1.0 moving-tag model is retired for this package.
-2. Create the GitHub release against that tag, titled the same (`v0.1.1`).
-3. Write a real description in the release body. Summarise what changed and why, in prose — an
-   empty body or a bare "see CHANGELOG" is not a release description. This body becomes the
-   changelog entry, so it is the version's permanent record.
+**Write the changelog section first.** `release.yml` fires on the tag push and *extracts* the
+`## vX.Y.Z` section out of `CHANGELOG.md` to use as the release body — and `exit 1`s if no such
+section exists. So the order is: write the entry, commit it, then tag.
+
+1. Write the version's section in `CHANGELOG.md`, headed `## vX.Y.Z - <date>`. Real prose about
+   what changed and why; this becomes the release body and is the version's permanent record. The
+   heading has to match `^## (\[)?(v)?X.Y.Z([] ]|$)`, which is what the extractor greps for.
+2. Confirm it extracts before you tag anything:
+   ```bash
+   awk -v ver="X.Y.Z" '$0 ~ "^## (\\[)?(v)?"ver"([] ]|$)" { grab = 1; next } grab && /^## / { exit } grab { print }' CHANGELOG.md
+   ```
+   Empty output means the release job will fail on its first step.
+3. Tag and push. Everything else is CI's: it creates the release, injects the benchmark table
+   between the markers it appends itself, and attaches the SBOM.
+
+> This page used to say "create the GitHub release, then write a description in the body", with
+> the changelog written back afterwards. That was the older flow. `update-changelog.yml` still
+> exists for it, but it now only backfills a release authored by hand and skips when the section is
+> already present — which, on the normal path, it is.
 
 ## What CI does afterwards
 
 Publishing the release (`release: released`) fires three workflows:
 
-- **Update Changelog** prepends the release body to `CHANGELOG.md` and commits it back to the
-  release's target branch. This is why `CHANGELOG.md` is never hand-edited as part of a
-  release — a manual entry will be duplicated.
+- **Update Changelog** backfills `CHANGELOG.md` from the release body, and *only* when the section
+  is missing — a release authored by hand in the GitHub UI. On the normal path the section is
+  already there, because it is what the body was built from, and this job does nothing.
 - **Release Benchmark** re-runs the benchmark suite against the tagged commit and injects the
   results table into the release body, between the `<!-- benchmark-start -->` and
   `<!-- benchmark-end -->` markers. Those markers must already be present in the body for the
