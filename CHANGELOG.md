@@ -8,6 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Entries below `Unreleased` are written by CI from the GitHub release body — see
 [docs/release.md](docs/release.md). Do not hand-edit released sections.
 
+## Unreleased
+
+_Nothing yet._
+
 ## v2.0.0 - 2026-08-27
 
 Two breaking changes that landed on `main` during org-wide sweeps and were never written down.

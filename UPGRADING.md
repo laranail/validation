@@ -7,8 +7,13 @@ Breaking changes, and what to do about them. Versions not listed here need no ac
 The provider rename below can be applied automatically:
 
 ```bash
-vendor/bin/rector process --config vendor/laranail/validation/rector-migrate-2.0.php
+vendor/bin/rector process app/ --config vendor/laranail/validation/rector-migrate-2.0.php
 ```
+
+The config declares no paths of its own, so pass them: `app/` at minimum, and usually `tests/` too —
+a Testbench `getPackageProviders()` is the single most common place the old class name survives.
+`config/` and `bootstrap/` are worth a pass. `testbench.yaml` is not PHP, so Rector will not see it;
+grep for the old name there by hand.
 
 The translation-key rename is a string change, which Rector has no clean rule for. It is a
 find-and-replace, described below.

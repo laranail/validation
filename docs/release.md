@@ -65,14 +65,9 @@ requests, and weekly, since a tag can also be moved on the remote without any pu
 
 ## Cutting the release
 
-1. Tag the release commit with the `v`-prefixed version — `v0.1.1`. Composer reads either
-   form, and the `v` prefix is what the repo's existing tags, the org convention, and the
-   tag-currency check (`verify-tag-currency.sh` filters on `^v`) all agree on. This page once
-   said "bare version"; that sentence contradicted all three and the script never matched it.
-   Releases are real SemVer points — the pre-1.0 moving-tag model is retired for this package.
-**Write the changelog section first.** `release.yml` fires on the tag push and *extracts* the
-`## vX.Y.Z` section out of `CHANGELOG.md` to use as the release body — and `exit 1`s if no such
-section exists. So the order is: write the entry, commit it, then tag.
+**The changelog comes first, and the tag is the trigger.** `release.yml` fires on the tag push and
+*extracts* the `## vX.Y.Z` section out of `CHANGELOG.md` to use as the release body — and `exit 1`s if
+no such section exists. So there is one order, and tagging is the last step in it.
 
 1. Write the version's section in `CHANGELOG.md`, headed `## vX.Y.Z - <date>`. Real prose about
    what changed and why; this becomes the release body and is the version's permanent record. The
@@ -82,7 +77,13 @@ section exists. So the order is: write the entry, commit it, then tag.
    awk -v ver="X.Y.Z" '$0 ~ "^## (\\[)?(v)?"ver"([] ]|$)" { grab = 1; next } grab && /^## / { exit } grab { print }' CHANGELOG.md
    ```
    Empty output means the release job will fail on its first step.
-3. Tag and push. Everything else is CI's: it creates the release, injects the benchmark table
+3. Commit the changelog entry to `main`.
+4. Tag the release commit with the `v`-prefixed version — `v2.0.0`. Composer reads either form, and
+   the `v` prefix is what the repo's existing tags, the org convention, and the tag-currency check
+   (`verify-tag-currency.sh` filters on `^v`) all agree on. This page once said "bare version"; that
+   sentence contradicted all three and the script never matched it. Releases are real SemVer points —
+   the pre-1.0 moving-tag model is retired for this package.
+5. Push the tag. Everything else is CI's: it creates the release, injects the benchmark table
    between the markers it appends itself, and attaches the SBOM.
 
 > This page used to say "create the GitHub release, then write a description in the body", with
