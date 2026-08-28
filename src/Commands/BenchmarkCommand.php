@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Commands;
 
+use Symfony\Component\Process\Process;
 use Simtabi\Laranail\Console\Tools\Commands\Command;
 use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
-use Symfony\Component\Process\Process;
 
 /**
  * The official face of the repo's benchmark harness. `benchmark.php` is a

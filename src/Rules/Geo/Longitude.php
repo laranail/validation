@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Geo;
 
@@ -37,6 +39,7 @@ final class Longitude implements ClientCheckable, ValidationRule
      * `between` compares by VALUE rather than string length here because the
      * `numeric` rule is present — that is how Laravel decides the unit, and
      * the runner follows it.
+     *
      * @return array<int, array<string, string|mixed[]>|array<string, string|array<string, string>>>
      */
     /**

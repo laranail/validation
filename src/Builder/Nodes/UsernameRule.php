@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Text\Username;
 
 /**
  * A username field.
@@ -118,7 +120,7 @@ class UsernameRule implements DataAwareRule, FluentRuleContract, ValidatorAwareR
      * ->reserved([...Username::DEFAULT_RESERVED, 'acme', 'enterprise'])
      * ```
      *
-     * @param  list<string>  $names
+     * @param list<string> $names
      */
     public function reserved(array $names): static
     {
@@ -130,7 +132,7 @@ class UsernameRule implements DataAwareRule, FluentRuleContract, ValidatorAwareR
     /**
      * Add to the shipped list rather than replacing it.
      *
-     * @param  list<string>|string  $names
+     * @param list<string>|string $names
      */
     public function alsoReserved(array|string $names): static
     {

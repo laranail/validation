@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Colour\Support;
 
@@ -17,9 +19,6 @@ namespace Simtabi\Laranail\Validation\Rules\Colour\Support;
  */
 final class Names
 {
-    /** @var array<string, true>|null */
-    private static ?array $lookup = null;
-
     /** @var list<string> */
     private const array NAMES = [
         'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black',
@@ -47,6 +46,9 @@ final class Names
         'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white',
         'whitesmoke', 'yellow', 'yellowgreen',
     ];
+
+    /** @var array<string, true>|null */
+    private static ?array $lookup = null;
 
     public static function has(string $value): bool
     {

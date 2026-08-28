@@ -1,20 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Validation\PresenceVerifierInterface;
+use Throwable;
+use Stringable;
+use ReflectionProperty;
+use ReflectionException;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use ReflectionException;
-use ReflectionProperty;
-use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
-use Simtabi\Laranail\Validation\Internal\BatchPresenceQuery;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\PresenceVerifierInterface;
 use Simtabi\Laranail\Validation\Internal\BatchRuleShape;
-use Simtabi\Laranail\Validation\Internal\PresenceMatchFidelity;
+use Simtabi\Laranail\Validation\Internal\BatchPresenceQuery;
 use Simtabi\Laranail\Validation\Internal\ValueTypePredicates;
-use Stringable;
-use Throwable;
+use Simtabi\Laranail\Validation\Internal\PresenceMatchFidelity;
+use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 
 /**
  * Batches exists/unique database validation queries for wildcard arrays.
@@ -78,8 +80,9 @@ final class BatchDatabaseChecker
     /**
      * Batch-query which values exist in the database for an Exists rule.
      *
-     * @param  array<int, mixed>  $values  Deduplicated, non-null values to check
-     * @return array<int, mixed>  Values that exist in the DB
+     * @param array<int, mixed> $values Deduplicated, non-null values to check
+     *
+     * @return array<int, mixed> Values that exist in the DB
      */
     public static function fetchExisting(array $values, Exists $rule): array
     {
@@ -99,8 +102,9 @@ final class BatchDatabaseChecker
     /**
      * Batch-query which values are already taken for a Unique rule.
      *
-     * @param  array<int, mixed>  $values  Deduplicated, non-null values to check
-     * @return array<int, mixed>  Values that already exist (taken)
+     * @param array<int, mixed> $values Deduplicated, non-null values to check
+     *
+     * @return array<int, mixed> Values that already exist (taken)
      */
     public static function fetchTaken(array $values, Unique $rule): array
     {
@@ -164,8 +168,9 @@ final class BatchDatabaseChecker
     /**
      * Find batchable Exists/Unique rules in a set of compiled rules.
      *
-     * @param  array<string, mixed>  $rules
-     * @return array<string, Exists|Unique>  Field name → rule object
+     * @param array<string, mixed> $rules
+     *
+     * @return array<string, Exists|Unique> Field name → rule object
      */
     public static function findBatchableRules(array $rules): array
     {
@@ -190,9 +195,10 @@ final class BatchDatabaseChecker
     /**
      * Collect values from items for batchable rules and group by table:column.
      *
-     * @param  array<string, Exists|Unique>  $batchableFields
-     * @param  array<int|string, mixed>  $items
-     * @param  array<string, mixed>  $fieldRules  Per-field rule array used to derive type predicates.
+     * @param array<string, Exists|Unique> $batchableFields
+     * @param array<int|string, mixed> $items
+     * @param array<string, mixed> $fieldRules Per-field rule array used to derive type predicates.
+     *
      * @return array<string, array{rule: Exists|Unique, values: list<mixed>}>
      */
     public static function collectValues(array $batchableFields, array $items, bool $isScalar, array $fieldRules = []): array
@@ -261,8 +267,9 @@ final class BatchDatabaseChecker
      * Unlike collectValues() which iterates items, this iterates expanded
      * rules like 'items.0.email', 'items.1.email' and uses data_get().
      *
-     * @param  array<string, mixed>  $preparedRules  Expanded rules with concrete paths
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $preparedRules Expanded rules with concrete paths
+     * @param array<string, mixed> $data
+     *
      * @return array<string, array{rule: Exists|Unique, values: list<mixed>}>
      */
     public static function collectExpandedValues(array $preparedRules, array $data): array
@@ -320,18 +327,6 @@ final class BatchDatabaseChecker
     }
 
     /**
-     * Build the grouping key for a batched rule. Disambiguates exists / unique
-     * against the same (table, column) so a validator carrying both rules
-     * does not conflate them.
-     */
-    private static function groupKey(string $table, string $column, Exists|Unique $rule): string
-    {
-        return $table . ':' . $column . ':'
-            . ($rule instanceof Unique ? 'unique' : 'exists') . ':'
-            . BatchRuleShape::of(self::extractMeta($rule));
-    }
-
-    /**
      * Filter values against per-item string-form type rules (integer, numeric,
      * uuid, ulid, string). Values that would never pass per-item validation
      * are dropped here so the batched whereIn query never sees them —
@@ -341,8 +336,9 @@ final class BatchDatabaseChecker
      * Object-form rules fall through unchanged; if no known type rule is
      * present, values are returned as-is (matches previous behaviour).
      *
-     * @param  array<mixed>  $values
-     * @param  array<mixed>|string  $itemRules  Either a pipe-delimited string or an array of rules.
+     * @param array<mixed> $values
+     * @param array<mixed>|string $itemRules Either a pipe-delimited string or an array of rules.
+     *
      * @return array<int, mixed>
      */
     public static function filterValuesByType(array $values, array|string $itemRules): array
@@ -356,9 +352,9 @@ final class BatchDatabaseChecker
      * Groups arrive already filtered (Phase 1) and deduplicated (collectors
      * own the dedup). Canonical order is filter → dedup → cap check → query.
      *
-     * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups
-     * @param  array<string, true>  $poisonedTableColumns  Extra table:columns that must not
-     *                                                     register a lookup ({@see findPoisonedTableColumns})
+     * @param array<string, array{rule: Exists|Unique, values: list<mixed>}> $groups
+     * @param array<string, true> $poisonedTableColumns Extra table:columns that must not
+     *                                                  register a lookup ({@see findPoisonedTableColumns})
      *
      * @throws BatchLimitExceededException When any group's value count exceeds `$maxValuesPerGroup`.
      */
@@ -389,35 +385,6 @@ final class BatchDatabaseChecker
     }
 
     /**
-     * Throw `BatchLimitExceededException` if any group exceeds the hard cap.
-     * Called after filter/dedup so the cap sees the same normalised set the
-     * query will.
-     *
-     * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups
-     */
-    private static function assertWithinCap(array $groups): void
-    {
-        foreach ($groups as $key => $group) {
-            $count = count($group['values']);
-
-            if ($count <= self::$maxValuesPerGroup) {
-                continue;
-            }
-
-            [$table, $column, $ruleType] = self::parseGroupKey($key);
-
-            throw new BatchLimitExceededException(
-                table: $table,
-                column: $column,
-                ruleType: $ruleType,
-                reason: BatchLimitExceededException::REASON_HARD_CAP,
-                valueCount: $count,
-                limit: self::$maxValuesPerGroup,
-            );
-        }
-    }
-
-    /**
      * Batch-query and register lookups on a verifier for a set of grouped rules.
      *
      * Groups are already filtered + deduped by the collector — no further
@@ -432,13 +399,14 @@ final class BatchDatabaseChecker
      * handles each rule correctly via per-item queries. Rare case, small
      * perf hit — exists and unique on the same (table, column) is unusual.
      *
-     * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups  Keyed by "table:column:ruleType"
-     * @param  array<string, true>  $poisonedTableColumns  Table:columns claimed by rules the
-     *                                                     collectors never saw (a field's second DB rule,
-     *                                                     non-batchable or string-form rules) — treated
-     *                                                     exactly like a detected group conflict.
-     * @return bool  False if any group was skipped, so the caller knows a
-     *               fallback verifier is required to answer it.
+     * @param array<string, array{rule: Exists|Unique, values: list<mixed>}> $groups Keyed by "table:column:ruleType"
+     * @param array<string, true> $poisonedTableColumns Table:columns claimed by rules the
+     *                                                  collectors never saw (a field's second DB rule,
+     *                                                  non-batchable or string-form rules) — treated
+     *                                                  exactly like a detected group conflict.
+     *
+     * @return bool False if any group was skipped, so the caller knows a
+     *              fallback verifier is required to answer it.
      */
     public static function registerLookups(PrecomputedPresenceVerifier $verifier, array $groups, array $poisonedTableColumns = []): bool
     {
@@ -477,11 +445,71 @@ final class BatchDatabaseChecker
     }
 
     /**
+     * Deduplicate and cast values to strings for batch queries.
+     *
+     * @param array<mixed> $values
+     *
+     * @return list<string>
+     */
+    public static function uniqueStringValues(array $values): array
+    {
+        return array_values(array_unique(
+            array_map(
+                static fn (mixed $v): string => is_scalar($v) || $v instanceof Stringable ? (string) $v : '',
+                $values,
+            ),
+            SORT_STRING,
+        ));
+    }
+
+    /**
+     * Build the grouping key for a batched rule. Disambiguates exists / unique
+     * against the same (table, column) so a validator carrying both rules
+     * does not conflate them.
+     */
+    private static function groupKey(string $table, string $column, Exists|Unique $rule): string
+    {
+        return $table . ':' . $column . ':'
+            . ($rule instanceof Unique ? 'unique' : 'exists') . ':'
+            . BatchRuleShape::of(self::extractMeta($rule));
+    }
+
+    /**
+     * Throw `BatchLimitExceededException` if any group exceeds the hard cap.
+     * Called after filter/dedup so the cap sees the same normalised set the
+     * query will.
+     *
+     * @param array<string, array{rule: Exists|Unique, values: list<mixed>}> $groups
+     */
+    private static function assertWithinCap(array $groups): void
+    {
+        foreach ($groups as $key => $group) {
+            $count = count($group['values']);
+
+            if ($count <= self::$maxValuesPerGroup) {
+                continue;
+            }
+
+            [$table, $column, $ruleType] = self::parseGroupKey($key);
+
+            throw new BatchLimitExceededException(
+                table: $table,
+                column: $column,
+                ruleType: $ruleType,
+                reason: BatchLimitExceededException::REASON_HARD_CAP,
+                valueCount: $count,
+                limit: self::$maxValuesPerGroup,
+            );
+        }
+    }
+
+    /**
      * Return the set of "table:column" strings that appear under more than
      * one rule type in the grouped rules (i.e. both an exists and a unique
      * group exist for the same physical column).
      *
-     * @param  array<string, array{rule: Exists|Unique, values: list<mixed>}>  $groups
+     * @param array<string, array{rule: Exists|Unique, values: list<mixed>}> $groups
+     *
      * @return array<string, true>
      */
     private static function findConflictingTableColumns(array $groups): array
@@ -565,32 +593,15 @@ final class BatchDatabaseChecker
 
             return [
                 'connection' => $connection,
-                'table' => $table,
-                'column' => $column === 'NULL' ? '' : $column,
-                'wheres' => $typedWheres,
-                'ignore' => $ignore,
-                'idColumn' => $idColumn,
+                'table'      => $table,
+                'column'     => $column === 'NULL' ? '' : $column,
+                'wheres'     => $typedWheres,
+                'ignore'     => $ignore,
+                'idColumn'   => $idColumn,
             ];
         } catch (ReflectionException) {
             return null;
         }
-    }
-
-    /**
-     * Deduplicate and cast values to strings for batch queries.
-     *
-     * @param  array<mixed>  $values
-     * @return list<string>
-     */
-    public static function uniqueStringValues(array $values): array
-    {
-        return array_values(array_unique(
-            array_map(
-                static fn (mixed $v): string => is_scalar($v) || $v instanceof Stringable ? (string) $v : '',
-                $values,
-            ),
-            SORT_STRING,
-        ));
     }
 
     private static function readProperty(object $object, string $property): mixed

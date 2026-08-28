@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\AntiSpam;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Date;
 use Throwable;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * The form was not submitted impossibly fast.
@@ -48,30 +50,6 @@ final readonly class SubmissionTiming implements ValidationRule
             ->getTimestamp());
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        $elapsed = self::elapsed($value);
-
-        if ($elapsed === null) {
-            // Undecryptable means tampered or from another key. Same message
-            // as too-fast: distinguishing them tells an attacker which lever
-            // they pulled.
-            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
-
-            return;
-        }
-
-        if ($elapsed < $this->minimumSeconds) {
-            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
-
-            return;
-        }
-
-        if ($elapsed > $this->maximumSeconds) {
-            $fail('laranail/validation::validation.submission_timing.expired')->translate();
-        }
-    }
-
     /** Seconds since the token was issued, or null if it is not a token we made. */
     public static function elapsed(mixed $value): ?int
     {
@@ -95,5 +73,29 @@ final readonly class SubmissionTiming implements ValidationRule
         // A token from the future is a clock skew or a forgery; either way it
         // is not a measurement.
         return $elapsed < 0 ? null : $elapsed;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        $elapsed = self::elapsed($value);
+
+        if ($elapsed === null) {
+            // Undecryptable means tampered or from another key. Same message
+            // as too-fast: distinguishing them tells an attacker which lever
+            // they pulled.
+            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
+
+            return;
+        }
+
+        if ($elapsed < $this->minimumSeconds) {
+            $fail('laranail/validation::validation.submission_timing.too_fast')->translate();
+
+            return;
+        }
+
+        if ($elapsed > $this->maximumSeconds) {
+            $fail('laranail/validation::validation.submission_timing.expired')->translate();
+        }
     }
 }

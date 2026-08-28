@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\Rules\Codes\Asin;
 use Simtabi\Laranail\Validation\Rules\Codes\Ismn;
@@ -9,7 +11,7 @@ use Simtabi\Laranail\Validation\Rules\Codes\UpcE;
 // =========================================================================
 
 it('accepts valid ISMNs, bare and formatted', function (string $value): void {
-    expect(ruleAccepts(new Ismn(), $value))->toBeTrue();
+    expect(ruleAccepts(new Ismn, $value))->toBeTrue();
 })->with([
     '9790060115615',        // a real published ISMN
     '979-0-060-11561-5',
@@ -18,7 +20,7 @@ it('accepts valid ISMNs, bare and formatted', function (string $value): void {
 ]);
 
 it('rejects ISMNs with the wrong prefix, length or check digit', function (mixed $value): void {
-    expect(ruleAccepts(new Ismn(), $value))->toBeFalse();
+    expect(ruleAccepts(new Ismn, $value))->toBeFalse();
 })->with([
     '9790060115614',   // bad check digit
     '9780060115616',   // 978 is ISBN territory, not ISMN
@@ -34,7 +36,7 @@ it('rejects ISMNs with the wrong prefix, length or check digit', function (mixed
 // =========================================================================
 
 it('accepts modern B-prefixed ASINs and ISBN-10 ASINs', function (string $value): void {
-    expect(ruleAccepts(new Asin(), $value))->toBeTrue();
+    expect(ruleAccepts(new Asin, $value))->toBeTrue();
 })->with([
     'B01LYCLS24',
     'B000002L5R',
@@ -45,7 +47,7 @@ it('accepts modern B-prefixed ASINs and ISBN-10 ASINs', function (string $value)
 it('rejects lowercase, wrong-length and checksum-failing ASINs', function (mixed $value): void {
     // The legacy rule accepted any 10 alphanumerics; the ISBN-10 branch has a
     // checksum and the B branch is uppercase — both are enforced now.
-    expect(ruleAccepts(new Asin(), $value))->toBeFalse();
+    expect(ruleAccepts(new Asin, $value))->toBeFalse();
 })->with([
     'b01lycls24',   // lowercase
     'B01LYCLS2',    // 9 chars
@@ -62,7 +64,7 @@ it('rejects lowercase, wrong-length and checksum-failing ASINs', function (mixed
 // =========================================================================
 
 it('accepts valid UPC-E codes across the expansion patterns', function (string $value): void {
-    expect(ruleAccepts(new UpcE(), $value))->toBeTrue();
+    expect(ruleAccepts(new UpcE, $value))->toBeTrue();
 })->with([
     '04252614',  // the textbook pair: expands to UPC-A 042100005264
     '01234531',  // last-digit-3 expansion pattern
@@ -74,7 +76,7 @@ it('rejects UPC-E codes the legacy checksum would have passed', function (mixed 
     // The check digit belongs to the EXPANDED UPC-A, not to the 8 compressed
     // digits — checksumming the compressed form (as the legacy rule did) both
     // accepts invalid codes and rejects valid ones.
-    expect(ruleAccepts(new UpcE(), $value))->toBeFalse();
+    expect(ruleAccepts(new UpcE, $value))->toBeFalse();
 })->with([
     '04252615',   // bad check digit
     '24252614',   // number system 2 does not exist in UPC-E

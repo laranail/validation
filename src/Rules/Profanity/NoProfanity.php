@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Profanity;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Normalizer;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Contracts\TermList;
 
 /**
@@ -50,13 +52,50 @@ final class NoProfanity implements ValidationRule
     private ?array $normalisedAllowed = null;
 
     /**
-     * @param  TermList|list<string>  $terms
-     * @param  list<string>  $allowed  Ignored when $terms is a TermList, which carries its own.
+     * @param TermList|list<string> $terms
+     * @param list<string> $allowed Ignored when $terms is a TermList, which carries its own.
      */
     public function __construct(
         private readonly TermList|array $terms,
         private readonly array $allowed = [],
     ) {}
+
+    /**
+     * Fold a value to the form the terms are compared against.
+     *
+     * Lowercase, decomposed to strip accents, and common character
+     * substitutions undone. Separators and repeated characters are left
+     * ALONE — {@see pattern()} absorbs those, and rewriting them here would
+     * destroy the word boundaries that stop `ass` matching inside `assess`.
+     */
+    public static function normalise(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+
+        // Full-width and other compatibility forms first: ｓｈｉｔ is not
+        // otherwise the same string as shit.
+        if (class_exists(Normalizer::class)) {
+            $decomposed = Normalizer::normalize($value, Normalizer::FORM_KD);
+
+            if (is_string($decomposed) && $decomposed !== '') {
+                $value = $decomposed;
+            }
+        }
+
+        // Strip combining marks left by the decomposition, so shít folds to shit.
+        $stripped = preg_replace('/\p{M}+/u', '', $value);
+
+        if (is_string($stripped)) {
+            $value = $stripped;
+        }
+
+        $value = strtr($value, [
+            '4' => 'a', '@' => 'a', '3' => 'e', '1' => 'i', '!' => 'i',
+            '0' => 'o', '5' => 's', '$' => 's', '7' => 't', '+' => 't',
+        ]);
+
+        return trim($value);
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -145,43 +184,6 @@ final class NoProfanity implements ValidationRule
         return '/\b' . $body . '\b/u';
     }
 
-    /**
-     * Fold a value to the form the terms are compared against.
-     *
-     * Lowercase, decomposed to strip accents, and common character
-     * substitutions undone. Separators and repeated characters are left
-     * ALONE — {@see pattern()} absorbs those, and rewriting them here would
-     * destroy the word boundaries that stop `ass` matching inside `assess`.
-     */
-    public static function normalise(string $value): string
-    {
-        $value = mb_strtolower(trim($value));
-
-        // Full-width and other compatibility forms first: ｓｈｉｔ is not
-        // otherwise the same string as shit.
-        if (class_exists(Normalizer::class)) {
-            $decomposed = Normalizer::normalize($value, Normalizer::FORM_KD);
-
-            if (is_string($decomposed) && $decomposed !== '') {
-                $value = $decomposed;
-            }
-        }
-
-        // Strip combining marks left by the decomposition, so shít folds to shit.
-        $stripped = preg_replace('/\p{M}+/u', '', $value);
-
-        if (is_string($stripped)) {
-            $value = $stripped;
-        }
-
-        $value = strtr($value, [
-            '4' => 'a', '@' => 'a', '3' => 'e', '1' => 'i', '!' => 'i',
-            '0' => 'o', '5' => 's', '$' => 's', '7' => 't', '+' => 't',
-        ]);
-
-        return trim($value);
-    }
-
     /** @return list<string> */
     private function terms(): array
     {
@@ -195,7 +197,8 @@ final class NoProfanity implements ValidationRule
     }
 
     /**
-     * @param  list<string>  $values
+     * @param list<string> $values
+     *
      * @return list<string>
      */
     private function normaliseAll(array $values): array

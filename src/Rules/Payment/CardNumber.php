@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Payment;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 
 /**
  * A payment card number: brand identified by IIN range (via the
@@ -34,12 +36,35 @@ use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 final class CardNumber implements ValidationRule
 {
     /**
-     * @param  list<string>|null  $brands  Accepted brand slugs; null accepts the whole catalogue.
+     * @param list<string>|null $brands Accepted brand slugs; null accepts the whole catalogue.
      */
     public function __construct(
         private readonly ?array $brands = null,
         private ?CardBrandCatalogue $catalogue = null,
     ) {}
+
+    public static function luhnPasses(string $digits): bool
+    {
+        $sum = 0;
+        $double = false;
+
+        for ($i = strlen($digits) - 1; $i >= 0; $i--) {
+            $digit = (int) $digits[$i];
+
+            if ($double) {
+                $digit *= 2;
+
+                if ($digit > 9) {
+                    $digit -= 9;
+                }
+            }
+
+            $sum += $digit;
+            $double = ! $double;
+        }
+
+        return $sum % 10 === 0;
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -74,7 +99,7 @@ final class CardNumber implements ValidationRule
         if (! in_array(strlen($digits), $brand->lengths, true)) {
             $this->fail($fail, 'card_number_length', [
                 'lengths' => implode(' or ', $brand->lengths),
-                'brand' => $brand->displayName,
+                'brand'   => $brand->displayName,
             ]);
 
             return;
@@ -85,37 +110,14 @@ final class CardNumber implements ValidationRule
         }
     }
 
-    public static function luhnPasses(string $digits): bool
-    {
-        $sum = 0;
-        $double = false;
-
-        for ($i = strlen($digits) - 1; $i >= 0; --$i) {
-            $digit = (int) $digits[$i];
-
-            if ($double) {
-                $digit *= 2;
-
-                if ($digit > 9) {
-                    $digit -= 9;
-                }
-            }
-
-            $sum += $digit;
-            $double = ! $double;
-        }
-
-        return $sum % 10 === 0;
-    }
-
     private function catalogue(): CardBrandCatalogue
     {
         return $this->catalogue ??= resolve(CardBrandCatalogue::class);
     }
 
     /**
-     * @param  Closure(string): PotentiallyTranslatedString  $fail
-     * @param  array<string, string>  $parameters
+     * @param Closure(string): PotentiallyTranslatedString $fail
+     * @param array<string, string> $parameters
      */
     private function fail(Closure $fail, string $key, array $parameters = []): void
     {

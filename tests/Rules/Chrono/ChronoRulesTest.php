@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
-use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
-use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
-use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
 use Simtabi\Laranail\Validation\Rules\Chrono\Rfc3339;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
 use Simtabi\Laranail\Validation\Rules\Chrono\TimeOfDay;
-use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
+use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
 use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
+use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
 
 afterEach(function (): void {
     Date::setTestNow();
@@ -22,7 +24,7 @@ afterEach(function (): void {
 it('accepts RFC 3339 timestamps, including the forms PHP itself fumbles', function (string $value): void {
     // PHP's own RFC3339 createFromFormat rejects 'Z' and bare-second forms —
     // the laravel/framework#35387 class the legacy rule worked around.
-    expect(ruleAccepts(new Rfc3339(), $value))->toBeTrue();
+    expect(ruleAccepts(new Rfc3339, $value))->toBeTrue();
 })->with([
     '2020-12-21T23:59:59+00:00',
     '2020-12-21T23:59:59Z',
@@ -34,7 +36,7 @@ it('accepts RFC 3339 timestamps, including the forms PHP itself fumbles', functi
 ]);
 
 it('rejects timestamps that only look like RFC 3339', function (mixed $value): void {
-    expect(ruleAccepts(new Rfc3339(), $value))->toBeFalse();
+    expect(ruleAccepts(new Rfc3339, $value))->toBeFalse();
 })->with([
     '2023-02-29T00:00:00Z',        // not a leap year
     '2020-02-30T00:00:00Z',        // no such date
@@ -53,11 +55,11 @@ it('rejects timestamps that only look like RFC 3339', function (mixed $value): v
 // =========================================================================
 
 it('accepts 24-hour times, with and without seconds', function (string $value): void {
-    expect(ruleAccepts(new TimeOfDay(), $value))->toBeTrue();
+    expect(ruleAccepts(new TimeOfDay, $value))->toBeTrue();
 })->with(['00:00', '9:30', '23:59', '23:59:59']);
 
 it('rejects out-of-range 24-hour times and meridiems', function (mixed $value): void {
-    expect(ruleAccepts(new TimeOfDay(), $value))->toBeFalse();
+    expect(ruleAccepts(new TimeOfDay, $value))->toBeFalse();
 })->with(['24:00', '23:60', '23:59:60', '9:05 PM', '930', 930, null]);
 
 it('accepts 12-hour times only with a meridiem', function (): void {
@@ -82,11 +84,11 @@ it('honours a custom separator', function (): void {
 // =========================================================================
 
 it('accepts canonical unix timestamps', function (mixed $value): void {
-    expect(ruleAccepts(new UnixTimestamp(), $value))->toBeTrue();
+    expect(ruleAccepts(new UnixTimestamp, $value))->toBeTrue();
 })->with(['1724457600', [1724457600], '0', [0]]);
 
 it('rejects floats, leading zeros and pre-epoch values by default', function (mixed $value): void {
-    expect(ruleAccepts(new UnixTimestamp(), $value))->toBeFalse();
+    expect(ruleAccepts(new UnixTimestamp, $value))->toBeFalse();
 })->with(['1.5', [1.5], '01', '-1', [-1], '12a', '+5', null]);
 
 it('accepts pre-epoch timestamps only when asked to', function (): void {
@@ -100,11 +102,11 @@ it('accepts pre-epoch timestamps only when asked to', function (): void {
 // =========================================================================
 
 it('accepts ISO 8601 durations', function (string $value): void {
-    expect(ruleAccepts(new DateInterval(), $value))->toBeTrue();
+    expect(ruleAccepts(new DateInterval, $value))->toBeTrue();
 })->with(['P1Y', 'PT30M', 'P1DT12H', 'P0Y']);
 
 it('rejects strings DateInterval cannot parse', function (mixed $value): void {
-    expect(ruleAccepts(new DateInterval(), $value))->toBeFalse();
+    expect(ruleAccepts(new DateInterval, $value))->toBeFalse();
 })->with(['1 day', 'p1y', 'P', 'PT', 'P1H', 12, null]);
 
 it('treats zero as non-positive when positivity is required', function (): void {
@@ -152,7 +154,7 @@ it('bounds the distance from a fixed reference', function (): void {
 it('reads an @-prefixed reference from a sibling field', function (): void {
     $rules = [
         'start_at' => 'required',
-        'end_at' => [new MaxDateDifference(48, '@start_at')],
+        'end_at'   => [new MaxDateDifference(48, '@start_at')],
     ];
 
     expect(Validator::make(
@@ -171,13 +173,13 @@ it('reads an @-prefixed reference from a sibling field', function (): void {
 // =========================================================================
 
 it('accepts timezone abbreviations in any case', function (string $value): void {
-    expect(ruleAccepts(new TimezoneAbbreviation(), $value))->toBeTrue();
+    expect(ruleAccepts(new TimezoneAbbreviation, $value))->toBeTrue();
 })->with(['EST', 'cet', 'EAT', 'utc']);
 
 it('rejects identifiers and unknown abbreviations', function (mixed $value): void {
     // 'Europe/Berlin' is a timezone IDENTIFIER — Laravel's own `timezone`
     // rule covers those; this rule is the abbreviation set that rule rejects.
-    expect(ruleAccepts(new TimezoneAbbreviation(), $value))->toBeFalse();
+    expect(ruleAccepts(new TimezoneAbbreviation, $value))->toBeFalse();
 })->with(['XYZ', 'Europe/Berlin', 'GMT+2', 123, null]);
 
 // =========================================================================

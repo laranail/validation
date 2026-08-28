@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Geo;
 
@@ -50,13 +52,6 @@ final readonly class UsState implements ValidationRule
 
     public function __construct(private bool $includeTerritories = false) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->includeTerritories)) {
-            $fail('laranail/validation::validation.us_state')->translate();
-        }
-    }
-
     public static function passes(mixed $value, bool $includeTerritories = false): bool
     {
         if (! is_string($value)) {
@@ -67,5 +62,12 @@ final readonly class UsState implements ValidationRule
             $value,
             $includeTerritories ? self::STATES + self::TERRITORIES : self::STATES,
         );
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->includeTerritories)) {
+            $fail('laranail/validation::validation.us_state')->translate();
+        }
     }
 }

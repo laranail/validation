@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Concerns;
 
-use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Container\Container;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 /**

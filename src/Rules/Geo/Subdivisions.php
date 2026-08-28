@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Geo;
 
@@ -17,7 +19,7 @@ final class Subdivisions
      * answer from a user's point of view and differ only in how carefully the
      * form was filled in.
      *
-     * @param  array<string, string>  $subdivisions  code => name
+     * @param array<string, string> $subdivisions code => name
      */
     public static function contains(string $value, array $subdivisions): bool
     {

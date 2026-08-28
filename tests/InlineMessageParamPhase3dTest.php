@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
 
@@ -10,22 +12,22 @@ use Simtabi\Laranail\Validation\FluentRule;
 dataset('phase3d_email', [
     'max' => [
         fn () => FluentRule::email()->max(255, message: 'x'),
-        fn () => FluentRule::email()->max(255)->message('x'),
+        fn ()  => FluentRule::email()->max(255)->message('x'),
         ['max' => 'x'],
     ],
     'confirmed' => [
         fn () => FluentRule::email()->confirmed(message: 'x'),
-        fn () => FluentRule::email()->confirmed()->message('x'),
+        fn ()        => FluentRule::email()->confirmed()->message('x'),
         ['confirmed' => 'x'],
     ],
     'same' => [
         fn () => FluentRule::email()->same('other', message: 'x'),
-        fn () => FluentRule::email()->same('other')->message('x'),
+        fn ()   => FluentRule::email()->same('other')->message('x'),
         ['same' => 'x'],
     ],
     'different' => [
         fn () => FluentRule::email()->different('other', message: 'x'),
-        fn () => FluentRule::email()->different('other')->message('x'),
+        fn ()        => FluentRule::email()->different('other')->message('x'),
         ['different' => 'x'],
     ],
 ]);
@@ -33,7 +35,7 @@ dataset('phase3d_email', [
 dataset('phase3d_password', [
     'confirmed' => [
         fn () => FluentRule::password()->confirmed(message: 'x'),
-        fn () => FluentRule::password()->confirmed()->message('x'),
+        fn ()        => FluentRule::password()->confirmed()->message('x'),
         ['confirmed' => 'x'],
     ],
 ]);
@@ -41,12 +43,12 @@ dataset('phase3d_password', [
 dataset('phase3d_boolean', [
     'accepted' => [
         fn () => FluentRule::boolean()->accepted(message: 'x'),
-        fn () => FluentRule::boolean()->accepted()->message('x'),
+        fn ()       => FluentRule::boolean()->accepted()->message('x'),
         ['accepted' => 'x'],
     ],
     'declined' => [
         fn () => FluentRule::boolean()->declined(message: 'x'),
-        fn () => FluentRule::boolean()->declined()->message('x'),
+        fn ()       => FluentRule::boolean()->declined()->message('x'),
         ['declined' => 'x'],
     ],
 ]);
@@ -54,17 +56,17 @@ dataset('phase3d_boolean', [
 dataset('phase3d_field', [
     'same' => [
         fn () => FluentRule::field()->same('other', message: 'x'),
-        fn () => FluentRule::field()->same('other')->message('x'),
+        fn ()   => FluentRule::field()->same('other')->message('x'),
         ['same' => 'x'],
     ],
     'different' => [
         fn () => FluentRule::field()->different('other', message: 'x'),
-        fn () => FluentRule::field()->different('other')->message('x'),
+        fn ()        => FluentRule::field()->different('other')->message('x'),
         ['different' => 'x'],
     ],
     'confirmed' => [
         fn () => FluentRule::field()->confirmed(message: 'x'),
-        fn () => FluentRule::field()->confirmed()->message('x'),
+        fn ()        => FluentRule::field()->confirmed()->message('x'),
         ['confirmed' => 'x'],
     ],
 ]);
@@ -141,7 +143,7 @@ it('PasswordRule::mixedCase is a mode modifier; does not accept message:', funct
 it('EmailRule::max(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['email' => 'a@' . str_repeat('b', 300) . '.com'],
-        ['email' => FluentRule::email()->max(50, message: 'Too long!')]
+        ['email' => FluentRule::email()->max(50, message: 'Too long!')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -151,7 +153,7 @@ it('EmailRule::max(message: ...) surfaces in validation', function (): void {
 it('BooleanRule::accepted(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['tos' => false],
-        ['tos' => FluentRule::boolean()->accepted(message: 'Must accept.')]
+        ['tos' => FluentRule::boolean()->accepted(message: 'Must accept.')],
     );
 
     expect($v->passes())->toBeFalse()

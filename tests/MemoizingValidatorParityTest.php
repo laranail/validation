@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Translation\ArrayLoader;
-use Illuminate\Translation\Translator;
+declare(strict_types=1);
+
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator as BaseValidator;
+use Illuminate\Translation\Translator;
+use Illuminate\Translation\ArrayLoader;
 use Simtabi\Laranail\Validation\MemoizingValidator;
 use Simtabi\Laranail\Validation\OptimizedValidator;
+use Illuminate\Validation\Validator as BaseValidator;
 
 /**
  * Parity suite for {@see MemoizingValidator}. The class memoizes string-rule
@@ -27,8 +29,9 @@ beforeEach(function (): void {
 });
 
 /**
- * @param  array<array-key, mixed>  $data
- * @param  array<array-key, mixed>  $rules
+ * @param array<array-key, mixed> $data
+ * @param array<array-key, mixed> $rules
+ *
  * @return array{0: BaseValidator, 1: MemoizingValidator}
  */
 function memoParityPair(array $data, array $rules): array
@@ -36,7 +39,7 @@ function memoParityPair(array $data, array $rules): array
     // A shared translator with no messages loaded: both validators emit the
     // same raw `validation.*` keys, so message parity is about structure and
     // ordering, not human strings.
-    $translator = new Translator(new ArrayLoader(), 'en');
+    $translator = new Translator(new ArrayLoader, 'en');
 
     return [
         new BaseValidator($translator, $data, $rules),
@@ -184,7 +187,7 @@ it('shares one static parse cache with OptimizedValidator (not redeclared)', fun
  * regexes) relies on the drop to avoid unbounded growth on long-lived workers.
  */
 it('caches up to the cap before resetting', function (): void {
-    for ($i = 1; $i <= 1024; ++$i) {
+    for ($i = 1; $i <= 1024; $i++) {
         [, $validator] = memoParityPair(['f' => 'x'], ['f' => 'max:' . $i]);
         $validator->passes();
     }
@@ -195,7 +198,7 @@ it('caches up to the cap before resetting', function (): void {
 });
 
 it('drops the cache after the cap is exceeded', function (): void {
-    for ($i = 1; $i <= 1024; ++$i) {
+    for ($i = 1; $i <= 1024; $i++) {
         [, $validator] = memoParityPair(['f' => 'x'], ['f' => 'max:' . $i]);
         $validator->passes();
     }

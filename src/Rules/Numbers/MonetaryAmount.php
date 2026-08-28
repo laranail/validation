@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Numbers;
 
@@ -35,14 +37,6 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
         private bool $allowNegative = false,
     ) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->decimals, $this->allowNegative)) {
-            $fail('laranail/validation::validation.monetary_amount')
-                ->translate(['decimals' => $this->decimals]);
-        }
-    }
-
     public static function passes(mixed $value, int $decimals = 2, bool $allowNegative = false): bool
     {
         if (is_int($value) || is_float($value)) {
@@ -78,6 +72,14 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
         $fraction = $decimals > 0 ? '(?:\\.\\d{1,' . $decimals . '})?' : '';
 
         return '/^' . $sign . '\\d+' . $fraction . '$/D';
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->decimals, $this->allowNegative)) {
+            $fail('laranail/validation::validation.monetary_amount')
+                ->translate(['decimals' => $this->decimals]);
+        }
     }
 
     /**

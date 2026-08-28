@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Crypto;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Rules\Crypto\Support\Base58Check;
 use Simtabi\Laranail\Validation\Rules\Crypto\Support\Bech32;
+use Simtabi\Laranail\Validation\Rules\Crypto\Support\Base58Check;
 
 /**
  * A Bitcoin address, checksum-verified rather than pattern-matched.
@@ -38,13 +40,6 @@ final readonly class BitcoinAddress implements ValidationRule
 
     public function __construct(private bool $testnet = false) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->testnet)) {
-            $fail('laranail/validation::validation.bitcoin_address')->translate();
-        }
-    }
-
     public static function passes(mixed $value, bool $testnet = false): bool
     {
         if (! is_string($value) || $value === '') {
@@ -70,5 +65,12 @@ final readonly class BitcoinAddress implements ValidationRule
                 : [self::MAINNET_P2PKH, self::MAINNET_P2SH],
             true,
         );
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->testnet)) {
+            $fail('laranail/validation::validation.bitcoin_address')->translate();
+        }
     }
 }

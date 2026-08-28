@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -95,7 +97,8 @@ final class ExcludeConditionExtractor
     }
 
     /**
-     * @param  array<int|string, mixed>  $segment
+     * @param array<int|string, mixed> $segment
+     *
      * @return array{action: string, field: string, values: list<string>}|null
      */
     private static function parseTuple(array $segment): ?array
@@ -113,7 +116,7 @@ final class ExcludeConditionExtractor
 
         return [
             'action' => $action,
-            'field' => $field,
+            'field'  => $field,
             'values' => array_map(
                 static fn (mixed $v): string => is_scalar($v) ? (string) $v : '',
                 array_values(array_slice($segment, 2)),
@@ -144,7 +147,7 @@ final class ExcludeConditionExtractor
 
             return [
                 'action' => $action,
-                'field' => $params[0],
+                'field'  => $params[0],
                 'values' => array_map(static fn (?string $v): string => (string) $v, array_slice($params, 1)),
             ];
         }

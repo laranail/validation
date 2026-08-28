@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * End-to-end fast-check parity harness: every cell runs the same rules and
@@ -50,7 +52,7 @@ function assertVerdictParity(string $rule, mixed $value): void
 {
     $shapes = [
         'top-level' => [['f' => $rule], ['f' => $value]],
-        'wildcard' => [['items.*.f' => $rule], ['items' => [['f' => $value], ['f' => $value]]]],
+        'wildcard'  => [['items.*.f' => $rule], ['items' => [['f' => $value], ['f' => $value]]]],
     ];
 
     foreach ($shapes as $shape => [$rules, $data]) {

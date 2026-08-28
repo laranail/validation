@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
 use Closure;
-use DateTimeImmutable;
 use Exception;
-use Illuminate\Contracts\Validation\ValidationRule;
 use LogicException;
+use DateTimeImmutable;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * A time whose minute component is one of the allowed values —
@@ -24,7 +26,7 @@ use LogicException;
 final readonly class MinuteIn implements ValidationRule
 {
     /**
-     * @param  list<int>  $minutes  Allowed minute values, each 0–59.
+     * @param list<int> $minutes Allowed minute values, each 0–59.
      */
     public function __construct(private array $minutes)
     {

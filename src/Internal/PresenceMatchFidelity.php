@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -40,8 +42,8 @@ final class PresenceMatchFidelity
      * one direction only: it can decline to batch a group that would have
      * been fine, never the reverse.
      *
-     * @param  list<mixed>  $values
-     * @param  array<int, mixed>  $fetched
+     * @param list<mixed> $values
+     * @param array<int, mixed> $fetched
      */
     public static function isFaithful(array $values, array $fetched): bool
     {

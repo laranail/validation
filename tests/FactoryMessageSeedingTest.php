@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Validation\Rules\Email;
 use Simtabi\Laranail\Validation\FluentRule;
@@ -14,7 +16,7 @@ use Simtabi\Laranail\Validation\FluentRule;
 it('StringRule: messageFor("string") surfaces on failing string rule', function (): void {
     $v = makeValidator(
         ['name' => 123],
-        ['name' => FluentRule::string()->messageFor('string', 'Must be text.')]
+        ['name' => FluentRule::string()->messageFor('string', 'Must be text.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -24,7 +26,7 @@ it('StringRule: messageFor("string") surfaces on failing string rule', function 
 it('NumericRule: messageFor("numeric") surfaces on failing numeric rule', function (): void {
     $v = makeValidator(
         ['age' => 'abc'],
-        ['age' => FluentRule::numeric()->messageFor('numeric', 'Must be a number.')]
+        ['age' => FluentRule::numeric()->messageFor('numeric', 'Must be a number.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -34,7 +36,7 @@ it('NumericRule: messageFor("numeric") surfaces on failing numeric rule', functi
 it('BooleanRule: messageFor("boolean") surfaces on failing boolean rule', function (): void {
     $v = makeValidator(
         ['active' => 'notabool'],
-        ['active' => FluentRule::boolean()->messageFor('boolean', 'Must be a boolean.')]
+        ['active' => FluentRule::boolean()->messageFor('boolean', 'Must be a boolean.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -44,7 +46,7 @@ it('BooleanRule: messageFor("boolean") surfaces on failing boolean rule', functi
 it('AcceptedRule: messageFor("accepted") surfaces on failing accepted rule', function (): void {
     $v = makeValidator(
         ['tos' => 'no'],
-        ['tos' => FluentRule::accepted()->messageFor('accepted', 'You must accept.')]
+        ['tos' => FluentRule::accepted()->messageFor('accepted', 'You must accept.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -54,7 +56,7 @@ it('AcceptedRule: messageFor("accepted") surfaces on failing accepted rule', fun
 it('DeclinedRule: messageFor("declined") surfaces on failing declined rule', function (): void {
     $v = makeValidator(
         ['opt_out' => 'yes'],
-        ['opt_out' => FluentRule::declined()->messageFor('declined', 'You must decline.')]
+        ['opt_out' => FluentRule::declined()->messageFor('declined', 'You must decline.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -64,7 +66,7 @@ it('DeclinedRule: messageFor("declined") surfaces on failing declined rule', fun
 it('FileRule: messageFor("file") surfaces on failing file rule', function (): void {
     $v = makeValidator(
         ['avatar' => 'notafile'],
-        ['avatar' => FluentRule::file()->messageFor('file', 'Must be a file.')]
+        ['avatar' => FluentRule::file()->messageFor('file', 'Must be a file.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -74,7 +76,7 @@ it('FileRule: messageFor("file") surfaces on failing file rule', function (): vo
 it('ImageRule: messageFor("image") surfaces on failing image rule', function (): void {
     $v = makeValidator(
         ['picture' => 'notanimage'],
-        ['picture' => FluentRule::image()->messageFor('image', 'Must be an image.')]
+        ['picture' => FluentRule::image()->messageFor('image', 'Must be an image.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -84,7 +86,7 @@ it('ImageRule: messageFor("image") surfaces on failing image rule', function ():
 it('ArrayRule: messageFor("array") surfaces on failing array rule', function (): void {
     $v = makeValidator(
         ['items' => 'notarray'],
-        ['items' => FluentRule::array()->messageFor('array', 'Must be an array.')]
+        ['items' => FluentRule::array()->messageFor('array', 'Must be an array.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -94,7 +96,7 @@ it('ArrayRule: messageFor("array") surfaces on failing array rule', function ():
 it('EmailRule: messageFor("email") surfaces on failing email rule (plain branch)', function (): void {
     $v = makeValidator(
         ['contact' => 'notanemail'],
-        ['contact' => FluentRule::email(defaults: false)->messageFor('email', 'Must be valid email.')]
+        ['contact' => FluentRule::email(defaults: false)->messageFor('email', 'Must be valid email.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -104,7 +106,7 @@ it('EmailRule: messageFor("email") surfaces on failing email rule (plain branch)
 it('EmailRule: messageFor("email") surfaces on failing email:modes branch', function (): void {
     $v = makeValidator(
         ['contact' => 'notanemail'],
-        ['contact' => FluentRule::email()->rfcCompliant()->messageFor('email', 'Must be valid email.')]
+        ['contact' => FluentRule::email()->rfcCompliant()->messageFor('email', 'Must be valid email.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -121,7 +123,7 @@ it('EmailRule: messageFor("email") surfaces on failing Email::default() object b
     try {
         $v = makeValidator(
             ['contact' => 'notanemail'],
-            ['contact' => FluentRule::email()->messageFor('email', 'Must be valid email.')]
+            ['contact' => FluentRule::email()->messageFor('email', 'Must be valid email.')],
         );
 
         expect($v->passes())->toBeFalse()
@@ -145,7 +147,7 @@ it('EmailRule: messageFor("email") surfaces on failing Email::default() object b
 it('StringRule: ->message() after factory binds to the implicit string rule', function (): void {
     $v = makeValidator(
         ['name' => 123],
-        ['name' => FluentRule::string()->message('Must be text.')]
+        ['name' => FluentRule::string()->message('Must be text.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -155,7 +157,7 @@ it('StringRule: ->message() after factory binds to the implicit string rule', fu
 it('NumericRule: ->message() after factory binds to the implicit numeric rule', function (): void {
     $v = makeValidator(
         ['age' => 'abc'],
-        ['age' => FluentRule::numeric()->message('Must be a number.')]
+        ['age' => FluentRule::numeric()->message('Must be a number.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -165,7 +167,7 @@ it('NumericRule: ->message() after factory binds to the implicit numeric rule', 
 it('BooleanRule: ->message() after factory binds to the implicit boolean rule', function (): void {
     $v = makeValidator(
         ['active' => 'notabool'],
-        ['active' => FluentRule::boolean()->message('Must be a boolean.')]
+        ['active' => FluentRule::boolean()->message('Must be a boolean.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -175,7 +177,7 @@ it('BooleanRule: ->message() after factory binds to the implicit boolean rule', 
 it('AcceptedRule: ->message() after factory binds to the implicit accepted rule', function (): void {
     $v = makeValidator(
         ['tos' => 'no'],
-        ['tos' => FluentRule::accepted()->message('You must accept.')]
+        ['tos' => FluentRule::accepted()->message('You must accept.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -185,7 +187,7 @@ it('AcceptedRule: ->message() after factory binds to the implicit accepted rule'
 it('DeclinedRule: ->message() after factory binds to the implicit declined rule', function (): void {
     $v = makeValidator(
         ['opt_out' => 'yes'],
-        ['opt_out' => FluentRule::declined()->message('You must decline.')]
+        ['opt_out' => FluentRule::declined()->message('You must decline.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -195,7 +197,7 @@ it('DeclinedRule: ->message() after factory binds to the implicit declined rule'
 it('FileRule: ->message() after factory binds to the implicit file rule', function (): void {
     $v = makeValidator(
         ['avatar' => 'notafile'],
-        ['avatar' => FluentRule::file()->message('Must be a file.')]
+        ['avatar' => FluentRule::file()->message('Must be a file.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -205,7 +207,7 @@ it('FileRule: ->message() after factory binds to the implicit file rule', functi
 it('ImageRule: ->message() after factory binds to the implicit image rule', function (): void {
     $v = makeValidator(
         ['picture' => 'notanimage'],
-        ['picture' => FluentRule::image()->message('Must be an image.')]
+        ['picture' => FluentRule::image()->message('Must be an image.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -215,7 +217,7 @@ it('ImageRule: ->message() after factory binds to the implicit image rule', func
 it('ArrayRule: ->message() after factory binds to the implicit array rule', function (): void {
     $v = makeValidator(
         ['items' => 'notarray'],
-        ['items' => FluentRule::array()->message('Must be an array.')]
+        ['items' => FluentRule::array()->message('Must be an array.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -225,7 +227,7 @@ it('ArrayRule: ->message() after factory binds to the implicit array rule', func
 it('EmailRule: ->message() after factory binds to the implicit email rule', function (): void {
     $v = makeValidator(
         ['contact' => 'notanemail'],
-        ['contact' => FluentRule::email(defaults: false)->message('Must be valid email.')]
+        ['contact' => FluentRule::email(defaults: false)->message('Must be valid email.')],
     );
 
     expect($v->passes())->toBeFalse()

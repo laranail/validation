@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Fiscal;
 
@@ -59,7 +61,7 @@ final readonly class VatNumber implements ValidationRule
     ];
 
     /**
-     * @param  list<string>|null  $countries  Accepted prefixes; null accepts every known one.
+     * @param list<string>|null $countries Accepted prefixes; null accepts every known one.
      */
     public function __construct(private ?array $countries = null) {}
 
@@ -90,14 +92,14 @@ final readonly class VatNumber implements ValidationRule
         }
 
         return match ($country) {
-            'NL' => $this->dutch($normalised, $tail),
-            'BE' => (int) substr($tail, 8, 2) === 97 - ((int) substr($tail, 0, 8) % 97),
-            'DE' => $this->germanMod11x10($tail),
-            'IT' => $this->italianLuhn($tail),
-            'SE' => str_ends_with($tail, '01') && $this->luhnPasses(substr($tail, 0, 10)),
-            'EL' => $this->greekPowerSum($tail),
-            'LU' => (int) substr($tail, 6, 2) === (int) substr($tail, 0, 6) % 89,
-            'FR' => $this->frenchKey($tail),
+            'NL'    => $this->dutch($normalised, $tail),
+            'BE'    => (int) substr($tail, 8, 2) === 97 - ((int) substr($tail, 0, 8) % 97),
+            'DE'    => $this->germanMod11x10($tail),
+            'IT'    => $this->italianLuhn($tail),
+            'SE'    => str_ends_with($tail, '01') && $this->luhnPasses(substr($tail, 0, 10)),
+            'EL'    => $this->greekPowerSum($tail),
+            'LU'    => (int) substr($tail, 6, 2) === (int) substr($tail, 0, 6) % 89,
+            'FR'    => $this->frenchKey($tail),
             default => true,
         };
     }
@@ -107,7 +109,7 @@ final readonly class VatNumber implements ValidationRule
     {
         $sum = 0;
 
-        for ($i = 0; $i < 8; ++$i) {
+        for ($i = 0; $i < 8; $i++) {
             $sum += ((int) $tail[$i]) * (9 - $i);
         }
 
@@ -136,7 +138,7 @@ final readonly class VatNumber implements ValidationRule
     {
         $product = 10;
 
-        for ($i = 0; $i < 8; ++$i) {
+        for ($i = 0; $i < 8; $i++) {
             $sum = (((int) $digits[$i]) + $product) % 10;
 
             if ($sum === 0) {
@@ -177,7 +179,7 @@ final readonly class VatNumber implements ValidationRule
     {
         $sum = 0;
 
-        for ($i = 0; $i < 8; ++$i) {
+        for ($i = 0; $i < 8; $i++) {
             $sum += ((int) $digits[$i]) * (2 ** (8 - $i));
         }
 
@@ -201,7 +203,7 @@ final readonly class VatNumber implements ValidationRule
         $sum = 0;
         $double = false;
 
-        for ($i = strlen($digits) - 1; $i >= 0; --$i) {
+        for ($i = strlen($digits) - 1; $i >= 0; $i--) {
             $digit = (int) $digits[$i];
 
             if ($double) {

@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Rules\Fiscal\VatNumber;
+use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
 
 // =========================================================================
 // VatNumber — checksum countries
@@ -11,7 +13,7 @@ it('accepts VAT numbers whose national checksum holds', function (string $value)
     // Each vector minted from the published algorithm, independently of the
     // rule's implementation. NL traced by hand: 1x9+2x8+3x7+4x6+5x5+6x4+7x3
     // +8x2 = 156, 156 mod 11 = 2 = the ninth digit.
-    expect(ruleAccepts(new VatNumber(), $value))->toBeTrue();
+    expect(ruleAccepts(new VatNumber, $value))->toBeTrue();
 })->with([
     'NL123456782B01',
     'BE0423456765',
@@ -25,7 +27,7 @@ it('accepts VAT numbers whose national checksum holds', function (string $value)
 
 it('rejects the same numbers with one digit off', function (string $value): void {
     // A pattern-only port would pass every one of these.
-    expect(ruleAccepts(new VatNumber(), $value))->toBeFalse();
+    expect(ruleAccepts(new VatNumber, $value))->toBeFalse();
 })->with([
     'NL123456783B01',
     'BE0423456766',
@@ -38,7 +40,7 @@ it('rejects the same numbers with one digit off', function (string $value): void
 ]);
 
 it('accepts pattern-only countries and punctuation people actually type', function (string $value): void {
-    expect(ruleAccepts(new VatNumber(), $value))->toBeTrue();
+    expect(ruleAccepts(new VatNumber, $value))->toBeTrue();
 })->with([
     'ATU12345678',
     'PL1234567890',
@@ -48,7 +50,7 @@ it('accepts pattern-only countries and punctuation people actually type', functi
 ]);
 
 it('rejects unknown prefixes and malformed tails', function (mixed $value): void {
-    expect(ruleAccepts(new VatNumber(), $value))->toBeFalse();
+    expect(ruleAccepts(new VatNumber, $value))->toBeFalse();
 })->with([
     'XX123456789',
     'NL123456782',      // missing the B-suffix

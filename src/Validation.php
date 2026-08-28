@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
@@ -25,6 +27,6 @@ final class Validation
      */
     public static function fake(): ValidationFake
     {
-        return new ValidationFake();
+        return new ValidationFake;
     }
 }

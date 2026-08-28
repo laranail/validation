@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Auth\GenericUser;
+declare(strict_types=1);
+
 use Livewire\Component;
+use Illuminate\Auth\GenericUser;
 use Simtabi\Laranail\Validation\Testing\FluentRulesTester;
 use Simtabi\Laranail\Validation\Tests\Fixtures\AppealLivewireComponent;
 

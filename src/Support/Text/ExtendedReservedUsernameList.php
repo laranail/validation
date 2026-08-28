@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support\Text;
 
-use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 use Simtabi\Laranail\Validation\Support\I18n\CodeFile;
+use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 
 /**
  * The full bundled reserved set: ~350 infrastructure, route and product

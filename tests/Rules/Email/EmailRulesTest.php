@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
-use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
-use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
-use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
-use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
+use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 
 /**
  * A list that answers yes to exactly the entries given.
@@ -17,11 +19,12 @@ use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
  * disposable and role rules — and so the tests exercise the same seam
  * laranail/email will use to swap in the real implementations.
  *
- * @param  list<string>  $entries
+ * @param list<string> $entries
  */
 function fakeList(array $entries): DisposableDomainList&RoleAccountList
 {
-    return new readonly class ($entries) implements DisposableDomainList, RoleAccountList {
+    return new readonly class($entries) implements DisposableDomainList, RoleAccountList
+    {
         /** @param  list<string>  $entries */
         public function __construct(private array $entries) {}
 
@@ -139,12 +142,12 @@ it('leaves an already-bound implementation alone', function (): void {
 });
 
 it('recognises real disposable domains through the bundled snapshot', function (): void {
-    $rule = new NotDisposableEmail(new BundledDisposableDomainList());
+    $rule = new NotDisposableEmail(new BundledDisposableDomainList);
 
     expect(ruleAccepts($rule, 'alice@mailinator.com'))->toBeFalse()
         ->and(ruleAccepts($rule, 'alice@gmail.com'))->toBeTrue();
 });
 
 it('recognises RFC 2142 role mailboxes through the bundled snapshot', function (string $local): void {
-    expect(ruleAccepts(new NotRoleEmail(new BundledRoleAccountList()), "{$local}@example.com"))->toBeFalse();
+    expect(ruleAccepts(new NotRoleEmail(new BundledRoleAccountList), "{$local}@example.com"))->toBeFalse();
 })->with(['postmaster', 'abuse', 'hostmaster', 'webmaster', 'info', 'sales', 'support']);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\Rules\Codes\Ean;
 use Simtabi\Laranail\Validation\Rules\Codes\Gtin;
@@ -12,7 +14,7 @@ use Simtabi\Laranail\Validation\Rules\Codes\Issn;
 // =========================================================================
 
 it('accepts valid GTINs of every width', function (string $value): void {
-    expect(ruleAccepts(new Gtin(), $value))->toBeTrue();
+    expect(ruleAccepts(new Gtin, $value))->toBeTrue();
 })->with([
     '96385074',        // GTIN-8
     '036000291452',    // GTIN-12 / UPC-A
@@ -21,7 +23,7 @@ it('accepts valid GTINs of every width', function (string $value): void {
 ]);
 
 it('rejects GTINs with a bad check digit', function (string $value): void {
-    expect(ruleAccepts(new Gtin(), $value))->toBeFalse();
+    expect(ruleAccepts(new Gtin, $value))->toBeFalse();
 })->with([
     '96385075',
     '036000291453',
@@ -31,7 +33,7 @@ it('rejects GTINs with a bad check digit', function (string $value): void {
 
 it('rejects GTINs of an impossible width', function (string $value): void {
     // 9, 10 and 11 digits are not GTIN widths at all, however the digits add up.
-    expect(ruleAccepts(new Gtin(), $value))->toBeFalse();
+    expect(ruleAccepts(new Gtin, $value))->toBeFalse();
 })->with(['9638507', '963850749', '0360002914', '03600029145']);
 
 it('can be narrowed to specific widths', function (): void {
@@ -39,7 +41,7 @@ it('can be narrowed to specific widths', function (): void {
 
     expect(ruleAccepts($thirteenOnly, '4006381333931'))->toBeTrue()
         ->and(ruleAccepts($thirteenOnly, '96385074'))->toBeFalse()
-        ->and(ruleAccepts(new Gtin(), '96385074'))->toBeTrue();
+        ->and(ruleAccepts(new Gtin, '96385074'))->toBeTrue();
 });
 
 it('weights the checksum from the right, not the left', function (): void {
@@ -57,14 +59,14 @@ it('weights the checksum from the right, not the left', function (): void {
 // =========================================================================
 
 it('accepts EAN-8 and EAN-13', function (string $value): void {
-    expect(ruleAccepts(new Ean(), $value))->toBeTrue();
+    expect(ruleAccepts(new Ean, $value))->toBeTrue();
 })->with(['96385074', '4006381333931']);
 
 it('rejects GTIN widths that are not retail EANs', function (string $value): void {
     // Valid GTINs, but a UPC-A and a shipping carton are not EANs. Accepting
     // them would let a carton code through where a retail code is meant.
-    expect(ruleAccepts(new Gtin(), $value))->toBeTrue()
-        ->and(ruleAccepts(new Ean(), $value))->toBeFalse();
+    expect(ruleAccepts(new Gtin, $value))->toBeTrue()
+        ->and(ruleAccepts(new Ean, $value))->toBeFalse();
 })->with(['036000291452', '00012345600012']);
 
 // =========================================================================
@@ -72,7 +74,7 @@ it('rejects GTIN widths that are not retail EANs', function (string $value): voi
 // =========================================================================
 
 it('accepts valid ISBN-10s', function (string $value): void {
-    expect(ruleAccepts(new Isbn(), $value))->toBeTrue();
+    expect(ruleAccepts(new Isbn, $value))->toBeTrue();
 })->with([
     '0306406152',
     '0-306-40615-2',   // hyphenated
@@ -82,7 +84,7 @@ it('accepts valid ISBN-10s', function (string $value): void {
 ]);
 
 it('accepts valid ISBN-13s', function (string $value): void {
-    expect(ruleAccepts(new Isbn(), $value))->toBeTrue();
+    expect(ruleAccepts(new Isbn, $value))->toBeTrue();
 })->with([
     '9780306406157',
     '978-0-306-40615-7',
@@ -90,7 +92,7 @@ it('accepts valid ISBN-13s', function (string $value): void {
 ]);
 
 it('rejects invalid ISBNs', function (string $value): void {
-    expect(ruleAccepts(new Isbn(), $value))->toBeFalse();
+    expect(ruleAccepts(new Isbn, $value))->toBeFalse();
 })->with([
     '0306406153',      // ISBN-10 check off by one
     '9780306406158',   // ISBN-13 check off by one
@@ -111,7 +113,7 @@ it('requires a book prefix for ISBN-13', function (): void {
     // 977 is the serials prefix. The GS1 checksum passes, so only the prefix
     // check distinguishes an ISSN-derived barcode from an ISBN.
     expect(Gtin::passes('9770306406158', [13]))->toBeTrue()
-        ->and(ruleAccepts(new Isbn(), '9770306406158'))->toBeFalse();
+        ->and(ruleAccepts(new Isbn, '9770306406158'))->toBeFalse();
 });
 
 // =========================================================================
@@ -119,7 +121,7 @@ it('requires a book prefix for ISBN-13', function (): void {
 // =========================================================================
 
 it('accepts valid ISSNs', function (string $value): void {
-    expect(ruleAccepts(new Issn(), $value))->toBeTrue();
+    expect(ruleAccepts(new Issn, $value))->toBeTrue();
 })->with([
     '0378-5955',
     '03785955',        // hyphen is optional
@@ -130,7 +132,7 @@ it('accepts valid ISSNs', function (string $value): void {
 ]);
 
 it('rejects invalid ISSNs', function (string $value): void {
-    expect(ruleAccepts(new Issn(), $value))->toBeFalse();
+    expect(ruleAccepts(new Issn, $value))->toBeFalse();
 })->with([
     '0378-5954',       // check off by one
     '0378595',         // too short

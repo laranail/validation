@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Fiscal;
 
@@ -49,14 +51,6 @@ final readonly class NationalIdentifier implements ValidationRule
 
     public function __construct(private string $country) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->country)) {
-            $fail('laranail/validation::validation.national_identifier')
-                ->translate(['country' => mb_strtoupper(trim($this->country))]);
-        }
-    }
-
     public static function passes(mixed $value, string $country): bool
     {
         if (! is_string($value)) {
@@ -70,8 +64,16 @@ final readonly class NationalIdentifier implements ValidationRule
             self::GB => self::britishNino($value),
             self::FR => self::frenchNir($value),
             self::VN => self::vietnameseCccd($value),
-            default => false,
+            default  => false,
         };
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->country)) {
+            $fail('laranail/validation::validation.national_identifier')
+                ->translate(['country' => mb_strtoupper(trim($this->country))]);
+        }
     }
 
     /**
@@ -93,7 +95,7 @@ final readonly class NationalIdentifier implements ValidationRule
 
         $sum = 0;
 
-        for ($i = 0; $i < 9; ++$i) {
+        for ($i = 0; $i < 9; $i++) {
             // The final digit carries weight -1, which is what makes this a
             // check rather than a plain weighted sum.
             $sum += (int) $digits[$i] * ($i === 8 ? -1 : 9 - $i);
@@ -123,7 +125,7 @@ final readonly class NationalIdentifier implements ValidationRule
         foreach ([9, 10] as $length) {
             $sum = 0;
 
-            for ($i = 0; $i < $length; ++$i) {
+            for ($i = 0; $i < $length; $i++) {
                 $sum += (int) $digits[$i] * ($length + 1 - $i);
             }
 

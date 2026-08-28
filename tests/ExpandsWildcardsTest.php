@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Validation\Factory;
+declare(strict_types=1);
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Validation\ValidationException;
 
 // =========================================================================
 // Unit: createDefaultValidator() directly
@@ -62,7 +64,7 @@ it('validates a real POST request through a FormRequest', function (): void {
         $formRequest = createFormRequest(
             rules: [
                 'items' => FluentRule::array()->required()->each([
-                    'name' => FluentRule::string()->required()->min(2),
+                    'name'  => FluentRule::string()->required()->min(2),
                     'email' => FluentRule::string()->required()->rule('email'),
                 ]),
             ],

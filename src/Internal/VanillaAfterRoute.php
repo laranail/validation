@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
 use Closure;
+use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * The one-validator route `RuleSet::after()` forces.
@@ -21,11 +23,12 @@ use Simtabi\Laranail\Validation\RuleSet;
 final class VanillaAfterRoute
 {
     /**
-     * @param  array<string, mixed>  $compiledRules  Output of {@see RuleSet::compile()} over the flattened fields.
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
-     * @param  list<Closure>  $afterCallbacks
+     * @param array<string, mixed> $compiledRules Output of {@see RuleSet::compile()} over the flattened fields.
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     * @param list<Closure> $afterCallbacks
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException

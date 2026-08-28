@@ -1,20 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
-use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
-use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
-use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
+declare(strict_types=1);
+
 use Rector\Config\RectorConfig;
+use RectorPest\Set\PestSetList;
+use RectorLaravel\Set\LaravelSetList;
+use RectorPest\Rules\UseToMatchRector;
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
+use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
+use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
+use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
-use RectorLaravel\Set\LaravelSetList;
-use RectorPest\Rules\UseToMatchRector;
-use RectorPest\Set\PestSetList;
 
 return RectorConfig::configure()
     ->withCache(

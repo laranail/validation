@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
+use LogicException;
+use InvalidArgumentException;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
-use InvalidArgumentException;
-use LogicException;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
 
 /**
@@ -43,11 +45,58 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     protected ?array $childRules = null;
 
     /**
+     * Mirrors `Macroable::__call` dispatch exactly except for the
+     * "no macro registered" branch, which throws a typed exception
+     * pointing at the correct typed builder instead of a bare
+     * `BadMethodCallException`. See `UnknownFluentRuleMethod`.
+     *
+     * @param array<int, mixed> $parameters
+     */
+    public function __call(string $method, array $parameters): mixed
+    {
+        if (! static::hasMacro($method)) {
+            throw UnknownFluentRuleMethod::on($method);
+        }
+
+        $macro = static::$macros[$method];
+
+        if ($macro instanceof Closure) {
+            $macro = $macro->bindTo($this, static::class);
+        }
+
+        if (! is_callable($macro)) {
+            throw UnknownFluentRuleMethod::on($method);
+        }
+
+        return $macro(...$parameters);
+    }
+
+    /** @param  array<int, mixed>  $parameters */
+    public static function __callStatic(string $method, array $parameters): mixed
+    {
+        if (! static::hasMacro($method)) {
+            throw UnknownFluentRuleMethod::on($method);
+        }
+
+        $macro = static::$macros[$method];
+
+        if ($macro instanceof Closure) {
+            $macro = $macro->bindTo(null, static::class);
+        }
+
+        if (! is_callable($macro)) {
+            throw UnknownFluentRuleMethod::on($method);
+        }
+
+        return $macro(...$parameters);
+    }
+
+    /**
      * Define rules for fixed-key children of this field.
      *
      * Produces fixed paths (answer.email_address) without wildcards.
      *
-     * @param  array<string, ValidationRule>  $rules
+     * @param array<string, ValidationRule> $rules
      */
     public function children(array $rules): static
     {
@@ -71,15 +120,15 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * survive untouched.
      *
      * @throws LogicException when $key already exists — silent override
-     *                         would hide the "parent already defines this"
-     *                         mistake. Use mergeChildRules() for
-     *                         intentional replacement.
+     *                        would hide the "parent already defines this"
+     *                        mistake. Use mergeChildRules() for
+     *                        intentional replacement.
      */
     public function addChildRule(string $key, ValidationRule $rule): static
     {
         if ($key === '') {
             throw new InvalidArgumentException(
-                'addChildRule() requires a non-empty key — empty keys expand to malformed dotted paths (parent.).'
+                'addChildRule() requires a non-empty key — empty keys expand to malformed dotted paths (parent.).',
             );
         }
 
@@ -103,13 +152,13 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     /**
      * Merge multiple keyed child rules, later-wins on collision.
      *
-     * @param  array<string, ValidationRule>  $rules
+     * @param array<string, ValidationRule> $rules
      */
     public function mergeChildRules(array $rules): static
     {
         if (array_key_exists('', $rules)) {
             throw new InvalidArgumentException(
-                'mergeChildRules() requires non-empty keys — empty keys expand to malformed dotted paths (parent.).'
+                'mergeChildRules() requires non-empty keys — empty keys expand to malformed dotted paths (parent.).',
             );
         }
 
@@ -158,52 +207,5 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     protected function buildValidationRules(): array
     {
         return [...$this->reorderConstraints($this->constraints), ...$this->rules];
-    }
-
-    /**
-     * Mirrors `Macroable::__call` dispatch exactly except for the
-     * "no macro registered" branch, which throws a typed exception
-     * pointing at the correct typed builder instead of a bare
-     * `BadMethodCallException`. See `UnknownFluentRuleMethod`.
-     *
-     * @param  array<int, mixed>  $parameters
-     */
-    public function __call(string $method, array $parameters): mixed
-    {
-        if (! static::hasMacro($method)) {
-            throw UnknownFluentRuleMethod::on($method);
-        }
-
-        $macro = static::$macros[$method];
-
-        if ($macro instanceof Closure) {
-            $macro = $macro->bindTo($this, static::class);
-        }
-
-        if (! is_callable($macro)) {
-            throw UnknownFluentRuleMethod::on($method);
-        }
-
-        return $macro(...$parameters);
-    }
-
-    /** @param  array<int, mixed>  $parameters */
-    public static function __callStatic(string $method, array $parameters): mixed
-    {
-        if (! static::hasMacro($method)) {
-            throw UnknownFluentRuleMethod::on($method);
-        }
-
-        $macro = static::$macros[$method];
-
-        if ($macro instanceof Closure) {
-            $macro = $macro->bindTo(null, static::class);
-        }
-
-        if (! is_callable($macro)) {
-            throw UnknownFluentRuleMethod::on($method);
-        }
-
-        return $macro(...$parameters);
     }
 }

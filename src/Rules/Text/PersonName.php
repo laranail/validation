@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
@@ -46,9 +48,12 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  */
 final readonly class PersonName implements ClientCheckable, ValidationRule
 {
+    /** At least one actual letter: `'`, `-` and `.` are punctuation, not a name. */
+    private const string LETTER = '/\p{L}/u';
+
     /**
-     * @param  int  $minNames  Fewest whitespace-separated names the field may carry.
-     * @param  int|null  $maxNames  Most it may carry; null for no upper bound.
+     * @param int $minNames Fewest whitespace-separated names the field may carry.
+     * @param int|null $maxNames Most it may carry; null for no upper bound.
      */
     public function __construct(
         private bool $allowDigits = false,
@@ -66,6 +71,17 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
     public static function names(int $min = 1, ?int $max = null, bool $allowDigits = false): self
     {
         return new self($allowDigits, $min, $max);
+    }
+
+    public static function passes(mixed $value, bool $allowDigits = false, int $minNames = 1, ?int $maxNames = null): bool
+    {
+        if (! is_string($value) || ! self::hasNameCharacters($value, $allowDigits)) {
+            return false;
+        }
+
+        $count = self::countNames($value);
+
+        return $count >= $minNames && ($maxNames === null || $count <= $maxNames);
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -91,17 +107,6 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
         if ($this->maxNames !== null && $count > $this->maxNames) {
             $fail('laranail/validation::validation.person_name_max')->translate(['max' => $this->maxNames]);
         }
-    }
-
-    public static function passes(mixed $value, bool $allowDigits = false, int $minNames = 1, ?int $maxNames = null): bool
-    {
-        if (! is_string($value) || ! self::hasNameCharacters($value, $allowDigits)) {
-            return false;
-        }
-
-        $count = self::countNames($value);
-
-        return $count >= $minNames && ($maxNames === null || $count <= $maxNames);
     }
 
     /**
@@ -131,9 +136,6 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
 
         return $rules;
     }
-
-    /** At least one actual letter: `'`, `-` and `.` are punctuation, not a name. */
-    private const string LETTER = '/\p{L}/u';
 
     private static function hasNameCharacters(string $value, bool $allowDigits): bool
     {

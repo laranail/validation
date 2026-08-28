@@ -1,36 +1,38 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Providers;
 
-use Illuminate\Support\Facades\Validator;
+use Stringable;
 use Illuminate\Support\Str;
-use Illuminate\Validation\InvokableValidationRule;
-use Illuminate\Validation\Validator as ValidationValidator;
+use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Package\Tools\Package;
-use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
-use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
+use Illuminate\Validation\InvokableValidationRule;
+use Simtabi\Laranail\Validation\Support\RuleAliases;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
-use Simtabi\Laranail\Validation\Commands\DoctorCommand;
 use Simtabi\Laranail\Validation\Commands\RulesCommand;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Commands\DoctorCommand;
+use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
+use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
+use Illuminate\Validation\Validator as ValidationValidator;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
-use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
-use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
-use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Support\I18n\BundledCountryDataset;
+use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Validation\Support\I18n\BundledCurrencyDataset;
 use Simtabi\Laranail\Validation\Support\I18n\BundledLanguageDataset;
-use Simtabi\Laranail\Validation\Support\Payment\BundledCardBrandCatalogue;
-use Simtabi\Laranail\Validation\Support\RuleAliases;
-use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
+use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 use Simtabi\Laranail\Validation\Support\Text\DefaultReservedUsernameList;
-use Stringable;
+use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
+use Simtabi\Laranail\Validation\Support\Payment\BundledCardBrandCatalogue;
 
 /**
  * The package is usable with no provider at all — every builder entry point is
@@ -80,6 +82,50 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->app->singletonIf(RuleRegistrar::class);
     }
 
+    public function bootingPackage(): void
+    {
+        $this->applyBatchLimit();
+        $this->registerRuleAliases();
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes(
+                [$this->configPath() => config_path('laranail-validation.php')],
+                $this->package->getNamespacedPublishTag('config'),
+            );
+
+            $this->commands([
+                RulesCommand::class,
+                DoctorCommand::class,
+                BenchmarkCommand::class,
+            ]);
+        }
+    }
+
+    /**
+     * Narrow the validator's loosely-typed parameter array to a string list.
+     *
+     * `Validator::extend` types the third argument as a bare `array`, so the
+     * factories cannot assume anything about it. Non-scalars are dropped
+     * rather than coerced: `(string) []` is a fatal, and a rule string cannot
+     * carry an array parameter in the first place.
+     *
+     * @param array<array-key, mixed> $parameters
+     *
+     * @return list<string>
+     */
+    private static function stringParameters(array $parameters): array
+    {
+        $strings = [];
+
+        foreach ($parameters as $parameter) {
+            if (is_scalar($parameter) || $parameter instanceof Stringable) {
+                $strings[] = (string) $parameter;
+            }
+        }
+
+        return $strings;
+    }
+
     /**
      * Bind the bundled email lists, but only if nothing else has.
      *
@@ -110,25 +156,6 @@ class ValidationServiceProvider extends PackageServiceProvider
         $this->app->singletonIf(LanguageDataset::class, BundledLanguageDataset::class);
         $this->app->singletonIf(CardBrandCatalogue::class, BundledCardBrandCatalogue::class);
         $this->app->singletonIf(ReservedUsernameList::class, DefaultReservedUsernameList::class);
-    }
-
-    public function bootingPackage(): void
-    {
-        $this->applyBatchLimit();
-        $this->registerRuleAliases();
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes(
-                [$this->configPath() => config_path('laranail-validation.php')],
-                $this->package->getNamespacedPublishTag('config'),
-            );
-
-            $this->commands([
-                RulesCommand::class,
-                DoctorCommand::class,
-                BenchmarkCommand::class,
-            ]);
-        }
     }
 
     /**
@@ -223,30 +250,6 @@ class ValidationServiceProvider extends PackageServiceProvider
                 },
             );
         }
-    }
-
-    /**
-     * Narrow the validator's loosely-typed parameter array to a string list.
-     *
-     * `Validator::extend` types the third argument as a bare `array`, so the
-     * factories cannot assume anything about it. Non-scalars are dropped
-     * rather than coerced: `(string) []` is a fatal, and a rule string cannot
-     * carry an array parameter in the first place.
-     *
-     * @param  array<array-key, mixed>  $parameters
-     * @return list<string>
-     */
-    private static function stringParameters(array $parameters): array
-    {
-        $strings = [];
-
-        foreach ($parameters as $parameter) {
-            if (is_scalar($parameter) || $parameter instanceof Stringable) {
-                $strings[] = (string) $parameter;
-            }
-        }
-
-        return $strings;
     }
 
     private function configPath(): string

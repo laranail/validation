@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Encoding;
 
@@ -32,7 +34,7 @@ final readonly class DataUri implements ValidationRule
     private const string URL_ENCODED = "/^(?:[A-Za-z0-9\\-_.~!$&'()*+,;=:@\\/?]|%[0-9A-Fa-f]{2})*$/D";
 
     /**
-     * @param  list<string>  $mediaTypes  Accepted declared types, exact or `family/*`.
+     * @param list<string> $mediaTypes Accepted declared types, exact or `family/*`.
      */
     public function __construct(private array $mediaTypes = []) {}
 

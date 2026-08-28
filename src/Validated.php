@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ValidatedInput;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 /**
  * Result of RuleSet::check(). Immutable view over validation outcome.
@@ -22,7 +24,7 @@ use Illuminate\Validation\ValidationException;
 final readonly class Validated
 {
     /**
-     * @param  array<string, mixed>  $validated
+     * @param array<string, mixed> $validated
      */
     public function __construct(
         private bool $passes,

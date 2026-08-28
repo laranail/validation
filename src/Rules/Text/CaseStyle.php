@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
@@ -39,22 +41,15 @@ final readonly class CaseStyle implements ClientCheckable, ValidationRule
      * separators.
      */
     private const array PATTERNS = [
-        self::CAMEL => '/^[a-z][a-zA-Z0-9]*$/D',
+        self::CAMEL  => '/^[a-z][a-zA-Z0-9]*$/D',
         self::PASCAL => '/^[A-Z][a-zA-Z0-9]*$/D',
-        self::SNAKE => '/^[a-z0-9]+(?:_[a-z0-9]+)*$/D',
-        self::KEBAB => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D',
+        self::SNAKE  => '/^[a-z0-9]+(?:_[a-z0-9]+)*$/D',
+        self::KEBAB  => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/D',
         // Each space-separated word starts with a capital. Digits may follow.
         self::TITLE => '/^[A-Z][a-z0-9]*(?: [A-Z][a-z0-9]*)*$/D',
     ];
 
     public function __construct(private string $style) {}
-
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->style)) {
-            $fail('laranail/validation::validation.case_style.' . $this->style)->translate();
-        }
-    }
 
     public static function passes(mixed $value, string $style): bool
     {
@@ -63,6 +58,13 @@ final readonly class CaseStyle implements ClientCheckable, ValidationRule
         }
 
         return preg_match(self::PATTERNS[$style], $value) === 1;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->style)) {
+            $fail('laranail/validation::validation.case_style.' . $this->style)->translate();
+        }
     }
 
     /**

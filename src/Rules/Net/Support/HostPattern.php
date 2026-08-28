@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net\Support;
 
@@ -28,7 +30,7 @@ namespace Simtabi\Laranail\Validation\Rules\Net\Support;
 final class HostPattern
 {
     /**
-     * @param  list<string>  $patterns
+     * @param list<string> $patterns
      */
     public static function matches(string $host, array $patterns): bool
     {

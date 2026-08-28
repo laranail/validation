@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Identifiers;
 
@@ -27,13 +29,6 @@ final class Jwt implements ValidationRule
 {
     private const string PATTERN = '/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$/D';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.jwt')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
@@ -43,6 +38,13 @@ final class Jwt implements ValidationRule
         $header = self::decodeSegment(explode('.', $value)[0]);
 
         return is_array($header) && isset($header['alg']);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.jwt')->translate();
+        }
     }
 
     /**

@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Support\InlineTermList;
+use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 
 /**
  * The bindable TermList over application-supplied arrays — the one-liner

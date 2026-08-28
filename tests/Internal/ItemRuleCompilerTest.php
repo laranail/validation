@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests\Internal;
 
@@ -6,7 +8,7 @@ use Illuminate\Validation\Rules\In;
 use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
 
 it('analyzeConditionals extracts exclude_unless tuples', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     $result = $compiler->analyzeConditionals([
         'price' => [['exclude_unless', 'type', 'product'], 'required', 'numeric'],
@@ -22,7 +24,7 @@ it('analyzeConditionals extracts exclude_unless tuples', function (): void {
 });
 
 it('analyzeConditionals extracts ALL exclude conditions on a field', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     $result = $compiler->analyzeConditionals([
         'x' => [['exclude_unless', 'type', 'a'], ['exclude_if', 'other', 'z'], 'string'],
@@ -35,7 +37,7 @@ it('analyzeConditionals extracts ALL exclude conditions on a field', function ()
 });
 
 it('analyzeConditionals extracts exclude_if with multiple values', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     $result = $compiler->analyzeConditionals([
         'sku' => [['exclude_if', 'type', 'draft', 'template'], 'required'],
@@ -46,14 +48,14 @@ it('analyzeConditionals extracts exclude_if with multiple values', function (): 
 });
 
 it('analyzeConditionals skips rules that are not arrays or have no conditional tuple', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     expect($compiler->analyzeConditionals(['name' => 'required|string']))->toBeEmpty()
         ->and($compiler->analyzeConditionals(['name' => ['required', 'string']]))->toBeEmpty();
 });
 
 it('findCommonDispatchField returns shared field when all conditionals reference it', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     $field = $compiler->findCommonDispatchField([
         'a' => [['action' => 'exclude_unless', 'field' => 'type', 'values' => ['x']]],
@@ -64,7 +66,7 @@ it('findCommonDispatchField returns shared field when all conditionals reference
 });
 
 it('findCommonDispatchField returns null when fields differ', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     $field = $compiler->findCommonDispatchField([
         'a' => [['action' => 'exclude_unless', 'field' => 'type', 'values' => ['x']]],
@@ -79,7 +81,7 @@ it('findCommonDispatchField returns null for empty input', function (): void {
 });
 
 it('reduceRulesForItem strips excluded fields when action matches', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
     $conditionals = [
         'price' => [['action' => 'exclude_unless', 'field' => 'type', 'values' => ['product']]],
     ];
@@ -95,7 +97,7 @@ it('reduceRulesForItem strips excluded fields when action matches', function ():
 });
 
 it('reduceRulesForItem keeps field and strips conditional tuple when active', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
     $conditionals = [
         'price' => [['action' => 'exclude_unless', 'field' => 'type', 'values' => ['product']]],
     ];
@@ -110,7 +112,7 @@ it('reduceRulesForItem keeps field and strips conditional tuple when active', fu
 });
 
 it('ruleCacheKey encodes field name + rule content to distinguish items with varying reduced rules', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     // Keys with different string content must produce different cache keys —
     // this is what prevents a cached validator from being reused across
@@ -126,12 +128,12 @@ it('ruleCacheKey encodes field name + rule content to distinguish items with var
 });
 
 it('buildFastChecks separates fast-checkable fields from slow rules', function (): void {
-    $compiler = new ItemRuleCompiler();
+    $compiler = new ItemRuleCompiler;
 
     [$checks, $slowRules] = $compiler->buildFastChecks([
-        'name' => 'required|string',
+        'name'  => 'required|string',
         'email' => 'required|email',
-        'meta' => ['required', new In(['a', 'b'])],
+        'meta'  => ['required', new In(['a', 'b'])],
     ]);
 
     expect($checks)->toHaveCount(2)

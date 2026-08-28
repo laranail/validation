@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Validation\Factory as ValidationFactory;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Illuminate\Validation\Factory as ValidationFactory;
 
 // =========================================================================
 // Every public name this package registers must carry the vendor AND the

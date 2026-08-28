@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Email;
 
@@ -30,6 +32,13 @@ use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
  */
 final class NoSubaddressing implements ValidationRule
 {
+    public static function passes(mixed $value): bool
+    {
+        $address = Address::split($value);
+
+        return $address !== null && ! str_contains($address[0], '+');
+    }
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $address = Address::split($value);
@@ -43,12 +52,5 @@ final class NoSubaddressing implements ValidationRule
         if (str_contains($address[0], '+')) {
             $fail('laranail/validation::validation.email.subaddress')->translate();
         }
-    }
-
-    public static function passes(mixed $value): bool
-    {
-        $address = Address::split($value);
-
-        return $address !== null && ! str_contains($address[0], '+');
     }
 }

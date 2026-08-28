@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Rules\Text\MaxWords;
 use Simtabi\Laranail\Validation\Rules\Text\MinWords;
+use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
 use Simtabi\Laranail\Validation\Rules\Text\Salutation;
 
 // =========================================================================
@@ -56,8 +58,8 @@ it('can require markup instead of forbidding it', function (): void {
 });
 
 it('keeps the forbidding default unchanged', function (): void {
-    expect(ruleAccepts(new HtmlClean(), 'plain text'))->toBeTrue()
-        ->and(ruleAccepts(new HtmlClean(), '<b>bold</b>'))->toBeFalse();
+    expect(ruleAccepts(new HtmlClean, 'plain text'))->toBeTrue()
+        ->and(ruleAccepts(new HtmlClean, '<b>bold</b>'))->toBeFalse();
 });
 
 // =========================================================================
@@ -65,11 +67,11 @@ it('keeps the forbidding default unchanged', function (): void {
 // =========================================================================
 
 it('accepts common salutations in any case, with or without the dot', function (string $value): void {
-    expect(ruleAccepts(new Salutation(), $value))->toBeTrue();
+    expect(ruleAccepts(new Salutation, $value))->toBeTrue();
 })->with(['Mr', 'mr', 'Mr.', 'MRS', 'Prof.', 'Mx', 'Dr.', 'Madame']);
 
 it('rejects values that are not salutations', function (mixed $value): void {
-    expect(ruleAccepts(new Salutation(), $value))->toBeFalse();
+    expect(ruleAccepts(new Salutation, $value))->toBeFalse();
 })->with(['xyz', 'Mister John', 'M r', 12, null]);
 
 it('validates against a custom salutation list when given one', function (): void {

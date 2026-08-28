@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\Rules\Banking\BsbNumber;
 use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
@@ -46,11 +48,11 @@ it('advertises the digest pattern for the browser', function (): void {
 // =========================================================================
 
 it('accepts Australian BSB numbers with and without the hyphen', function (string $value): void {
-    expect(ruleAccepts(new BsbNumber(), $value))->toBeTrue();
+    expect(ruleAccepts(new BsbNumber, $value))->toBeTrue();
 })->with(['062-000', '062000', '733100']);
 
 it('rejects malformed BSB numbers', function (mixed $value): void {
-    expect(ruleAccepts(new BsbNumber(), $value))->toBeFalse();
+    expect(ruleAccepts(new BsbNumber, $value))->toBeFalse();
 })->with([
     '062-00',      // five digits
     '0620000',     // seven digits

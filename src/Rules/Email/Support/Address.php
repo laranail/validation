@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Email\Support;
 
@@ -18,7 +20,7 @@ namespace Simtabi\Laranail\Validation\Rules\Email\Support;
 final class Address
 {
     /**
-     * @return array{0: string, 1: string}|null  [local part, domain], or null.
+     * @return array{0: string, 1: string}|null [local part, domain], or null.
      */
     public static function split(mixed $value): ?array
     {

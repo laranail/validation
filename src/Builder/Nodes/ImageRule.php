@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
@@ -8,11 +10,6 @@ class ImageRule extends FileRule
 {
     /** @var list<string> */
     protected array $constraints = ['image'];
-
-    protected function defaultConstraintName(): string
-    {
-        return 'image';
-    }
 
     public function allowSvg(): static
     {
@@ -62,5 +59,10 @@ class ImageRule extends FileRule
     public function ratio(float|string $value, ?string $message = null): static
     {
         return $this->dimensions(new Dimensions(['ratio' => $value]), $message);
+    }
+
+    protected function defaultConstraintName(): string
+    {
+        return 'image';
     }
 }

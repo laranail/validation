@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Geo;
 
@@ -23,13 +25,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class LatLng implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.lat_lng')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) || substr_count($value, ',') !== 1) {
@@ -40,5 +35,12 @@ final class LatLng implements ValidationRule
 
         return Coordinate::isWithin($latitude, 90.0)
             && Coordinate::isWithin($longitude, 180.0);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.lat_lng')->translate();
+        }
     }
 }

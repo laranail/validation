@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Database;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * Every value in the submitted array names an existing record.
@@ -30,8 +32,8 @@ use Illuminate\Support\Facades\DB;
 final readonly class ModelsExist implements ValidationRule
 {
     /**
-     * @param  class-string<Model>  $model   Model to look the values up against.
-     * @param  string|null          $column  Defaults to the model's route key.
+     * @param class-string<Model> $model Model to look the values up against.
+     * @param string|null $column Defaults to the model's route key.
      */
     public function __construct(
         private string $model,
@@ -69,7 +71,7 @@ final readonly class ModelsExist implements ValidationRule
         /** @var list<string> $identifiers */
         $identifiers = array_keys($wanted);
 
-        $model = new $this->model();
+        $model = new $this->model;
         $column = $this->column ?? $model->getRouteKeyName();
 
         // Query builder rather than the Eloquent one, matching

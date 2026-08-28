@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
-use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 
 class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -23,15 +25,6 @@ class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     public function __construct()
     {
         $this->seedLastConstraint($this->defaultConstraintName());
-    }
-
-    /**
-     * Hook for subclasses (ImageRule) to override which constraint name
-     * seeds $lastConstraint without re-implementing __construct.
-     */
-    protected function defaultConstraintName(): string
-    {
-        return 'file';
     }
 
     public function min(int|string $size, ?string $message = null): static
@@ -69,6 +62,15 @@ class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         return $this->addRule('mimetypes:' . implode(',', $mimetypes));
     }
 
+    /**
+     * Hook for subclasses (ImageRule) to override which constraint name
+     * seeds $lastConstraint without re-implementing __construct.
+     */
+    protected function defaultConstraintName(): string
+    {
+        return 'file';
+    }
+
     protected function toKilobytes(int|string $size): int
     {
         if (is_int($size)) {
@@ -80,10 +82,10 @@ class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
             $unit = strtolower($matches[2]);
 
             return (int) round(match ($unit) {
-                'kb' => $value,
-                'mb' => $value * 1_000,
-                'gb' => $value * 1_000_000,
-                'tb' => $value * 1_000_000_000,
+                'kb'    => $value,
+                'mb'    => $value * 1_000,
+                'gb'    => $value * 1_000_000,
+                'tb'    => $value * 1_000_000_000,
                 default => $value,
             });
         }

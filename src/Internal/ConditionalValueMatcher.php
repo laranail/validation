@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -23,9 +25,9 @@ final class ConditionalValueMatcher
      * Does the dependent at `$depPath` match `$rawValues` under Laravel's
      * `validateRequiredIf`/`…Unless` comparison semantics?
      *
-     * @param  list<?string>         $rawValues  The rule's value parameters.
-     * @param  array<string, mixed>  $itemData
-     * @param  array<string, mixed>  $itemRules  Item-scoped rules, for the `boolean` declaration check.
+     * @param list<?string> $rawValues The rule's value parameters.
+     * @param array<string, mixed> $itemData
+     * @param array<string, mixed> $itemRules Item-scoped rules, for the `boolean` declaration check.
      */
     public static function matches(string $depPath, array $rawValues, array $itemData, array $itemRules): bool
     {
@@ -42,7 +44,7 @@ final class ConditionalValueMatcher
      * through a validator's protected `getValue()`), so they don't re-resolve
      * via `data_get`.
      *
-     * @param  list<?string>  $rawValues
+     * @param list<?string> $rawValues
      */
     public static function matchesValue(mixed $other, array $rawValues, bool $dependentHasBooleanRule = false): bool
     {
@@ -61,6 +63,35 @@ final class ConditionalValueMatcher
     }
 
     /**
+     * Does the dependent field's rule set contain a `boolean` marker?
+     *
+     * Public because both the item-scoped path ({@see matches()}) and the
+     * top-level path ({@see ConditionalEvaluationPhase::evaluate()}) need the
+     * same answer, and Laravel applies the conversion in both.
+     * Best-effort check against the item-scoped rule set — mirrors Laravel's
+     * `shouldConvertToBoolean` which reads `$this->rules[$parameter]`.
+     *
+     * `array-key`, not `string`: the top-level caller hands over the
+     * validator's own `$rules`, which Laravel types as a bare array.
+     *
+     * @param array<array-key, mixed> $itemRules
+     */
+    public static function dependentHasBooleanRule(string $depPath, array $itemRules): bool
+    {
+        $rules = $itemRules[$depPath] ?? null;
+
+        if (is_string($rules)) {
+            return in_array('boolean', explode('|', $rules), true);
+        }
+
+        if (! is_array($rules)) {
+            return false;
+        }
+
+        return in_array('boolean', $rules, true);
+    }
+
+    /**
      * Stand-in for PHP's loose `in_array($other, $values, false)` with `$other`
      * a non-bool/non-null scalar — phpstan-strict-rules forbids loose `in_array`,
      * so the cases are hand-rolled:
@@ -72,7 +103,7 @@ final class ConditionalValueMatcher
      * - any other scalar compares by string coercion, covering numeric-string ↔
      *   numeric (`'1'` ↔ `1`).
      *
-     * @param  list<mixed>  $values
+     * @param list<mixed> $values
      */
     private static function scalarLooseIn(int|float|string $other, array $values): bool
     {
@@ -97,14 +128,15 @@ final class ConditionalValueMatcher
      * value is already a bool; null conversion when the resolved value is
      * null. Order matters — bool first, then null.
      *
-     * @param  list<mixed>  $values
+     * @param list<mixed> $values
+     *
      * @return list<mixed>
      */
     private static function convertValues(array $values, mixed $other, bool $dependentHasBooleanRule): array
     {
         if (is_bool($other) || $dependentHasBooleanRule) {
             $values = array_map(static fn (mixed $v): mixed => match ($v) {
-                'true' => true,
+                'true'  => true,
                 'false' => false,
                 default => $v,
             }, $values);
@@ -118,34 +150,5 @@ final class ConditionalValueMatcher
         }
 
         return $values;
-    }
-
-    /**
-     * Does the dependent field's rule set contain a `boolean` marker?
-     *
-     * Public because both the item-scoped path ({@see matches()}) and the
-     * top-level path ({@see ConditionalEvaluationPhase::evaluate()}) need the
-     * same answer, and Laravel applies the conversion in both.
-     * Best-effort check against the item-scoped rule set — mirrors Laravel's
-     * `shouldConvertToBoolean` which reads `$this->rules[$parameter]`.
-     *
-     * `array-key`, not `string`: the top-level caller hands over the
-     * validator's own `$rules`, which Laravel types as a bare array.
-     *
-     * @param  array<array-key, mixed>  $itemRules
-     */
-    public static function dependentHasBooleanRule(string $depPath, array $itemRules): bool
-    {
-        $rules = $itemRules[$depPath] ?? null;
-
-        if (is_string($rules)) {
-            return in_array('boolean', explode('|', $rules), true);
-        }
-
-        if (! is_array($rules)) {
-            return false;
-        }
-
-        return in_array('boolean', $rules, true);
     }
 }

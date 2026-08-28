@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
@@ -162,9 +164,63 @@ trait HasFluentValidation
     }
 
     /**
+     * Compile FluentRule objects to native format, expand wildcards
+     * against actual data, and extract labels/messages.
+     *
+     * @param array<string, mixed>|null $rules
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
+     * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
+     */
+    protected function compileFluentRules(?array $rules, array $messages, array $attributes): array
+    {
+        // If no rules passed (null), resolve from rules() method or $rules
+        // property. An explicitly empty array `[]` means "caller wants no
+        // validation" — it must NOT fall back to the component's default
+        // rules, matching Livewire's $this->validate([]) behavior.
+        $ruleSet = $rules !== null ? RuleSet::from($rules) : $this->resolveFluentRuleSource();
+
+        if ($ruleSet->isEmpty()) {
+            return [$rules, $messages, $attributes];
+        }
+
+        $hasFluentRules = $ruleSet->hasObjectRules();
+
+        if (! $hasFluentRules) {
+            return [$rules, $messages, $attributes];
+        }
+
+        $flatRules = $ruleSet->flattenRules();
+
+        // Use Livewire's data resolution when available — it correctly
+        // handles model-bound properties and nested data for wildcard expansion.
+        // For array source, preserve the exact shape callers passed previously.
+        $rawData = method_exists($this, 'getDataForValidation') // @phpstan-ignore function.alreadyNarrowedType
+            ? $this->getDataForValidation($flatRules)
+            : (method_exists($this, 'all') ? $this->all() : []); // @phpstan-ignore function.alreadyNarrowedType
+
+        // Unwrap Eloquent models to arrays so WildcardExpander can traverse them.
+        if (method_exists($this, 'unwrapDataForValidation')) { // @phpstan-ignore function.alreadyNarrowedType
+            $rawData = $this->unwrapDataForValidation($rawData);
+        }
+
+        $data = $this->toNullableArray($rawData) ?? [];
+
+        $prepared = $ruleSet->prepare($data, $flatRules);
+
+        return [
+            $prepared->rules,
+            array_merge($prepared->messages, $messages),
+            array_merge($prepared->attributes, $attributes),
+        ];
+    }
+
+    /**
      * Merge with Livewire's rulesFromOutside (same as parent::getRules()).
      *
-     * @param  array<string, mixed>  $rules
+     * @param array<string, mixed> $rules
+     *
      * @return array<string, mixed>
      */
     private function mergeRulesFromOutside(array $rules): array
@@ -245,57 +301,5 @@ trait HasFluentValidation
         }
 
         return $result;
-    }
-
-    /**
-     * Compile FluentRule objects to native format, expand wildcards
-     * against actual data, and extract labels/messages.
-     *
-     * @param  array<string, mixed>|null  $rules
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
-     * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
-     */
-    protected function compileFluentRules(?array $rules, array $messages, array $attributes): array
-    {
-        // If no rules passed (null), resolve from rules() method or $rules
-        // property. An explicitly empty array `[]` means "caller wants no
-        // validation" — it must NOT fall back to the component's default
-        // rules, matching Livewire's $this->validate([]) behavior.
-        $ruleSet = $rules !== null ? RuleSet::from($rules) : $this->resolveFluentRuleSource();
-
-        if ($ruleSet->isEmpty()) {
-            return [$rules, $messages, $attributes];
-        }
-
-        $hasFluentRules = $ruleSet->hasObjectRules();
-
-        if (! $hasFluentRules) {
-            return [$rules, $messages, $attributes];
-        }
-
-        $flatRules = $ruleSet->flattenRules();
-
-        // Use Livewire's data resolution when available — it correctly
-        // handles model-bound properties and nested data for wildcard expansion.
-        // For array source, preserve the exact shape callers passed previously.
-        $rawData = method_exists($this, 'getDataForValidation') // @phpstan-ignore function.alreadyNarrowedType
-            ? $this->getDataForValidation($flatRules)
-            : (method_exists($this, 'all') ? $this->all() : []); // @phpstan-ignore function.alreadyNarrowedType
-
-        // Unwrap Eloquent models to arrays so WildcardExpander can traverse them.
-        if (method_exists($this, 'unwrapDataForValidation')) { // @phpstan-ignore function.alreadyNarrowedType
-            $rawData = $this->unwrapDataForValidation($rawData);
-        }
-
-        $data = $this->toNullableArray($rawData) ?? [];
-
-        $prepared = $ruleSet->prepare($data, $flatRules);
-
-        return [
-            $prepared->rules,
-            array_merge($prepared->messages, $messages),
-            array_merge($prepared->attributes, $attributes),
-        ];
     }
 }

@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\FluentRule;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\FluentRule;
 use Symfony\Component\HttpFoundation\File\File;
 
 // =========================================================================

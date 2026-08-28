@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Translation\ArrayLoader;
+declare(strict_types=1);
+
 use Illuminate\Translation\Translator;
-use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Illuminate\Translation\ArrayLoader;
 use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\Rules\Text\PersonName;
 use Simtabi\Laranail\Validation\Schemas\PersonNameSchema;
 
 /*
@@ -24,10 +26,10 @@ use Simtabi\Laranail\Validation\Schemas\PersonNameSchema;
 
 it('refuses a payload carrying no name at all', function (): void {
     $payloads = [
-        'no keys at all' => [],
-        'all empty strings' => ['first_name' => '', 'middle_name' => '', 'last_name' => ''],
-        'all null' => ['first_name' => null, 'middle_name' => null, 'last_name' => null],
-        'whitespace only' => ['first_name' => '   ', 'middle_name' => "\t", 'last_name' => ' '],
+        'no keys at all'      => [],
+        'all empty strings'   => ['first_name' => '', 'middle_name' => '', 'last_name' => ''],
+        'all null'            => ['first_name' => null, 'middle_name' => null, 'last_name' => null],
+        'whitespace only'     => ['first_name' => '   ', 'middle_name' => "\t", 'last_name' => ' '],
         'only unrelated keys' => ['email' => 'a@b.test'],
     ];
 
@@ -42,13 +44,13 @@ it('accepts every combination that carries a name', function (): void {
     // path the application actually uses. The validator has to agree with the
     // schema exactly: anything holding one of the three must validate.
     $combinations = [
-        'first only' => ['first_name' => 'Ada'],
-        'middle only' => ['middle_name' => 'Prince'],
-        'last only' => ['last_name' => 'Bono'],
+        'first only'       => ['first_name' => 'Ada'],
+        'middle only'      => ['middle_name' => 'Prince'],
+        'last only'        => ['last_name' => 'Bono'],
         'first and middle' => ['first_name' => 'Ada', 'middle_name' => 'Byron'],
-        'first and last' => ['first_name' => 'Ada', 'last_name' => 'Lovelace'],
-        'middle and last' => ['middle_name' => 'Byron', 'last_name' => 'Lovelace'],
-        'all three' => ['first_name' => 'Ada', 'middle_name' => 'Byron', 'last_name' => 'Lovelace'],
+        'first and last'   => ['first_name' => 'Ada', 'last_name' => 'Lovelace'],
+        'middle and last'  => ['middle_name' => 'Byron', 'last_name' => 'Lovelace'],
+        'all three'        => ['first_name' => 'Ada', 'middle_name' => 'Byron', 'last_name' => 'Lovelace'],
     ];
 
     $schema = PersonNameSchema::make();
@@ -117,7 +119,7 @@ it('works with a field set that is not first/middle/last', function (): void {
     // given names, or a patronymic, or one name, is not an edge case — the
     // three-column split is a guess about a naming culture.
     $shapes = [
-        'two fields' => [['given_name', 'family_name'], ['family_name' => 'Mokoena']],
+        'two fields'  => [['given_name', 'family_name'], ['family_name' => 'Mokoena']],
         'four fields' => [
             ['first_name', 'second_name', 'third_name', 'last_name'],
             ['second_name' => 'Byron', 'last_name' => 'Lovelace'],
@@ -148,11 +150,11 @@ it('still requires a name when there is only one field to put it in', function (
 
 it('normalises exactly the fields it was declared with', function (): void {
     expect(PersonNameSchema::make('given_name', 'family_name')->normalise([
-        'given_name' => '  Ada  ',
+        'given_name'  => '  Ada  ',
         'family_name' => '   ',
-        'email' => 'ignored@example.test',
+        'email'       => 'ignored@example.test',
     ]))->toBe([
-        'given_name' => 'Ada',
+        'given_name'  => 'Ada',
         'family_name' => null,
     ]);
 });
@@ -161,9 +163,9 @@ it('fills every declared field even when the payload omits them', function (): v
     // A partial row is how an untouched optional input becomes '' in the
     // database: present, not null, sorting before every real value.
     expect(PersonNameSchema::make()->normalise([]))->toBe([
-        'first_name' => null,
+        'first_name'  => null,
         'middle_name' => null,
-        'last_name' => null,
+        'last_name'   => null,
     ]);
 });
 
@@ -181,13 +183,13 @@ it('accepts several names in one field by default', function (string $value): vo
     expect(PersonNameSchema::make()->toRuleSet()->check(['first_name' => $value])->passes())
         ->toBeTrue();
 })->with([
-    'two' => ['Ada Byron'],
-    'three' => ['Ada Byron Gordon'],
-    'doubled space' => ['Ada  Byron'],
+    'two'                  => ['Ada Byron'],
+    'three'                => ['Ada Byron Gordon'],
+    'doubled space'        => ['Ada  Byron'],
     'compound family name' => ['Ait Ben Haddou'],
-    'hyphenated' => ['Jean-Luc'],
-    'apostrophe' => ["O'Neill"],
-    'non-latin' => ['李 明'],
+    'hyphenated'           => ['Jean-Luc'],
+    'apostrophe'           => ["O'Neill"],
+    'non-latin'            => ['李 明'],
 ]);
 
 it('can insist on exactly one name per field', function (): void {
@@ -248,9 +250,9 @@ it('refuses input that is not a name at all', function (string $value): void {
     expect(PersonNameSchema::make()->toRuleSet()->check(['first_name' => $value])->passes())
         ->toBeFalse();
 })->with([
-    'digits' => ['Henry 8'],
-    'markup' => ['<script>'],
-    'an email' => ['ada@example.test'],
+    'digits'           => ['Henry 8'],
+    'markup'           => ['<script>'],
+    'an email'         => ['ada@example.test'],
     'punctuation only' => ["'-."],
 ]);
 
@@ -342,13 +344,13 @@ it('advertises a browser form that agrees with the PHP check', function (int $mi
         );
     }
 })->with([
-    'unbounded' => [1, null, false],
-    'single' => [1, 1, false],
-    'at most two' => [1, 2, false],
-    'at least two' => [2, null, false],
-    'at least three' => [3, null, false],
-    'between two and three' => [2, 3, false],
-    'digits allowed' => [1, null, true],
+    'unbounded'               => [1, null, false],
+    'single'                  => [1, 1, false],
+    'at most two'             => [1, 2, false],
+    'at least two'            => [2, null, false],
+    'at least three'          => [3, null, false],
+    'between two and three'   => [2, 3, false],
+    'digits allowed'          => [1, null, true],
     'digits allowed, bounded' => [2, 3, true],
 ]);
 
@@ -361,7 +363,7 @@ it('shows a sentence rather than a raw key if the namespace is not registered', 
     // A translator with an empty ArrayLoader has no namespaces at all, so
     // trans() hands every key straight back — the same thing a consuming
     // application sees when the package's provider has not been discovered.
-    app()->instance('translator', new Translator(new ArrayLoader(), 'en'));
+    app()->instance('translator', new Translator(new ArrayLoader, 'en'));
 
     [, $messages] = RuleSet::compileWithMetadata(
         PersonNameSchema::make('given_name', 'family_name')->rules(),

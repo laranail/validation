@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Encoding;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Number;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 
 /**
@@ -29,12 +31,39 @@ use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 final readonly class Base64Image implements ValidationRule
 {
     /**
-     * @param  list<string>  $mimes  Accepted `image/*` subtypes.
+     * @param list<string> $mimes Accepted `image/*` subtypes.
      */
     public function __construct(
         private array $mimes = ['jpeg', 'png', 'gif', 'webp', 'bmp'],
         private ?int $maxBytes = null,
     ) {}
+
+    /**
+     * The decoded bytes, from the bare or data-URI form — null when the
+     * value is not canonical base64.
+     */
+    public static function decode(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'data:')) {
+            $comma = strpos($value, ',');
+
+            if ($comma === false || ! str_contains(substr($value, 0, $comma), ';base64')) {
+                return null;
+            }
+
+            $value = substr($value, $comma + 1);
+        }
+
+        if (! Base64::passes($value)) {
+            return null;
+        }
+
+        return (string) base64_decode($value, true);
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -62,32 +91,5 @@ final readonly class Base64Image implements ValidationRule
         if ($subtype === null || ! in_array($subtype, $this->mimes, true)) {
             $fail('laranail/validation::validation.base64_image')->translate();
         }
-    }
-
-    /**
-     * The decoded bytes, from the bare or data-URI form — null when the
-     * value is not canonical base64.
-     */
-    public static function decode(mixed $value): ?string
-    {
-        if (! is_string($value)) {
-            return null;
-        }
-
-        if (str_starts_with($value, 'data:')) {
-            $comma = strpos($value, ',');
-
-            if ($comma === false || ! str_contains(substr($value, 0, $comma), ';base64')) {
-                return null;
-            }
-
-            $value = substr($value, $comma + 1);
-        }
-
-        if (! Base64::passes($value)) {
-            return null;
-        }
-
-        return (string) base64_decode($value, true);
     }
 }

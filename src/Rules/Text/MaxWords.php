@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use LogicException;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * At most `$max` words.
@@ -26,18 +28,18 @@ final readonly class MaxWords implements ValidationRule
         }
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || self::count($value) > $this->max) {
-            $fail('laranail/validation::validation.max_words')->translate(['max' => $this->max]);
-        }
-    }
-
     /** How many words the value contains, shared with {@see MinWords}. */
     public static function count(string $value): int
     {
         $words = preg_split("~[^\p{L}\p{N}']+~u", $value, -1, PREG_SPLIT_NO_EMPTY);
 
         return $words === false ? 0 : count($words);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || self::count($value) > $this->max) {
+            $fail('laranail/validation::validation.max_words')->translate(['max' => $this->max]);
+        }
     }
 }

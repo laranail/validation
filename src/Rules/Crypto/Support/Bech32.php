@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Crypto\Support;
 
@@ -113,7 +115,7 @@ final class Bech32
             $top = $checksum >> 25;
             $checksum = (($checksum & 0x1FFFFFF) << 5) ^ $value;
 
-            for ($i = 0; $i < 5; ++$i) {
+            for ($i = 0; $i < 5; $i++) {
                 if ((($top >> $i) & 1) === 1) {
                     $checksum ^= self::GENERATOR[$i];
                 }

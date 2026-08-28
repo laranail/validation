@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+declare(strict_types=1);
+
 use Illuminate\Validation\Rule;
-use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Support\Facades\DB;
 use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\FluentRule;
 
 /**
  * Two fields pointing at the same table and column.
@@ -40,14 +42,15 @@ function setupSharedColumnUsers(): void
 }
 
 /**
- * @param  array<array-key, mixed>  $data
+ * @param array<array-key, mixed> $data
+ *
  * @return array<array-key, string>
  */
 function vanillaSharedColumnErrors(array $data): array
 {
     return Validator::make($data, [
         'items.*.primary' => ['required', 'string', Rule::unique('testing.users', 'email')],
-        'items.*.backup' => ['required', 'string', Rule::unique('testing.users', 'email')],
+        'items.*.backup'  => ['required', 'string', Rule::unique('testing.users', 'email')],
     ])->errors()->keys();
 }
 
@@ -68,7 +71,7 @@ it('checks both fields, whichever order they are declared in', function (bool $p
     expect(RuleSet::from($rules)->check($data)->fails())->toBeTrue();
 })->with([
     'primary declared first' => true,
-    'backup declared first' => false,
+    'backup declared first'  => false,
 ]);
 
 it('flags every taken value when both fields carry one', function (): void {
@@ -78,7 +81,7 @@ it('flags every taken value when both fields carry one', function (): void {
 
     $result = RuleSet::from(['items' => FluentRule::array()->required()->each([
         'primary' => FluentRule::string()->required()->unique('testing.users', 'email'),
-        'backup' => FluentRule::string()->required()->unique('testing.users', 'email'),
+        'backup'  => FluentRule::string()->required()->unique('testing.users', 'email'),
     ])])->check($data);
 
     expect($result->errors()->keys())->toHaveSameSize(vanillaSharedColumnErrors($data));
@@ -90,7 +93,7 @@ it('lets both through when neither value is taken', function (): void {
 
     $result = RuleSet::from(['items' => FluentRule::array()->required()->each([
         'primary' => FluentRule::string()->required()->unique('testing.users', 'email'),
-        'backup' => FluentRule::string()->required()->unique('testing.users', 'email'),
+        'backup'  => FluentRule::string()->required()->unique('testing.users', 'email'),
     ])])->check(['items' => [['primary' => 'free@example.com', 'backup' => 'spare@example.com']]]);
 
     expect($result->passes())->toBeTrue();

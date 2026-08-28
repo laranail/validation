@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
 
@@ -145,9 +147,9 @@ it('factory message: and chained method message: coexist under separate keys', f
         ->max(255, message: 'Too long.');
 
     expect($rule->getCustomMessages())->toBe([
-        'email' => 'Invalid email.',
+        'email'    => 'Invalid email.',
         'required' => 'Email is required.',
-        'max' => 'Too long.',
+        'max'      => 'Too long.',
     ]);
 });
 
@@ -190,7 +192,7 @@ it('chained ->message() after a date method still binds to that method, not "dat
 it('FluentRule::email(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['contact' => 'notanemail'],
-        ['contact' => FluentRule::email(defaults: false, message: 'Must be valid email.')]
+        ['contact' => FluentRule::email(defaults: false, message: 'Must be valid email.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -200,7 +202,7 @@ it('FluentRule::email(message: ...) surfaces in live validation', function (): v
 it('FluentRule::uuid(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['token' => 'notuuid'],
-        ['token' => FluentRule::uuid(message: 'Must be a UUID.')]
+        ['token' => FluentRule::uuid(message: 'Must be a UUID.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -211,7 +213,7 @@ it('FluentRule::integer(message: ...) surfaces in live validation', function ():
     // 1.5 passes `numeric` but fails `integer`, so the integer-bound message fires.
     $v = makeValidator(
         ['age' => 1.5],
-        ['age' => FluentRule::integer(message: 'Must be whole number.')]
+        ['age' => FluentRule::integer(message: 'Must be whole number.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -221,7 +223,7 @@ it('FluentRule::integer(message: ...) surfaces in live validation', function ():
 it('FluentRule::string(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['name' => ['array-not-string']],
-        ['name' => FluentRule::string(message: 'Must be text.')]
+        ['name' => FluentRule::string(message: 'Must be text.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -231,7 +233,7 @@ it('FluentRule::string(message: ...) surfaces in live validation', function (): 
 it('FluentRule::numeric(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['score' => 'abc'],
-        ['score' => FluentRule::numeric(message: 'Must be a number.')]
+        ['score' => FluentRule::numeric(message: 'Must be a number.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -241,7 +243,7 @@ it('FluentRule::numeric(message: ...) surfaces in live validation', function ():
 it('FluentRule::array(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['tags' => 'not-an-array'],
-        ['tags' => FluentRule::array(message: 'Must be a list.')]
+        ['tags' => FluentRule::array(message: 'Must be a list.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -251,7 +253,7 @@ it('FluentRule::array(message: ...) surfaces in live validation', function (): v
 it('FluentRule::file(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['upload' => 'not-a-file'],
-        ['upload' => FluentRule::file(message: 'Must be a file.')]
+        ['upload' => FluentRule::file(message: 'Must be a file.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -261,7 +263,7 @@ it('FluentRule::file(message: ...) surfaces in live validation', function (): vo
 it('FluentRule::image(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['avatar' => 'not-an-image'],
-        ['avatar' => FluentRule::image(message: 'Must be an image.')]
+        ['avatar' => FluentRule::image(message: 'Must be an image.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -271,7 +273,7 @@ it('FluentRule::image(message: ...) surfaces in live validation', function (): v
 it('FluentRule::boolean(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['agree' => 'maybe'],
-        ['agree' => FluentRule::boolean(message: 'Must be true or false.')]
+        ['agree' => FluentRule::boolean(message: 'Must be true or false.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -281,7 +283,7 @@ it('FluentRule::boolean(message: ...) surfaces in live validation', function ():
 it('FluentRule::date(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['dob' => 'not-a-date'],
-        ['dob' => FluentRule::date(message: 'Bad date.')]
+        ['dob' => FluentRule::date(message: 'Bad date.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -350,7 +352,7 @@ it('format() preserves an explicit empty-string date_format message over a non-e
 it('FluentRule::dateTime(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
         ['ts' => 'not-a-datetime'],
-        ['ts' => FluentRule::dateTime(message: 'Bad timestamp.')]
+        ['ts' => FluentRule::dateTime(message: 'Bad timestamp.')],
     );
 
     expect($v->passes())->toBeFalse()

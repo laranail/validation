@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
+use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
+use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
-use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
-use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 
 /**
  * An IP address field.
@@ -77,7 +79,7 @@ class IpAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAware
      */
     public function public(?string $message = null): static
     {
-        return $this->rule(new PublicIp(), $message);
+        return $this->rule(new PublicIp, $message);
     }
 
     /**
@@ -89,7 +91,7 @@ class IpAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAware
      */
     public function private(?string $message = null): static
     {
-        return $this->rule(new PrivateIp(), $message);
+        return $this->rule(new PrivateIp, $message);
     }
 
     /**
@@ -100,11 +102,23 @@ class IpAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAware
      * FluentRule::ip()->inRange(['203.0.113.0/24', '2001:db8::/32'])
      * ```
      *
-     * @param  list<string>|string  $networks
+     * @param list<string>|string $networks
      */
     public function inRange(array|string $networks, ?string $message = null): static
     {
         return $this->rule(new InCidrRange(array_values((array) $networks)), $message);
+    }
+
+    /**
+     * @return list<string|object>
+     */
+    protected function buildValidationRules(): array
+    {
+        return [
+            ...$this->reorderConstraints($this->constraints),
+            $this->family,
+            ...$this->rules,
+        ];
     }
 
     private function family(string $rule, ?string $message): static
@@ -119,17 +133,5 @@ class IpAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAware
         }
 
         return $this;
-    }
-
-    /**
-     * @return list<string|object>
-     */
-    protected function buildValidationRules(): array
-    {
-        return [
-            ...$this->reorderConstraints($this->constraints),
-            $this->family,
-            ...$this->rules,
-        ];
     }
 }

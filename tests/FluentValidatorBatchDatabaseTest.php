@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Database\Schema\Blueprint;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Schema\Blueprint;
 use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\FluentValidator;
 
 // =========================================================================
@@ -18,7 +20,7 @@ function setupFluentValidatorDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver' => 'sqlite',
+        'driver'   => 'sqlite',
         'database' => ':memory:',
     ]]);
 

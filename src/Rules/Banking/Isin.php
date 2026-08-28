@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Banking;
 
@@ -22,13 +24,6 @@ final class Isin implements ValidationRule
 {
     private const string PATTERN = '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/D';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.isin')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value)) {
@@ -49,5 +44,12 @@ final class Isin implements ValidationRule
         }
 
         return Luhn::passes($expanded);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.isin')->translate();
+        }
     }
 }

@@ -21,7 +21,7 @@ function providerFiles(string $src): array
 
     /** @var iterable<SplFileInfo> $files */
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS)
+        new RecursiveDirectoryIterator($src, FilesystemIterator::SKIP_DOTS),
     );
 
     foreach ($files as $file) {
@@ -56,7 +56,7 @@ it('ends every provider namespace in Providers', function (): void {
         preg_match('/^namespace\s+([^;]+);/m', $source === false ? '' : $source, $matches);
 
         expect($matches[1] ?? '')->toEndWith('\\Providers');
-        ++$checked;
+        $checked++;
     }
 
     expect($checked)->toBeGreaterThan(0);

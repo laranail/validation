@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
+declare(strict_types=1);
+
 use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Event;
+use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\Events\RuleSetCompiling;
-use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 use Simtabi\Laranail\Validation\Events\ValidationFailed;
 use Simtabi\Laranail\Validation\Events\ValidationStarting;
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 
 /**
  * The event vocabulary and closure hooks of §5.6 — the seams a consumer
@@ -50,7 +52,7 @@ it('does not permanently mutate the rule set through the event', function (): vo
     $calls = 0;
 
     Event::listen(RuleSetCompiling::class, function (RuleSetCompiling $event) use (&$calls): void {
-        ++$calls;
+        $calls++;
 
         if ($calls === 1) {
             $event->rules['once_only'] = 'required';

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Events;
 
@@ -18,10 +20,10 @@ use Simtabi\Laranail\Validation\RuleSet;
 final class RuleSetCompiling
 {
     /**
-     * @param  array<string, mixed>  $rules  Field → rule input, as the rule set holds it. Mutable.
-     * @param  array<string, string>  $messages  Custom messages. Mutable.
-     * @param  array<string, string>  $attributes  Human attribute names. Mutable.
-     * @param  array<string, mixed>  $data  The data about to be validated. Mutable.
+     * @param array<string, mixed> $rules Field → rule input, as the rule set holds it. Mutable.
+     * @param array<string, string> $messages Custom messages. Mutable.
+     * @param array<string, string> $attributes Human attribute names. Mutable.
+     * @param array<string, mixed> $data The data about to be validated. Mutable.
      */
     public function __construct(
         public readonly RuleSet $ruleSet,

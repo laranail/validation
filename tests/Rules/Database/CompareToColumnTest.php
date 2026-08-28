@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Database\Schema\Blueprint;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Rules\Database\CompareToColumn;
 use Simtabi\Laranail\Validation\Rules\Database\Comparison;
+use Simtabi\Laranail\Validation\Rules\Database\CompareToColumn;
 
 beforeEach(function (): void {
     config(['database.default' => 'testing']);
@@ -25,7 +27,11 @@ beforeEach(function (): void {
 
 it('compares the value against the looked-up column across the operators', function (): void {
     $rule = static fn (Comparison $op): CompareToColumn => new CompareToColumn(
-        'products', 'max_quantity', $op, 'id', 1,
+        'products',
+        'max_quantity',
+        $op,
+        'id',
+        1,
     );
 
     expect(ruleAccepts($rule(Comparison::LessThanOrEqual), '10'))->toBeTrue()
@@ -50,7 +56,7 @@ it('compares numerically, not lexicographically', function (): void {
 it('reads an @-prefixed key from a sibling field', function (): void {
     $rules = [
         'product_id' => 'required',
-        'quantity' => [new CompareToColumn('products', 'max_quantity', Comparison::LessThanOrEqual, 'id', '@product_id')],
+        'quantity'   => [new CompareToColumn('products', 'max_quantity', Comparison::LessThanOrEqual, 'id', '@product_id')],
     ];
 
     expect(Validator::make(['product_id' => 1, 'quantity' => '10'], $rules)->passes())->toBeTrue()

@@ -1,20 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Http\FormRequest;
+declare(strict_types=1);
+
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Validation\Rule;
+use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Http\FormRequest;
+use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\HasFluentRules;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\HasFluentRules;
-use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Helper: set up in-memory SQLite with mixed integer + uuid tables
@@ -24,7 +26,7 @@ function setupGuardsDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver' => 'sqlite',
+        'driver'   => 'sqlite',
         'database' => ':memory:',
     ]]);
 
@@ -42,12 +44,13 @@ function setupGuardsDatabase(): void
 }
 
 /**
- * @param  array<string, mixed>  $rules
- * @param  array<string, mixed>  $data
+ * @param array<string, mixed> $rules
+ * @param array<string, mixed> $data
  */
 function createGuardsFormRequest(array $rules, array $data): FormRequest
 {
-    $formRequest = new class extends FormRequest {
+    $formRequest = new class extends FormRequest
+    {
         use HasFluentRules;
 
         /** @var array<string, mixed> */
@@ -136,7 +139,8 @@ it('filterValuesByType keeps ULIDs and drops malformed for ulid rule', function 
 });
 
 it('filterValuesByType preserves scalar and Stringable for string rule', function (): void {
-    $stringable = new class implements Stringable {
+    $stringable = new class implements Stringable
+    {
         public function __toString(): string
         {
             return 'x';
@@ -368,11 +372,11 @@ it('exists and unique against same (table, column) fall back to per-item queries
 
     $groups = [
         'widgets:uuid:exists' => [
-            'rule' => $existsRule,
+            'rule'   => $existsRule,
             'values' => ['11111111-2222-3333-4444-555555555555'],
         ],
         'widgets:uuid:unique' => [
-            'rule' => $uniqueRule,
+            'rule'   => $uniqueRule,
             'values' => ['99999999-0000-0000-0000-000000000000'],
         ],
     ];
@@ -392,11 +396,11 @@ it('non-conflicting (different columns) exists and unique groups are both regist
 
     $groups = [
         'widgets:uuid:exists' => [
-            'rule' => $existsRule,
+            'rule'   => $existsRule,
             'values' => ['11111111-2222-3333-4444-555555555555'],
         ],
         'widgets:id:unique' => [
-            'rule' => $uniqueRule,
+            'rule'   => $uniqueRule,
             'values' => ['1'],
         ],
     ];
@@ -446,7 +450,7 @@ it('buildVerifier throws BatchLimitExceededException when group exceeds cap', fu
     $rule = Rule::exists('widgets', 'id');
 
     $values = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $values[] = (string) $i;
     }
 
@@ -518,7 +522,7 @@ it('FormRequest path remaps hard-cap breach to ValidationException', function ()
 
     // Build 11 distinct valid ids; cap 10 so we trip the hard cap.
     $items = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -555,7 +559,7 @@ it('FormRequest path raw BatchLimitExceededException carries ruleType and reason
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -594,7 +598,7 @@ it('RuleSet check() returns failed Validated on hard-cap breach without throwing
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -619,7 +623,7 @@ it('RuleSet validate() throws ValidationException on hard-cap breach (not BatchL
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -649,7 +653,7 @@ it('duplicate values deduplicate before cap check (10001 identical ids with cap 
 
     // 10_001 identical ids — after dedup this is 1 value, well under any cap.
     $items = [];
-    for ($i = 0; $i < 10_001; ++$i) {
+    for ($i = 0; $i < 10_001; $i++) {
         $items[] = ['id' => 1];
     }
 
@@ -715,7 +719,7 @@ it('FormRequest path short-circuits when flat parent array exceeds max:N', funct
 
     // Parent says max:5, user sends 100 items.
     $items = [];
-    for ($i = 1; $i <= 100; ++$i) {
+    for ($i = 1; $i <= 100; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -794,7 +798,7 @@ it('FormRequest path short-circuits nested wildcard when inner parent exceeds ma
 
     // orders.*.items has max:3; the first order sends 10 items.
     $overflow = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $overflow[] = ['id' => $i];
     }
 
@@ -879,13 +883,13 @@ it('parent-max detection handles string-form parent rule (array|max:5)', functio
     // Use plain array rules (not FluentRule) so the parent ends up as a
     // pipe-delimited string — forces the string branch of extractParentMax.
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
     $formRequest = createGuardsFormRequest(
         rules: [
-            'items' => 'required|array|max:5',
+            'items'      => 'required|array|max:5',
             'items.*.id' => ['required', 'integer', Rule::exists('testing.widgets', 'id')],
         ],
         data: ['items' => $items],
@@ -918,7 +922,7 @@ it('FormRequest raw BatchLimitExceededException for parent-max carries attribute
 
     // Bypass the trait remap by calling the private method directly.
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -926,7 +930,7 @@ it('FormRequest raw BatchLimitExceededException for parent-max carries attribute
         'items' => ['required', 'array', 'max:5'],
     ];
     $wildcardAttributes = [];
-    for ($i = 0; $i < 10; ++$i) {
+    for ($i = 0; $i < 10; $i++) {
         $key = "items.{$i}.id";
         $preparedRules[$key] = ['required', 'integer', Rule::exists('testing.widgets', 'id')];
         $wildcardAttributes[] = $key;
@@ -957,11 +961,12 @@ it('FormRequest failedValidation() override sees parent-max remapped ValidationE
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
-    $formRequest = new class extends FormRequest {
+    $formRequest = new class extends FormRequest
+    {
         use HasFluentRules;
 
         public static bool $failedValidationWasCalled = false;
@@ -1018,7 +1023,7 @@ it('parent-max remap populates Validator::failed() with the Max rule key', funct
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -1056,7 +1061,7 @@ it('RuleSet validateInternal rejects flat parent max:N before any DB query fires
     // path, the top validator catches `max` before per-item wildcard
     // validation runs (and before batching).
     $items = [];
-    for ($i = 1; $i <= 20; ++$i) {
+    for ($i = 1; $i <= 20; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -1094,9 +1099,9 @@ it('RuleSet nested second-level wildcard does NOT batch today (accidental DoS sa
     // `.*.` field names — so nested batching is a no-op. Pin this so any
     // future change to enable nested batching MUST also add the guards.
     $orders = [];
-    for ($o = 0; $o < 2; ++$o) {
+    for ($o = 0; $o < 2; $o++) {
         $items = [];
-        for ($i = 1; $i <= 2; ++$i) {
+        for ($i = 1; $i <= 2; $i++) {
             $items[] = ['id' => $i];
         }
 
@@ -1169,7 +1174,7 @@ it('FormRequest path: Phase 1 + 2 + 3 guards co-operate on a single request', fu
     // Parent max is 50, so Phase 3 (parent-max) does NOT fire — but Phase 2
     // (hard cap, override to 5) does, applied to filter+dedup'd values.
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -1214,7 +1219,7 @@ it('RuleSet check(): Phase 1 + 2 guards co-operate via the full engine', functio
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -1242,7 +1247,7 @@ it('parent-max short-circuit also fires for unique rules, carrying ruleType=uniq
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $items[] = ['uuid' => sprintf('%08d-0000-0000-0000-000000000000', $i)];
     }
 
@@ -1251,7 +1256,7 @@ it('parent-max short-circuit also fires for unique rules, carrying ruleType=uniq
         'items' => ['required', 'array', 'max:3'],
     ];
     $wildcardAttributes = [];
-    for ($i = 0; $i < 10; ++$i) {
+    for ($i = 0; $i < 10; $i++) {
         $key = "items.{$i}.uuid";
         $preparedRules[$key] = ['required', 'uuid', Rule::unique('testing.widgets', 'uuid')];
         $wildcardAttributes[] = $key;
@@ -1282,7 +1287,7 @@ it('RuleSet withBag() stamps the error bag onto remapped hard-cap ValidationExce
     setupGuardsDatabase();
 
     $items = [];
-    for ($i = 1; $i <= 11; ++$i) {
+    for ($i = 1; $i <= 11; $i++) {
         $items[] = ['id' => $i];
     }
 
@@ -1369,7 +1374,7 @@ it('hard-cap trips fast and cheaply on a realistic 50k-item hostile payload', fu
     // fires, and it must not exhaust memory or blow past a sensible wall-clock
     // budget.
     $items = [];
-    for ($i = 1; $i <= 50_000; ++$i) {
+    for ($i = 1; $i <= 50_000; $i++) {
         $items[] = ['id' => $i];
     }
 

@@ -1,35 +1,37 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\ValidationException;
-use InvalidArgumentException;
-use IteratorAggregate;
+use Traversable;
 use LogicException;
+use IteratorAggregate;
 use ReflectionProperty;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use InvalidArgumentException;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\ValidationJs\RuleExporter;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Internal\ItemValidator;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Events\RuleSetCompiling;
-use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 use Simtabi\Laranail\Validation\Events\ValidationFailed;
-use Simtabi\Laranail\Validation\Events\ValidationStarting;
-use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 use Simtabi\Laranail\Validation\Internal\BatchLimitRemap;
-use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
+use Simtabi\Laranail\Validation\Events\ValidationStarting;
 use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
-use Simtabi\Laranail\Validation\Internal\ItemValidator;
+use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 use Simtabi\Laranail\Validation\Internal\VanillaAfterRoute;
-use Simtabi\Laranail\ValidationJs\RuleExporter;
-use Traversable;
+use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
+use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 
 /**
  * @implements Arrayable<string, mixed>
@@ -63,19 +65,19 @@ final class RuleSet implements Arrayable, IteratorAggregate
 
     public function __construct()
     {
-        $this->ruleCompiler = new ItemRuleCompiler();
-        $this->errorCollector = new ItemErrorCollector();
+        $this->ruleCompiler = new ItemRuleCompiler;
+        $this->errorCollector = new ItemErrorCollector;
     }
 
     public static function make(): self
     {
-        return new self();
+        return new self;
     }
 
     /** @param  array<string, mixed>  $rules */
     public static function from(array $rules): self
     {
-        $ruleSet = new self();
+        $ruleSet = new self;
         $ruleSet->fields = $rules;
 
         return $ruleSet;
@@ -91,11 +93,107 @@ final class RuleSet implements Arrayable, IteratorAggregate
      *         'email' => $rules->email()->required(),
      *     ])->validate($data);
      *
-     * @param  Closure(FluentSchema): array<string, mixed>  $callback
+     * @param Closure(FluentSchema): array<string, mixed> $callback
      */
     public static function define(Closure $callback): self
     {
-        return self::from($callback(new FluentSchema()));
+        return self::from($callback(new FluentSchema));
+    }
+
+    /**
+     * @param array<string, mixed> $rules
+     *
+     * @return array<string, mixed>
+     */
+    public static function compile(array $rules): array
+    {
+        foreach ($rules as $field => $rule) {
+            if (is_object($rule) && method_exists($rule, 'compiledRules')) {
+                $rules[$field] = $rule->compiledRules();
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Compile rules to array format, guaranteed to return arrays per field.
+     * Useful when passing rules to APIs that expect array<string, array<mixed>>
+     * (e.g., Livewire's $this->validate()).
+     *
+     * @param array<string, mixed> $rules
+     *
+     * @return array<string, array<mixed>>
+     */
+    /**
+     * Compile rules and extract labels/messages for use with Livewire's validate().
+     * Returns [rules, messages, attributes] matching validate()'s parameter order.
+     *
+     * Usage in Filament components:
+     *   [$rules, $messages, $attributes] = RuleSet::compileWithMetadata($this->rules());
+     *   $this->validate($rules, $messages, $attributes);
+     *
+     * @param array<string, mixed> $rules
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, string>, 2: array<string, string>}
+     */
+    public static function compileWithMetadata(array $rules): array
+    {
+        $ruleSet = self::from($rules);
+        $flattened = $ruleSet->flattenRules();
+        [$messages, $attributes] = self::extractMetadata($flattened);
+
+        return [self::compile($flattened), $messages, $attributes];
+    }
+
+    /**
+     * @param array<string, mixed> $rules
+     *
+     * @return array<string, array<mixed>>
+     */
+    public static function compileToArrays(array $rules): array
+    {
+        $compiled = self::compile($rules);
+
+        /** @var array<string, array<mixed>> $result */
+        $result = [];
+
+        foreach ($compiled as $field => $rule) {
+            if (is_string($rule)) {
+                $result[$field] = explode('|', $rule);
+            } elseif (is_array($rule)) {
+                $result[$field] = $rule;
+            } else {
+                $result[$field] = [$rule];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Extract labels and per-rule messages from rule objects before compilation.
+     *
+     * @param array<string, mixed> $rules
+     *
+     * @return array{0: array<string, string>, 1: array<string, string>}
+     */
+    public static function extractMetadata(array $rules): array
+    {
+        $messages = [];
+        $attributes = [];
+
+        foreach ($rules as $field => $rule) {
+            // For mixed arrays like ['exclude', FluentRule::string('ID')],
+            // look inside for rule objects with metadata.
+            $objects = is_object($rule) ? [$rule] : (is_array($rule) ? array_filter($rule, is_object(...)) : []);
+
+            foreach ($objects as $object) {
+                self::extractObjectMetadata($object, $field, $messages, $attributes);
+            }
+        }
+
+        return [$messages, $attributes];
     }
 
     public function field(string $name, mixed $rule): self
@@ -117,10 +215,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  string|list<string>  ...$fields  Pass either as variadic strings
-     *                                           (`->only('a', 'b')`) or as a single
-     *                                           array (`->only(['a', 'b'])`) — matches
-     *                                           Collection::only / Arr::only semantics.
+     * @param string|list<string> ...$fields Pass either as variadic strings
+     *                                       (`->only('a', 'b')`) or as a single
+     *                                       array (`->only(['a', 'b'])`) — matches
+     *                                       Collection::only / Arr::only semantics.
      */
     public function only(string|array ...$fields): self
     {
@@ -217,13 +315,13 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * If strict add-only behaviour is required (collision throws), use the
      * primitive `modify($field, fn ($r) => $r->addEachRule($key, $rule))`.
      *
-     * @param  array<string, ValidationRule>  $rules
+     * @param array<string, ValidationRule> $rules
      *
      * @throws LogicException When `$field` is not in the rule set, when the
-     *                         stored rule is not an `ArrayRule`, or when the
-     *                         stored rule's `each()` is list-shaped (a
-     *                         `CannotExtendListShapedEach` bubbles out of
-     *                         `mergeEachRules`).
+     *                        stored rule is not an `ArrayRule`, or when the
+     *                        stored rule's `each()` is list-shaped (a
+     *                        `CannotExtendListShapedEach` bubbles out of
+     *                        `mergeEachRules`).
      */
     public function modifyEach(string $field, array $rules): self
     {
@@ -247,17 +345,17 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * consumer demand surfaced). Falls through to `modify()` with the
      * primitive if you need to extend an `ArrayRule`'s `children()`.
      *
-     * @param  array<string, ValidationRule>  $rules
+     * @param array<string, ValidationRule> $rules
      *
      * @throws LogicException When `$field` is not in the rule set or the
-     *                         stored rule is not a `FieldRule`.
+     *                        stored rule is not a `FieldRule`.
      */
     public function modifyChildren(string $field, array $rules): self
     {
         return $this->modify($field, static function (mixed $rule) use ($field, $rules): ValidationRule {
             if (! $rule instanceof FieldRule) {
                 throw new LogicException(
-                    "Field [{$field}] is not a FieldRule — modifyChildren() only applies to FluentRule::field() rules. For ArrayRule::children() extension, use modify(\$field, fn (\$r) => \$r->children([...]))."
+                    "Field [{$field}] is not a FieldRule — modifyChildren() only applies to FluentRule::field() rules. For ArrayRule::children() extension, use modify(\$field, fn (\$r) => \$r->children([...])).",
                 );
             }
 
@@ -313,7 +411,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * Callbacks run in registration order, each seeing the previous one's
      * output — trimming, casting, or normalising input belongs here.
      *
-     * @param  Closure(array<string, mixed>): (array<string, mixed>|null)  $callback
+     * @param Closure(array<string, mixed>): (array<string, mixed>|null) $callback
      */
     public function before(Closure $callback): self
     {
@@ -335,7 +433,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * shortcuts. Hooks trade speed for the full Laravel feature; a rule set
      * without them keeps the fast engine.
      *
-     * @param  Closure(\Illuminate\Validation\Validator): void  $callback
+     * @param Closure(\Illuminate\Validation\Validator): void $callback
      */
     public function after(Closure $callback): self
     {
@@ -411,8 +509,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
         [$messages, $attributes] = self::extractMetadata($flat);
 
         return [
-            'rules' => self::compileToArrays($flat),
-            'messages' => $messages,
+            'rules'      => self::compileToArrays($flat),
+            'messages'   => $messages,
             'attributes' => $attributes,
         ];
     }
@@ -426,8 +524,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
      *     $p = RuleSet::from($rules)->prepare($data);
      *     parent::__construct($translator, $data, $p->rules, $p->messages, $p->attributes);
      *
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>|null  $flatRules  Pre-computed flatten() result
+     * @param array<string, mixed> $data
+     * @param array<string, mixed>|null $flatRules Pre-computed flatten() result
      */
     public function prepare(array $data, ?array $flatRules = null): PreparedRules
     {
@@ -460,9 +558,9 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * calls `$request->all()` internally, keeping the unsafe read scoped
      * to the library boundary for static-analysis purposes.
      *
-     * @param  array<string, mixed>|Request  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed>|Request $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
      */
     public function check(array|Request $data, array $messages = [], array $attributes = []): Validated
     {
@@ -474,7 +572,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
             return new Validated(
                 passes: true,
                 validated: $validated,
-                errors: new MessageBag(),
+                errors: new MessageBag,
                 validator: Validator::make($data, []),
             );
         } catch (ValidationException $validationException) {
@@ -492,7 +590,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
+     *
      * @return array<string, mixed>
      */
     public function expandWildcards(array $data): array
@@ -512,8 +611,9 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * fast at the call site with the install command rather than returning
      * an empty schema a browser would silently treat as "nothing to check".
      *
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array{version: int, fields: array<string, array{attribute: string|null, client: list<array{rule: string, params: array<array-key, string>}>, server: list<string>}>, messages: array<string, string>, messageVariants: array<string, array<string, string>>}
      *
      * @throws LogicException When laranail/validation-js is not installed.
@@ -544,9 +644,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * calls `$request->all()` internally, keeping the unsafe read scoped
      * to the library boundary for static-analysis purposes.
      *
-     * @param  array<string, mixed>|Request  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed>|Request $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException
@@ -572,12 +673,123 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
+     * Expand wildcard rules against `$data` and return the rules paired with
+     * implicit-attributes metadata. Returns the awkward tuple shape
+     * `[$rules, $implicitAttributes]`; user code should reach for
+     * `expandWildcards()` (rules only) or `prepare()` (full PreparedRules
+     * payload) instead.
+     *
+     * @internal Used by {@see prepare()}, {@see validate()}, and the
+     *     compile pipeline. Not covered by the package's BC promise.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed>|null $flatRules Pre-computed flatten() result
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, list<string>>}
+     */
+    public function expand(array $data, ?array $flatRules = null): array
+    {
+        $flatRules ??= $this->flatten();
+        $rules = [];
+        $implicitAttributes = [];
+
+        foreach ($flatRules as $field => $rule) {
+            if (! str_contains($field, '*')) {
+                $rules[$field] = $rule;
+
+                continue;
+            }
+
+            $paths = WildcardExpander::expand($field, $data);
+
+            if ($paths !== []) {
+                $implicitAttributes[$field] = $paths;
+            }
+
+            foreach ($paths as $path) {
+                $rules[$path] = $rule;
+            }
+        }
+
+        return [$rules, $implicitAttributes];
+    }
+
+    /**
+     * Flatten rules with wildcard keys preserved (e.g. items.*.name).
+     * Unlike prepare(), this does NOT expand wildcards against data.
+     *
+     * @return array<string, mixed>
+     */
+    public function flattenRules(): array
+    {
+        return $this->flatten();
+    }
+
+    /**
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     */
+    private static function extractObjectMetadata(object $object, string $field, array &$messages, array &$attributes): void
+    {
+        if (method_exists($object, 'getLabel')) {
+            $label = $object->getLabel();
+
+            if (is_string($label)) {
+                $attributes[$field] = $label;
+            }
+        }
+
+        if (method_exists($object, 'getCustomMessages')) {
+            /** @var array<string, string> $customMessages */
+            $customMessages = $object->getCustomMessages();
+            foreach ($customMessages as $ruleName => $msg) {
+                $messages[$ruleName === '' ? $field : $field . '.' . $ruleName] = $msg;
+            }
+        }
+    }
+
+    /** @param  array<string, mixed>  $rules */
+    private static function flattenRule(string $prefix, mixed $rule, array &$rules): void
+    {
+        // Get nested rule definitions if the rule supports them.
+        $eachListRule = $rule instanceof ArrayRule ? $rule->getEachListRule() : null;
+        $eachKeyedRules = $rule instanceof ArrayRule ? $rule->getEachKeyedRules() : null;
+
+        /** @var array<string, mixed>|null $childRules */
+        $childRules = is_object($rule) && method_exists($rule, 'getChildRules') ? $rule->getChildRules() : null;
+
+        if (! $eachListRule instanceof ValidationRule && $eachKeyedRules === null && $childRules === null) {
+            $rules[$prefix] = $rule;
+
+            return;
+        }
+
+        // Store the parent rule, stripped of nested definitions to prevent double-validation.
+        $rules[$prefix] = $rule instanceof ArrayRule ? $rule->withoutEachRules() : $rule;
+
+        // each() → wildcard paths: items.*.name
+        if ($eachListRule instanceof ValidationRule) {
+            self::flattenRule($prefix . '.*', $eachListRule, $rules);
+        } elseif ($eachKeyedRules !== null) {
+            foreach ($eachKeyedRules as $field => $fieldRule) {
+                self::flattenRule($prefix . '.*.' . $field, $fieldRule, $rules);
+            }
+        }
+
+        // children() → fixed paths: search.value, answer.email_address
+        foreach ($childRules ?? [] as $field => $fieldRule) {
+            self::flattenRule($prefix . '.' . $field, $fieldRule, $rules);
+        }
+    }
+
+    /**
      * Normalize a public entry-point's `$data` argument. Routing `Request`
      * through `->all()` here keeps the unsafe-input read scoped to the
      * package boundary, so callers can use `RuleSet::validate($request)`
      * without tripping static-analysis rules against `$request->all()`.
      *
-     * @param  array<string, mixed>|Request  $data
+     * @param array<string, mixed>|Request $data
+     *
      * @return array<string, mixed>
      */
     private function normalizeInput(array|Request $data): array
@@ -595,9 +807,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException
@@ -659,9 +872,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException
@@ -683,9 +897,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException
@@ -750,7 +965,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
     /**
      * Split flattened rules into top-level rules and wildcard groups.
      *
-     * @param  array<string, mixed>|null  $flatRules  Pre-computed flatten() result to avoid re-processing
+     * @param array<string, mixed>|null $flatRules Pre-computed flatten() result to avoid re-processing
+     *
      * @return array{0: array<string, mixed>, 1: array<string, array<string, mixed>>}
      */
     private function separateRules(?array $flatRules = null): array
@@ -776,7 +992,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
             if (! str_contains($field, '.*')) {
                 throw new InvalidArgumentException(
                     "Malformed wildcard rule key [{$field}]: a wildcard segment must be written as '.*' "
-                    . "(e.g. 'items.*.name'). Did you mean '" . str_replace('*', '.*', $field) . "'?"
+                    . "(e.g. 'items.*.name'). Did you mean '" . str_replace('*', '.*', $field) . "'?",
                 );
             }
 
@@ -793,24 +1009,24 @@ final class RuleSet implements Arrayable, IteratorAggregate
     /**
      * Validate all wildcard groups per-item with fast-check optimization.
      *
-     * @param  array<string, array<string, mixed>>  $wildcardGroups
-    /**
-     * @param  array<string, array<string, mixed>>  $wildcardGroups
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
-     * @param  array<string, mixed>|null  $fallbackResult  Set when full expansion fallback is used
+     * @param array<string, array<string, mixed>> $wildcardGroups
+     * @param array<string, array<string, mixed>> $wildcardGroups
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     * @param array<string, mixed>|null $fallbackResult Set when full expansion fallback is used
+     *
      * @return array<string, list<string>>
      *
      * @throws ValidationException
      */
     private function validateWildcardGroups(
-        array  $wildcardGroups,
-        array  $data,
-        array  $messages,
-        array  $attributes,
+        array $wildcardGroups,
+        array $data,
+        array $messages,
+        array $attributes,
         ?array &$fallbackResult = null,
-        bool   $stopOnFirstFailure = false,
+        bool $stopOnFirstFailure = false,
     ): array {
         /** @var array<string, list<string>> $allErrors */
         $allErrors = [];
@@ -865,10 +1081,11 @@ final class RuleSet implements Arrayable, IteratorAggregate
     /**
      * Validate individual items in a wildcard group.
      *
-     * @param  array<int|string, mixed>  $items
-     * @param  array<string, mixed>  $itemRules
-     * @param  array<string, string>  $itemMessages
-     * @param  array<string, string>  $itemAttributes
+     * @param array<int|string, mixed> $items
+     * @param array<string, mixed> $itemRules
+     * @param array<string, string> $itemMessages
+     * @param array<string, string> $itemAttributes
+     *
      * @return array<string, list<string>>
      */
     private function validateItems(array $items, array $itemRules, array $itemMessages, array $itemAttributes, string $parent, bool $isScalar, bool $stopOnFirstFailure = false): array
@@ -880,11 +1097,11 @@ final class RuleSet implements Arrayable, IteratorAggregate
     /**
      * Reject input keys not covered by any rule in the set.
      *
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $topRules
-     * @param  array<string, array<string, mixed>>  $wildcardGroups
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $topRules
+     * @param array<string, array<string, mixed>> $wildcardGroups
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
      *
      * @throws ValidationException
      */
@@ -918,7 +1135,7 @@ final class RuleSet implements Arrayable, IteratorAggregate
     /**
      * Check if an input key matches any allowed rule key, including wildcard patterns.
      *
-     * @param  list<string>  $allowedKeys
+     * @param list<string> $allowedKeys
      */
     private function isKnownField(string $inputKey, array $allowedKeys): bool
     {
@@ -958,7 +1175,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
      *   ['exclude_unless', 'items.*.type', 'chapter'] → ['exclude_unless', 'type', 'chapter']
      *   'gte:items.*.start_time' → 'gte:start_time'
      *
-     * @param  array<string, mixed>  $groupRules
+     * @param array<string, mixed> $groupRules
+     *
      * @return array<string, mixed>
      */
     private function rewriteRulesForPerItem(array $groupRules, string $parent): array
@@ -1000,7 +1218,8 @@ final class RuleSet implements Arrayable, IteratorAggregate
      * rule's constraint list so per-item validation resolves the dep against
      * the relative item.
      *
-     * @param  array<int|string, mixed>  $rule
+     * @param array<int|string, mixed> $rule
+     *
      * @return list<mixed>
      */
     private function stripPrefixFromConstraints(array $rule, string $prefix): array
@@ -1045,9 +1264,10 @@ final class RuleSet implements Arrayable, IteratorAggregate
     }
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     *
      * @return array<string, mixed>
      *
      * @throws ValidationException
@@ -1073,149 +1293,6 @@ final class RuleSet implements Arrayable, IteratorAggregate
         return $validator->validate();
     }
 
-    /**
-     * Expand wildcard rules against `$data` and return the rules paired with
-     * implicit-attributes metadata. Returns the awkward tuple shape
-     * `[$rules, $implicitAttributes]`; user code should reach for
-     * `expandWildcards()` (rules only) or `prepare()` (full PreparedRules
-     * payload) instead.
-     *
-     * @internal Used by {@see prepare()}, {@see validate()}, and the
-     *     compile pipeline. Not covered by the package's BC promise.
-     *
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>|null  $flatRules  Pre-computed flatten() result
-     * @return array{0: array<string, mixed>, 1: array<string, list<string>>}
-     */
-    public function expand(array $data, ?array $flatRules = null): array
-    {
-        $flatRules ??= $this->flatten();
-        $rules = [];
-        $implicitAttributes = [];
-
-        foreach ($flatRules as $field => $rule) {
-            if (! str_contains($field, '*')) {
-                $rules[$field] = $rule;
-
-                continue;
-            }
-
-            $paths = WildcardExpander::expand($field, $data);
-
-            if ($paths !== []) {
-                $implicitAttributes[$field] = $paths;
-            }
-
-            foreach ($paths as $path) {
-                $rules[$path] = $rule;
-            }
-        }
-
-        return [$rules, $implicitAttributes];
-    }
-
-    /**
-     * @param  array<string, mixed>  $rules
-     * @return array<string, mixed>
-     */
-    public static function compile(array $rules): array
-    {
-        foreach ($rules as $field => $rule) {
-            if (is_object($rule) && method_exists($rule, 'compiledRules')) {
-                $rules[$field] = $rule->compiledRules();
-            }
-        }
-
-        return $rules;
-    }
-
-    /**
-     * Compile rules to array format, guaranteed to return arrays per field.
-     * Useful when passing rules to APIs that expect array<string, array<mixed>>
-     * (e.g., Livewire's $this->validate()).
-     *
-     * @param  array<string, mixed>  $rules
-     * @return array<string, array<mixed>>
-     */
-    /**
-     * Compile rules and extract labels/messages for use with Livewire's validate().
-     * Returns [rules, messages, attributes] matching validate()'s parameter order.
-     *
-     * Usage in Filament components:
-     *   [$rules, $messages, $attributes] = RuleSet::compileWithMetadata($this->rules());
-     *   $this->validate($rules, $messages, $attributes);
-     *
-     * @param  array<string, mixed>  $rules
-     * @return array{0: array<string, mixed>, 1: array<string, string>, 2: array<string, string>}
-     */
-    public static function compileWithMetadata(array $rules): array
-    {
-        $ruleSet = self::from($rules);
-        $flattened = $ruleSet->flattenRules();
-        [$messages, $attributes] = self::extractMetadata($flattened);
-
-        return [self::compile($flattened), $messages, $attributes];
-    }
-
-    /**
-     * @param  array<string, mixed>  $rules
-     * @return array<string, array<mixed>>
-     */
-    public static function compileToArrays(array $rules): array
-    {
-        $compiled = self::compile($rules);
-
-        /** @var array<string, array<mixed>> $result */
-        $result = [];
-
-        foreach ($compiled as $field => $rule) {
-            if (is_string($rule)) {
-                $result[$field] = explode('|', $rule);
-            } elseif (is_array($rule)) {
-                $result[$field] = $rule;
-            } else {
-                $result[$field] = [$rule];
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Extract labels and per-rule messages from rule objects before compilation.
-     *
-     * @param  array<string, mixed>  $rules
-     * @return array{0: array<string, string>, 1: array<string, string>}
-     */
-    public static function extractMetadata(array $rules): array
-    {
-        $messages = [];
-        $attributes = [];
-
-        foreach ($rules as $field => $rule) {
-            // For mixed arrays like ['exclude', FluentRule::string('ID')],
-            // look inside for rule objects with metadata.
-            $objects = is_object($rule) ? [$rule] : (is_array($rule) ? array_filter($rule, is_object(...)) : []);
-
-            foreach ($objects as $object) {
-                self::extractObjectMetadata($object, $field, $messages, $attributes);
-            }
-        }
-
-        return [$messages, $attributes];
-    }
-
-    /**
-     * Flatten rules with wildcard keys preserved (e.g. items.*.name).
-     * Unlike prepare(), this does NOT expand wildcards against data.
-     *
-     * @return array<string, mixed>
-     */
-    public function flattenRules(): array
-    {
-        return $this->flatten();
-    }
-
     /** @return array<string, mixed> */
     private function flatten(): array
     {
@@ -1226,62 +1303,5 @@ final class RuleSet implements Arrayable, IteratorAggregate
         }
 
         return $rules;
-    }
-
-    /**
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
-     */
-    private static function extractObjectMetadata(object $object, string $field, array &$messages, array &$attributes): void
-    {
-        if (method_exists($object, 'getLabel')) {
-            $label = $object->getLabel();
-
-            if (is_string($label)) {
-                $attributes[$field] = $label;
-            }
-        }
-
-        if (method_exists($object, 'getCustomMessages')) {
-            /** @var array<string, string> $customMessages */
-            $customMessages = $object->getCustomMessages();
-            foreach ($customMessages as $ruleName => $msg) {
-                $messages[$ruleName === '' ? $field : $field . '.' . $ruleName] = $msg;
-            }
-        }
-    }
-
-    /** @param  array<string, mixed>  $rules */
-    private static function flattenRule(string $prefix, mixed $rule, array &$rules): void
-    {
-        // Get nested rule definitions if the rule supports them.
-        $eachListRule = $rule instanceof ArrayRule ? $rule->getEachListRule() : null;
-        $eachKeyedRules = $rule instanceof ArrayRule ? $rule->getEachKeyedRules() : null;
-
-        /** @var array<string, mixed>|null $childRules */
-        $childRules = is_object($rule) && method_exists($rule, 'getChildRules') ? $rule->getChildRules() : null;
-
-        if (! $eachListRule instanceof ValidationRule && $eachKeyedRules === null && $childRules === null) {
-            $rules[$prefix] = $rule;
-
-            return;
-        }
-
-        // Store the parent rule, stripped of nested definitions to prevent double-validation.
-        $rules[$prefix] = $rule instanceof ArrayRule ? $rule->withoutEachRules() : $rule;
-
-        // each() → wildcard paths: items.*.name
-        if ($eachListRule instanceof ValidationRule) {
-            self::flattenRule($prefix . '.*', $eachListRule, $rules);
-        } elseif ($eachKeyedRules !== null) {
-            foreach ($eachKeyedRules as $field => $fieldRule) {
-                self::flattenRule($prefix . '.*.' . $field, $fieldRule, $rules);
-            }
-        }
-
-        // children() → fixed paths: search.value, answer.email_address
-        foreach ($childRules ?? [] as $field => $fieldRule) {
-            self::flattenRule($prefix . '.' . $field, $fieldRule, $rules);
-        }
     }
 }

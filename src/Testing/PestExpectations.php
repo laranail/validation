@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Optional Pest expectations for the FluentRulesTester.
@@ -22,12 +24,12 @@
  * `FluentRulesTester`. The internal narrowing helpers in this file are not.
  */
 
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Pest\Expectation;
 use PHPUnit\Framework\Assert;
-use Simtabi\Laranail\Validation\FluentValidator;
 use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Foundation\Http\FormRequest;
+use Simtabi\Laranail\Validation\FluentValidator;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Testing\FluentRulesTester;
 
 if (! class_exists(Expectation::class)) {
@@ -39,7 +41,8 @@ if (! class_exists(Expectation::class)) {
  * the narrowers below to satisfy FluentRulesTester's stricter PHPStan types
  * without weakening the public API.
  *
- * @param  array<array-key, mixed>  $array
+ * @param array<array-key, mixed> $array
+ *
  * @return array<string, mixed>
  */
 $assertStringKeyed = static function (array $array, string $context): array {
@@ -75,7 +78,8 @@ $narrowTarget = static function (mixed $value) use ($assertStringKeyed): array|s
 };
 
 /**
- * @param  array<array-key, mixed>  $data
+ * @param array<array-key, mixed> $data
+ *
  * @return array<string, mixed>
  */
 $narrowData = static fn (array $data): array => $assertStringKeyed($data, 'Validation data');

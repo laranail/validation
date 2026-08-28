@@ -130,7 +130,7 @@
         "phpstan-simplified": "vendor/bin/phpstan analyse --memory-limit=2G --error-format symplify",
         "phpstan-clear-cache": "vendor/bin/phpstan clear-result-cache",
         "tag-currency": "bash scripts/verify-tag-currency.sh",
-        "format": "vendor/bin/pint",
+        "format": "@pint-fix",
         "rector": "vendor/bin/rector process",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
@@ -139,6 +139,13 @@
             "@rector",
             "@format",
             "@phpstan-simplified"
+        ],
+        "pint": "vendor/bin/pint --test --config vendor/laranail/package-tools/pint.json",
+        "pint-fix": "vendor/bin/pint --parallel --config vendor/laranail/package-tools/pint.json",
+        "lint": [
+            "@pint",
+            "@phpstan",
+            "@rector"
         ]
     },
     "extra": {

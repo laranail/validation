@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Codes;
 
@@ -30,22 +32,15 @@ final readonly class Gtin implements ValidationRule
     private array $lengths;
 
     /**
-     * @param  list<int>  $lengths  Widths to accept; defaults to all four.
+     * @param list<int> $lengths Widths to accept; defaults to all four.
      */
     public function __construct(array $lengths = self::VALID_LENGTHS)
     {
         $this->lengths = $lengths === [] ? self::VALID_LENGTHS : $lengths;
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->lengths)) {
-            $fail('laranail/validation::validation.gtin')->translate();
-        }
-    }
-
     /**
-     * @param  list<int>  $lengths
+     * @param list<int> $lengths
      */
     public static function passes(mixed $value, array $lengths = self::VALID_LENGTHS): bool
     {
@@ -75,11 +70,18 @@ final readonly class Gtin implements ValidationRule
         $sum = 0;
         $weight = 3;
 
-        for ($i = strlen($body) - 1; $i >= 0; --$i) {
+        for ($i = strlen($body) - 1; $i >= 0; $i--) {
             $sum += ((int) $body[$i]) * $weight;
             $weight = $weight === 3 ? 1 : 3;
         }
 
         return (10 - ($sum % 10)) % 10;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->lengths)) {
+            $fail('laranail/validation::validation.gtin')->translate();
+        }
     }
 }

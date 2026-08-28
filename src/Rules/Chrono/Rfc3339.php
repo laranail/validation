@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
@@ -25,13 +27,6 @@ final class Rfc3339 implements ValidationRule
         . '(?<h>[01]\d|2[0-3]):(?<i>[0-5]\d):(?<s>[0-5]\d|60)(?:\.\d+)?'
         . '(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/D';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail/validation::validation.rfc3339')->translate();
-        }
-    }
-
     public static function passes(string $value): bool
     {
         if (preg_match(self::GRAMMAR, $value, $parts) !== 1) {
@@ -39,5 +34,12 @@ final class Rfc3339 implements ValidationRule
         }
 
         return checkdate((int) $parts['m'], (int) $parts['d'], (int) $parts['y']);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || ! self::passes($value)) {
+            $fail('laranail/validation::validation.rfc3339')->translate();
+        }
     }
 }

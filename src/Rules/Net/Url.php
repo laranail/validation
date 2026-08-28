@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -58,14 +60,14 @@ final readonly class Url implements ValidationRule
     private const array DEFAULT_PORTS = ['http' => 80, 'https' => 443, 'ftp' => 21, 'ftps' => 990, 'ws' => 80, 'wss' => 443];
 
     /**
-     * @param  list<string>  $schemes  Accepted schemes, lowercase, without `://`.
-     * @param  list<string>  $hosts  Allow-list; `*.example.com` matches subdomains only.
-     * @param  list<string>  $blockedHosts  Deny-list, same syntax, applied after the allow-list.
-     * @param  list<int>  $ports  Accepted ports; empty accepts any, including none.
-     * @param  bool  $allowCredentials  Permit `user:pass@` in the authority.
-     * @param  bool  $allowIpHost  Permit an IP literal instead of a name.
-     * @param  bool  $publicHostOnly  Reject reserved IP literals and loopback names.
-     * @param  bool  $requireTld  Reject single-label hosts such as `intranet`.
+     * @param list<string> $schemes Accepted schemes, lowercase, without `://`.
+     * @param list<string> $hosts Allow-list; `*.example.com` matches subdomains only.
+     * @param list<string> $blockedHosts Deny-list, same syntax, applied after the allow-list.
+     * @param list<int> $ports Accepted ports; empty accepts any, including none.
+     * @param bool $allowCredentials Permit `user:pass@` in the authority.
+     * @param bool $allowIpHost Permit an IP literal instead of a name.
+     * @param bool $publicHostOnly Reject reserved IP literals and loopback names.
+     * @param bool $requireTld Reject single-label hosts such as `intranet`.
      */
     public function __construct(
         private array $schemes = ['http', 'https'],

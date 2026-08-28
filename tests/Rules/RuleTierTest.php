@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Http\Client\Factory as HttpFactory;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 // =========================================================================

@@ -1,19 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Simtabi\Laranail\Validation\Rules\Telecom\UniquePhone;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
-use Simtabi\Laranail\Validation\Rules\Telecom\UniquePhone;
 
 /**
  * A phone-number field.
@@ -185,26 +187,6 @@ class PhoneRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     }
 
     /**
-     * @return list<string|object>
-     */
-    protected function buildValidationRules(): array
-    {
-        return [
-            ...$this->reorderConstraints($this->constraints),
-            new Phone(
-                countries: $this->countries,
-                countryField: $this->countryField,
-                types: $this->types,
-                possibleOnly: $this->possibleOnly,
-                allowExtension: $this->allowExtension,
-                rejectShortNumbers: $this->rejectShortNumbers,
-                rejectEmergency: $this->rejectEmergency,
-            ),
-            ...$this->rules,
-        ];
-    }
-
-    /**
      * Uniqueness compared in E.164 rather than as typed.
      *
      * Overrides the generic `unique()` deliberately. Laravel's compares the attribute exactly as it
@@ -236,5 +218,25 @@ class PhoneRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         }
 
         return $this->addRule($rule, $message);
+    }
+
+    /**
+     * @return list<string|object>
+     */
+    protected function buildValidationRules(): array
+    {
+        return [
+            ...$this->reorderConstraints($this->constraints),
+            new Phone(
+                countries: $this->countries,
+                countryField: $this->countryField,
+                types: $this->types,
+                possibleOnly: $this->possibleOnly,
+                allowExtension: $this->allowExtension,
+                rejectShortNumbers: $this->rejectShortNumbers,
+                rejectEmergency: $this->rejectEmergency,
+            ),
+            ...$this->rules,
+        ];
     }
 }

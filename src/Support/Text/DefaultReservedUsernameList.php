@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support\Text;
 
-use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
 
 /**
  * The default binding: {@see Username}'s own 35-name floor, unchanged, so

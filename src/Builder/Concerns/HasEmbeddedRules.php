@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
-use BackedEnum;
 use Closure;
-use Illuminate\Contracts\Support\Arrayable;
+use BackedEnum;
 use Illuminate\Validation\Rule;
+use Illuminate\Contracts\Support\Arrayable;
 
 trait HasEmbeddedRules
 {

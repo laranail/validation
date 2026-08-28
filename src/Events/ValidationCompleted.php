@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Events;
 
@@ -12,8 +14,8 @@ use Simtabi\Laranail\Validation\RuleSet;
 final readonly class ValidationCompleted
 {
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $validated
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $validated
      */
     public function __construct(
         public RuleSet $ruleSet,

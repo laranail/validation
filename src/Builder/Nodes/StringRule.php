@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
+use Simtabi\Laranail\Validation\Regex;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Regex;
 
 class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -155,7 +157,7 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
      * accepts a {@see Regex} or a builder closure; see {@see matches()} for
      * the raw-string spelling that adds delimiters and `D` for you.
      *
-     * @param  string|Regex|Closure(Regex): Regex  $pattern
+     * @param string|Regex|Closure(Regex): Regex $pattern
      */
     public function regex(string|Regex|Closure $pattern, ?string $message = null): static
     {
@@ -174,7 +176,7 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
      * The builder is never required — a team that already has a pattern
      * just uses it.
      *
-     * @param  string|Regex|Closure(Regex): Regex  $pattern
+     * @param string|Regex|Closure(Regex): Regex $pattern
      */
     public function matches(string|Regex|Closure $pattern, ?string $message = null): static
     {
@@ -183,18 +185,6 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
             : $this->compileRegex($pattern);
 
         return $this->addRule('regex:' . $compiled, $message);
-    }
-
-    /** @param  Regex|Closure(Regex): Regex  $pattern */
-    private function compileRegex(Regex|Closure $pattern): string
-    {
-        if ($pattern instanceof Closure) {
-            $built = $pattern(Regex::build());
-
-            return $built->compile();
-        }
-
-        return $pattern->compile();
     }
 
     public function notRegex(string $pattern, ?string $message = null): static
@@ -266,5 +256,17 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
     protected function buildValidationRules(): array
     {
         return [...$this->reorderConstraints($this->constraints), ...$this->rules];
+    }
+
+    /** @param  Regex|Closure(Regex): Regex  $pattern */
+    private function compileRegex(Regex|Closure $pattern): string
+    {
+        if ($pattern instanceof Closure) {
+            $built = $pattern(Regex::build());
+
+            return $built->compile();
+        }
+
+        return $pattern->compile();
     }
 }

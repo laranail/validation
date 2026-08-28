@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support;
 
 use Closure;
+use SplFileInfo;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\ValidationRule;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
-use SplFileInfo;
 
 /**
  * The one registry of rule classes (§5.2.2) — the alias wiring, the console
@@ -50,9 +52,9 @@ final class RuleRegistrar
     /**
      * Register a consumer rule, optionally with a string alias.
      *
-     * @param  class-string<ValidationRule>  $rule
-     * @param  Closure(list<string>): ValidationRule|null  $factory  Builds the rule from
-     *                                                               string-rule parameters; required for an alias.
+     * @param class-string<ValidationRule> $rule
+     * @param Closure(list<string>): ValidationRule|null $factory Builds the rule from
+     *                                                            string-rule parameters; required for an alias.
      */
     public function register(string $rule, ?string $alias = null, ?Closure $factory = null): self
     {

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Validation\ValidationException;
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\RuleSet;
 use PHPUnit\Framework\AssertionFailedError;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\Testing\FluentRulesTester;
 
 // =========================================================================
@@ -97,7 +99,7 @@ it('failsWith raises when the field has no error', function (): void {
 it('failsOnly passes when exactly one field failed', function (): void {
     FluentRulesTester::for([
         'email' => FluentRule::email()->required(),
-        'name' => FluentRule::string()->required(),
+        'name'  => FluentRule::string()->required(),
     ])
         ->with(['name' => 'Ada', 'email' => ''])
         ->failsOnly('email');
@@ -105,7 +107,7 @@ it('failsOnly passes when exactly one field failed', function (): void {
 
 it('failsOnly with rule key checks the specific failed rule', function (): void {
     FluentRulesTester::for([
-        'name' => FluentRule::string()->required()->min(5),
+        'name'  => FluentRule::string()->required()->min(5),
         'email' => FluentRule::email(),
     ])
         ->with(['name' => 'Jo', 'email' => 'a@b.test'])
@@ -115,7 +117,7 @@ it('failsOnly with rule key checks the specific failed rule', function (): void 
 it('failsOnly raises when other fields also failed', function (): void {
     expect(static function (): void {
         FluentRulesTester::for([
-            'name' => FluentRule::string()->required(),
+            'name'  => FluentRule::string()->required(),
             'email' => FluentRule::email()->required(),
         ])
             ->with(['name' => '', 'email' => ''])
@@ -157,9 +159,9 @@ it('raises LogicException when failsOnly() is called before with()', function ()
 
 it('doesNotFailOn passes when listed fields did not fail', function (): void {
     FluentRulesTester::for([
-        'name' => FluentRule::string()->required(),
+        'name'  => FluentRule::string()->required(),
         'email' => FluentRule::email()->required(),
-        'age' => FluentRule::numeric()->required(),
+        'age'   => FluentRule::numeric()->required(),
     ])
         ->with(['name' => 'Ada', 'email' => 'a@b.test', 'age' => null])
         ->fails()
@@ -177,7 +179,7 @@ it('doesNotFailOn passes when validation entirely passed', function (): void {
 it('doesNotFailOn raises when one of the listed fields failed', function (): void {
     expect(static function (): void {
         FluentRulesTester::for([
-            'name' => FluentRule::string()->required(),
+            'name'  => FluentRule::string()->required(),
             'email' => FluentRule::email()->required(),
         ])
             ->with(['name' => '', 'email' => ''])
@@ -236,7 +238,7 @@ it('failsWithAny matches both exact and descendant errors in the same bag', func
     FluentRulesTester::for([
         'amount' => FluentRule::array()->required()->children([
             'currency' => FluentRule::string()->required(),
-            'value' => FluentRule::numeric()->required()->min(1),
+            'value'    => FluentRule::numeric()->required()->min(1),
         ]),
     ])
         ->with(['amount' => ['currency' => 'EUR', 'value' => 0]])
@@ -262,7 +264,7 @@ it('failsWithAny does NOT match free-floating substrings', function (): void {
 it('failsWithAny raises an AssertionFailedError when no matching keys exist', function (): void {
     expect(static function (): void {
         FluentRulesTester::for([
-            'name' => FluentRule::string()->required(),
+            'name'  => FluentRule::string()->required(),
             'email' => FluentRule::email()->required(),
         ])
             ->with(['name' => '', 'email' => ''])

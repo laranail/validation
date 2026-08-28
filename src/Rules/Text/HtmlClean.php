@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
@@ -41,6 +43,15 @@ final readonly class HtmlClean implements ValidationRule
      */
     public function __construct(private bool $mustContainHtml = false) {}
 
+    public static function passes(mixed $value): bool
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return strip_tags($value) === $value;
+    }
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($this->mustContainHtml) {
@@ -54,14 +65,5 @@ final readonly class HtmlClean implements ValidationRule
         if (! self::passes($value)) {
             $fail('laranail/validation::validation.html_clean')->translate();
         }
-    }
-
-    public static function passes(mixed $value): bool
-    {
-        if (! is_string($value)) {
-            return false;
-        }
-
-        return strip_tags($value) === $value;
     }
 }

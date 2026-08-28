@@ -1,34 +1,36 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\Rules\Net\Cidr;
+use Simtabi\Laranail\Validation\Rules\Codes\Ean;
+use Simtabi\Laranail\Validation\Rules\Text\Slug;
+use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
+use Simtabi\Laranail\Validation\Rules\Codes\Issn;
 use Illuminate\Validation\InvokableValidationRule;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
-use Simtabi\Laranail\Validation\Rules\Codes\Ean;
-use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
-use Simtabi\Laranail\Validation\Rules\Codes\Issn;
-use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
-use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
-use Simtabi\Laranail\Validation\Rules\Net\Cidr;
+use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Rules\Net\DomainName;
 use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
-use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
-use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
-use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
 use Simtabi\Laranail\Validation\Rules\Text\PersonName;
-use Simtabi\Laranail\Validation\Rules\Text\Slug;
-use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
+use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
+use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 
 /**
  * One-off boolean guards over the rule library — `Check::iban($v)` where
@@ -52,62 +54,62 @@ final class Check
 
     public static function iban(mixed $value): bool
     {
-        return self::rule(new Iban(), $value);
+        return self::rule(new Iban, $value);
     }
 
     public static function bic(mixed $value): bool
     {
-        return self::rule(new Bic(), $value);
+        return self::rule(new Bic, $value);
     }
 
     public static function isin(mixed $value): bool
     {
-        return self::rule(new Isin(), $value);
+        return self::rule(new Isin, $value);
     }
 
     public static function luhn(mixed $value): bool
     {
-        return self::rule(new Luhn(), $value);
+        return self::rule(new Luhn, $value);
     }
 
     public static function ean(mixed $value): bool
     {
-        return self::rule(new Ean(), $value);
+        return self::rule(new Ean, $value);
     }
 
     public static function isbn(mixed $value): bool
     {
-        return self::rule(new Isbn(), $value);
+        return self::rule(new Isbn, $value);
     }
 
     public static function issn(mixed $value): bool
     {
-        return self::rule(new Issn(), $value);
+        return self::rule(new Issn, $value);
     }
 
     public static function imei(mixed $value): bool
     {
-        return self::rule(new Imei(), $value);
+        return self::rule(new Imei, $value);
     }
 
     public static function vin(mixed $value): bool
     {
-        return self::rule(new Vin(), $value);
+        return self::rule(new Vin, $value);
     }
 
     public static function jwt(mixed $value): bool
     {
-        return self::rule(new Jwt(), $value);
+        return self::rule(new Jwt, $value);
     }
 
     public static function semVer(mixed $value): bool
     {
-        return self::rule(new SemVer(), $value);
+        return self::rule(new SemVer, $value);
     }
 
     public static function slug(mixed $value): bool
     {
-        return self::rule(new Slug(), $value);
+        return self::rule(new Slug, $value);
     }
 
     public static function username(mixed $value, int $min = 3, int $max = 32): bool
@@ -117,22 +119,22 @@ final class Check
 
     public static function personName(mixed $value): bool
     {
-        return self::rule(new PersonName(), $value);
+        return self::rule(new PersonName, $value);
     }
 
     public static function cssColor(mixed $value): bool
     {
-        return self::rule(new CssColor(), $value);
+        return self::rule(new CssColor, $value);
     }
 
     public static function latitude(mixed $value): bool
     {
-        return self::rule(new Latitude(), $value);
+        return self::rule(new Latitude, $value);
     }
 
     public static function longitude(mixed $value): bool
     {
-        return self::rule(new Longitude(), $value);
+        return self::rule(new Longitude, $value);
     }
 
     public static function postalCode(mixed $value, string $country): bool
@@ -147,7 +149,7 @@ final class Check
 
     public static function macAddress(mixed $value): bool
     {
-        return self::rule(new MacAddress(), $value);
+        return self::rule(new MacAddress, $value);
     }
 
     public static function domainName(mixed $value, bool $requireTld = true): bool
@@ -157,12 +159,12 @@ final class Check
 
     public static function subdomain(mixed $value): bool
     {
-        return self::rule(new Subdomain(), $value);
+        return self::rule(new Subdomain, $value);
     }
 
     public static function cidr(mixed $value): bool
     {
-        return self::rule(new Cidr(), $value);
+        return self::rule(new Cidr, $value);
     }
 
     /**

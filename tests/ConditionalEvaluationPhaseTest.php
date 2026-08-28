@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
+use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
 
 /**
  * Direct unit coverage for {@see ConditionalEvaluationPhase}. Previously
@@ -9,11 +11,11 @@ use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
  * extracting the class made these branches reachable in isolation.
  */
 it('indexes exclude_unless tuples', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
 
     $rules = [
         'name' => [['exclude_unless', 'type', 'A', 'B'], 'string'],
-        'age' => ['integer'],
+        'age'  => ['integer'],
     ];
 
     expect($phase->indexConditionalAttrs($rules))->toBe([
@@ -24,7 +26,7 @@ it('indexes exclude_unless tuples', function (): void {
 });
 
 it('indexes exclude_if tuples', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
 
     $rules = [
         'name' => [['exclude_if', 'type', 'X']],
@@ -38,11 +40,11 @@ it('indexes exclude_if tuples', function (): void {
 });
 
 it('skips non-conditional tuples', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
 
     $rules = [
         'name' => [['required_if', 'other', 'Y']],
-        'age' => 'integer',
+        'age'  => 'integer',
     ];
 
     expect($phase->indexConditionalAttrs($rules))
@@ -50,7 +52,7 @@ it('skips non-conditional tuples', function (): void {
 });
 
 it('skips malformed tuples (under 3 elements)', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
 
     $rules = [
         'name' => [['exclude_unless', 'type']],
@@ -61,7 +63,7 @@ it('skips malformed tuples (under 3 elements)', function (): void {
 });
 
 it('skips tuples with non-string field', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
 
     $rules = [
         'name' => [['exclude_unless', 123, 'A']],
@@ -72,7 +74,7 @@ it('skips tuples with non-string field', function (): void {
 });
 
 it('exclude_unless excludes when value not in list', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_unless', 'field' => 'type', 'values' => ['A', 'B']],
     ];
@@ -83,7 +85,7 @@ it('exclude_unless excludes when value not in list', function (): void {
 });
 
 it('exclude_unless does not exclude when value in list', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_unless', 'field' => 'type', 'values' => ['A', 'B']],
     ];
@@ -94,7 +96,7 @@ it('exclude_unless does not exclude when value in list', function (): void {
 });
 
 it('exclude_if excludes when value in list', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_if', 'field' => 'type', 'values' => ['X']],
     ];
@@ -105,7 +107,7 @@ it('exclude_if excludes when value in list', function (): void {
 });
 
 it('exclude_if does not exclude when value not in list', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_if', 'field' => 'type', 'values' => ['X']],
     ];
@@ -116,10 +118,10 @@ it('exclude_if does not exclude when value not in list', function (): void {
 });
 
 it('caches getValue lookups across tuples in one evaluate call', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $callCount = 0;
     $getValue = function () use (&$callCount): string {
-        ++$callCount;
+        $callCount++;
 
         return 'A';
     };
@@ -140,7 +142,7 @@ it('decides a non-scalar dependent like native (array never matches a string val
     // exclude_if does not fire → NotExcluded (not Defer). The matcher decides
     // null/bool/non-scalar correctly now; Defer is reserved for an unresolved
     // wildcard whose position has no matching attribute segment.
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_if', 'field' => 'type', 'values' => ['']],
     ];
@@ -153,7 +155,7 @@ it('decides a non-scalar dependent like native (array never matches a string val
 it('defers only when a wildcard position has no matching attribute segment', function (): void {
     // attribute 'name' has one segment (index 0); the dep 'a.*.type' wildcard
     // sits at index 1 with no attribute segment to map to → stays a wildcard → Defer.
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $tuples = [
         ['action' => 'exclude_unless', 'field' => 'a.*.type', 'values' => ['a']],
     ];
@@ -203,7 +205,7 @@ it('resolveWildcard handles multi-level wildcards', function (): void {
 });
 
 it('evaluate resolves wildcard before lookup', function (): void {
-    $phase = new ConditionalEvaluationPhase();
+    $phase = new ConditionalEvaluationPhase;
     $captured = null;
     $getValue = function (string $field) use (&$captured): string {
         $captured = $field;

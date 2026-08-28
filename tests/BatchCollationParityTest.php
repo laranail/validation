@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+declare(strict_types=1);
+
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\FluentValidator;
+use Illuminate\Support\Facades\DB;
 use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\FluentValidator;
 
 /**
  * The batched presence check must agree with the database, not with PHP.
@@ -87,7 +89,7 @@ it('agrees with the database when the collation is case-insensitive', function (
     'exact' => 'alice@example.com',
     'upper' => 'ALICE@EXAMPLE.COM',
     'mixed' => 'Alice@Example.com',
-    'free' => 'dave@example.com',
+    'free'  => 'dave@example.com',
 ]);
 
 it('agrees with the database on exists, for the same reason inverted', function (string $email): void {
@@ -104,7 +106,7 @@ it('agrees with the database on exists, for the same reason inverted', function 
 
     expect($batched)->toBe($vanilla);
 })->with([
-    'exact' => 'alice@example.com',
-    'upper' => 'ALICE@EXAMPLE.COM',
+    'exact'  => 'alice@example.com',
+    'upper'  => 'ALICE@EXAMPLE.COM',
     'absent' => 'nobody@example.com',
 ]);

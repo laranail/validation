@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Lang;
-use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 
 // =========================================================================
 // Phase 1: required_without (single-param) pre-evaluation parity grid.
@@ -12,8 +14,9 @@ use Simtabi\Laranail\Validation\RuleSet;
 // =========================================================================
 
 /**
- * @param  array<int, array<string, mixed>>  $items
- * @param  array<string, string>             $messages
+ * @param array<int, array<string, mixed>> $items
+ * @param array<string, string> $messages
+ *
  * @return array<string, array<int, string>>
  */
 function runPresenceItems(array $items, array $messages = []): array
@@ -78,12 +81,12 @@ it('required_without: sibling empty-string counts as absent (rule activates)', f
 it('required_without: verdicts match native Laravel for every shape', function (): void {
     $shapes = [
         ['postcode' => '1234AB', 'birthdate' => '1990-01-01'],
-        ['postcode' => '1234AB'],
+        ['postcode'  => '1234AB'],
         ['birthdate' => '1990-01-01'],
         [],
-        ['postcode' => null],
-        ['postcode' => ''],
-        ['postcode' => []],
+        ['postcode'  => null],
+        ['postcode'  => ''],
+        ['postcode'  => []],
         ['birthdate' => null],
         ['birthdate' => ''],
     ];
@@ -157,17 +160,18 @@ function fieldWithPresenceRule(string $ruleName): FieldRule
     $field = FluentRule::field();
 
     return match ($ruleName) {
-        'required_with' => $field->requiredWith('birthdate'),
-        'required_without' => $field->requiredWithout('birthdate'),
-        'required_with_all' => $field->requiredWithAll('birthdate'),
+        'required_with'        => $field->requiredWith('birthdate'),
+        'required_without'     => $field->requiredWithout('birthdate'),
+        'required_with_all'    => $field->requiredWithAll('birthdate'),
         'required_without_all' => $field->requiredWithoutAll('birthdate'),
-        default => throw new LogicException('Unknown rule ' . $ruleName),
+        default                => throw new LogicException('Unknown rule ' . $ruleName),
     };
 }
 
 /**
- * @param  array<int, array<string, mixed>>  $items
- * @param  array<string, string>             $messages
+ * @param array<int, array<string, mixed>> $items
+ * @param array<string, string> $messages
+ *
  * @return array<string, array<int, string>>
  */
 function runPresenceItemsForRule(string $ruleName, array $items, array $messages = []): array
@@ -218,12 +222,12 @@ it('required_without_all: sibling absent → rule active → target absent fails
 it('phase 2: verdicts match native Laravel across all four rules × shape grid', function (): void {
     $shapes = [
         ['postcode' => '1234AB', 'birthdate' => '1990-01-01'],
-        ['postcode' => '1234AB'],
+        ['postcode'  => '1234AB'],
         ['birthdate' => '1990-01-01'],
         [],
-        ['postcode' => null],
-        ['postcode' => ''],
-        ['postcode' => []],
+        ['postcode'  => null],
+        ['postcode'  => ''],
+        ['postcode'  => []],
         ['birthdate' => null],
         ['birthdate' => '   '],
     ];
@@ -254,7 +258,7 @@ it('phase 2: wildcard translator override preserves original rule for each of th
 
         // Build a shape that definitely activates each rule → target missing → error must mention the preserved rule name.
         $shape = match ($ruleName) {
-            'required_with', 'required_with_all' => ['birthdate' => '1990-01-01'],
+            'required_with', 'required_with_all'       => ['birthdate' => '1990-01-01'],
             'required_without', 'required_without_all' => [],
         };
 
@@ -274,18 +278,18 @@ it('phase 2: wildcard translator override preserves original rule for each of th
 /**
  * Build a FieldRule with a multi-param presence conditional.
  *
- * @param  list<string>  $params
+ * @param list<string> $params
  */
 function fieldWithMultiParamPresenceRule(string $ruleName, array $params): FieldRule
 {
     $field = FluentRule::field();
 
     return match ($ruleName) {
-        'required_with' => $field->requiredWith(...$params),
-        'required_without' => $field->requiredWithout(...$params),
-        'required_with_all' => $field->requiredWithAll(...$params),
+        'required_with'        => $field->requiredWith(...$params),
+        'required_without'     => $field->requiredWithout(...$params),
+        'required_with_all'    => $field->requiredWithAll(...$params),
         'required_without_all' => $field->requiredWithoutAll(...$params),
-        default => throw new LogicException('Unknown rule ' . $ruleName),
+        default                => throw new LogicException('Unknown rule ' . $ruleName),
     };
 }
 
@@ -299,9 +303,9 @@ it('phase 3: multi-param parity matches native Laravel across full rule × shape
         ['b' => 'B'],                                   // one sibling present, target absent
         [],                                             // none present
         ['postcode' => 'X'],                            // only target present
-        ['a' => '', 'b' => 'B'],                        // one sibling empty-string
-        ['a' => null, 'b' => 'B'],                      // one sibling null
-        ['a' => '   ', 'b' => 'B'],                     // one sibling whitespace-only
+        ['a'        => '', 'b' => 'B'],                        // one sibling empty-string
+        ['a'        => null, 'b' => 'B'],                      // one sibling null
+        ['a'        => '   ', 'b' => 'B'],                     // one sibling whitespace-only
     ];
 
     $ruleNames = ['required_with', 'required_without', 'required_with_all', 'required_without_all'];
@@ -384,7 +388,8 @@ it('phase 3: multi-param translator override still preserves original rule', fun
  * Uses the raw-rule form (not FluentRule) so exotic parameter shapes reach
  * the parser verbatim.
  *
- * @param  array<int, array<string, mixed>>  $items
+ * @param array<int, array<string, mixed>> $items
+ *
  * @return array{native: array<int, bool>, fluent: array<int, bool>}
  */
 function parityForRawPresenceRule(string $ruleString, array $items): array
@@ -426,7 +431,7 @@ it('parity: leading-comma param (required_with:,birthdate) matches Laravel', fun
     $items = [
         ['postcode' => 'X', 'birthdate' => '1990-01-01'],   // birthdate present → rule active
         ['birthdate' => '1990-01-01'],                      // target absent, rule active → fail
-        ['postcode' => 'X'],                                 // birthdate absent, but null slot matches full item → present
+        ['postcode'  => 'X'],                                 // birthdate absent, but null slot matches full item → present
         [],                                                  // fully empty item
     ];
 
@@ -438,7 +443,7 @@ it('parity: trailing-comma param (required_without:birthdate,) matches Laravel',
     $items = [
         ['postcode' => 'X', 'birthdate' => '1990-01-01'],
         ['birthdate' => '1990-01-01'],
-        ['postcode' => 'X'],
+        ['postcode'  => 'X'],
         [],
     ];
 
@@ -453,7 +458,7 @@ it('parity: CSV-quoted params (required_with:"a,b",c) matches Laravel', function
     $items = [
         ['postcode' => 'X', 'a,b' => 1, 'c' => 1],
         ['a,b' => 1],
-        ['c' => 1],
+        ['c'   => 1],
         [],
     ];
 
@@ -491,7 +496,8 @@ it('required_without treats whitespace-only sibling as absent (matches Laravel t
 
 it('required_without treats empty Countable sibling as absent', function (): void {
     // Sibling = empty Countable → rule activates.
-    $emptyCountable = new class implements Countable {
+    $emptyCountable = new class implements Countable
+    {
         public function count(): int
         {
             return 0;

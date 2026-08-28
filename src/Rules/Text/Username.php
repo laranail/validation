@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
@@ -55,11 +57,11 @@ final readonly class Username implements ClientCheckable, ValidationRule
     private const string DEFAULT_SEPARATORS = '._-';
 
     /**
-     * @param  int  $min  Fewest characters, counting separators.
-     * @param  int  $max  Most characters, counting separators.
-     * @param  string  $separators  Which characters may appear between others.
-     * @param  bool  $lowercase  Reject uppercase rather than accepting and folding it.
-     * @param  list<string>|null  $reserved  Replaces the default list; `[]` disables the check.
+     * @param int $min Fewest characters, counting separators.
+     * @param int $max Most characters, counting separators.
+     * @param string $separators Which characters may appear between others.
+     * @param bool $lowercase Reject uppercase rather than accepting and folding it.
+     * @param list<string>|null $reserved Replaces the default list; `[]` disables the check.
      */
     public function __construct(
         private int $min = 3,
@@ -68,23 +70,6 @@ final readonly class Username implements ClientCheckable, ValidationRule
         private bool $lowercase = false,
         private ?array $reserved = null,
     ) {}
-
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || preg_match(self::pattern($this->min, $this->max, $this->separators, $this->lowercase), $value) !== 1) {
-            // One message for the shape, because the shape is one idea and
-            // splitting it would produce "must not start with a separator",
-            // "must not contain two separators in a row" and three more, each
-            // reachable only by fixing the previous one.
-            $fail('laranail/validation::validation.username')->translate();
-
-            return;
-        }
-
-        if (self::isReserved($value, $this->reserved ?? $this->boundReserved(), $this->separators)) {
-            $fail('laranail/validation::validation.username_reserved')->translate();
-        }
-    }
 
     /** @param  list<string>|null  $reserved */
     public static function passes(
@@ -107,23 +92,6 @@ final readonly class Username implements ClientCheckable, ValidationRule
     }
 
     /**
-     * The application-bound list, or the floor when no container is booted —
-     * a rule set built in a queued job or plain unit test still validates.
-     * Uncached on purpose: this class is readonly, and the container binding
-     * may legitimately change between validations in long-lived workers.
-     *
-     * @return list<string>
-     */
-    private function boundReserved(): array
-    {
-        if (function_exists('app') && app()->bound(ReservedUsernameList::class)) {
-            return resolve(ReservedUsernameList::class)->names();
-        }
-
-        return self::DEFAULT_RESERVED;
-    }
-
-    /**
      * Shape and length in one pattern, so the rule and the form advertised to
      * a browser cannot disagree.
      *
@@ -133,7 +101,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
      * per character. That is what makes this rule expressible as a pattern at
      * all, and why a rule with a Unicode class could not do the same.
      *
-     * @param  string  $separators  Escaped for a character class before use.
+     * @param string $separators Escaped for a character class before use.
      */
     public static function pattern(
         int $min = 3,
@@ -165,7 +133,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
      * compared the literal value would let `a.d.m.i.n` and `ad-min` through,
      * and those are the same claim to anyone reading a profile page.
      *
-     * @param  list<string>  $reserved
+     * @param list<string> $reserved
      */
     public static function isReserved(string $value, array $reserved, string $separators = self::DEFAULT_SEPARATORS): bool
     {
@@ -195,6 +163,41 @@ final readonly class Username implements ClientCheckable, ValidationRule
         return false;
     }
 
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || preg_match(self::pattern($this->min, $this->max, $this->separators, $this->lowercase), $value) !== 1) {
+            // One message for the shape, because the shape is one idea and
+            // splitting it would produce "must not start with a separator",
+            // "must not contain two separators in a row" and three more, each
+            // reachable only by fixing the previous one.
+            $fail('laranail/validation::validation.username')->translate();
+
+            return;
+        }
+
+        if (self::isReserved($value, $this->reserved ?? $this->boundReserved(), $this->separators)) {
+            $fail('laranail/validation::validation.username_reserved')->translate();
+        }
+    }
+
+    /**
+     * The shape travels; the reserved list does not.
+     *
+     * A browser could check a name against a list, and it would be exporting
+     * the list — which is a small disclosure with no upside, since the server
+     * checks it anyway and the field is already undetermined the moment a
+     * `unique` sits beside it.
+     *
+     * @return list<array{rule: string, params: array<array-key, string>}>
+     */
+    public function clientRules(): array
+    {
+        return [[
+            'rule'   => 'regex',
+            'params' => ['pattern' => self::pattern($this->min, $this->max, $this->separators, $this->lowercase)],
+        ]];
+    }
+
     /**
      * `preg_quote` is not enough inside a character class: it leaves `-`
      * alone, and a stray `-` between two characters there is a RANGE. A
@@ -211,20 +214,19 @@ final readonly class Username implements ClientCheckable, ValidationRule
     }
 
     /**
-     * The shape travels; the reserved list does not.
+     * The application-bound list, or the floor when no container is booted —
+     * a rule set built in a queued job or plain unit test still validates.
+     * Uncached on purpose: this class is readonly, and the container binding
+     * may legitimately change between validations in long-lived workers.
      *
-     * A browser could check a name against a list, and it would be exporting
-     * the list — which is a small disclosure with no upside, since the server
-     * checks it anyway and the field is already undetermined the moment a
-     * `unique` sits beside it.
-     *
-     * @return list<array{rule: string, params: array<array-key, string>}>
+     * @return list<string>
      */
-    public function clientRules(): array
+    private function boundReserved(): array
     {
-        return [[
-            'rule' => 'regex',
-            'params' => ['pattern' => self::pattern($this->min, $this->max, $this->separators, $this->lowercase)],
-        ]];
+        if (function_exists('app') && app()->bound(ReservedUsernameList::class)) {
+            return resolve(ReservedUsernameList::class)->names();
+        }
+
+        return self::DEFAULT_RESERVED;
     }
 }

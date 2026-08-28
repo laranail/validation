@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
-use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
+use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
 
 // =========================================================================
 // IMEI
 // =========================================================================
 
 it('accepts valid IMEIs', function (string $value): void {
-    expect(ruleAccepts(new Imei(), $value))->toBeTrue();
+    expect(ruleAccepts(new Imei, $value))->toBeTrue();
 })->with([
     '490154203237518',
     '356938035643809',
@@ -18,7 +20,7 @@ it('accepts valid IMEIs', function (string $value): void {
 ]);
 
 it('rejects invalid IMEIs', function (string $value): void {
-    expect(ruleAccepts(new Imei(), $value))->toBeFalse();
+    expect(ruleAccepts(new Imei, $value))->toBeFalse();
 })->with([
     '490154203237519',    // Luhn check off by one
     '35693803564380',     // 14 digits
@@ -31,7 +33,7 @@ it('rejects IMEISV, which has no check digit to verify', function (): void {
     // Swapping the check digit for a two-digit software version removes the
     // only integrity check the format has. Accepting both widths would mean
     // silently validating nothing for the 16-digit case.
-    expect(ruleAccepts(new Imei(), '3569380356438099'))->toBeFalse();
+    expect(ruleAccepts(new Imei, '3569380356438099'))->toBeFalse();
 });
 
 // =========================================================================
@@ -39,7 +41,7 @@ it('rejects IMEISV, which has no check digit to verify', function (): void {
 // =========================================================================
 
 it('accepts structurally valid VINs', function (string $value): void {
-    expect(ruleAccepts(new Vin(), $value))->toBeTrue();
+    expect(ruleAccepts(new Vin, $value))->toBeTrue();
 })->with([
     '1M8GDM9AXKP042788',
     '1HGCM82633A004352',
@@ -50,7 +52,7 @@ it('accepts structurally valid VINs', function (string $value): void {
 
 it('rejects VINs containing I, O or Q', function (string $value): void {
     // Barred throughout the format, being too easily confused with 1 and 0.
-    expect(ruleAccepts(new Vin(), $value))->toBeFalse();
+    expect(ruleAccepts(new Vin, $value))->toBeFalse();
 })->with([
     '1M8GDM9AXKP04278I',
     '1M8GDM9AXKP04278O',
@@ -58,7 +60,7 @@ it('rejects VINs containing I, O or Q', function (string $value): void {
 ]);
 
 it('rejects VINs of the wrong length', function (string $value): void {
-    expect(ruleAccepts(new Vin(), $value))->toBeFalse();
+    expect(ruleAccepts(new Vin, $value))->toBeFalse();
 })->with(['1M8GDM9AXKP04278', '1M8GDM9AXKP0427888']);
 
 it('verifies the check digit only when asked', function (): void {
@@ -67,7 +69,7 @@ it('verifies the check digit only when asked', function (): void {
     // Enforcing it by default would reject real data.
     $broken = '1M8GDM9A0KP042788';   // valid shape, check digit forced to 0
 
-    expect(ruleAccepts(new Vin(), $broken))->toBeTrue()
+    expect(ruleAccepts(new Vin, $broken))->toBeTrue()
         ->and(ruleAccepts(new Vin(checkDigit: true), $broken))->toBeFalse()
         ->and(ruleAccepts(new Vin(checkDigit: true), '1M8GDM9AXKP042788'))->toBeTrue();
 });
@@ -83,7 +85,7 @@ it('handles the X check digit', function (): void {
 // =========================================================================
 
 it('accepts valid semantic versions', function (string $value): void {
-    expect(ruleAccepts(new SemVer(), $value))->toBeTrue();
+    expect(ruleAccepts(new SemVer, $value))->toBeTrue();
 })->with([
     '0.0.4',
     '1.2.3',
@@ -99,7 +101,7 @@ it('accepts valid semantic versions', function (string $value): void {
 ]);
 
 it('rejects invalid semantic versions', function (string $value): void {
-    expect(ruleAccepts(new SemVer(), $value))->toBeFalse();
+    expect(ruleAccepts(new SemVer, $value))->toBeFalse();
 })->with([
     '1',
     '1.2',
@@ -119,7 +121,7 @@ it('resists catastrophic backtracking', function (): void {
     $pathological = '1.0.0-' . str_repeat('a.', 5000) . '!';
 
     $start = hrtime(true);
-    $result = ruleAccepts(new SemVer(), $pathological);
+    $result = ruleAccepts(new SemVer, $pathological);
     $elapsedMs = (hrtime(true) - $start) / 1_000_000;
 
     expect($result)->toBeFalse()
@@ -134,19 +136,19 @@ it('accepts well-formed JWTs', function (): void {
     $header = rtrim(strtr(base64_encode((string) json_encode(['alg' => 'HS256', 'typ' => 'JWT'])), '+/', '-_'), '=');
     $payload = rtrim(strtr(base64_encode((string) json_encode(['sub' => '123'])), '+/', '-_'), '=');
 
-    expect(ruleAccepts(new Jwt(), "{$header}.{$payload}.signature"))->toBeTrue()
+    expect(ruleAccepts(new Jwt, "{$header}.{$payload}.signature"))->toBeTrue()
         // An unsecured token has an empty signature but keeps both dots.
-        ->and(ruleAccepts(new Jwt(), "{$header}.{$payload}."))->toBeTrue();
+        ->and(ruleAccepts(new Jwt, "{$header}.{$payload}."))->toBeTrue();
 });
 
 it('rejects strings that merely look like JWTs', function (): void {
     // The classic bare-regex failure: three dot-separated base64url runs is a
     // shape, not a token. Decoding the header rejects it for one base64 pass.
-    expect(ruleAccepts(new Jwt(), 'aaa.bbb.ccc'))->toBeFalse();
+    expect(ruleAccepts(new Jwt, 'aaa.bbb.ccc'))->toBeFalse();
 });
 
 it('rejects malformed JWTs', function (string $value): void {
-    expect(ruleAccepts(new Jwt(), $value))->toBeFalse();
+    expect(ruleAccepts(new Jwt, $value))->toBeFalse();
 })->with([
     'onlyonesegment',
     'two.segments',
@@ -157,7 +159,7 @@ it('rejects malformed JWTs', function (string $value): void {
 it('rejects a header that decodes but carries no alg', function (): void {
     $header = rtrim(strtr(base64_encode((string) json_encode(['typ' => 'JWT'])), '+/', '-_'), '=');
 
-    expect(ruleAccepts(new Jwt(), "{$header}.eyJzdWIiOiIxMjMifQ.sig"))->toBeFalse();
+    expect(ruleAccepts(new Jwt, "{$header}.eyJzdWIiOiIxMjMifQ.sig"))->toBeFalse();
 });
 
 it('accepts alg none, which is well-formed and worthless', function (): void {
@@ -166,5 +168,5 @@ it('accepts alg none, which is well-formed and worthless', function (): void {
     // library before any claim in it is believed.
     $header = rtrim(strtr(base64_encode((string) json_encode(['alg' => 'none'])), '+/', '-_'), '=');
 
-    expect(ruleAccepts(new Jwt(), "{$header}.eyJzdWIiOiIxMjMifQ."))->toBeTrue();
+    expect(ruleAccepts(new Jwt, "{$header}.eyJzdWIiOiIxMjMifQ."))->toBeTrue();
 });

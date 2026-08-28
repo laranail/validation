@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 
 // =========================================================================
@@ -49,14 +51,14 @@ it('validates string with min and max', function (): void {
 it('validates string with chained modifiers and constraints', function (): void {
     $v = makeValidator(
         ['password' => 'short'],
-        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)]
+        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)],
     );
 
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['password' => 'longenoughpassword'],
-        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)]
+        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)],
     );
 
     expect($v->passes())->toBeTrue();
@@ -65,7 +67,7 @@ it('validates string with chained modifiers and constraints', function (): void 
 it('validates when condition is false does not apply', function (): void {
     $validator = makeValidator(
         ['name' => 'Jo'],
-        ['name' => FluentRule::string()->required()->when(false, fn (StringRule $r): StringRule => $r->min(12))->max(255)]
+        ['name' => FluentRule::string()->required()->when(false, fn (StringRule $r): StringRule => $r->min(12))->max(255)],
     );
 
     expect($validator->passes())->toBeTrue();
@@ -78,14 +80,15 @@ it('validates when condition is false does not apply', function (): void {
 it('supports the rule escape hatch with a string', function (): void {
     $validator = makeValidator(
         ['name' => 'hello', 'other' => 'world'],
-        ['name' => FluentRule::string()->required()->rule('different:other')]
+        ['name' => FluentRule::string()->required()->rule('different:other')],
     );
 
     expect($validator->passes())->toBeTrue();
 });
 
 it('supports the rule escape hatch with a ValidationRule object', function (): void {
-    $customRule = new class implements ValidationRule {
+    $customRule = new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void
         {
             if ($value !== 'valid') {
@@ -108,14 +111,14 @@ it('supports the rule escape hatch with a ValidationRule object', function (): v
 it('validates required_if with field and value', function (): void {
     $v = makeValidator(
         ['role' => 'admin'],
-        ['name' => FluentRule::string()->requiredIf('role', 'admin')]
+        ['name' => FluentRule::string()->requiredIf('role', 'admin')],
     );
 
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['role' => 'user'],
-        ['name' => FluentRule::string()->requiredIf('role', 'admin')]
+        ['name' => FluentRule::string()->requiredIf('role', 'admin')],
     );
 
     expect($v->passes())->toBeTrue();
@@ -144,14 +147,14 @@ it('validates present passes when field is present', function (): void {
 it('validates string with in rule', function (): void {
     $v = makeValidator(
         ['status' => 'draft'],
-        ['status' => FluentRule::string()->required()->in(['draft', 'published', 'archived'])]
+        ['status' => FluentRule::string()->required()->in(['draft', 'published', 'archived'])],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['status' => 'deleted'],
-        ['status' => FluentRule::string()->required()->in(['draft', 'published', 'archived'])]
+        ['status' => FluentRule::string()->required()->in(['draft', 'published', 'archived'])],
     );
 
     expect($v->passes())->toBeFalse();
@@ -160,14 +163,14 @@ it('validates string with in rule', function (): void {
 it('validates string with enum rule', function (): void {
     $v = makeValidator(
         ['status' => 'active'],
-        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class)]
+        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class)],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['status' => 'nonexistent'],
-        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class)]
+        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class)],
     );
 
     expect($v->passes())->toBeFalse();
@@ -434,13 +437,13 @@ it('validates string with dateFormat', function (): void {
 it('validates string with confirmed', function (): void {
     $v = makeValidator(
         ['password' => 'secret', 'password_confirmation' => 'secret'],
-        ['password' => FluentRule::string()->confirmed()]
+        ['password' => FluentRule::string()->confirmed()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['password' => 'secret', 'password_confirmation' => 'different'],
-        ['password' => FluentRule::string()->confirmed()]
+        ['password' => FluentRule::string()->confirmed()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -448,13 +451,13 @@ it('validates string with confirmed', function (): void {
 it('validates string with same', function (): void {
     $v = makeValidator(
         ['password' => 'secret', 'confirm' => 'secret'],
-        ['password' => FluentRule::string()->same('confirm')]
+        ['password' => FluentRule::string()->same('confirm')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['password' => 'secret', 'confirm' => 'other'],
-        ['password' => FluentRule::string()->same('confirm')]
+        ['password' => FluentRule::string()->same('confirm')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -462,13 +465,13 @@ it('validates string with same', function (): void {
 it('validates string with different', function (): void {
     $v = makeValidator(
         ['name' => 'John', 'other' => 'Jane'],
-        ['name' => FluentRule::string()->different('other')]
+        ['name' => FluentRule::string()->different('other')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['name' => 'John', 'other' => 'John'],
-        ['name' => FluentRule::string()->different('other')]
+        ['name' => FluentRule::string()->different('other')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -480,13 +483,13 @@ it('validates string with different', function (): void {
 it('validates string with inArray', function (): void {
     $v = makeValidator(
         ['name' => 'John', 'names' => ['John', 'Jane']],
-        ['name' => FluentRule::string()->inArray('names.*')]
+        ['name' => FluentRule::string()->inArray('names.*')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['name' => 'Bob', 'names' => ['John', 'Jane']],
-        ['name' => FluentRule::string()->inArray('names.*')]
+        ['name' => FluentRule::string()->inArray('names.*')],
     );
     expect($v->passes())->toBeFalse();
 });

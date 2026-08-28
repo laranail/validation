@@ -1,25 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
-use BackedEnum;
 use Closure;
+use BackedEnum;
+use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Contains;
-use Illuminate\Validation\Rules\DoesntContain;
-use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\ExcludeUnless;
-use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\ProhibitedIf;
-use Illuminate\Validation\Rules\ProhibitedUnless;
-use Illuminate\Validation\Rules\RequiredIf;
-use Illuminate\Validation\Rules\RequiredUnless;
+use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use LogicException;
+use Illuminate\Validation\Rules\Contains;
+use Illuminate\Validation\Rules\ExcludeIf;
+use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\DoesntContain;
+use Illuminate\Validation\Rules\ExcludeUnless;
+use Illuminate\Validation\Rules\RequiredUnless;
+use Illuminate\Validation\Rules\ProhibitedUnless;
 
 trait HasFieldModifiers
 {
@@ -32,18 +34,6 @@ trait HasFieldModifiers
 
     /** @var array<string, string> */
     private array $customMessages = [];
-
-    /**
-     * Seed $lastConstraint for rule classes whose defining constraint
-     * is property-initialised (e.g. `protected array $constraints = ['string']`)
-     * rather than added via addRule(). Called from factory constructors so
-     * `FluentRule::string()->message('...')` binds to 'string' without the
-     * caller knowing the initialisation internals.
-     */
-    protected function seedLastConstraint(string $name): void
-    {
-        $this->lastConstraint = $name;
-    }
 
     /**
      * Set the human-readable label for this field.
@@ -108,68 +98,6 @@ trait HasFieldModifiers
     public function getCustomMessages(): array
     {
         return $this->customMessages;
-    }
-
-    /**
-     * Strings are appended to $constraints. Objects are appended to $rules.
-     *
-     * When $message is non-null, writes it to customMessages under the
-     * resolved $lastConstraint key. Throws LogicException if $message is
-     * set but no rule was added (e.g. an early-return branch in a caller).
-     *
-     * @param  array<int, string>|string|object  $rules
-     */
-    protected function addRule(array|string|object $rules, ?string $message = null): static
-    {
-        $this->compiledCache = null;
-
-        if (is_object($rules)) {
-            $this->rules[] = $rules;
-
-            $this->lastConstraint = match (true) {
-                $rules instanceof RequiredIf => 'required',
-                $rules instanceof RequiredUnless => 'required',
-                $rules instanceof ProhibitedIf => 'prohibited',
-                $rules instanceof ProhibitedUnless => 'prohibited',
-                $rules instanceof ExcludeIf => 'exclude',
-                $rules instanceof ExcludeUnless => 'exclude',
-                $rules instanceof In => 'in',
-                $rules instanceof NotIn => 'not_in',
-                $rules instanceof Unique => 'unique',
-                $rules instanceof Exists => 'exists',
-                $rules instanceof Contains => 'contains',
-                $rules instanceof DoesntContain => 'doesnt_contain',
-                default => lcfirst(class_basename($rules)),
-            };
-        } else {
-            $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
-            // Track last constraint name: 'min:2' → 'min', 'required' → 'required'
-            $last = is_array($rules) ? end($rules) : $rules;
-            $this->lastConstraint = is_string($last) ? explode(':', $last, 2)[0] : null;
-        }
-
-        if ($message !== null) {
-            if ($this->lastConstraint === null) {
-                throw new LogicException('message parameter has no rule to bind to');
-            }
-
-            $this->customMessages[$this->lastConstraint] = $message;
-        }
-
-        return $this;
-    }
-
-    /** @param array<int|string, string|int|bool|BackedEnum> $values */
-    private static function serializeValues(array $values): string
-    {
-        return implode(',', array_map(
-            static fn (string|int|bool|BackedEnum $v): string|int => match (true) {
-                $v instanceof BackedEnum => $v->value,
-                is_bool($v) => $v ? '1' : '0',
-                default => $v,
-            },
-            $values,
-        ));
     }
 
     public function bail(): static
@@ -389,39 +317,6 @@ trait HasFieldModifiers
     }
 
     /**
-     * Reorder constraints so that presence modifiers (required, nullable, bail, etc.)
-     * appear before type and size constraints ("required" must come
-     * before "must be a string").
-     *
-     * @param  list<string>  $constraints
-     * @return list<string>
-     */
-    protected function reorderConstraints(array $constraints): array
-    {
-        $presence = [];
-        $rest = [];
-
-        foreach ($constraints as $constraint) {
-            if ($this->isPresenceConstraint($constraint)) {
-                $presence[] = $constraint;
-            } else {
-                $rest[] = $constraint;
-            }
-        }
-
-        return [...$presence, ...$rest];
-    }
-
-    private function isPresenceConstraint(string $constraint): bool
-    {
-        return in_array($constraint, ['required', 'nullable', 'sometimes', 'filled', 'present', 'missing', 'bail', 'exclude', 'prohibited'], true)
-            || str_starts_with($constraint, 'required_')
-            || str_starts_with($constraint, 'missing_')
-            || str_starts_with($constraint, 'exclude_')
-            || str_starts_with($constraint, 'prohibited_');
-    }
-
-    /**
      * Add any Laravel validation rule — string, object, or array tuple.
      *
      * Array tuples like ['mimetypes', 'image/jpeg', 'application/pdf'] are
@@ -433,7 +328,7 @@ trait HasFieldModifiers
      * instance — there is no defensive copy. Clone first if you need
      * isolation: `(clone $ruleSet->get($field))->rule($extra)`.
      *
-     * @param  object|string|array<int, string>  $rule
+     * @param object|string|array<int, string> $rule
      */
     public function rule(object|string|array $rule, ?string $message = null): static
     {
@@ -458,9 +353,9 @@ trait HasFieldModifiers
      *         fn ($r) => $r->sometimes()->max(100),
      *     )
      *
-     * @param  Closure(Fluent<string, mixed>): bool  $condition
-     * @param  Closure(static): static|string|list<string>  $rules
-     * @param  Closure(static): static|string|list<string>  $defaultRules
+     * @param Closure(Fluent<string, mixed>): bool $condition
+     * @param Closure(static): static|string|list<string> $rules
+     * @param Closure(static): static|string|list<string> $defaultRules
      */
     public function whenInput(Closure $condition, Closure|string|array $rules, Closure|string|array $defaultRules = []): static
     {
@@ -472,7 +367,116 @@ trait HasFieldModifiers
     }
 
     /**
-     * @param  Closure(static): static|string|list<string>  $rules
+     * Seed $lastConstraint for rule classes whose defining constraint
+     * is property-initialised (e.g. `protected array $constraints = ['string']`)
+     * rather than added via addRule(). Called from factory constructors so
+     * `FluentRule::string()->message('...')` binds to 'string' without the
+     * caller knowing the initialisation internals.
+     */
+    protected function seedLastConstraint(string $name): void
+    {
+        $this->lastConstraint = $name;
+    }
+
+    /**
+     * Strings are appended to $constraints. Objects are appended to $rules.
+     *
+     * When $message is non-null, writes it to customMessages under the
+     * resolved $lastConstraint key. Throws LogicException if $message is
+     * set but no rule was added (e.g. an early-return branch in a caller).
+     *
+     * @param array<int, string>|string|object $rules
+     */
+    protected function addRule(array|string|object $rules, ?string $message = null): static
+    {
+        $this->compiledCache = null;
+
+        if (is_object($rules)) {
+            $this->rules[] = $rules;
+
+            $this->lastConstraint = match (true) {
+                $rules instanceof RequiredIf       => 'required',
+                $rules instanceof RequiredUnless   => 'required',
+                $rules instanceof ProhibitedIf     => 'prohibited',
+                $rules instanceof ProhibitedUnless => 'prohibited',
+                $rules instanceof ExcludeIf        => 'exclude',
+                $rules instanceof ExcludeUnless    => 'exclude',
+                $rules instanceof In               => 'in',
+                $rules instanceof NotIn            => 'not_in',
+                $rules instanceof Unique           => 'unique',
+                $rules instanceof Exists           => 'exists',
+                $rules instanceof Contains         => 'contains',
+                $rules instanceof DoesntContain    => 'doesnt_contain',
+                default                            => lcfirst(class_basename($rules)),
+            };
+        } else {
+            $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
+            // Track last constraint name: 'min:2' → 'min', 'required' → 'required'
+            $last = is_array($rules) ? end($rules) : $rules;
+            $this->lastConstraint = is_string($last) ? explode(':', $last, 2)[0] : null;
+        }
+
+        if ($message !== null) {
+            if ($this->lastConstraint === null) {
+                throw new LogicException('message parameter has no rule to bind to');
+            }
+
+            $this->customMessages[$this->lastConstraint] = $message;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Reorder constraints so that presence modifiers (required, nullable, bail, etc.)
+     * appear before type and size constraints ("required" must come
+     * before "must be a string").
+     *
+     * @param list<string> $constraints
+     *
+     * @return list<string>
+     */
+    protected function reorderConstraints(array $constraints): array
+    {
+        $presence = [];
+        $rest = [];
+
+        foreach ($constraints as $constraint) {
+            if ($this->isPresenceConstraint($constraint)) {
+                $presence[] = $constraint;
+            } else {
+                $rest[] = $constraint;
+            }
+        }
+
+        return [...$presence, ...$rest];
+    }
+
+    /** @param array<int|string, string|int|bool|BackedEnum> $values */
+    private static function serializeValues(array $values): string
+    {
+        return implode(',', array_map(
+            static fn (string|int|bool|BackedEnum $v): string|int => match (true) {
+                $v instanceof BackedEnum => $v->value,
+                is_bool($v)              => $v ? '1' : '0',
+                default                  => $v,
+            },
+            $values,
+        ));
+    }
+
+    private function isPresenceConstraint(string $constraint): bool
+    {
+        return in_array($constraint, ['required', 'nullable', 'sometimes', 'filled', 'present', 'missing', 'bail', 'exclude', 'prohibited'], true)
+            || str_starts_with($constraint, 'required_')
+            || str_starts_with($constraint, 'missing_')
+            || str_starts_with($constraint, 'exclude_')
+            || str_starts_with($constraint, 'prohibited_');
+    }
+
+    /**
+     * @param Closure(static): static|string|list<string> $rules
+     *
      * @return string|list<string|object>
      */
     private function compileConditionalBranch(Closure|string|array $rules): string|array

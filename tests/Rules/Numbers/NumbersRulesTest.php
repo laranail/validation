@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\Rules\Numbers\Parity;
+use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 
 // =========================================================================
 // Parity
@@ -13,14 +15,14 @@ it('classifies whole numbers, including negatives', function (mixed $value, bool
     expect(Parity::passes($value, Parity::EVEN))->toBe($even)
         ->and(Parity::passes($value, Parity::ODD))->toBe(! $even);
 })->with([
-    'zero' => [0, true],
-    'positive even' => [4, true],
-    'positive odd' => [7, false],
-    'negative even' => [-4, true],
-    'negative odd' => [-3, false],
+    'zero'           => [0, true],
+    'positive even'  => [4, true],
+    'positive odd'   => [7, false],
+    'negative even'  => [-4, true],
+    'negative odd'   => [-3, false],
     'numeric string' => ['4', true],
-    'signed string' => ['-3', false],
-    'padded string' => ['  6  ', true],
+    'signed string'  => ['-3', false],
+    'padded string'  => ['  6  ', true],
 ]);
 
 it('rejects values that have no parity', function (mixed $value): void {
@@ -29,14 +31,14 @@ it('rejects values that have no parity', function (mixed $value): void {
     expect(Parity::passes($value, Parity::EVEN))->toBeFalse()
         ->and(Parity::passes($value, Parity::ODD))->toBeFalse();
 })->with([
-    'fractional' => 2.5,
+    'fractional'   => 2.5,
     'not a number' => 'four',
-    'empty' => '',
-    'hex-ish' => '0x4',
-    'exponent' => '1e2',
-    'null' => null,
-    'array' => [[2]],
-    'bool' => true,
+    'empty'        => '',
+    'hex-ish'      => '0x4',
+    'exponent'     => '1e2',
+    'null'         => null,
+    'array'        => [[2]],
+    'bool'         => true,
 ]);
 
 it('accepts a whole float but not one beyond int range', function (): void {
@@ -66,17 +68,17 @@ it('rejects what numeric accepts but nobody typed as a price', function (mixed $
     // these is numeric to PHP.
     expect(MonetaryAmount::passes($value))->toBeFalse();
 })->with([
-    'exponent' => '1e3',
-    'hex' => '0x1A',
-    'infinity' => INF,
-    'nan' => NAN,
+    'exponent'            => '1e3',
+    'hex'                 => '0x1A',
+    'infinity'            => INF,
+    'nan'                 => NAN,
     'thousands separator' => '1,234.50',
-    'currency symbol' => '$12.00',
-    'trailing dot' => '12.',
-    'too many decimals' => '12.345',
+    'currency symbol'     => '$12.00',
+    'trailing dot'        => '12.',
+    'too many decimals'   => '12.345',
     'negative by default' => '-12.00',
-    'empty' => '',
-    'spaces only' => '   ',
+    'empty'               => '',
+    'spaces only'         => '   ',
 ]);
 
 it('takes the decimal count as a parameter, because currencies differ', function (): void {

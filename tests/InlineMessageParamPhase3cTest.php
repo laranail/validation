@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Validation\Rules\Dimensions;
 use Simtabi\Laranail\Validation\FluentRule;
@@ -10,32 +12,32 @@ use Simtabi\Laranail\Validation\FluentRule;
 dataset('phase3c_array', [
     'min' => [
         fn () => FluentRule::array()->min(1, message: 'x'),
-        fn () => FluentRule::array()->min(1)->message('x'),
+        fn ()  => FluentRule::array()->min(1)->message('x'),
         ['min' => 'x'],
     ],
     'max' => [
         fn () => FluentRule::array()->max(10, message: 'x'),
-        fn () => FluentRule::array()->max(10)->message('x'),
+        fn ()  => FluentRule::array()->max(10)->message('x'),
         ['max' => 'x'],
     ],
     'between' => [
         fn () => FluentRule::array()->between(1, 5, message: 'x'),
-        fn () => FluentRule::array()->between(1, 5)->message('x'),
+        fn ()      => FluentRule::array()->between(1, 5)->message('x'),
         ['between' => 'x'],
     ],
     'exactly' => [
         fn () => FluentRule::array()->exactly(3, message: 'x'),
-        fn () => FluentRule::array()->exactly(3)->message('x'),
+        fn ()   => FluentRule::array()->exactly(3)->message('x'),
         ['size' => 'x'],
     ],
     'list' => [
         fn () => FluentRule::array()->list(message: 'x'),
-        fn () => FluentRule::array()->list()->message('x'),
+        fn ()   => FluentRule::array()->list()->message('x'),
         ['list' => 'x'],
     ],
     'distinct' => [
         fn () => FluentRule::array()->distinct(message: 'x'),
-        fn () => FluentRule::array()->distinct()->message('x'),
+        fn ()       => FluentRule::array()->distinct()->message('x'),
         ['distinct' => 'x'],
     ],
 ]);
@@ -43,42 +45,42 @@ dataset('phase3c_array', [
 dataset('phase3c_date', [
     'before' => [
         fn () => FluentRule::date()->before('2026-12-31', message: 'x'),
-        fn () => FluentRule::date()->before('2026-12-31')->message('x'),
+        fn ()     => FluentRule::date()->before('2026-12-31')->message('x'),
         ['before' => 'x'],
     ],
     'after' => [
         fn () => FluentRule::date()->after('2020-01-01', message: 'x'),
-        fn () => FluentRule::date()->after('2020-01-01')->message('x'),
+        fn ()    => FluentRule::date()->after('2020-01-01')->message('x'),
         ['after' => 'x'],
     ],
     'beforeOrEqual' => [
         fn () => FluentRule::date()->beforeOrEqual('2026-12-31', message: 'x'),
-        fn () => FluentRule::date()->beforeOrEqual('2026-12-31')->message('x'),
+        fn ()              => FluentRule::date()->beforeOrEqual('2026-12-31')->message('x'),
         ['before_or_equal' => 'x'],
     ],
     'afterOrEqual' => [
         fn () => FluentRule::date()->afterOrEqual('2020-01-01', message: 'x'),
-        fn () => FluentRule::date()->afterOrEqual('2020-01-01')->message('x'),
+        fn ()             => FluentRule::date()->afterOrEqual('2020-01-01')->message('x'),
         ['after_or_equal' => 'x'],
     ],
     'beforeToday' => [
         fn () => FluentRule::date()->beforeToday(message: 'x'),
-        fn () => FluentRule::date()->beforeToday()->message('x'),
+        fn ()     => FluentRule::date()->beforeToday()->message('x'),
         ['before' => 'x'],
     ],
     'past' => [
         fn () => FluentRule::date()->past(message: 'x'),
-        fn () => FluentRule::date()->past()->message('x'),
+        fn ()     => FluentRule::date()->past()->message('x'),
         ['before' => 'x'],
     ],
     'dateEquals' => [
         fn () => FluentRule::date()->dateEquals('2026-04-22', message: 'x'),
-        fn () => FluentRule::date()->dateEquals('2026-04-22')->message('x'),
+        fn ()          => FluentRule::date()->dateEquals('2026-04-22')->message('x'),
         ['date_equals' => 'x'],
     ],
     'same' => [
         fn () => FluentRule::date()->same('other', message: 'x'),
-        fn () => FluentRule::date()->same('other')->message('x'),
+        fn ()   => FluentRule::date()->same('other')->message('x'),
         ['same' => 'x'],
     ],
 ]);
@@ -86,22 +88,22 @@ dataset('phase3c_date', [
 dataset('phase3c_file', [
     'min' => [
         fn () => FluentRule::file()->min(100, message: 'x'),
-        fn () => FluentRule::file()->min(100)->message('x'),
+        fn ()  => FluentRule::file()->min(100)->message('x'),
         ['min' => 'x'],
     ],
     'max' => [
         fn () => FluentRule::file()->max('2mb', message: 'x'),
-        fn () => FluentRule::file()->max('2mb')->message('x'),
+        fn ()  => FluentRule::file()->max('2mb')->message('x'),
         ['max' => 'x'],
     ],
     'between' => [
         fn () => FluentRule::file()->between(1, '2mb', message: 'x'),
-        fn () => FluentRule::file()->between(1, '2mb')->message('x'),
+        fn ()      => FluentRule::file()->between(1, '2mb')->message('x'),
         ['between' => 'x'],
     ],
     'exactly' => [
         fn () => FluentRule::file()->exactly(500, message: 'x'),
-        fn () => FluentRule::file()->exactly(500)->message('x'),
+        fn ()   => FluentRule::file()->exactly(500)->message('x'),
         ['size' => 'x'],
     ],
 ]);
@@ -159,7 +161,7 @@ it('DateRule::between + messageFor(after) targets the first sub-rule', function 
 
     expect($rule->getCustomMessages())->toBe([
         'before' => 'Must be before end.',
-        'after' => 'Must be after start.',
+        'after'  => 'Must be after start.',
     ]);
 });
 
@@ -201,7 +203,7 @@ it('ImageRule chained dimension methods: last-write-wins on dimensions key', fun
 it('ArrayRule::max(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['tags' => ['a', 'b', 'c']],
-        ['tags' => FluentRule::array()->max(2, message: 'Too many.')]
+        ['tags' => FluentRule::array()->max(2, message: 'Too many.')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -211,7 +213,7 @@ it('ArrayRule::max(message: ...) surfaces in validation', function (): void {
 it('DateRule::before(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['start' => '2030-01-01'],
-        ['start' => FluentRule::date()->before('2026-12-31', message: 'Must be before 2027.')]
+        ['start' => FluentRule::date()->before('2026-12-31', message: 'Must be before 2027.')],
     );
 
     expect($v->passes())->toBeFalse()

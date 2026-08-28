@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\Regex;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Regex;
 
 /**
  * The fluent regex builder (§6.9) — safe-by-construction patterns for the

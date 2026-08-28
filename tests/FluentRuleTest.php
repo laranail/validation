@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Validation\ValidationRule;
+declare(strict_types=1);
+
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Contains;
-use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\RuleSet;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestArrayKeyEnum;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
+use Illuminate\Validation\Rules\Contains;
+use Illuminate\Validation\Rules\ExcludeIf;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
+use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestArrayKeyEnum;
 
 // =========================================================================
 // BooleanRule
@@ -60,14 +62,14 @@ it('creates boolean declined rule', function (): void {
 it('validates array with required and min/max', function (): void {
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->required()->min(1)->max(10)]
+        ['tags' => FluentRule::array()->required()->min(1)->max(10)],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tags' => []],
-        ['tags' => FluentRule::array()->required()->min(1)]
+        ['tags' => FluentRule::array()->required()->min(1)],
     );
 
     expect($v->passes())->toBeFalse();
@@ -76,14 +78,14 @@ it('validates array with required and min/max', function (): void {
 it('validates array with list', function (): void {
     $v = makeValidator(
         ['ids' => [1, 2, 3]],
-        ['ids' => FluentRule::array()->required()->list()->min(1)]
+        ['ids' => FluentRule::array()->required()->list()->min(1)],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['ids' => ['a' => 1, 'b' => 2]],
-        ['ids' => FluentRule::array()->required()->list()]
+        ['ids' => FluentRule::array()->required()->list()],
     );
 
     expect($v->passes())->toBeFalse();
@@ -92,7 +94,7 @@ it('validates array with list', function (): void {
 it('validates array with keys', function (): void {
     $validator = makeValidator(
         ['data' => ['name' => 'John', 'email' => 'john@example.com']],
-        ['data' => FluentRule::array(['name', 'email'])->required()]
+        ['data' => FluentRule::array(['name', 'email'])->required()],
     );
 
     expect($validator->passes())->toBeTrue();
@@ -106,7 +108,7 @@ it('validates array with nullable', function (): void {
 it('validates array with between', function (): void {
     $validator = makeValidator(
         ['items' => ['a', 'b', 'c']],
-        ['items' => FluentRule::array()->between(1, 5)]
+        ['items' => FluentRule::array()->between(1, 5)],
     );
 
     expect($validator->passes())->toBeTrue();
@@ -115,14 +117,14 @@ it('validates array with between', function (): void {
 it('validates array with exactly', function (): void {
     $v = makeValidator(
         ['items' => ['a', 'b']],
-        ['items' => FluentRule::array()->exactly(2)]
+        ['items' => FluentRule::array()->exactly(2)],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['items' => ['a', 'b', 'c']],
-        ['items' => FluentRule::array()->exactly(2)]
+        ['items' => FluentRule::array()->exactly(2)],
     );
 
     expect($v->passes())->toBeFalse();
@@ -131,14 +133,14 @@ it('validates array with exactly', function (): void {
 it('validates array each() with scalar rule standalone', function (): void {
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->required()->each(FluentRule::string()->max(50))]
+        ['tags' => FluentRule::array()->required()->each(FluentRule::string()->max(50))],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tags' => ['php', 123]],
-        ['tags' => FluentRule::array()->required()->each(FluentRule::string()->max(50))]
+        ['tags' => FluentRule::array()->required()->each(FluentRule::string()->max(50))],
     );
 
     expect($v->passes())->toBeFalse()
@@ -150,8 +152,8 @@ it('validates array each() with field mappings standalone', function (): void {
         ['items' => [['name' => 'John', 'age' => 25], ['name' => 'Jane', 'age' => 30]]],
         ['items' => FluentRule::array()->required()->each([
             'name' => FluentRule::string()->required()->min(2),
-            'age' => FluentRule::numeric()->required()->min(0),
-        ])]
+            'age'  => FluentRule::numeric()->required()->min(0),
+        ])],
     );
 
     expect($v->passes())->toBeTrue();
@@ -160,8 +162,8 @@ it('validates array each() with field mappings standalone', function (): void {
         ['items' => [['name' => 'J', 'age' => 25]]],
         ['items' => FluentRule::array()->required()->each([
             'name' => FluentRule::string()->required()->min(2),
-            'age' => FluentRule::numeric()->required()->min(0),
-        ])]
+            'age'  => FluentRule::numeric()->required()->min(0),
+        ])],
     );
 
     expect($v->passes())->toBeFalse()
@@ -171,7 +173,7 @@ it('validates array each() with field mappings standalone', function (): void {
 it('produces indexed error keys for standalone each() scalar', function (): void {
     $validator = makeValidator(
         ['tags' => ['valid', 123]],
-        ['tags' => FluentRule::array()->required()->each(FluentRule::string())]
+        ['tags' => FluentRule::array()->required()->each(FluentRule::string())],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -183,7 +185,7 @@ it('produces indexed error keys for standalone each() with fields', function ():
         ['items' => [['name' => 'Ok'], ['name' => '']]],
         ['items' => FluentRule::array()->required()->each([
             'name' => FluentRule::string()->required()->min(2),
-        ])]
+        ])],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -194,8 +196,8 @@ it('validates nested array each() standalone', function (): void {
     $v = makeValidator(
         ['matrix' => [['a', 'b'], ['c', 'd']]],
         ['matrix' => FluentRule::array()->required()->each(
-            FluentRule::array()->each(FluentRule::string()->max(10))
-        )]
+            FluentRule::array()->each(FluentRule::string()->max(10)),
+        )],
     );
 
     expect($v->passes())->toBeTrue();
@@ -203,8 +205,8 @@ it('validates nested array each() standalone', function (): void {
     $v = makeValidator(
         ['matrix' => [['a', 123], ['c', 'd']]],
         ['matrix' => FluentRule::array()->required()->each(
-            FluentRule::array()->each(FluentRule::string()->max(10))
-        )]
+            FluentRule::array()->each(FluentRule::string()->max(10)),
+        )],
     );
 
     expect($v->passes())->toBeFalse();
@@ -216,7 +218,7 @@ it('validates array children() with fixed-key rules standalone', function (): vo
         ['search' => FluentRule::array()->required()->children([
             'value' => FluentRule::string()->required(),
             'regex' => FluentRule::boolean()->required(),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeTrue();
@@ -226,7 +228,7 @@ it('validates array children() with fixed-key rules standalone', function (): vo
         ['search' => FluentRule::array()->required()->children([
             'value' => FluentRule::string()->required(),
             'regex' => FluentRule::boolean()->required(),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeFalse()
@@ -244,7 +246,7 @@ it('validates nested children() standalone', function (): void {
                 'host' => FluentRule::string()->required(),
                 'port' => FluentRule::numeric()->required()->integer(),
             ]),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeTrue();
@@ -256,7 +258,7 @@ it('validates nested children() standalone', function (): void {
                 'host' => FluentRule::string()->required(),
                 'port' => FluentRule::numeric()->required()->integer(),
             ]),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeFalse()
@@ -271,10 +273,10 @@ it('validates each() + children() combined standalone', function (): void {
         ]],
         ['items' => FluentRule::array()->required()->each([
             'action' => FluentRule::array()->required()->children([
-                'type' => FluentRule::string()->required(),
+                'type'   => FluentRule::string()->required(),
                 'target' => FluentRule::string()->required(),
             ]),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeTrue();
@@ -286,10 +288,10 @@ it('validates each() + children() combined standalone', function (): void {
         ]],
         ['items' => FluentRule::array()->required()->each([
             'action' => FluentRule::array()->required()->children([
-                'type' => FluentRule::string()->required(),
+                'type'   => FluentRule::string()->required(),
                 'target' => FluentRule::string()->required(),
             ]),
-        ])]
+        ])],
     );
 
     expect($v->passes())->toBeFalse()
@@ -312,13 +314,13 @@ it('validates each() + children() combined standalone', function (): void {
 it('validates anyOf passes when any rule matches', function (): void {
     $v = makeValidator(
         ['contact' => 'user@example.com'],
-        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])]
+        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['contact' => 'https://example.com'],
-        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])]
+        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -326,7 +328,7 @@ it('validates anyOf passes when any rule matches', function (): void {
 it('validates anyOf fails when no rule matches', function (): void {
     $validator = makeValidator(
         ['contact' => 'not-email-or-url'],
-        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])]
+        ['contact' => FluentRule::anyOf([FluentRule::string()->email(), FluentRule::string()->url()])],
     );
     expect($validator->passes())->toBeFalse();
 });
@@ -417,13 +419,13 @@ it('requiredIf with bool value serializes correctly', function (): void {
     // required_if:published,1 — matches when published is "1" or 1 (form input)
     $v = makeValidator(
         ['published' => '0'],
-        ['title' => FluentRule::string()->requiredIf('published', true)]
+        ['title' => FluentRule::string()->requiredIf('published', true)],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['published' => '1'],
-        ['title' => FluentRule::string()->requiredIf('published', true)]
+        ['title' => FluentRule::string()->requiredIf('published', true)],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -432,13 +434,13 @@ it('requiredIf with false value serializes correctly', function (): void {
     // required_if:active,0 — matches when active is "0" or 0
     $v = makeValidator(
         ['active' => '0', 'reason' => 'testing'],
-        ['reason' => FluentRule::string()->requiredIf('active', false)]
+        ['reason' => FluentRule::string()->requiredIf('active', false)],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['active' => '1'],
-        ['reason' => FluentRule::string()->requiredIf('active', false)]
+        ['reason' => FluentRule::string()->requiredIf('active', false)],
     );
     expect($v->passes())->toBeTrue(); // active is 1, not 0 → reason not required
 });
@@ -449,7 +451,7 @@ it('requiredIf with false value serializes correctly', function (): void {
 it('requiredIf accepts BackedEnum values', function (): void {
     $v = makeValidator(
         ['type' => 'active', 'reason' => 'needs review'],
-        ['reason' => FluentRule::string()->requiredIf('type', TestStringEnum::Active)]
+        ['reason' => FluentRule::string()->requiredIf('type', TestStringEnum::Active)],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -543,7 +545,8 @@ it('whenInput branch does not leak parent messages or labels', function (): void
 // =========================================================================
 
 it('message works on custom ValidationRule via class name fallback', function (): void {
-    $customRule = new class implements ValidationRule {
+    $customRule = new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void
         {
             if ($value !== 'valid') {
@@ -606,7 +609,7 @@ it('rule-specific message takes priority over fieldMessage', function (): void {
 it('validates string with notIn rule passes', function (): void {
     $validator = makeValidator(
         ['role' => 'editor'],
-        ['role' => FluentRule::string()->required()->notIn(['admin', 'root'])]
+        ['role' => FluentRule::string()->required()->notIn(['admin', 'root'])],
     );
 
     expect($validator->passes())->toBeTrue();
@@ -615,7 +618,7 @@ it('validates string with notIn rule passes', function (): void {
 it('validates string with notIn rule fails', function (): void {
     $validator = makeValidator(
         ['role' => 'admin'],
-        ['role' => FluentRule::string()->required()->notIn(['admin', 'root'])]
+        ['role' => FluentRule::string()->required()->notIn(['admin', 'root'])],
     );
 
     expect($validator->passes())->toBeFalse();
@@ -628,14 +631,14 @@ it('validates string with notIn rule fails', function (): void {
 it('validates numeric with int enum', function (): void {
     $v = makeValidator(
         ['priority' => 1],
-        ['priority' => FluentRule::numeric()->required()->enum(TestIntEnum::class)]
+        ['priority' => FluentRule::numeric()->required()->enum(TestIntEnum::class)],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['priority' => 99],
-        ['priority' => FluentRule::numeric()->required()->enum(TestIntEnum::class)]
+        ['priority' => FluentRule::numeric()->required()->enum(TestIntEnum::class)],
     );
 
     expect($v->passes())->toBeFalse();
@@ -648,7 +651,7 @@ it('validates numeric with int enum', function (): void {
 it('propagates error messages from sub-validator', function (): void {
     $validator = makeValidator(
         ['name' => ''],
-        ['name' => FluentRule::string()->required()->min(2)]
+        ['name' => FluentRule::string()->required()->min(2)],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -658,7 +661,7 @@ it('propagates error messages from sub-validator', function (): void {
 it('has no errors when validation passes', function (): void {
     $validator = makeValidator(
         ['name' => 'John'],
-        ['name' => FluentRule::string()->required()->min(2)]
+        ['name' => FluentRule::string()->required()->min(2)],
     );
 
     expect($validator->passes())->toBeTrue()
@@ -672,7 +675,7 @@ it('has no errors when validation passes', function (): void {
 it('uses label in error messages via SelfValidates', function (): void {
     $validator = makeValidator(
         ['name' => ''],
-        ['name' => FluentRule::string('Full Name')->required()]
+        ['name' => FluentRule::string('Full Name')->required()],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -682,7 +685,7 @@ it('uses label in error messages via SelfValidates', function (): void {
 it('uses per-rule message via SelfValidates', function (): void {
     $validator = makeValidator(
         ['name' => ''],
-        ['name' => FluentRule::string()->required()->message('We need your name!')]
+        ['name' => FluentRule::string()->required()->message('We need your name!')],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -692,7 +695,7 @@ it('uses per-rule message via SelfValidates', function (): void {
 it('uses label on numeric rule', function (): void {
     $validator = makeValidator(
         ['age' => 'not-a-number'],
-        ['age' => FluentRule::numeric('Your age')->required()]
+        ['age' => FluentRule::numeric('Your age')->required()],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -702,7 +705,7 @@ it('uses label on numeric rule', function (): void {
 it('uses label on date rule', function (): void {
     $validator = makeValidator(
         ['starts_at' => 'not-a-date'],
-        ['starts_at' => FluentRule::date('Start Date')->required()]
+        ['starts_at' => FluentRule::date('Start Date')->required()],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -712,7 +715,7 @@ it('uses label on date rule', function (): void {
 it('uses label on boolean rule', function (): void {
     $validator = makeValidator(
         ['agree' => 'not-a-bool'],
-        ['agree' => FluentRule::boolean('Terms Agreement')->required()]
+        ['agree' => FluentRule::boolean('Terms Agreement')->required()],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -722,7 +725,7 @@ it('uses label on boolean rule', function (): void {
 it('uses message after in() rule', function (): void {
     $validator = makeValidator(
         ['role' => 'hacker'],
-        ['role' => FluentRule::string()->required()->in(['admin', 'user'])->message('Pick a valid role.')]
+        ['role' => FluentRule::string()->required()->in(['admin', 'user'])->message('Pick a valid role.')],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -732,7 +735,7 @@ it('uses message after in() rule', function (): void {
 it('uses message after requiredIf with closure', function (): void {
     $validator = makeValidator(
         [],
-        ['name' => FluentRule::string()->requiredIf(fn (): true => true)->message('Conditionally required!')]
+        ['name' => FluentRule::string()->requiredIf(fn (): true => true)->message('Conditionally required!')],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -748,7 +751,7 @@ it('supports multiple messages on different rules', function (): void {
         ['name' => ''],
         ['name' => FluentRule::string()
             ->required()->message('Name is required.')
-            ->min(2)->message('Name too short.')]
+            ->min(2)->message('Name too short.')],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -758,7 +761,7 @@ it('supports multiple messages on different rules', function (): void {
 it('uses message inside when() conditional', function (): void {
     $validator = makeValidator(
         ['password' => 'short'],
-        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12)->message('Admin passwords need 12+ chars.'))]
+        ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12)->message('Admin passwords need 12+ chars.'))],
     );
 
     expect($validator->passes())->toBeFalse()
@@ -772,13 +775,13 @@ it('uses message inside when() conditional', function (): void {
 it('validates boolean with acceptedIf', function (): void {
     $v = makeValidator(
         ['tos' => true, 'country' => 'US'],
-        ['tos' => FluentRule::boolean()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::boolean()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tos' => false, 'country' => 'US'],
-        ['tos' => FluentRule::boolean()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::boolean()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -786,13 +789,13 @@ it('validates boolean with acceptedIf', function (): void {
 it('validates boolean with declinedIf', function (): void {
     $v = makeValidator(
         ['opt_in' => false, 'type' => 'minor'],
-        ['opt_in' => FluentRule::boolean()->declinedIf('type', 'minor')]
+        ['opt_in' => FluentRule::boolean()->declinedIf('type', 'minor')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['opt_in' => true, 'type' => 'minor'],
-        ['opt_in' => FluentRule::boolean()->declinedIf('type', 'minor')]
+        ['opt_in' => FluentRule::boolean()->declinedIf('type', 'minor')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -830,7 +833,7 @@ it('FluentRule::accepted() does not combine with strict boolean (no footgun)', f
 it('FluentRule::accepted() supports label', function (): void {
     $v = makeValidator(
         ['agree' => false],
-        ['agree' => FluentRule::accepted('Terms Agreement')->required()]
+        ['agree' => FluentRule::accepted('Terms Agreement')->required()],
     );
     expect($v->passes())->toBeFalse()
         ->and($v->errors()->first('agree'))->toContain('Terms Agreement');
@@ -839,19 +842,19 @@ it('FluentRule::accepted() supports label', function (): void {
 it('FluentRule::accepted()->acceptedIf() replaces unconditional accepted', function (): void {
     $v = makeValidator(
         ['tos' => false, 'country' => 'DE'],
-        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tos' => false, 'country' => 'US'],
-        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['tos' => true, 'country' => 'US'],
-        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::accepted()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -862,7 +865,7 @@ it('FluentRule::accepted()->required()->acceptedIf() preserves required', functi
     // $this->constraints via addRule()).
     $v = makeValidator(
         [],
-        ['tos' => FluentRule::accepted()->required()->acceptedIf('country', 'US')]
+        ['tos' => FluentRule::accepted()->required()->acceptedIf('country', 'US')],
     );
     expect($v->passes())->toBeFalse()
         ->and($v->errors()->first('tos'))->toContain('required');
@@ -871,7 +874,7 @@ it('FluentRule::accepted()->required()->acceptedIf() preserves required', functi
 it('FluentRule::accepted()->nullable() allows null without accepted check', function (): void {
     $v = makeValidator(
         ['tos' => null],
-        ['tos' => FluentRule::accepted()->nullable()]
+        ['tos' => FluentRule::accepted()->nullable()],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -890,13 +893,13 @@ it('FluentRule::accepted() is case-sensitive (rejects YES / ON / TRUE)', functio
 it('validates array with requiredArrayKeys', function (): void {
     $v = makeValidator(
         ['data' => ['name' => 'John', 'email' => 'john@test.com']],
-        ['data' => FluentRule::array()->requiredArrayKeys('name', 'email')]
+        ['data' => FluentRule::array()->requiredArrayKeys('name', 'email')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['data' => ['name' => 'John']],
-        ['data' => FluentRule::array()->requiredArrayKeys('name', 'email')]
+        ['data' => FluentRule::array()->requiredArrayKeys('name', 'email')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -904,13 +907,13 @@ it('validates array with requiredArrayKeys', function (): void {
 it('validates array with BackedEnum keys', function (): void {
     $v = makeValidator(
         ['data' => ['low' => 1, 'medium' => 2]],
-        ['data' => FluentRule::array([TestArrayKeyEnum::Low, TestArrayKeyEnum::Medium])]
+        ['data' => FluentRule::array([TestArrayKeyEnum::Low, TestArrayKeyEnum::Medium])],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['data' => ['low' => 1, 'medium' => 2, 'unknown' => 3]],
-        ['data' => FluentRule::array([TestArrayKeyEnum::Low, TestArrayKeyEnum::Medium])]
+        ['data' => FluentRule::array([TestArrayKeyEnum::Low, TestArrayKeyEnum::Medium])],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -946,13 +949,13 @@ it('validates field with missing', function (): void {
 it('validates missingIf', function (): void {
     $v = makeValidator(
         ['type' => 'free'],
-        ['price' => FluentRule::string()->missingIf('type', 'free')]
+        ['price' => FluentRule::string()->missingIf('type', 'free')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->missingIf('type', 'free')]
+        ['price' => FluentRule::string()->missingIf('type', 'free')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -960,13 +963,13 @@ it('validates missingIf', function (): void {
 it('validates missingUnless', function (): void {
     $v = makeValidator(
         ['type' => 'free'],
-        ['price' => FluentRule::string()->missingUnless('type', 'paid')]
+        ['price' => FluentRule::string()->missingUnless('type', 'paid')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->missingUnless('type', 'paid')]
+        ['price' => FluentRule::string()->missingUnless('type', 'paid')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -974,13 +977,13 @@ it('validates missingUnless', function (): void {
 it('validates missingWith', function (): void {
     $v = makeValidator(
         ['coupon' => 'ABC'],
-        ['discount' => FluentRule::string()->missingWith('coupon')]
+        ['discount' => FluentRule::string()->missingWith('coupon')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['coupon' => 'ABC', 'discount' => '10'],
-        ['discount' => FluentRule::string()->missingWith('coupon')]
+        ['discount' => FluentRule::string()->missingWith('coupon')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -988,13 +991,13 @@ it('validates missingWith', function (): void {
 it('validates missingWithAll', function (): void {
     $v = makeValidator(
         ['a' => '1', 'b' => '2'],
-        ['c' => FluentRule::string()->missingWithAll('a', 'b')]
+        ['c' => FluentRule::string()->missingWithAll('a', 'b')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['a' => '1', 'b' => '2', 'c' => '3'],
-        ['c' => FluentRule::string()->missingWithAll('a', 'b')]
+        ['c' => FluentRule::string()->missingWithAll('a', 'b')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1006,13 +1009,13 @@ it('validates missingWithAll', function (): void {
 it('validates requiredUnless with field and value', function (): void {
     $v = makeValidator(
         ['role' => 'guest'],
-        ['name' => FluentRule::string()->requiredUnless('role', 'guest')]
+        ['name' => FluentRule::string()->requiredUnless('role', 'guest')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['role' => 'admin'],
-        ['name' => FluentRule::string()->requiredUnless('role', 'guest')]
+        ['name' => FluentRule::string()->requiredUnless('role', 'guest')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1039,13 +1042,13 @@ it('validates requiredUnless with closure', function (): void {
 it('validates requiredWith', function (): void {
     $v = makeValidator(
         ['email' => 'test@test.com'],
-        ['name' => FluentRule::string()->requiredWith('email')]
+        ['name' => FluentRule::string()->requiredWith('email')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         [],
-        ['name' => FluentRule::string()->requiredWith('email')]
+        ['name' => FluentRule::string()->requiredWith('email')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1053,13 +1056,13 @@ it('validates requiredWith', function (): void {
 it('validates requiredWithAll', function (): void {
     $v = makeValidator(
         ['first' => 'a', 'last' => 'b'],
-        ['full' => FluentRule::string()->requiredWithAll('first', 'last')]
+        ['full' => FluentRule::string()->requiredWithAll('first', 'last')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['first' => 'a'],
-        ['full' => FluentRule::string()->requiredWithAll('first', 'last')]
+        ['full' => FluentRule::string()->requiredWithAll('first', 'last')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1067,13 +1070,13 @@ it('validates requiredWithAll', function (): void {
 it('validates requiredWithout', function (): void {
     $v = makeValidator(
         [],
-        ['name' => FluentRule::string()->requiredWithout('nickname')]
+        ['name' => FluentRule::string()->requiredWithout('nickname')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['nickname' => 'Johnny'],
-        ['name' => FluentRule::string()->requiredWithout('nickname')]
+        ['name' => FluentRule::string()->requiredWithout('nickname')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1081,13 +1084,13 @@ it('validates requiredWithout', function (): void {
 it('validates requiredWithoutAll', function (): void {
     $v = makeValidator(
         [],
-        ['name' => FluentRule::string()->requiredWithoutAll('first_name', 'last_name')]
+        ['name' => FluentRule::string()->requiredWithoutAll('first_name', 'last_name')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['first_name' => 'John'],
-        ['name' => FluentRule::string()->requiredWithoutAll('first_name', 'last_name')]
+        ['name' => FluentRule::string()->requiredWithoutAll('first_name', 'last_name')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1099,7 +1102,7 @@ it('validates requiredWithoutAll', function (): void {
 it('validates excludeIf', function (): void {
     $validator = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->excludeIf('type', 'free')]
+        ['price' => FluentRule::string()->excludeIf('type', 'free')],
     );
     expect($validator->passes())->toBeTrue();
 });
@@ -1107,7 +1110,7 @@ it('validates excludeIf', function (): void {
 it('validates excludeUnless', function (): void {
     $validator = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->excludeUnless('type', 'paid')]
+        ['price' => FluentRule::string()->excludeUnless('type', 'paid')],
     );
     expect($validator->passes())->toBeTrue();
 });
@@ -1160,7 +1163,7 @@ it('validates excludeUnless with closure excludes from validated', function (): 
 it('validates excludeWith', function (): void {
     $validator = makeValidator(
         ['other' => 'val', 'field' => 'val'],
-        ['field' => FluentRule::string()->excludeWith('other')]
+        ['field' => FluentRule::string()->excludeWith('other')],
     );
     expect($validator->passes())->toBeTrue();
 });
@@ -1168,7 +1171,7 @@ it('validates excludeWith', function (): void {
 it('validates excludeWithout', function (): void {
     $validator = makeValidator(
         ['field' => 'val'],
-        ['field' => FluentRule::string()->excludeWithout('other')]
+        ['field' => FluentRule::string()->excludeWithout('other')],
     );
     expect($validator->passes())->toBeTrue();
 });
@@ -1180,13 +1183,13 @@ it('validates excludeWithout', function (): void {
 it('validates prohibitedIf with field and value', function (): void {
     $v = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->prohibitedIf('type', 'free')]
+        ['price' => FluentRule::string()->prohibitedIf('type', 'free')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['type' => 'paid', 'price' => '100'],
-        ['price' => FluentRule::string()->prohibitedIf('type', 'free')]
+        ['price' => FluentRule::string()->prohibitedIf('type', 'free')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1207,13 +1210,13 @@ it('validates prohibitedIf with closure', function (): void {
 it('validates prohibitedUnless with field and value', function (): void {
     $v = makeValidator(
         ['type' => 'free', 'price' => '100'],
-        ['price' => FluentRule::string()->prohibitedUnless('type', 'paid')]
+        ['price' => FluentRule::string()->prohibitedUnless('type', 'paid')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['type' => 'paid', 'price' => '100'],
-        ['price' => FluentRule::string()->prohibitedUnless('type', 'paid')]
+        ['price' => FluentRule::string()->prohibitedUnless('type', 'paid')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1229,13 +1232,13 @@ it('validates prohibitedUnless with bool', function (): void {
 it('validates prohibits', function (): void {
     $v = makeValidator(
         ['field' => 'val', 'other' => 'val'],
-        ['field' => FluentRule::string()->prohibits('other')]
+        ['field' => FluentRule::string()->prohibits('other')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['field' => 'val'],
-        ['field' => FluentRule::string()->prohibits('other')]
+        ['field' => FluentRule::string()->prohibits('other')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1247,13 +1250,13 @@ it('validates prohibits', function (): void {
 it('validates enum with callback modifier', function (): void {
     $v = makeValidator(
         ['status' => 'active'],
-        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class, fn (Enum $rule): Enum => $rule->only(TestStringEnum::Active))]
+        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class, fn (Enum $rule): Enum => $rule->only(TestStringEnum::Active))],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['status' => 'inactive'],
-        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class, fn (Enum $rule): Enum => $rule->only(TestStringEnum::Active))]
+        ['status' => FluentRule::string()->required()->enum(TestStringEnum::class, fn (Enum $rule): Enum => $rule->only(TestStringEnum::Active))],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1497,7 +1500,7 @@ it('clone allows extending rules for FormRequest inheritance', function (): void
 it('compiles fluent rules to native format', function (): void {
     $compiled = RuleSet::compile([
         'name' => FluentRule::string()->required()->min(2),
-        'age' => FluentRule::numeric()->integer(),
+        'age'  => FluentRule::numeric()->integer(),
     ]);
     expect($compiled)->toMatchArray(['name' => 'required|string|min:2', 'age' => 'numeric|integer']);
 });
@@ -1517,14 +1520,14 @@ it('compile passes through non-fluent rules unchanged', function (): void {
 it('compileToArrays returns arrays for fluent rules', function (): void {
     $compiled = RuleSet::compileToArrays([
         'name' => FluentRule::string()->required()->min(2),
-        'age' => FluentRule::numeric()->integer(),
+        'age'  => FluentRule::numeric()->integer(),
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string', 'min:2'], 'age' => ['numeric', 'integer']]);
 });
 
 it('compileToArrays explodes string rules into arrays', function (): void {
     $compiled = RuleSet::compileToArrays([
-        'name' => 'required|string|max:255',
+        'name'  => 'required|string|max:255',
         'email' => 'required|email',
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'email']]);
@@ -1539,7 +1542,8 @@ it('compileToArrays passes through array rules unchanged', function (): void {
 });
 
 it('compileToArrays wraps standalone objects in arrays', function (): void {
-    $rule = new class implements ValidationRule {
+    $rule = new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void {}
     };
 
@@ -1552,9 +1556,9 @@ it('compileToArrays wraps standalone objects in arrays', function (): void {
 
 it('compileToArrays handles mixed fluent and string rules', function (): void {
     $compiled = RuleSet::compileToArrays([
-        'name' => FluentRule::string()->required(),
+        'name'  => FluentRule::string()->required(),
         'email' => 'required|email',
-        'tags' => ['required', 'array'],
+        'tags'  => ['required', 'array'],
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string'], 'email' => ['required', 'email'], 'tags' => ['required', 'array']]);
 });
@@ -1606,14 +1610,14 @@ it('supports macros on StringRule', function (): void {
 
     $v = makeValidator(
         ['slug' => 'hello'],
-        ['slug' => FluentRule::string()->slug()]
+        ['slug' => FluentRule::string()->slug()],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['slug' => 'Hello World'],
-        ['slug' => FluentRule::string()->slug()]
+        ['slug' => FluentRule::string()->slug()],
     );
 
     expect($v->passes())->toBeFalse();
@@ -1624,7 +1628,8 @@ it('supports macros on StringRule', function (): void {
 // =========================================================================
 
 it('compiledRules returns array when rule contains non-stringable object', function (): void {
-    $nonStringable = new class implements ValidationRule {
+    $nonStringable = new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void {}
     };
 
@@ -1680,13 +1685,13 @@ it('buildNestedRules handles nested ArrayRule in field mapping each()', function
 it('validates requiredIf with multiple values', function (): void {
     $v = makeValidator(
         ['role' => 'editor'],
-        ['name' => FluentRule::string()->requiredIf('role', 'admin', 'editor')]
+        ['name' => FluentRule::string()->requiredIf('role', 'admin', 'editor')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['role' => 'viewer'],
-        ['name' => FluentRule::string()->requiredIf('role', 'admin', 'editor')]
+        ['name' => FluentRule::string()->requiredIf('role', 'admin', 'editor')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1694,13 +1699,13 @@ it('validates requiredIf with multiple values', function (): void {
 it('validates requiredWith with multiple fields', function (): void {
     $v = makeValidator(
         ['first' => 'John'],
-        ['name' => FluentRule::string()->requiredWith('first', 'last')]
+        ['name' => FluentRule::string()->requiredWith('first', 'last')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         [],
-        ['name' => FluentRule::string()->requiredWith('first', 'last')]
+        ['name' => FluentRule::string()->requiredWith('first', 'last')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1708,7 +1713,7 @@ it('validates requiredWith with multiple fields', function (): void {
 it('validates prohibits with multiple fields', function (): void {
     $validator = makeValidator(
         ['role' => 'admin', 'other' => 'x', 'another' => 'y'],
-        ['role' => FluentRule::string()->prohibits('other', 'another')]
+        ['role' => FluentRule::string()->prohibits('other', 'another')],
     );
     expect($validator->passes())->toBeFalse();
 });
@@ -1740,7 +1745,7 @@ it('validates rule escape hatch with closure', function (): void {
             if ($value !== 'valid') {
                 $fail("The {$attribute} must be valid.");
             }
-        })]
+        })],
     );
     expect($v->passes())->toBeFalse();
 
@@ -1750,7 +1755,7 @@ it('validates rule escape hatch with closure', function (): void {
             if ($value !== 'valid') {
                 $fail("The {$attribute} must be valid.");
             }
-        })]
+        })],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1810,20 +1815,20 @@ it('failed() is empty when validation passes', function (): void {
 it('validates presentIf', function (): void {
     $v = makeValidator(
         ['type' => 'admin', 'role' => 'editor'],
-        ['role' => FluentRule::string()->presentIf('type', 'admin')]
+        ['role' => FluentRule::string()->presentIf('type', 'admin')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['type' => 'admin'],
-        ['role' => FluentRule::string()->presentIf('type', 'admin')]
+        ['role' => FluentRule::string()->presentIf('type', 'admin')],
     );
     expect($v->passes())->toBeFalse();
 
     // When condition doesn't match, field doesn't need to be present
     $v = makeValidator(
         ['type' => 'guest'],
-        ['role' => FluentRule::string()->presentIf('type', 'admin')]
+        ['role' => FluentRule::string()->presentIf('type', 'admin')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1831,19 +1836,19 @@ it('validates presentIf', function (): void {
 it('validates presentUnless', function (): void {
     $v = makeValidator(
         ['type' => 'admin'],
-        ['role' => FluentRule::string()->presentUnless('type', 'guest')]
+        ['role' => FluentRule::string()->presentUnless('type', 'guest')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['type' => 'admin', 'role' => 'editor'],
-        ['role' => FluentRule::string()->presentUnless('type', 'guest')]
+        ['role' => FluentRule::string()->presentUnless('type', 'guest')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['type' => 'guest'],
-        ['role' => FluentRule::string()->presentUnless('type', 'guest')]
+        ['role' => FluentRule::string()->presentUnless('type', 'guest')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1851,19 +1856,19 @@ it('validates presentUnless', function (): void {
 it('validates presentWith', function (): void {
     $v = makeValidator(
         ['email' => 'test@test.com'],
-        ['name' => FluentRule::string()->presentWith('email')]
+        ['name' => FluentRule::string()->presentWith('email')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['email' => 'test@test.com', 'name' => 'John'],
-        ['name' => FluentRule::string()->presentWith('email')]
+        ['name' => FluentRule::string()->presentWith('email')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         [],
-        ['name' => FluentRule::string()->presentWith('email')]
+        ['name' => FluentRule::string()->presentWith('email')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1871,20 +1876,20 @@ it('validates presentWith', function (): void {
 it('validates presentWithAll', function (): void {
     $v = makeValidator(
         ['first' => 'a', 'last' => 'b'],
-        ['full' => FluentRule::string()->presentWithAll('first', 'last')]
+        ['full' => FluentRule::string()->presentWithAll('first', 'last')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['first' => 'a', 'last' => 'b', 'full' => 'a b'],
-        ['full' => FluentRule::string()->presentWithAll('first', 'last')]
+        ['full' => FluentRule::string()->presentWithAll('first', 'last')],
     );
     expect($v->passes())->toBeTrue();
 
     // Only one field present — not required
     $v = makeValidator(
         ['first' => 'a'],
-        ['full' => FluentRule::string()->presentWithAll('first', 'last')]
+        ['full' => FluentRule::string()->presentWithAll('first', 'last')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1896,19 +1901,19 @@ it('validates presentWithAll', function (): void {
 it('validates requiredIfAccepted', function (): void {
     $v = makeValidator(
         ['terms' => 'yes'],
-        ['signature' => FluentRule::string()->requiredIfAccepted('terms')]
+        ['signature' => FluentRule::string()->requiredIfAccepted('terms')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['terms' => 'yes', 'signature' => 'John Doe'],
-        ['signature' => FluentRule::string()->requiredIfAccepted('terms')]
+        ['signature' => FluentRule::string()->requiredIfAccepted('terms')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['terms' => 'no'],
-        ['signature' => FluentRule::string()->requiredIfAccepted('terms')]
+        ['signature' => FluentRule::string()->requiredIfAccepted('terms')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1916,19 +1921,19 @@ it('validates requiredIfAccepted', function (): void {
 it('validates requiredIfDeclined', function (): void {
     $v = makeValidator(
         ['terms' => 'no'],
-        ['reason' => FluentRule::string()->requiredIfDeclined('terms')]
+        ['reason' => FluentRule::string()->requiredIfDeclined('terms')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['terms' => 'no', 'reason' => 'I disagree'],
-        ['reason' => FluentRule::string()->requiredIfDeclined('terms')]
+        ['reason' => FluentRule::string()->requiredIfDeclined('terms')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['terms' => 'yes'],
-        ['reason' => FluentRule::string()->requiredIfDeclined('terms')]
+        ['reason' => FluentRule::string()->requiredIfDeclined('terms')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1940,13 +1945,13 @@ it('validates requiredIfDeclined', function (): void {
 it('validates contains on array', function (): void {
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->contains('php')]
+        ['tags' => FluentRule::array()->contains('php')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->contains('python')]
+        ['tags' => FluentRule::array()->contains('python')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1954,13 +1959,13 @@ it('validates contains on array', function (): void {
 it('validates doesntContain on array', function (): void {
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->doesntContain('python')]
+        ['tags' => FluentRule::array()->doesntContain('python')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->doesntContain('php')]
+        ['tags' => FluentRule::array()->doesntContain('php')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1972,7 +1977,7 @@ it('validates doesntContain on array', function (): void {
 it('contains preserves value containing a comma (CSV-quoted)', function (): void {
     $v = makeValidator(
         ['tags' => ['a,b', 'other']],
-        ['tags' => FluentRule::array()->contains('a,b')]
+        ['tags' => FluentRule::array()->contains('a,b')],
     );
     expect($v->passes())->toBeTrue();
 
@@ -1980,7 +1985,7 @@ it('contains preserves value containing a comma (CSV-quoted)', function (): void
     // and the validator would require both 'a' AND 'b' to be present.
     $v = makeValidator(
         ['tags' => ['a', 'b']],
-        ['tags' => FluentRule::array()->contains('a,b')]
+        ['tags' => FluentRule::array()->contains('a,b')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -1988,7 +1993,7 @@ it('contains preserves value containing a comma (CSV-quoted)', function (): void
 it('contains preserves value containing double quotes (escaped)', function (): void {
     $v = makeValidator(
         ['tags' => ['he said "hi"', 'other']],
-        ['tags' => FluentRule::array()->contains('he said "hi"')]
+        ['tags' => FluentRule::array()->contains('he said "hi"')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -1996,7 +2001,7 @@ it('contains preserves value containing double quotes (escaped)', function (): v
 it('contains accepts BackedEnum by its value', function (): void {
     $v = makeValidator(
         ['statuses' => ['active', 'other']],
-        ['statuses' => FluentRule::array()->contains(TestStringEnum::Active)]
+        ['statuses' => FluentRule::array()->contains(TestStringEnum::Active)],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2004,13 +2009,14 @@ it('contains accepts BackedEnum by its value', function (): void {
 it('contains accepts UnitEnum by its name', function (): void {
     $v = makeValidator(
         ['flags' => ['Foo']],
-        ['flags' => FluentRule::array()->contains(TestUnitEnum::Foo)]
+        ['flags' => FluentRule::array()->contains(TestUnitEnum::Foo)],
     );
     expect($v->passes())->toBeTrue();
 });
 
 it('contains accepts Arrayable input (single arg expanded)', function (): void {
-    $arrayable = new class implements Arrayable {
+    $arrayable = new class implements Arrayable
+    {
         /** @return array<int, mixed> */
         public function toArray(): array
         {
@@ -2020,7 +2026,7 @@ it('contains accepts Arrayable input (single arg expanded)', function (): void {
 
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->contains($arrayable)]
+        ['tags' => FluentRule::array()->contains($arrayable)],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2038,7 +2044,7 @@ it('contains accepts single-array input (equivalent to varargs)', function (): v
 it('contains variadic passthrough still works', function (): void {
     $v = makeValidator(
         ['tags' => ['a', 'b', 'c']],
-        ['tags' => FluentRule::array()->contains('a', 'b')]
+        ['tags' => FluentRule::array()->contains('a', 'b')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2050,7 +2056,7 @@ it('contains ->message() binds to the "contains" rule key', function (): void {
 
     $v = makeValidator(
         ['tags' => ['laravel']],
-        ['tags' => FluentRule::array()->contains('php')->message('Must contain PHP.')]
+        ['tags' => FluentRule::array()->contains('php')->message('Must contain PHP.')],
     );
     expect($v->passes())->toBeFalse()
         ->and($v->errors()->first('tags'))->toBe('Must contain PHP.');
@@ -2065,13 +2071,13 @@ it('doesntContain ->message() binds to the "doesnt_contain" rule key', function 
 it('doesntContain preserves value containing a comma (CSV-quoted)', function (): void {
     $v = makeValidator(
         ['tags' => ['other']],
-        ['tags' => FluentRule::array()->doesntContain('a,b')]
+        ['tags' => FluentRule::array()->doesntContain('a,b')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['tags' => ['a,b', 'other']],
-        ['tags' => FluentRule::array()->doesntContain('a,b')]
+        ['tags' => FluentRule::array()->doesntContain('a,b')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2079,19 +2085,20 @@ it('doesntContain preserves value containing a comma (CSV-quoted)', function ():
 it('doesntContain accepts BackedEnum by its value', function (): void {
     $v = makeValidator(
         ['statuses' => ['inactive']],
-        ['statuses' => FluentRule::array()->doesntContain(TestStringEnum::Active)]
+        ['statuses' => FluentRule::array()->doesntContain(TestStringEnum::Active)],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['statuses' => ['active']],
-        ['statuses' => FluentRule::array()->doesntContain(TestStringEnum::Active)]
+        ['statuses' => FluentRule::array()->doesntContain(TestStringEnum::Active)],
     );
     expect($v->passes())->toBeFalse();
 });
 
 it('doesntContain accepts Arrayable + single-array input', function (): void {
-    $arrayable = new class implements Arrayable {
+    $arrayable = new class implements Arrayable
+    {
         /** @return array<int, mixed> */
         public function toArray(): array
         {
@@ -2101,14 +2108,14 @@ it('doesntContain accepts Arrayable + single-array input', function (): void {
 
     $v = makeValidator(
         ['tags' => ['php']],
-        ['tags' => FluentRule::array()->doesntContain($arrayable)]
+        ['tags' => FluentRule::array()->doesntContain($arrayable)],
     );
     expect($v->passes())->toBeTrue();
 
     // Single-array — equivalent to varargs
     $v = makeValidator(
         ['tags' => ['php', 'laravel']],
-        ['tags' => FluentRule::array()->doesntContain(['banned', 'evil'])]
+        ['tags' => FluentRule::array()->doesntContain(['banned', 'evil'])],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2119,7 +2126,7 @@ it('contains handles variadic BackedEnum values', function (): void {
         ['statuses' => FluentRule::array()->contains(
             TestStringEnum::Active,
             TestStringEnum::Inactive,
-        )]
+        )],
     );
     expect($v->passes())->toBeTrue();
 
@@ -2128,7 +2135,7 @@ it('contains handles variadic BackedEnum values', function (): void {
         ['statuses' => FluentRule::array()->contains(
             TestStringEnum::Active,
             TestStringEnum::Inactive,
-        )]
+        )],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2147,7 +2154,7 @@ it('contains messageFor("contains", ...) surfaces in live validation', function 
     // customMessages without going through addRule's class-basename match.
     $v = makeValidator(
         ['tags' => ['laravel']],
-        ['tags' => FluentRule::array()->contains('php')->messageFor('contains', 'Must include PHP.')]
+        ['tags' => FluentRule::array()->contains('php')->messageFor('contains', 'Must include PHP.')],
     );
     expect($v->passes())->toBeFalse()
         ->and($v->errors()->first('tags'))->toBe('Must include PHP.');
@@ -2174,14 +2181,14 @@ it('contains produces a Contains object equivalent to Rule::contains() for every
 
     expect((string) $fluentContains)->toBe((string) $directRule);
 })->with([
-    'single string' => 'php',
-    'single int' => 42,
+    'single string'          => 'php',
+    'single int'             => 42,
     'single array unwrapped' => [['a', 'b', 'c']],
     'Arrayable (Collection)' => fn () => collect(['a', 'b']),
-    'BackedEnum single' => fn () => TestStringEnum::Active,
-    'UnitEnum single' => fn () => TestUnitEnum::Foo,
-    'embedded comma' => 'a,b',
-    'embedded quote' => 'he said "hi"',
+    'BackedEnum single'      => fn () => TestStringEnum::Active,
+    'UnitEnum single'        => fn () => TestUnitEnum::Foo,
+    'embedded comma'         => 'a,b',
+    'embedded quote'         => 'he said "hi"',
 ]);
 
 // =========================================================================
@@ -2191,13 +2198,13 @@ it('contains produces a Contains object equivalent to Rule::contains() for every
 it('validates url shortcut', function (): void {
     $v = makeValidator(
         ['website' => 'https://example.com'],
-        ['website' => FluentRule::url()->required()]
+        ['website' => FluentRule::url()->required()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['website' => 'not-a-url'],
-        ['website' => FluentRule::url()->required()]
+        ['website' => FluentRule::url()->required()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2205,13 +2212,13 @@ it('validates url shortcut', function (): void {
 it('validates uuid shortcut', function (): void {
     $v = makeValidator(
         ['id' => '550e8400-e29b-41d4-a716-446655440000'],
-        ['id' => FluentRule::uuid()->required()]
+        ['id' => FluentRule::uuid()->required()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['id' => 'not-a-uuid'],
-        ['id' => FluentRule::uuid()->required()]
+        ['id' => FluentRule::uuid()->required()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2219,13 +2226,13 @@ it('validates uuid shortcut', function (): void {
 it('validates ulid shortcut', function (): void {
     $v = makeValidator(
         ['id' => '01ARZ3NDEKTSV4RRFFQ69G5FAV'],
-        ['id' => FluentRule::ulid()->required()]
+        ['id' => FluentRule::ulid()->required()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['id' => 'not-a-ulid'],
-        ['id' => FluentRule::ulid()->required()]
+        ['id' => FluentRule::ulid()->required()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2233,13 +2240,13 @@ it('validates ulid shortcut', function (): void {
 it('validates ip shortcut', function (): void {
     $v = makeValidator(
         ['address' => '192.168.1.1'],
-        ['address' => FluentRule::ip()->required()]
+        ['address' => FluentRule::ip()->required()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['address' => 'not-an-ip'],
-        ['address' => FluentRule::ip()->required()]
+        ['address' => FluentRule::ip()->required()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2355,13 +2362,13 @@ it('validates declined shortcut', function (): void {
 it('validates declinedIf', function (): void {
     $v = makeValidator(
         ['under_18' => 'yes', 'has_consent' => 'no'],
-        ['has_consent' => FluentRule::declined()->declinedIf('under_18', 'yes')]
+        ['has_consent' => FluentRule::declined()->declinedIf('under_18', 'yes')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['under_18' => 'yes', 'has_consent' => 'yes'],
-        ['has_consent' => FluentRule::declined()->declinedIf('under_18', 'yes')]
+        ['has_consent' => FluentRule::declined()->declinedIf('under_18', 'yes')],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -2373,19 +2380,19 @@ it('validates declinedIf', function (): void {
 it('validates prohibitedIfAccepted', function (): void {
     $v = makeValidator(
         ['terms' => 'yes', 'waiver' => 'some value'],
-        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')]
+        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['terms' => 'yes'],
-        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')]
+        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['terms' => 'no', 'waiver' => 'some value'],
-        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')]
+        ['waiver' => FluentRule::string()->prohibitedIfAccepted('terms')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2393,19 +2400,19 @@ it('validates prohibitedIfAccepted', function (): void {
 it('validates prohibitedIfDeclined', function (): void {
     $v = makeValidator(
         ['terms' => 'no', 'reason' => 'I disagree'],
-        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')]
+        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')],
     );
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
         ['terms' => 'no'],
-        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')]
+        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['terms' => 'yes', 'reason' => 'whatever'],
-        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')]
+        ['reason' => FluentRule::string()->prohibitedIfDeclined('terms')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2417,7 +2424,7 @@ it('validates prohibitedIfDeclined', function (): void {
 it('validates encoding', function (): void {
     $v = makeValidator(
         ['name' => 'hello'],
-        ['name' => FluentRule::string()->encoding('UTF-8')]
+        ['name' => FluentRule::string()->encoding('UTF-8')],
     );
     expect($v->passes())->toBeTrue();
 });
@@ -2441,7 +2448,8 @@ it('toArray returns array from string-compiled rules', function (): void {
 });
 
 it('toArray returns array from object-compiled rules', function (): void {
-    $rule = FluentRule::string()->required()->rule(new class implements ValidationRule {
+    $rule = FluentRule::string()->required()->rule(new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void {}
     });
     expect($rule->toArray())->toMatchArray([0 => 'required', 1 => 'string']);
@@ -2449,7 +2457,7 @@ it('toArray returns array from object-compiled rules', function (): void {
 
 it('RuleSet dump returns rules messages and attributes', function (): void {
     $dump = RuleSet::from([
-        'name' => FluentRule::string('Full Name')->required()->max(255),
+        'name'  => FluentRule::string('Full Name')->required()->max(255),
         'email' => FluentRule::email()->required(),
     ])->dump();
 

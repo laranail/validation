@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\Rules\Net\Cidr;
-use Simtabi\Laranail\Validation\Rules\Net\DomainName;
-use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
+use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Net\DomainName;
 
 // =========================================================================
 // DomainName
 // =========================================================================
 
 it('accepts valid domain names', function (string $value): void {
-    expect(ruleAccepts(new DomainName(), $value))->toBeTrue();
+    expect(ruleAccepts(new DomainName, $value))->toBeTrue();
 })->with([
     'example.com',
     'sub.example.com',
@@ -24,7 +26,7 @@ it('accepts valid domain names', function (string $value): void {
 ]);
 
 it('rejects invalid domain names', function (string $value): void {
-    expect(ruleAccepts(new DomainName(), $value))->toBeFalse();
+    expect(ruleAccepts(new DomainName, $value))->toBeFalse();
 })->with([
     'localhost',               // single label, no TLD
     '-example.com',            // label may not lead with a hyphen
@@ -39,8 +41,8 @@ it('rejects invalid domain names', function (string $value): void {
 ]);
 
 it('rejects a label longer than 63 characters', function (): void {
-    expect(ruleAccepts(new DomainName(), str_repeat('a', 63) . '.com'))->toBeTrue()
-        ->and(ruleAccepts(new DomainName(), str_repeat('a', 64) . '.com'))->toBeFalse();
+    expect(ruleAccepts(new DomainName, str_repeat('a', 63) . '.com'))->toBeTrue()
+        ->and(ruleAccepts(new DomainName, str_repeat('a', 64) . '.com'))->toBeFalse();
 });
 
 it('rejects a name longer than 253 characters', function (): void {
@@ -55,20 +57,20 @@ it('rejects a name longer than 253 characters', function (): void {
     // strlen($x)->toBe(n), Rector's Pest set rewrites it and silently changed
     // the expected value while dropping two of the four assertions.
     expect($atLimit)->toHaveLength(253)
-        ->and(ruleAccepts(new DomainName(), $atLimit))->toBeTrue()
+        ->and(ruleAccepts(new DomainName, $atLimit))->toBeTrue()
         ->and($overLimit)->toHaveLength(254)
-        ->and(ruleAccepts(new DomainName(), $overLimit))->toBeFalse();
+        ->and(ruleAccepts(new DomainName, $overLimit))->toBeFalse();
 });
 
 it('treats a unicode name and its A-label form alike', function (): void {
     // The whole point of normalising to ASCII first: these are the same name.
     expect(DomainName::supportsInternationalNames())->toBeTrue()
-        ->and(ruleAccepts(new DomainName(), 'münchen.de'))->toBeTrue()
-        ->and(ruleAccepts(new DomainName(), 'xn--mnchen-3ya.de'))->toBeTrue();
+        ->and(ruleAccepts(new DomainName, 'münchen.de'))->toBeTrue()
+        ->and(ruleAccepts(new DomainName, 'xn--mnchen-3ya.de'))->toBeTrue();
 })->skip(fn (): bool => ! DomainName::supportsInternationalNames(), 'ext-intl not installed');
 
 it('can allow single-label names', function (): void {
-    expect(ruleAccepts(new DomainName(), 'localhost'))->toBeFalse()
+    expect(ruleAccepts(new DomainName, 'localhost'))->toBeFalse()
         ->and(ruleAccepts(new DomainName(requireTld: false), 'localhost'))->toBeTrue();
 });
 
@@ -77,11 +79,11 @@ it('can allow single-label names', function (): void {
 // =========================================================================
 
 it('accepts valid subdomains', function (string $value): void {
-    expect(ruleAccepts(new Subdomain(), $value))->toBeTrue();
+    expect(ruleAccepts(new Subdomain, $value))->toBeTrue();
 })->with(['blog', 'my-app', 'a', 'a1', '123', str_repeat('a', 63)]);
 
 it('rejects invalid subdomains', function (string $value): void {
-    expect(ruleAccepts(new Subdomain(), $value))->toBeFalse();
+    expect(ruleAccepts(new Subdomain, $value))->toBeFalse();
 })->with([
     'blog.example.com',        // one label only
     '-blog',
@@ -95,8 +97,8 @@ it('rejects punycode in a user-chosen subdomain', function (): void {
     // xn--pple-43d renders as `аpple` with a Cyrillic а. Accepting Punycode
     // from user input is a homograph attack waiting to happen, and a
     // self-chosen subdomain is exactly where it would land.
-    expect(ruleAccepts(new Subdomain(), 'xn--pple-43d'))->toBeFalse()
-        ->and(ruleAccepts(new Subdomain(), 'XN--pple-43d'))->toBeFalse();
+    expect(ruleAccepts(new Subdomain, 'xn--pple-43d'))->toBeFalse()
+        ->and(ruleAccepts(new Subdomain, 'XN--pple-43d'))->toBeFalse();
 });
 
 // =========================================================================
@@ -104,8 +106,8 @@ it('rejects punycode in a user-chosen subdomain', function (): void {
 // =========================================================================
 
 it('accepts publicly routable addresses', function (string $ip): void {
-    expect(ruleAccepts(new PublicIp(), $ip))->toBeTrue()
-        ->and(ruleAccepts(new PrivateIp(), $ip))->toBeFalse();
+    expect(ruleAccepts(new PublicIp, $ip))->toBeTrue()
+        ->and(ruleAccepts(new PrivateIp, $ip))->toBeFalse();
 })->with([
     '8.8.8.8',
     '1.1.1.1',
@@ -117,8 +119,8 @@ it('accepts publicly routable addresses', function (string $ip): void {
 ]);
 
 it('rejects addresses that are not publicly routable', function (string $ip): void {
-    expect(ruleAccepts(new PublicIp(), $ip))->toBeFalse()
-        ->and(ruleAccepts(new PrivateIp(), $ip))->toBeTrue();
+    expect(ruleAccepts(new PublicIp, $ip))->toBeFalse()
+        ->and(ruleAccepts(new PrivateIp, $ip))->toBeTrue();
 })->with([
     '10.0.0.1',                // RFC 1918
     '172.16.0.1',
@@ -143,7 +145,7 @@ it('unwraps IPv4-mapped IPv6 before classifying', function (string $ip): void {
     // The classic SSRF filter bypass: ::ffff:127.0.0.1 is loopback written as
     // v6, and filter_var's NO_PRIV_RANGE|NO_RES_RANGE flags read it as an
     // ordinary global v6 address.
-    expect(ruleAccepts(new PublicIp(), $ip))->toBeFalse();
+    expect(ruleAccepts(new PublicIp, $ip))->toBeFalse();
 })->with([
     '::ffff:127.0.0.1',
     '::ffff:10.0.0.1',
@@ -152,16 +154,16 @@ it('unwraps IPv4-mapped IPv6 before classifying', function (string $ip): void {
 ]);
 
 it('rejects values that are not IP addresses at all', function (string $value): void {
-    expect(ruleAccepts(new PublicIp(), $value))->toBeFalse()
-        ->and(ruleAccepts(new PrivateIp(), $value))->toBeFalse();
+    expect(ruleAccepts(new PublicIp, $value))->toBeFalse()
+        ->and(ruleAccepts(new PrivateIp, $value))->toBeFalse();
 })->with(['not-an-ip', '999.999.999.999', '10.0.0', 'example.com', '10.0.0.1/8']);
 
 it('is the exact complement of PrivateIp over valid addresses', function (): void {
     // Both rules delegate to one classifier precisely so a range cannot be
     // private to one and public to the other.
     foreach (['8.8.8.8', '10.0.0.1', '::1', '2001:4860:4860::8888', '::ffff:127.0.0.1'] as $ip) {
-        expect(ruleAccepts(new PublicIp(), $ip))
-            ->not->toBe(ruleAccepts(new PrivateIp(), $ip), "both agreed on {$ip}");
+        expect(ruleAccepts(new PublicIp, $ip))
+            ->not->toBe(ruleAccepts(new PrivateIp, $ip), "both agreed on {$ip}");
     }
 });
 
@@ -170,7 +172,7 @@ it('is the exact complement of PrivateIp over valid addresses', function (): voi
 // =========================================================================
 
 it('accepts valid CIDR notation', function (string $value): void {
-    expect(ruleAccepts(new Cidr(), $value))->toBeTrue();
+    expect(ruleAccepts(new Cidr, $value))->toBeTrue();
 })->with([
     '10.0.0.0/8',
     '192.168.1.0/24',
@@ -183,7 +185,7 @@ it('accepts valid CIDR notation', function (string $value): void {
 ]);
 
 it('rejects invalid CIDR notation', function (string $value): void {
-    expect(ruleAccepts(new Cidr(), $value))->toBeFalse();
+    expect(ruleAccepts(new Cidr, $value))->toBeFalse();
 })->with([
     '10.0.0.0/33',             // v4 prefix out of range
     '10.0.0.0/64',             // a v6 prefix on a v4 address

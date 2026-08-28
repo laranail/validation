@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Codes;
 
@@ -21,13 +23,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Asin implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail/validation::validation.asin')->translate();
-        }
-    }
-
     public static function passes(string $value): bool
     {
         if (preg_match('/^B[0-9A-Z]{9}$/D', $value) === 1) {
@@ -35,5 +30,12 @@ final class Asin implements ValidationRule
         }
 
         return Isbn::passes($value, [10]);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || ! self::passes($value)) {
+            $fail('laranail/validation::validation.asin')->translate();
+        }
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Banking;
 
@@ -17,13 +19,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Luhn implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.luhn')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) && ! is_int($value)) {
@@ -46,7 +41,7 @@ final class Luhn implements ValidationRule
 
         // Right to left: every second digit is doubled, and a doubled value
         // above 9 has its digits summed — equivalent to subtracting 9.
-        for ($i = strlen($digits) - 1; $i >= 0; --$i) {
+        for ($i = strlen($digits) - 1; $i >= 0; $i--) {
             $digit = (int) $digits[$i];
 
             if ($double) {
@@ -62,5 +57,12 @@ final class Luhn implements ValidationRule
         }
 
         return $sum % 10 === 0;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.luhn')->translate();
+        }
     }
 }

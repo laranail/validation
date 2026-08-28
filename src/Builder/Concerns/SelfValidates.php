@@ -1,29 +1,56 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
 use Closure;
+use Stringable;
+use ReflectionProperty;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\ExcludeUnless;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\ProhibitedIf;
-use Illuminate\Validation\Rules\ProhibitedUnless;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\ExcludeUnless;
 use Illuminate\Validation\Rules\RequiredUnless;
-use ReflectionProperty;
-use Stringable;
+use Illuminate\Validation\Rules\ProhibitedUnless;
 
 trait SelfValidates
 {
+    /**
+     * Exact rule names (the part before any `:`) whose rules must be evaluated
+     * against a null/absent value rather than skipped by `nullable`. Matched
+     * exactly — not by prefix — so a non-presence rule that merely shares a
+     * stem (most notably `required_array_keys`) never counts, and no entry is
+     * silently subsumed by another (`required_with` vs `required_without`).
+     */
+    private const PRESENCE_FORCING_RULES = [
+        'required', 'filled', 'present', 'missing',
+        'required_if', 'required_unless',
+        'required_with', 'required_with_all',
+        'required_without', 'required_without_all',
+        'required_if_accepted', 'required_if_declined',
+        'present_if', 'present_unless', 'present_with', 'present_with_all',
+        'missing_if', 'missing_unless', 'missing_with', 'missing_with_all',
+    ];
+
     public bool $implicit = true;
 
     protected \Illuminate\Validation\Validator $validator;
 
     /** @var array<array-key, mixed> */
     protected array $data = [];
+
+    /** @var string|list<string|object>|null */
+    protected string|array|null $compiledCache = null;
+
+    public function __clone(): void
+    {
+        $this->compiledCache = null;
+    }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -61,6 +88,98 @@ trait SelfValidates
         }
 
         $this->forwardErrors($innerValidator, $attribute, $nestedRules !== [], $fail);
+    }
+
+    public function canCompile(): bool
+    {
+        return $this->rules === [];
+    }
+
+    /**
+     * Compile to native Laravel format. Returns a pipe-joined string
+     * when possible (faster for Laravel to parse), or an array when
+     * non-stringable object rules are present. Memoized since rule
+     * objects are immutable after construction.
+     *
+     * @return string|list<string|object>
+     */
+    public function compiledRules(): string|array
+    {
+        return $this->compiledCache ??= $this->buildCompiledRules();
+    }
+
+    /**
+     * Get the compiled rules as an array. Useful for debugging and testing.
+     *
+     * @return list<string|object>
+     */
+    public function toArray(): array
+    {
+        $compiled = $this->compiledRules();
+
+        if (is_array($compiled)) {
+            return $compiled;
+        }
+
+        return $compiled === '' ? [] : explode('|', $compiled);
+    }
+
+    /**
+     * Dump the compiled rules and terminate execution.
+     */
+    public function dd(mixed ...$args): never
+    {
+        dd($this->toArray(), ...$args);
+    }
+
+    /**
+     * Dump the compiled rules.
+     */
+    public function dump(mixed ...$args): static
+    {
+        dump($this->toArray(), ...$args);
+
+        return $this;
+    }
+
+    /** @return array<string, mixed> */
+    public function buildNestedRules(string $attribute): array
+    {
+        return [];
+    }
+
+    public function setValidator(\Illuminate\Contracts\Validation\Validator $validator): static
+    {
+        $this->validator = $validator;
+
+        return $this;
+    }
+
+    /** @param  array<array-key, mixed>  $data */
+    public function setData(array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    protected function hasPresenceModifier(): bool
+    {
+        if (array_intersect($this->constraints, ['required', 'sometimes', 'nullable', 'present']) !== []) {
+            return true;
+        }
+
+        if ($this->hasPresenceConstraint()) {
+            return true;
+        }
+
+        return $this->hasPresenceRule();
+    }
+
+    /** @return list<string|object> */
+    protected function buildValidationRules(): array
+    {
+        return [...$this->rules, ...$this->constraints];
     }
 
     /** @return array<string, string> */
@@ -147,23 +266,6 @@ trait SelfValidates
     }
 
     /**
-     * Exact rule names (the part before any `:`) whose rules must be evaluated
-     * against a null/absent value rather than skipped by `nullable`. Matched
-     * exactly — not by prefix — so a non-presence rule that merely shares a
-     * stem (most notably `required_array_keys`) never counts, and no entry is
-     * silently subsumed by another (`required_with` vs `required_without`).
-     */
-    private const PRESENCE_FORCING_RULES = [
-        'required', 'filled', 'present', 'missing',
-        'required_if', 'required_unless',
-        'required_with', 'required_with_all',
-        'required_without', 'required_without_all',
-        'required_if_accepted', 'required_if_declined',
-        'present_if', 'present_unless', 'present_with', 'present_with_all',
-        'missing_if', 'missing_unless', 'missing_with', 'missing_with_all',
-    ];
-
-    /**
      * Whether the chain carries a modifier that forces evaluation of a
      * null/absent value, in which case `nullable` must NOT short-circuit
      * validation. Covers every presence family that diverges from a plain
@@ -206,19 +308,6 @@ trait SelfValidates
         }
 
         return false;
-    }
-
-    protected function hasPresenceModifier(): bool
-    {
-        if (array_intersect($this->constraints, ['required', 'sometimes', 'nullable', 'present']) !== []) {
-            return true;
-        }
-
-        if ($this->hasPresenceConstraint()) {
-            return true;
-        }
-
-        return $this->hasPresenceRule();
     }
 
     private function hasPresenceConstraint(): bool
@@ -281,66 +370,6 @@ trait SelfValidates
         return false;
     }
 
-    public function canCompile(): bool
-    {
-        return $this->rules === [];
-    }
-
-    /** @var string|list<string|object>|null */
-    protected string|array|null $compiledCache = null;
-
-    public function __clone(): void
-    {
-        $this->compiledCache = null;
-    }
-
-    /**
-     * Compile to native Laravel format. Returns a pipe-joined string
-     * when possible (faster for Laravel to parse), or an array when
-     * non-stringable object rules are present. Memoized since rule
-     * objects are immutable after construction.
-     *
-     * @return string|list<string|object>
-     */
-    public function compiledRules(): string|array
-    {
-        return $this->compiledCache ??= $this->buildCompiledRules();
-    }
-
-    /**
-     * Get the compiled rules as an array. Useful for debugging and testing.
-     *
-     * @return list<string|object>
-     */
-    public function toArray(): array
-    {
-        $compiled = $this->compiledRules();
-
-        if (is_array($compiled)) {
-            return $compiled;
-        }
-
-        return $compiled === '' ? [] : explode('|', $compiled);
-    }
-
-    /**
-     * Dump the compiled rules and terminate execution.
-     */
-    public function dd(mixed ...$args): never
-    {
-        dd($this->toArray(), ...$args);
-    }
-
-    /**
-     * Dump the compiled rules.
-     */
-    public function dump(mixed ...$args): static
-    {
-        dump($this->toArray(), ...$args);
-
-        return $this;
-    }
-
     /** @return string|list<string|object> */
     private function buildCompiledRules(): string|array
     {
@@ -398,7 +427,7 @@ trait SelfValidates
      * `regex:/^(a|b)$/` pattern) cannot be safely pipe-joined — Laravel's parser
      * would split it. Rules with one fall back to array form instead.
      *
-     * @param  list<string>  $rules
+     * @param list<string> $rules
      */
     private function anyContainsPipe(array $rules): bool
     {
@@ -421,32 +450,5 @@ trait SelfValidates
         return $rule instanceof ExcludeIf || $rule instanceof ExcludeUnless
             || $rule instanceof RequiredIf || $rule instanceof RequiredUnless
             || $rule instanceof ProhibitedIf || $rule instanceof ProhibitedUnless;
-    }
-
-    /** @return list<string|object> */
-    protected function buildValidationRules(): array
-    {
-        return [...$this->rules, ...$this->constraints];
-    }
-
-    /** @return array<string, mixed> */
-    public function buildNestedRules(string $attribute): array
-    {
-        return [];
-    }
-
-    public function setValidator(\Illuminate\Contracts\Validation\Validator $validator): static
-    {
-        $this->validator = $validator;
-
-        return $this;
-    }
-
-    /** @param  array<array-key, mixed>  $data */
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
     }
 }

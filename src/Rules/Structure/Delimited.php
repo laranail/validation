@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Structure;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\Validator;
 use InvalidArgumentException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * Validate every item of a delimited string against the same rule.
@@ -45,12 +47,12 @@ final readonly class Delimited implements ValidationRule
     private string $separator;
 
     /**
-     * @param  list<mixed>  $rules      Applied to each item.
-     * @param  string       $separator  Splits the string; not trimmed itself.
-     * @param  int|null     $min        Fewest items required.
-     * @param  int|null     $max        Most items allowed.
-     * @param  bool         $distinct   Reject repeated items.
-     * @param  bool         $trim       Trim whitespace around each item.
+     * @param list<mixed> $rules Applied to each item.
+     * @param string $separator Splits the string; not trimmed itself.
+     * @param int|null $min Fewest items required.
+     * @param int|null $max Most items allowed.
+     * @param bool $distinct Reject repeated items.
+     * @param bool $trim Trim whitespace around each item.
      *
      * @throws InvalidArgumentException If the separator is empty.
      */
