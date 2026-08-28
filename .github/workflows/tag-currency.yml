@@ -17,7 +17,7 @@ on:
     # Monday 06:00 America/New_York, matching the Dependabot window. Cron has no
     # timezone, so this is 11:00 UTC and drifts an hour with DST — which does
     # not matter for a weekly check and is not worth a workaround.
-    - cron: '0 11 * * 1'
+    - cron: '37 11 * * 1'
   workflow_dispatch:
 
 concurrency:
