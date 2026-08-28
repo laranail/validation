@@ -114,7 +114,7 @@
         "laranail/phone": "^0.1 \u2014 required by FluentRule::phone() and Rules\\Telecom\\Phone. Suggested rather than required because it carries libphonenumber's numbering-plan metadata, which a project validating only strings and dates should not have to install.",
         "nikic/php-parser": "^5.0 \u2014 required by Simtabi\\Laranail\\Validation\\Testing\\Arch\\BansFieldRuleTypeMethods, an opt-in Pest/PHPUnit arch helper that bans type-specific method calls on the untyped FluentRule::field() builder.",
         "laranail/password-history": "^0.1 \u2014 reuse prevention: password()->notReused() appears when installed.",
-        "laranail/password-tools": "^0.2 \u2014 zxcvbn strength scoring and secure generators: password()->strength(3) appears when installed."
+        "laranail/password-tools": "^0.1 \u2014 zxcvbn strength scoring and secure generators: password()->strength(3) appears when installed."
     },
     "autoload": {
         "psr-4": {
