@@ -1,16 +1,15 @@
 name: Rector
 
 on:
-  push:
-    paths:
-      - '**.php'
-      - 'rector.php'
-      - '.github/workflows/rector.yml'
   pull_request:
     paths:
       - '**.php'
       - 'rector.php'
       - '.github/workflows/rector.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

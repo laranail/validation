@@ -1,14 +1,14 @@
 name: Fix PHP code style issues
 
 on:
-  push:
-    paths:
-      - '**.php'
-      - 'pint.json'
   pull_request:
     paths:
       - '**.php'
       - 'pint.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write

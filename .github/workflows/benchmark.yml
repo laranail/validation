@@ -10,6 +10,10 @@ on:
       - 'benchmark.php'
       - '.github/workflows/benchmark.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   benchmark:
     runs-on: ubuntu-latest
