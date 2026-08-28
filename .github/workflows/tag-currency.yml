@@ -12,9 +12,6 @@ permissions:
 # because a tag can also be moved or deleted directly on the remote, which no
 # push to this repository would notice.
 on:
-  push:
-    branches:
-      - main
   pull_request:
   schedule:
     # Monday 06:00 America/New_York, matching the Dependabot window. Cron has no
@@ -22,6 +19,10 @@ on:
     # not matter for a weekly check and is not worth a workaround.
     - cron: '0 11 * * 1'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tag-currency:
