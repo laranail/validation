@@ -27,6 +27,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/laranail/validation-js"
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org",
+            "exclude": [
+                "laranail/*"
+            ]
+        },
+        {
+            "packagist.org": false
         }
     ],
     "name": "laranail/validation",
