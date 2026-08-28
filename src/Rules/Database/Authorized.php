@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Database;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * The submitted identifier names a record the current user may act on.
@@ -30,10 +32,10 @@ use Illuminate\Database\Eloquent\Model;
 final readonly class Authorized implements ValidationRule
 {
     /**
-     * @param  string                     $ability   Ability name, as the policy declares it.
-     * @param  class-string<Model>        $model     Model to resolve the value against.
-     * @param  string|null                $guard     Auth guard, or null for the default.
-     * @param  list<mixed>                $arguments Extra arguments passed after the model.
+     * @param string $ability Ability name, as the policy declares it.
+     * @param class-string<Model> $model Model to resolve the value against.
+     * @param string|null $guard Auth guard, or null for the default.
+     * @param list<mixed> $arguments Extra arguments passed after the model.
      */
     public function __construct(
         private string $ability,
@@ -50,7 +52,7 @@ final readonly class Authorized implements ValidationRule
             return;
         }
 
-        $model = new $this->model();
+        $model = new $this->model;
 
         $record = $model->newQuery()
             ->where($model->getRouteKeyName(), $value)

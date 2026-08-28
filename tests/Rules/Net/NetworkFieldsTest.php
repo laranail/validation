@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
-use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
+declare(strict_types=1);
+
 use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
+use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
 
 function netCheck(mixed $rule, mixed $value): bool
 {

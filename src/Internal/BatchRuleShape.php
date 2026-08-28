@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -22,7 +24,7 @@ final class BatchRuleShape
      * the whole shape, so the annotation stays honest about its one caller,
      * even though only three of the keys are read.
      *
-     * @param  array{connection: string|null, table: string, column: string, wheres: array<int, array{column: string, value: string}>, ignore: mixed, idColumn: string}|null  $meta
+     * @param array{connection: string|null, table: string, column: string, wheres: array<int, array{column: string, value: string}>, ignore: mixed, idColumn: string}|null $meta
      */
     public static function of(?array $meta): string
     {

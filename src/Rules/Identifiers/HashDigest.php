@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Identifiers;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use InvalidArgumentException;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
@@ -27,34 +29,34 @@ final readonly class HashDigest implements ClientCheckable, ValidationRule
 {
     /** Hex-digest widths per admitted algorithm. */
     private const array LENGTHS = [
-        'adler32' => 8,
-        'crc32' => 8,
-        'crc32b' => 8,
-        'crc32c' => 8,
-        'md4' => 32,
-        'md5' => 32,
-        'ripemd128' => 32,
-        'ripemd160' => 40,
-        'ripemd256' => 64,
-        'ripemd320' => 80,
-        'sha1' => 40,
-        'sha224' => 56,
-        'sha256' => 64,
-        'sha384' => 96,
-        'sha512' => 128,
+        'adler32'    => 8,
+        'crc32'      => 8,
+        'crc32b'     => 8,
+        'crc32c'     => 8,
+        'md4'        => 32,
+        'md5'        => 32,
+        'ripemd128'  => 32,
+        'ripemd160'  => 40,
+        'ripemd256'  => 64,
+        'ripemd320'  => 80,
+        'sha1'       => 40,
+        'sha224'     => 56,
+        'sha256'     => 64,
+        'sha384'     => 96,
+        'sha512'     => 128,
         'sha512/224' => 56,
         'sha512/256' => 64,
-        'sha3-224' => 56,
-        'sha3-256' => 64,
-        'sha3-384' => 96,
-        'sha3-512' => 128,
-        'tiger128' => 32,
-        'tiger160' => 40,
-        'tiger192' => 48,
-        'whirlpool' => 128,
-        'xxh32' => 8,
-        'xxh64' => 16,
-        'xxh128' => 32,
+        'sha3-224'   => 56,
+        'sha3-256'   => 64,
+        'sha3-384'   => 96,
+        'sha3-512'   => 128,
+        'tiger128'   => 32,
+        'tiger160'   => 40,
+        'tiger192'   => 48,
+        'whirlpool'  => 128,
+        'xxh32'      => 8,
+        'xxh64'      => 16,
+        'xxh128'     => 32,
     ];
 
     private int $length;

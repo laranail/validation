@@ -1,26 +1,28 @@
-<?php declare(strict_types=1);
+<?php
 
-use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
-use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
-use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
+declare(strict_types=1);
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
 use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
 use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
+use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
+use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
+use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
 
 // =========================================================================
 // CountryCode — ISO 3166-1, alpha-2 by default, alpha-3 by flag
 // =========================================================================
 
 it('accepts assigned alpha-2 country codes', function (string $value): void {
-    expect(ruleAccepts(new CountryCode(), $value))->toBeTrue();
+    expect(ruleAccepts(new CountryCode, $value))->toBeTrue();
 })->with(['US', 'KE', 'DE', 'XK']);
 
 it('rejects unassigned, lowercase and alpha-3 values in alpha-2 mode', function (mixed $value): void {
     // Empty strings are absent from this list on purpose: Laravel skips
     // non-implicit rules on '' — presence is `required`'s job, not this rule's.
-    expect(ruleAccepts(new CountryCode(), $value))->toBeFalse();
+    expect(ruleAccepts(new CountryCode, $value))->toBeFalse();
 })->with(['AA', 'us', 'USA', 'U', 12, null, [['US']]]);
 
 it('accepts assigned alpha-3 codes only in alpha-3 mode', function (): void {
@@ -42,7 +44,8 @@ it('has no alpha-3 for the user-assigned XK', function (): void {
 });
 
 it('honours a bound CountryDataset', function (): void {
-    $this->app->instance(CountryDataset::class, new class implements CountryDataset {
+    $this->app->instance(CountryDataset::class, new class implements CountryDataset
+    {
         public function isAlpha2(string $code): bool
         {
             return $code === 'ZZ';
@@ -54,8 +57,8 @@ it('honours a bound CountryDataset', function (): void {
         }
     });
 
-    expect(ruleAccepts(new CountryCode(), 'ZZ'))->toBeTrue()
-        ->and(ruleAccepts(new CountryCode(), 'US'))->toBeFalse();
+    expect(ruleAccepts(new CountryCode, 'ZZ'))->toBeTrue()
+        ->and(ruleAccepts(new CountryCode, 'US'))->toBeFalse();
 });
 
 // =========================================================================
@@ -63,11 +66,11 @@ it('honours a bound CountryDataset', function (): void {
 // =========================================================================
 
 it('accepts assigned ISO 639-1 codes', function (string $value): void {
-    expect(ruleAccepts(new LanguageCode(), $value))->toBeTrue();
+    expect(ruleAccepts(new LanguageCode, $value))->toBeTrue();
 })->with(['en', 'sw', 'de', 'zh']);
 
 it('rejects unassigned, uppercase and three-letter values', function (mixed $value): void {
-    expect(ruleAccepts(new LanguageCode(), $value))->toBeFalse();
+    expect(ruleAccepts(new LanguageCode, $value))->toBeFalse();
 })->with(['EN', 'eng', 'xx', 3, null]);
 
 it('folds language case only when asked to', function (): void {
@@ -75,15 +78,16 @@ it('folds language case only when asked to', function (): void {
 });
 
 it('honours a bound LanguageDataset', function (): void {
-    $this->app->instance(LanguageDataset::class, new class implements LanguageDataset {
+    $this->app->instance(LanguageDataset::class, new class implements LanguageDataset
+    {
         public function isAlpha2(string $code): bool
         {
             return $code === 'zz';
         }
     });
 
-    expect(ruleAccepts(new LanguageCode(), 'zz'))->toBeTrue()
-        ->and(ruleAccepts(new LanguageCode(), 'en'))->toBeFalse();
+    expect(ruleAccepts(new LanguageCode, 'zz'))->toBeTrue()
+        ->and(ruleAccepts(new LanguageCode, 'en'))->toBeFalse();
 });
 
 // =========================================================================
@@ -91,13 +95,13 @@ it('honours a bound LanguageDataset', function (): void {
 // =========================================================================
 
 it('accepts current alpha currency codes, including the 2016-2024 replacements', function (string $value): void {
-    expect(ruleAccepts(new CurrencyCode(), $value))->toBeTrue();
+    expect(ruleAccepts(new CurrencyCode, $value))->toBeTrue();
 })->with(['USD', 'EUR', 'KES', 'BYN', 'MRU', 'STN', 'VES', 'SLE', 'ZWG', 'XAU', 'XXX']);
 
 it('rejects retired and unassigned alpha codes', function (mixed $value): void {
     // HRK (Croatia -> euro, 2023), SLL (redenominated, withdrawn 2023) and
     // ZWL (replaced by ZWG, 2024) are exactly what a stale list would accept.
-    expect(ruleAccepts(new CurrencyCode(), $value))->toBeFalse();
+    expect(ruleAccepts(new CurrencyCode, $value))->toBeFalse();
 })->with(['HRK', 'SLL', 'ZWL', 'usd', 'ABC', '840', 840, null]);
 
 it('validates numeric codes in numeric mode', function (): void {
@@ -122,7 +126,8 @@ it('folds currency case only when asked to', function (): void {
 });
 
 it('honours a bound CurrencyDataset', function (): void {
-    $this->app->instance(CurrencyDataset::class, new class implements CurrencyDataset {
+    $this->app->instance(CurrencyDataset::class, new class implements CurrencyDataset
+    {
         public function isCode(string $code): bool
         {
             return $code === 'ZZZ';
@@ -139,8 +144,8 @@ it('honours a bound CurrencyDataset', function (): void {
         }
     });
 
-    expect(ruleAccepts(new CurrencyCode(), 'ZZZ'))->toBeTrue()
-        ->and(ruleAccepts(new CurrencyCode(), 'USD'))->toBeFalse();
+    expect(ruleAccepts(new CurrencyCode, 'ZZZ'))->toBeTrue()
+        ->and(ruleAccepts(new CurrencyCode, 'USD'))->toBeFalse();
 });
 
 // =========================================================================

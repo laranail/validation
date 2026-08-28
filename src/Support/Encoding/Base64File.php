@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support\Encoding;
 
@@ -19,7 +21,7 @@ use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
 final class Base64File
 {
     /**
-     * @param  string  $name  The client filename the rules will see.
+     * @param string $name The client filename the rules will see.
      */
     public static function toUploadedFile(mixed $value, string $name = 'upload'): ?UploadedFile
     {

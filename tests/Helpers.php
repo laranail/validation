@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Concerns\ValidatesAttributes;
@@ -15,7 +17,7 @@ function laravelSupportsIntegerStrict(): bool
 {
     $reflection = new ReflectionMethod(
         ValidatesAttributes::class,
-        'validateInteger'
+        'validateInteger',
     );
 
     return count($reflection->getParameters()) >= 3;
@@ -28,8 +30,9 @@ function laravelSupportsIntegerStrict(): bool
  * be stringified during compilation — __toString() silently drops them. Use
  * this to assert the object itself survived rather than its lossy string form.
  *
- * @param  list<object|string>  $rules
- * @param  class-string  $type
+ * @param list<object|string> $rules
+ * @param class-string $type
+ *
  * @return list<object>
  */
 function rulesOfType(array $rules, string $type): array
@@ -81,7 +84,8 @@ function compiledArray(mixed $compiled): array
  * failed outright. Every Windows CI cell failed that way while every Linux one
  * passed.
  *
- * @param  class-string|null  $implementing  Restrict to classes of this type.
+ * @param class-string|null $implementing Restrict to classes of this type.
+ *
  * @return list<class-string>
  */
 function ruleClassesUnder(?string $implementing = null): array

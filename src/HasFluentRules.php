@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Validation\Validator;
 use ReflectionMethod;
-use ReflectionNamedType;
 use ReflectionProperty;
-use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
+use ReflectionNamedType;
+use Illuminate\Container\Container;
+use Illuminate\Validation\Validator;
 use Simtabi\Laranail\Validation\Internal\ValidatorStateCopier;
+use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 /**
  * Add this trait to a FormRequest to enable FluentRule features:
@@ -72,6 +74,80 @@ trait HasFluentRules
         $schema = Container::getInstance()->call([$this, 'schema']);
 
         return $schema;
+    }
+
+    protected function createDefaultValidator(ValidationFactory $factory): Validator
+    {
+        // schema(FluentSchema $rules) — the builder shape — and rules() are both
+        // rule sources. schema() detection keys off the FluentSchema-typed first
+        // parameter (not just the method name), so an unrelated schema() method
+        // (e.g. one returning a JSON/DB schema) is never hijacked. rules() counts
+        // only when the consumer declared their own (definesOwnRules()); the
+        // trait's fallback rules() just re-exposes schema() and must not trigger
+        // a merge. When both are present they are merged rather than one shadowing
+        // the other — the more specific declaration wins each shared field (see
+        // mergeSchemaAndRules()), so an abstract base or trait can supply one
+        // method and a concrete request the other. Each source is resolved by the
+        // container.
+        $hasSchema = method_exists($this, 'schema') && $this->schemaExpectsFluentSchema();
+        $hasRules = $this->definesOwnRules();
+
+        /** @var array<string, mixed>|RuleSet $rules */
+        $rules = match (true) {
+            $hasSchema && $hasRules => $this->mergeSchemaAndRules(
+                $this->container->call([$this, 'schema']),
+                $this->container->call([$this, 'rules']),
+            ),
+            $hasSchema => $this->container->call([$this, 'schema']),
+            $hasRules  => $this->container->call([$this, 'rules']),
+            default    => [],
+        };
+
+        /** @var array<string, mixed> $data */
+        $data = $this->validationData();
+
+        // Auto-unwrap: rules() may return either a plain array or a RuleSet
+        // (the latter pattern lets callers chain ->only/->except/->merge
+        // before returning, eliminating a terminal ->toArray() call).
+        $ruleSet = $rules instanceof RuleSet ? $rules : RuleSet::from($rules);
+        $prepared = $ruleSet->prepare($data);
+
+        // Pre-exclude rules whose exclude_unless/exclude_if conditions
+        // don't match the actual data. This happens BEFORE the validator
+        // constructor, so excluded rules are never parsed.
+        $preparedRules = $this->preExcludeRules($prepared->rules, $data);
+
+        [$fastChecks, $attributePatternMap] = $this->buildFastCheckMaps($prepared, $preparedRules);
+
+        $messages = $this->messages() + $prepared->messages;
+        $attributes = $this->attributes() + $prepared->attributes;
+
+        // Only use OptimizedValidator when there are fast-checkable wildcard
+        // rules or conditional rules were pre-excluded.
+        if ($fastChecks !== [] || count($preparedRules) < count($prepared->rules)) {
+            $validator = $this->makeOptimizedValidator($factory, $data, $preparedRules, $messages, $attributes);
+            $validator->withFastChecks($fastChecks, $attributePatternMap);
+        } else {
+            /** @var Validator $validator */
+            $validator = $factory->make($data, $preparedRules, $messages, $attributes);
+        }
+
+        if ($prepared->implicitAttributes !== []) {
+            new ReflectionProperty(Validator::class, 'implicitAttributes')
+                ->setValue($validator, $prepared->implicitAttributes);
+        }
+
+        $validator->stopOnFirstFailure($this->stopOnFirstFailure);
+
+        $this->applyBatchPresenceVerifier($validator, $prepared, $preparedRules, $data);
+
+        if ($this->isPrecognitive()) {
+            $validator->setRules(
+                $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders()),
+            );
+        }
+
+        return $validator;
     }
 
     /**
@@ -171,89 +247,15 @@ trait HasFluentRules
         return new ReflectionMethod($this, 'rules')->getFileName() !== __FILE__;
     }
 
-    protected function createDefaultValidator(ValidationFactory $factory): Validator
-    {
-        // schema(FluentSchema $rules) — the builder shape — and rules() are both
-        // rule sources. schema() detection keys off the FluentSchema-typed first
-        // parameter (not just the method name), so an unrelated schema() method
-        // (e.g. one returning a JSON/DB schema) is never hijacked. rules() counts
-        // only when the consumer declared their own (definesOwnRules()); the
-        // trait's fallback rules() just re-exposes schema() and must not trigger
-        // a merge. When both are present they are merged rather than one shadowing
-        // the other — the more specific declaration wins each shared field (see
-        // mergeSchemaAndRules()), so an abstract base or trait can supply one
-        // method and a concrete request the other. Each source is resolved by the
-        // container.
-        $hasSchema = method_exists($this, 'schema') && $this->schemaExpectsFluentSchema();
-        $hasRules = $this->definesOwnRules();
-
-        /** @var array<string, mixed>|RuleSet $rules */
-        $rules = match (true) {
-            $hasSchema && $hasRules => $this->mergeSchemaAndRules(
-                $this->container->call([$this, 'schema']),
-                $this->container->call([$this, 'rules']),
-            ),
-            $hasSchema => $this->container->call([$this, 'schema']),
-            $hasRules => $this->container->call([$this, 'rules']),
-            default => [],
-        };
-
-        /** @var array<string, mixed> $data */
-        $data = $this->validationData();
-
-        // Auto-unwrap: rules() may return either a plain array or a RuleSet
-        // (the latter pattern lets callers chain ->only/->except/->merge
-        // before returning, eliminating a terminal ->toArray() call).
-        $ruleSet = $rules instanceof RuleSet ? $rules : RuleSet::from($rules);
-        $prepared = $ruleSet->prepare($data);
-
-        // Pre-exclude rules whose exclude_unless/exclude_if conditions
-        // don't match the actual data. This happens BEFORE the validator
-        // constructor, so excluded rules are never parsed.
-        $preparedRules = $this->preExcludeRules($prepared->rules, $data);
-
-        [$fastChecks, $attributePatternMap] = $this->buildFastCheckMaps($prepared, $preparedRules);
-
-        $messages = $this->messages() + $prepared->messages;
-        $attributes = $this->attributes() + $prepared->attributes;
-
-        // Only use OptimizedValidator when there are fast-checkable wildcard
-        // rules or conditional rules were pre-excluded.
-        if ($fastChecks !== [] || count($preparedRules) < count($prepared->rules)) {
-            $validator = $this->makeOptimizedValidator($factory, $data, $preparedRules, $messages, $attributes);
-            $validator->withFastChecks($fastChecks, $attributePatternMap);
-        } else {
-            /** @var Validator $validator */
-            $validator = $factory->make($data, $preparedRules, $messages, $attributes);
-        }
-
-        if ($prepared->implicitAttributes !== []) {
-            new ReflectionProperty(Validator::class, 'implicitAttributes')
-                ->setValue($validator, $prepared->implicitAttributes);
-        }
-
-        $validator->stopOnFirstFailure($this->stopOnFirstFailure);
-
-        $this->applyBatchPresenceVerifier($validator, $prepared, $preparedRules, $data);
-
-        if ($this->isPrecognitive()) {
-            $validator->setRules(
-                $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
-            );
-        }
-
-        return $validator;
-    }
-
     /**
      * Create an OptimizedValidator with the same setup the factory provides
      * (extensions, container, presence verifier, excludeUnvalidatedArrayKeys)
      * without mutating the shared factory's resolver. Octane-safe.
      *
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $rules
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $rules
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
      */
     private function makeOptimizedValidator(
         ValidationFactory $factory,

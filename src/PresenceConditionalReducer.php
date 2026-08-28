@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
+use stdClass;
 use Illuminate\Http\UploadedFile;
 use Simtabi\Laranail\Validation\Internal\AbstractConditionalReducer;
-use stdClass;
 
 /**
  * Per-item pre-evaluation of Laravel's presence-conditional rules
@@ -36,8 +38,8 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
      * Rewrite presence-conditional rules for a single field against
      * item data. Handles pipe-joined strings and list-of-rules shape.
      *
-     * @param  array<string, mixed>   $itemData
-     * @param  array<string, string>  $itemMessages
+     * @param array<string, mixed> $itemData
+     * @param array<string, string> $itemMessages
      */
     public static function apply(mixed $rule, string $field, array $itemData, array $itemMessages): mixed
     {
@@ -73,8 +75,8 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
      *
      * Covers both single- and multi-param forms of all four rules.
      *
-     * @param  array<string, mixed>   $itemData
-     * @param  array<string, string>  $itemMessages
+     * @param array<string, mixed> $itemData
+     * @param array<string, string> $itemMessages
      */
     private static function rewriteOne(string $rule, string $field, array $itemData, array $itemMessages): ?string
     {
@@ -118,10 +120,10 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
      * | `required_with_all`     | ALL of `$params` present       |
      * | `required_without_all`  | ALL of `$params` absent        |
      *
-     * @param  list<?string>          $params    May contain `null` entries when `str_getcsv`
-     *                                           resolved an empty slot (matches Laravel's
-     *                                           `Arr::get($data, null)` → full-item semantics).
-     * @param  array<string, mixed>   $itemData
+     * @param list<?string> $params May contain `null` entries when `str_getcsv`
+     *                              resolved an empty slot (matches Laravel's
+     *                              `Arr::get($data, null)` → full-item semantics).
+     * @param array<string, mixed> $itemData
      */
     private static function ruleActivates(string $ruleName, array $params, array $itemData): bool
     {
@@ -137,11 +139,11 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
         }
 
         return match ($ruleName) {
-            'required_with' => $anyPresent,
-            'required_without' => ! $allPresent,
-            'required_with_all' => $allPresent,
+            'required_with'        => $anyPresent,
+            'required_without'     => ! $allPresent,
+            'required_with_all'    => $allPresent,
             'required_without_all' => ! $anyPresent,
-            default => false,
+            default                => false,
         };
     }
 
@@ -152,11 +154,11 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
      * (`required_without:profile.birthdate`), so resolve via `data_get`
      * instead of direct array-key lookup.
      *
-     * @param  array<string, mixed>  $itemData
+     * @param array<string, mixed> $itemData
      */
     private static function fieldPresent(array $itemData, ?string $field): bool
     {
-        $marker = new stdClass();
+        $marker = new stdClass;
         // A `null` key mirrors `Arr::get($data, null)` and resolves to the
         // full item (that's how Laravel treats a null parameter slot).
         $value = $field === null ? $itemData : data_get($itemData, $field, $marker);

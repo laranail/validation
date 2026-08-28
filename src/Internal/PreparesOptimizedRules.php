@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Validator;
-use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
-use Simtabi\Laranail\Validation\OptimizedValidator;
-use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
 use Simtabi\Laranail\Validation\PreparedRules;
+use Simtabi\Laranail\Validation\OptimizedValidator;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
+use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 
 /**
  * Shared rule-preparation steps for the optimized validation entry points.
@@ -34,8 +36,9 @@ trait PreparesOptimizedRules
      * don't match the actual data. Operates on expanded rules (concrete
      * paths like interactions.5.style.top) before they reach the validator.
      *
-     * @param  array<string, mixed>  $rules
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $rules
+     * @param array<string, mixed> $data
+     *
      * @return array<string, mixed>
      */
     private function preExcludeRules(array $rules, array $data): array
@@ -80,7 +83,8 @@ trait PreparesOptimizedRules
     /**
      * Build fast-check closures and the attribute-to-pattern lookup map.
      *
-     * @param  array<string, mixed>  $preparedRules  Rules after pre-exclusion
+     * @param array<string, mixed> $preparedRules Rules after pre-exclusion
+     *
      * @return array{0: array<string, Closure(mixed): bool>, 1: array<string, string>}
      */
     private function buildFastCheckMaps(PreparedRules $prepared, array $preparedRules): array
@@ -99,8 +103,9 @@ trait PreparesOptimizedRules
 
     /**
      * @param array<string, Closure(mixed): bool> $fastChecks
-     * @param  array<string, list<string>>  $implicitAttributes
-     * @param  array<string, mixed>  $preparedRules
+     * @param array<string, list<string>> $implicitAttributes
+     * @param array<string, mixed> $preparedRules
+     *
      * @return array<string, string>
      */
     private function buildAttributePatternMap(array $fastChecks, array $implicitAttributes, array $preparedRules): array
@@ -127,10 +132,10 @@ trait PreparesOptimizedRules
      * exists/unique checks on single fields. No-op when there are no wildcard
      * attributes or the batch checker isn't available (no DB bound).
      *
-     * @param  array<string, mixed>  $preparedRules
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $preparedRules
+     * @param array<string, mixed> $data
      *
-     * @throws ValidationException  when a parent array exceeds its max:N budget
+     * @throws ValidationException when a parent array exceeds its max:N budget
      */
     private function applyBatchPresenceVerifier(Validator $validator, PreparedRules $prepared, array $preparedRules, array $data): void
     {
@@ -171,9 +176,9 @@ trait PreparesOptimizedRules
      *   happens before the validator runs, `failedValidation()` is NOT invoked.
      * - Hard cap (Phase 2): enforced inside `BatchDatabaseChecker::buildVerifier`.
      *
-     * @param  array<string, mixed>  $preparedRules  Full prepared rules (NOT pre-intersected).
-     * @param  array<string, mixed>  $data
-     * @param  list<string>  $wildcardAttributes  Concrete expanded wildcard paths (e.g. `items.0.id`).
+     * @param array<string, mixed> $preparedRules Full prepared rules (NOT pre-intersected).
+     * @param array<string, mixed> $data
+     * @param list<string> $wildcardAttributes Concrete expanded wildcard paths (e.g. `items.0.id`).
      *
      * @throws BatchLimitExceededException
      */
@@ -206,9 +211,9 @@ trait PreparesOptimizedRules
      * Exists / Unique rule — no point refusing to query when we weren't
      * going to query anyway.
      *
-     * @param  array<string, mixed>  $wildcardRules  Rules keyed by concrete wildcard path.
-     * @param  array<string, mixed>  $preparedRules  Full rules, needed to find parent rule strings.
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $wildcardRules Rules keyed by concrete wildcard path.
+     * @param array<string, mixed> $preparedRules Full rules, needed to find parent rule strings.
+     * @param array<string, mixed> $data
      *
      * @throws BatchLimitExceededException
      */

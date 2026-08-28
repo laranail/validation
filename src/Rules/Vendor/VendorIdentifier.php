@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Vendor;
 
@@ -52,23 +54,15 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
 
     /** @var array<string, string> */
     private const array PATTERNS = [
-        self::GOOGLE_ANALYTICS => '/^G-[A-Z0-9]{10}$/D',
+        self::GOOGLE_ANALYTICS   => '/^G-[A-Z0-9]{10}$/D',
         self::GOOGLE_TAG_MANAGER => '/^GTM-[A-Z0-9]{6,8}$/D',
-        self::FACEBOOK_PIXEL => '/^\d{15,16}$/D',
-        self::AWS_REGION => '/^[a-z]{2}(?:-gov)?-[a-z]{4,9}-\d$/D',
+        self::FACEBOOK_PIXEL     => '/^\d{15,16}$/D',
+        self::AWS_REGION         => '/^[a-z]{2}(?:-gov)?-[a-z]{4,9}-\d$/D',
         // No consecutive periods, and cannot start or end with one.
         self::DISCORD_USERNAME => '/^(?!.*\.\.)[a-z0-9_.]{2,32}$/D',
     ];
 
     public function __construct(private string $vendor) {}
-
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->vendor)) {
-            $fail('laranail/validation::validation.vendor_identifier')
-                ->translate(['vendor' => str_replace('_', ' ', mb_strtolower(trim($this->vendor)))]);
-        }
-    }
 
     public static function passes(mixed $value, string $vendor): bool
     {
@@ -94,24 +88,18 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
         // either way would admit a value Discord itself refuses.
         $candidate = match ($vendor) {
             self::GOOGLE_ANALYTICS, self::GOOGLE_TAG_MANAGER => mb_strtoupper($value),
-            default => $value,
+            default                                          => $value,
         };
 
         return preg_match(self::PATTERNS[$vendor], $candidate) === 1;
     }
 
-    /**
-     * A tenant id is a UUID, but Microsoft also accepts three well-known
-     * aliases wherever one is expected, and a settings field that rejected
-     * `common` would reject a working configuration.
-     */
-    private static function microsoftTenant(string $value): bool
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (in_array(mb_strtolower($value), ['common', 'organizations', 'consumers'], true)) {
-            return true;
+        if (! self::passes($value, $this->vendor)) {
+            $fail('laranail/validation::validation.vendor_identifier')
+                ->translate(['vendor' => str_replace('_', ' ', mb_strtolower(trim($this->vendor)))]);
         }
-
-        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD', $value) === 1;
     }
 
     /**
@@ -145,5 +133,19 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
         $foldsCase = in_array($vendor, [self::GOOGLE_ANALYTICS, self::GOOGLE_TAG_MANAGER], true);
 
         return [['rule' => 'regex', 'params' => ['pattern' => $foldsCase ? $pattern . 'i' : $pattern]]];
+    }
+
+    /**
+     * A tenant id is a UUID, but Microsoft also accepts three well-known
+     * aliases wherever one is expected, and a settings field that rejected
+     * `common` would reject a working configuration.
+     */
+    private static function microsoftTenant(string $value): bool
+    {
+        if (in_array(mb_strtolower($value), ['common', 'organizations', 'consumers'], true)) {
+            return true;
+        }
+
+        return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD', $value) === 1;
     }
 }

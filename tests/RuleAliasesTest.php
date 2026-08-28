@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\ValidationRule;
+declare(strict_types=1);
+
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 
 /**
  * Rule families whose aliases ship with their own package rather than here.
@@ -29,19 +31,19 @@ const EXTERNALLY_ALIASED_NAMESPACES = ['Telecom'];
 function sampleParameters(): array
 {
     return [
-        'models_exist' => [User::class],
-        'authorized' => ['do-something', User::class],
-        'parity' => ['even'],
-        'vendor_identifier' => ['aws_region'],
+        'models_exist'        => [User::class],
+        'authorized'          => ['do-something', User::class],
+        'parity'              => ['even'],
+        'vendor_identifier'   => ['aws_region'],
         'national_identifier' => ['nl'],
-        'minute_in' => ['0', '15', '30', '45'],
+        'minute_in'           => ['0', '15', '30', '45'],
         'max_date_difference' => ['48', '2026-08-24 00:00:00'],
-        'minimum_age' => ['18'],
-        'compare_to_column' => ['posts', 'owner_id', 'gte', 'id', '1'],
+        'minimum_age'         => ['18'],
+        'compare_to_column'   => ['posts', 'owner_id', 'gte', 'id', '1'],
         'file_exists_on_disk' => ['local'],
-        'hash_digest' => ['sha256'],
-        'max_words' => ['200'],
-        'min_words' => ['2'],
+        'hash_digest'         => ['sha256'],
+        'max_words'           => ['200'],
+        'min_words'           => ['2'],
     ];
 }
 
@@ -182,7 +184,7 @@ it('behaves exactly like the rule built with no arguments', function (): void {
             continue;
         }
 
-        $direct = new $class();
+        $direct = new $class;
 
         if (print_r($viaAlias, true) !== print_r($direct, true)) {
             $drifted[] = $suffix;

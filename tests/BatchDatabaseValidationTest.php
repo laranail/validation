@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Http\FormRequest;
+declare(strict_types=1);
+
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\HasFluentRules;
-use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
 use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\HasFluentRules;
+use Illuminate\Validation\DatabasePresenceVerifier;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
 
 // =========================================================================
 // Helper: set up in-memory SQLite for DB tests
@@ -25,7 +27,7 @@ function setupTestDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver' => 'sqlite',
+        'driver'   => 'sqlite',
         'database' => ':memory:',
     ]]);
 
@@ -47,7 +49,7 @@ function setupTestDatabase(): void
 // =========================================================================
 
 it('precomputed verifier returns 1 for existing values and 0 for missing', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('t', 'c', ['a', 'b', 'c']);
 
     expect($verifier->getCount('t', 'c', 'a'))->toBe(1)
@@ -55,7 +57,7 @@ it('precomputed verifier returns 1 for existing values and 0 for missing', funct
 });
 
 it('precomputed verifier counts multi values correctly', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('t', 'c', ['a', 'b', 'c']);
 
     expect($verifier->getMultiCount('t', 'c', ['a', 'b', 'z']))->toBe(2)
@@ -63,7 +65,7 @@ it('precomputed verifier counts multi values correctly', function (): void {
 });
 
 it('precomputed verifier scopes lookups by table and column', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('users', 'email', ['alice@example.com']);
     $verifier->addLookup('users', 'username', ['bob']);
 
@@ -79,12 +81,12 @@ it('precomputed verifier scopes lookups by table and column', function (): void 
 // =========================================================================
 
 it('precomputed verifier preserves custom messages keyed by rule name', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('users', 'email', ['known@example.com']);
 
     $validator = Validator::make(
         ['email' => 'unknown@example.com'],
-        ['email' => ['required', Rule::exists('users', 'email')]],
+        ['email'        => ['required', Rule::exists('users', 'email')]],
         ['email.exists' => 'Custom exists message'],
     );
     $validator->setPresenceVerifier($verifier);
@@ -94,7 +96,7 @@ it('precomputed verifier preserves custom messages keyed by rule name', function
 });
 
 it('precomputed verifier produces standard exists message', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('users', 'email', ['known@example.com']);
 
     $validator = Validator::make(
@@ -108,7 +110,7 @@ it('precomputed verifier produces standard exists message', function (): void {
 });
 
 it('precomputed verifier passes for values in the lookup set', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('users', 'email', ['known@example.com']);
 
     $validator = Validator::make(
@@ -121,7 +123,7 @@ it('precomputed verifier passes for values in the lookup set', function (): void
 });
 
 it('precomputed verifier preserves custom attributes', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
     $verifier->addLookup('users', 'email', ['known@example.com']);
 
     $validator = Validator::make(
@@ -611,14 +613,14 @@ it('FormRequest path does not batch exists rules with extra wheres', function ()
 // =========================================================================
 
 it('verifier returns 0 for unknown lookup with no fallback', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
 
     expect($verifier->getCount('unknown_table', 'col', 'val'))->toBe(0)
         ->and($verifier->getMultiCount('unknown_table', 'col', ['a', 'b']))->toBe(0);
 });
 
 it('verifier hasLookups returns false when empty', function (): void {
-    $verifier = new PrecomputedPresenceVerifier();
+    $verifier = new PrecomputedPresenceVerifier;
 
     expect($verifier->hasLookups())->toBeFalse();
 });
@@ -781,12 +783,13 @@ it('duplicate values are deduplicated before batch query', function (): void {
 // =========================================================================
 
 /**
- * @param  array<string, mixed>  $rules
- * @param  array<string, mixed>  $data
+ * @param array<string, mixed> $rules
+ * @param array<string, mixed> $data
  */
 function createBatchFormRequest(array $rules, array $data): FormRequest
 {
-    $formRequest = new class extends FormRequest {
+    $formRequest = new class extends FormRequest
+    {
         use HasFluentRules;
 
         /** @var array<string, mixed> */

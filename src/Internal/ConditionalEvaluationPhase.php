@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -21,12 +23,44 @@ final class ConditionalEvaluationPhase
     private array $valueCache = [];
 
     /**
+     * Replace wildcards in a condition field reference with the concrete key
+     * at the SAME dot-position in the attribute path — mirroring how Laravel
+     * resolves a dependent wildcard reference against the attribute under
+     * validation. E.g. "interactions.*.type" against "interactions.5.style.top"
+     * → "interactions.5.type", and "items.*.type" against "items.foo.rows.0.x"
+     * → "items.foo.type" (associative keys handled, not just numeric indices).
+     *
+     * A `*` whose position has no corresponding attribute segment is left in
+     * place, so callers can detect the unresolved wildcard and defer.
+     *
+     * Pure — exposed `static` so tests can pin it without instantiating.
+     */
+    public static function resolveWildcard(string $attribute, string $conditionField): string
+    {
+        if (! str_contains($conditionField, '*')) {
+            return $conditionField;
+        }
+
+        $attributeSegments = explode('.', $attribute);
+        $fieldSegments = explode('.', $conditionField);
+
+        foreach ($fieldSegments as $i => $segment) {
+            if ($segment === '*') {
+                $fieldSegments[$i] = $attributeSegments[$i] ?? '*';
+            }
+        }
+
+        return implode('.', $fieldSegments);
+    }
+
+    /**
      * Build a flat map of attributes that carry exclude_unless / exclude_if
      * tuples, paired with the parsed tuple data. Pure — depends only on the
      * rule shape. Accepts the Validator's untyped `$rules` array directly;
      * non-string keys are filtered inside.
      *
-     * @param  array<array-key, mixed>  $rules
+     * @param array<array-key, mixed> $rules
+     *
      * @return array<string, list<array{action: string, field: string, values: list<string>}>>
      */
     public function indexConditionalAttrs(array $rules): array
@@ -64,9 +98,9 @@ final class ConditionalEvaluationPhase
      * because `Validator::getValue()` is protected — the closure must be
      * constructed inside the validator subclass to capture scope.
      *
-     * @param  list<array{action: string, field: string, values: list<string>}>  $tuples
-     * @param  Closure(string): mixed  $getValue
-     * @param  array<array-key, mixed>  $rules  The validator's parsed rules, read
+     * @param list<array{action: string, field: string, values: list<string>}> $tuples
+     * @param Closure(string): mixed $getValue
+     * @param array<array-key, mixed> $rules The validator's parsed rules, read
      *                                       only to learn whether a dependent
      *                                       is declared `boolean`. Defaults to
      *                                       none, which simply skips the
@@ -132,36 +166,5 @@ final class ConditionalEvaluationPhase
         }
 
         return $deferred ? ConditionalVerdict::Defer : ConditionalVerdict::NotExcluded;
-    }
-
-    /**
-     * Replace wildcards in a condition field reference with the concrete key
-     * at the SAME dot-position in the attribute path — mirroring how Laravel
-     * resolves a dependent wildcard reference against the attribute under
-     * validation. E.g. "interactions.*.type" against "interactions.5.style.top"
-     * → "interactions.5.type", and "items.*.type" against "items.foo.rows.0.x"
-     * → "items.foo.type" (associative keys handled, not just numeric indices).
-     *
-     * A `*` whose position has no corresponding attribute segment is left in
-     * place, so callers can detect the unresolved wildcard and defer.
-     *
-     * Pure — exposed `static` so tests can pin it without instantiating.
-     */
-    public static function resolveWildcard(string $attribute, string $conditionField): string
-    {
-        if (! str_contains($conditionField, '*')) {
-            return $conditionField;
-        }
-
-        $attributeSegments = explode('.', $attribute);
-        $fieldSegments = explode('.', $conditionField);
-
-        foreach ($fieldSegments as $i => $segment) {
-            if ($segment === '*') {
-                $fieldSegments[$i] = $attributeSegments[$i] ?? '*';
-            }
-        }
-
-        return implode('.', $fieldSegments);
     }
 }

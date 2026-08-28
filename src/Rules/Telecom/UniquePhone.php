@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Telecom;
 
 use Closure;
+use RuntimeException;
+use Illuminate\Support\Arr;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\DatabaseManager;
+use Simtabi\Laranail\Phone\PhoneFormatter;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Arr;
-use RuntimeException;
-use Simtabi\Laranail\Phone\PhoneFormatter;
 
 /**
  * Uniqueness for a phone column, compared in E.164 rather than as typed.
@@ -37,9 +39,9 @@ final class UniquePhone implements DataAwareRule, ValidationRule
     private string $ignoreColumn = 'id';
 
     /**
-     * @param string      $table        The table to search
-     * @param string      $column       The column holding E.164
-     * @param string|null $country      ISO 3166-1 alpha-2 hint for parsing bare national input
+     * @param string $table The table to search
+     * @param string $column The column holding E.164
+     * @param string|null $country ISO 3166-1 alpha-2 hint for parsing bare national input
      * @param string|null $countryField A sibling field to read that hint from instead
      */
     public function __construct(

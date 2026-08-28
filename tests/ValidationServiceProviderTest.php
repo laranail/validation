@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 
 /**
@@ -38,7 +40,8 @@ it('binds the bundled email fallbacks only when nothing else has', function (): 
     // The laranail/email scenario: a consumer (or sibling package) bound the
     // contract FIRST. Re-registering this provider must leave it alone —
     // singletonIf, not singleton, is what makes the outcome order-free.
-    $replacement = new class implements DisposableDomainList {
+    $replacement = new class implements DisposableDomainList
+    {
         public function contains(string $domain): bool
         {
             return $domain === 'blocked.test';

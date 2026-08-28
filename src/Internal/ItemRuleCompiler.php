@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\FastCheckCompiler;
-use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
-use Simtabi\Laranail\Validation\PresenceConditionalReducer;
-use Simtabi\Laranail\Validation\ValueConditionalReducer;
 use Stringable;
+use Illuminate\Support\Arr;
+use Simtabi\Laranail\Validation\FastCheckCompiler;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Simtabi\Laranail\Validation\ValueConditionalReducer;
+use Simtabi\Laranail\Validation\PresenceConditionalReducer;
+use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
 
 /**
  * Collaborator for {@see ItemValidator}. Extracts the rule-shape concerns
@@ -29,7 +31,8 @@ final class ItemRuleCompiler
      * evaluation. A field may carry more than one exclude_* rule; all of them
      * must be evaluated (the field is excluded if any fires), matching native.
      *
-     * @param  array<string, mixed>  $itemRules
+     * @param array<string, mixed> $itemRules
+     *
      * @return array<string, list<array{action: string, field: string, values: list<string>}>>
      */
     public function analyzeConditionals(array $itemRules): array
@@ -52,10 +55,11 @@ final class ItemRuleCompiler
     /**
      * Reduce item rules by evaluating conditional exclusions against the item data.
      *
-     * @param  array<string, mixed>  $itemRules
-     * @param  array<string, mixed>  $itemData
-     * @param  array<string, list<array{action: string, field: string, values: list<string>}>>  $conditionalFields
-     * @param  array<string, string>  $itemMessages
+     * @param array<string, mixed> $itemRules
+     * @param array<string, mixed> $itemData
+     * @param array<string, list<array{action: string, field: string, values: list<string>}>> $conditionalFields
+     * @param array<string, string> $itemMessages
+     *
      * @return array<string, mixed>
      */
     public function reduceRulesForItem(array $itemRules, array $itemData, array $conditionalFields, array $itemMessages = []): array
@@ -79,90 +83,11 @@ final class ItemRuleCompiler
     }
 
     /**
-     * Is the field excluded by ANY of its exclude_* conditions? Mirrors native
-     * Laravel, which evaluates every exclude rule on a field.
-     *
-     * @param  list<array{action: string, field: string, values: list<string>}>  $conditions
-     * @param  array<string, mixed>  $itemData
-     * @param  array<string, mixed>  $itemRules
-     */
-    private function fieldIsExcluded(array $conditions, array $itemData, array $itemRules): bool
-    {
-        foreach ($conditions as $condition) {
-            // exclude_if is inactive when the dependent field is absent (mirrors
-            // Laravel's Arr::has short-circuit); short-circuiting also skips the
-            // matcher's data_get there. Otherwise match via the shared matcher,
-            // which reproduces Laravel's null/bool/loose-scalar coercion.
-            $present = $condition['action'] !== 'exclude_if' || Arr::has($itemData, $condition['field']);
-            $match = $present
-                && ConditionalValueMatcher::matches($condition['field'], $condition['values'], $itemData, $itemRules);
-
-            if ($condition['action'] === 'exclude_unless' ? ! $match : $match) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Strip exclude_unless/exclude_if tuples from a rule array, leaving the
-     * actual validation rules. Joins remaining strings into a pipe-delimited
-     * string when possible.
-     *
-     * Only the exclude tuples are removed — required_if/required_unless tuples
-     * must survive so the field's presence conditional still validates (the
-     * value-conditional reducer rewrites string forms; native Laravel handles
-     * the surviving tuple form).
-     */
-    private function stripConditionalTuples(mixed $rules): mixed
-    {
-        if (! is_array($rules)) {
-            return $rules;
-        }
-
-        $stripped = [];
-
-        foreach ($rules as $rule) {
-            if (is_array($rule) && isset($rule[0]) && is_string($rule[0])
-                && in_array($rule[0], ['exclude_unless', 'exclude_if'], true)) {
-                continue;
-            }
-
-            // Stringify Stringable objects (Rule::in, Rule::notIn) so the
-            // result can be fast-checked as a pipe-joined string.
-            $stripped[] = $rule instanceof Stringable ? (string) $rule : $rule;
-        }
-
-        // If all remaining rules are strings, join them for faster parsing —
-        // unless a token contains a literal `|` (e.g. `regex:/^(a|b)$/`), which
-        // Laravel's parser would split. Keep the array form in that case.
-        $allStrings = true;
-        $anyContainsPipe = false;
-        foreach ($stripped as $rule) {
-            if (! is_string($rule)) {
-                $allStrings = false;
-                break;
-            }
-
-            if (str_contains($rule, '|')) {
-                $anyContainsPipe = true;
-            }
-        }
-
-        if ($allStrings && ! $anyContainsPipe && $stripped !== []) {
-            return implode('|', array_map(static fn (mixed $v): string => is_scalar($v) ? (string) $v : '', $stripped));
-        }
-
-        return $stripped;
-    }
-
-    /**
      * Find a common dispatch field if EVERY exclude condition references the
      * same field. Returns the field name (e.g., "type") or null if conditions
      * reference different fields or there are no conditionals.
      *
-     * @param  array<string, list<array{action: string, field: string, values: list<string>}>>  $conditionalFields
+     * @param array<string, list<array{action: string, field: string, values: list<string>}>> $conditionalFields
      */
     public function findCommonDispatchField(array $conditionalFields): ?string
     {
@@ -189,7 +114,7 @@ final class ItemRuleCompiler
      * Delegate to `RuleCacheKey::for` — see that class for the rationale on
      * why field names alone are insufficient after per-item reducers engage.
      *
-     * @param  array<string, mixed>  $rules
+     * @param array<string, mixed> $rules
      */
     public function ruleCacheKey(array $rules): string
     {
@@ -200,7 +125,8 @@ final class ItemRuleCompiler
      * Build fast-check closures for eligible fields.
      * Returns fast checks for compilable fields and the remaining slow rules.
      *
-     * @param  array<string, mixed>  $compiledRules
+     * @param array<string, mixed> $compiledRules
+     *
      * @return array{0: list<Closure(array<string, mixed>): bool>, 1: array<string, mixed>}
      */
     public function buildFastChecks(array $compiledRules): array
@@ -310,8 +236,8 @@ final class ItemRuleCompiler
      * Build a PrecomputedPresenceVerifier by batching all exists/unique values
      * from slow rules across all items in a single whereIn query.
      *
-     * @param  array<string, mixed>  $slowRules
-     * @param  array<int|string, mixed>  $items
+     * @param array<string, mixed> $slowRules
+     * @param array<int|string, mixed> $items
      */
     public function buildBatchVerifier(array $slowRules, array $items, bool $isScalar): ?PrecomputedPresenceVerifier
     {
@@ -331,5 +257,84 @@ final class ItemRuleCompiler
             $groups,
             DatabaseClaimScanner::findPoisonedTableColumns($slowRules),
         );
+    }
+
+    /**
+     * Is the field excluded by ANY of its exclude_* conditions? Mirrors native
+     * Laravel, which evaluates every exclude rule on a field.
+     *
+     * @param list<array{action: string, field: string, values: list<string>}> $conditions
+     * @param array<string, mixed> $itemData
+     * @param array<string, mixed> $itemRules
+     */
+    private function fieldIsExcluded(array $conditions, array $itemData, array $itemRules): bool
+    {
+        foreach ($conditions as $condition) {
+            // exclude_if is inactive when the dependent field is absent (mirrors
+            // Laravel's Arr::has short-circuit); short-circuiting also skips the
+            // matcher's data_get there. Otherwise match via the shared matcher,
+            // which reproduces Laravel's null/bool/loose-scalar coercion.
+            $present = $condition['action'] !== 'exclude_if' || Arr::has($itemData, $condition['field']);
+            $match = $present
+                && ConditionalValueMatcher::matches($condition['field'], $condition['values'], $itemData, $itemRules);
+
+            if ($condition['action'] === 'exclude_unless' ? ! $match : $match) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Strip exclude_unless/exclude_if tuples from a rule array, leaving the
+     * actual validation rules. Joins remaining strings into a pipe-delimited
+     * string when possible.
+     *
+     * Only the exclude tuples are removed — required_if/required_unless tuples
+     * must survive so the field's presence conditional still validates (the
+     * value-conditional reducer rewrites string forms; native Laravel handles
+     * the surviving tuple form).
+     */
+    private function stripConditionalTuples(mixed $rules): mixed
+    {
+        if (! is_array($rules)) {
+            return $rules;
+        }
+
+        $stripped = [];
+
+        foreach ($rules as $rule) {
+            if (is_array($rule) && isset($rule[0]) && is_string($rule[0])
+                && in_array($rule[0], ['exclude_unless', 'exclude_if'], true)) {
+                continue;
+            }
+
+            // Stringify Stringable objects (Rule::in, Rule::notIn) so the
+            // result can be fast-checked as a pipe-joined string.
+            $stripped[] = $rule instanceof Stringable ? (string) $rule : $rule;
+        }
+
+        // If all remaining rules are strings, join them for faster parsing —
+        // unless a token contains a literal `|` (e.g. `regex:/^(a|b)$/`), which
+        // Laravel's parser would split. Keep the array form in that case.
+        $allStrings = true;
+        $anyContainsPipe = false;
+        foreach ($stripped as $rule) {
+            if (! is_string($rule)) {
+                $allStrings = false;
+                break;
+            }
+
+            if (str_contains($rule, '|')) {
+                $anyContainsPipe = true;
+            }
+        }
+
+        if ($allStrings && ! $anyContainsPipe && $stripped !== []) {
+            return implode('|', array_map(static fn (mixed $v): string => is_scalar($v) ? (string) $v : '', $stripped));
+        }
+
+        return $stripped;
     }
 }

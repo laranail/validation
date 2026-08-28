@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\AntiSpam;
 
@@ -35,15 +37,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final readonly class Honeypot implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            // Deliberately vague. Telling the sender which field gave them
-            // away is telling the bot's author how to pass next time.
-            $fail('laranail/validation::validation.honeypot')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if ($value === null) {
@@ -58,5 +51,14 @@ final readonly class Honeypot implements ValidationRule
         // An array or an object in a honeypot field is a malformed submission,
         // never a person.
         return false;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            // Deliberately vague. Telling the sender which field gave them
+            // away is telling the bot's author how to pass next time.
+            $fail('laranail/validation::validation.honeypot')->translate();
+        }
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
 
@@ -11,67 +13,67 @@ use Simtabi\Laranail\Validation\FluentRule;
 dataset('phase3b_string', [
     'alpha' => [
         fn () => FluentRule::string()->alpha(message: 'x'),
-        fn () => FluentRule::string()->alpha()->message('x'),
+        fn ()    => FluentRule::string()->alpha()->message('x'),
         ['alpha' => 'x'],
     ],
     'ascii' => [
         fn () => FluentRule::string()->ascii(message: 'x'),
-        fn () => FluentRule::string()->ascii()->message('x'),
+        fn ()    => FluentRule::string()->ascii()->message('x'),
         ['ascii' => 'x'],
     ],
     'between' => [
         fn () => FluentRule::string()->between(2, 10, message: 'x'),
-        fn () => FluentRule::string()->between(2, 10)->message('x'),
+        fn ()      => FluentRule::string()->between(2, 10)->message('x'),
         ['between' => 'x'],
     ],
     'min' => [
         fn () => FluentRule::string()->min(2, message: 'x'),
-        fn () => FluentRule::string()->min(2)->message('x'),
+        fn ()  => FluentRule::string()->min(2)->message('x'),
         ['min' => 'x'],
     ],
     'max' => [
         fn () => FluentRule::string()->max(100, message: 'x'),
-        fn () => FluentRule::string()->max(100)->message('x'),
+        fn ()  => FluentRule::string()->max(100)->message('x'),
         ['max' => 'x'],
     ],
     'exactly' => [
         fn () => FluentRule::string()->exactly(5, message: 'x'),
-        fn () => FluentRule::string()->exactly(5)->message('x'),
+        fn ()   => FluentRule::string()->exactly(5)->message('x'),
         ['size' => 'x'],
     ],
     'url' => [
         fn () => FluentRule::string()->url(message: 'x'),
-        fn () => FluentRule::string()->url()->message('x'),
+        fn ()  => FluentRule::string()->url()->message('x'),
         ['url' => 'x'],
     ],
     'uuid' => [
         fn () => FluentRule::string()->uuid(message: 'x'),
-        fn () => FluentRule::string()->uuid()->message('x'),
+        fn ()   => FluentRule::string()->uuid()->message('x'),
         ['uuid' => 'x'],
     ],
     'regex' => [
         fn () => FluentRule::string()->regex('/^[a-z]+$/', message: 'x'),
-        fn () => FluentRule::string()->regex('/^[a-z]+$/')->message('x'),
+        fn ()    => FluentRule::string()->regex('/^[a-z]+$/')->message('x'),
         ['regex' => 'x'],
     ],
     'same' => [
         fn () => FluentRule::string()->same('other', message: 'x'),
-        fn () => FluentRule::string()->same('other')->message('x'),
+        fn ()   => FluentRule::string()->same('other')->message('x'),
         ['same' => 'x'],
     ],
     'dateFormat' => [
         fn () => FluentRule::string()->dateFormat('Y-m-d', message: 'x'),
-        fn () => FluentRule::string()->dateFormat('Y-m-d')->message('x'),
+        fn ()          => FluentRule::string()->dateFormat('Y-m-d')->message('x'),
         ['date_format' => 'x'],
     ],
     'confirmed' => [
         fn () => FluentRule::string()->confirmed(message: 'x'),
-        fn () => FluentRule::string()->confirmed()->message('x'),
+        fn ()        => FluentRule::string()->confirmed()->message('x'),
         ['confirmed' => 'x'],
     ],
     'currentPassword' => [
         fn () => FluentRule::string()->currentPassword(message: 'x'),
-        fn () => FluentRule::string()->currentPassword()->message('x'),
+        fn ()               => FluentRule::string()->currentPassword()->message('x'),
         ['current_password' => 'x'],
     ],
 ]);
@@ -79,27 +81,27 @@ dataset('phase3b_string', [
 dataset('phase3b_numeric', [
     'min' => [
         fn () => FluentRule::numeric()->min(0, message: 'x'),
-        fn () => FluentRule::numeric()->min(0)->message('x'),
+        fn ()  => FluentRule::numeric()->min(0)->message('x'),
         ['min' => 'x'],
     ],
     'max' => [
         fn () => FluentRule::numeric()->max(100, message: 'x'),
-        fn () => FluentRule::numeric()->max(100)->message('x'),
+        fn ()  => FluentRule::numeric()->max(100)->message('x'),
         ['max' => 'x'],
     ],
     'between' => [
         fn () => FluentRule::numeric()->between(0, 100, message: 'x'),
-        fn () => FluentRule::numeric()->between(0, 100)->message('x'),
+        fn ()      => FluentRule::numeric()->between(0, 100)->message('x'),
         ['between' => 'x'],
     ],
     'integer' => [
         fn () => FluentRule::numeric()->integer(message: 'x'),
-        fn () => FluentRule::numeric()->integer()->message('x'),
+        fn ()      => FluentRule::numeric()->integer()->message('x'),
         ['integer' => 'x'],
     ],
     'decimal' => [
         fn () => FluentRule::numeric()->decimal(2, message: 'x'),
-        fn () => FluentRule::numeric()->decimal(2)->message('x'),
+        fn ()      => FluentRule::numeric()->decimal(2)->message('x'),
         ['decimal' => 'x'],
     ],
     'positive' => [
@@ -114,7 +116,7 @@ dataset('phase3b_numeric', [
     ],
     'multipleOf' => [
         fn () => FluentRule::numeric()->multipleOf(5, message: 'x'),
-        fn () => FluentRule::numeric()->multipleOf(5)->message('x'),
+        fn ()          => FluentRule::numeric()->multipleOf(5)->message('x'),
         ['multiple_of' => 'x'],
     ],
 ]);
@@ -159,7 +161,7 @@ it('NumericRule::digits() + messageFor(integer, ...) targets the integer sub-rul
         ->messageFor('integer', 'Must be a whole number.');
 
     expect($rule->getCustomMessages())->toBe([
-        'digits' => 'Must be 5 digits.',
+        'digits'  => 'Must be 5 digits.',
         'integer' => 'Must be a whole number.',
     ]);
 });
@@ -183,7 +185,7 @@ it('NumericRule::exactly(message: ...) binds to size', function (): void {
 it('StringRule::min(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['name' => 'a'],
-        ['name' => FluentRule::string()->min(2, message: 'Too short!')]
+        ['name' => FluentRule::string()->min(2, message: 'Too short!')],
     );
 
     expect($v->passes())->toBeFalse()
@@ -193,7 +195,7 @@ it('StringRule::min(message: ...) surfaces in validation', function (): void {
 it('NumericRule::between(message: ...) surfaces in validation', function (): void {
     $v = makeValidator(
         ['age' => 200],
-        ['age' => FluentRule::numeric()->between(0, 150, message: 'Out of range.')]
+        ['age' => FluentRule::numeric()->between(0, 150, message: 'Out of range.')],
     );
 
     expect($v->passes())->toBeFalse()

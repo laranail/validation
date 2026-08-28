@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule as LaravelRule;
 use Simtabi\Laranail\Validation\FluentValidator;
-use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * Concrete FluentValidator for the benchmark — the import-style conditional
@@ -17,17 +19,17 @@ final class BenchImportValidator extends FluentValidator
         $types = ['button', 'hotspot', 'image', 'text', 'chapter', 'menu', 'pause'];
 
         parent::__construct($data, [
-            'interactions' => 'required|array|min:1',
-            'interactions.*.type' => ['required', 'string', LaravelRule::in($types)],
-            'interactions.*.title' => ['nullable', 'string'],
-            'interactions.*.start_time' => ['required', 'numeric', 'min:0'],
-            'interactions.*.end_time' => [['required_unless', 'interactions.*.type', 'pause'], 'numeric', 'gte:interactions.*.start_time'],
-            'interactions.*.position' => [['exclude_unless', 'interactions.*.type', 'chapter', 'menu'], 'string'],
-            'interactions.*.text' => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'text'], 'nullable', 'string'],
-            'interactions.*.image_url' => [['exclude_unless', 'interactions.*.type', 'image', 'hotspot'], ['required_if', 'interactions.*.type', 'image'], 'nullable', 'string'],
+            'interactions'                  => 'required|array|min:1',
+            'interactions.*.type'           => ['required', 'string', LaravelRule::in($types)],
+            'interactions.*.title'          => ['nullable', 'string'],
+            'interactions.*.start_time'     => ['required', 'numeric', 'min:0'],
+            'interactions.*.end_time'       => [['required_unless', 'interactions.*.type', 'pause'], 'numeric', 'gte:interactions.*.start_time'],
+            'interactions.*.position'       => [['exclude_unless', 'interactions.*.type', 'chapter', 'menu'], 'string'],
+            'interactions.*.text'           => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'text'], 'nullable', 'string'],
+            'interactions.*.image_url'      => [['exclude_unless', 'interactions.*.type', 'image', 'hotspot'], ['required_if', 'interactions.*.type', 'image'], 'nullable', 'string'],
             'interactions.*.should_fade_in' => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'image', 'text'], 'boolean'],
-            'interactions.*.style.top' => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'image', 'text'], 'string'],
-            'interactions.*.style.left' => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'image', 'text'], 'string'],
+            'interactions.*.style.top'      => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'image', 'text'], 'string'],
+            'interactions.*.style.left'     => [['exclude_unless', 'interactions.*.type', 'button', 'hotspot', 'image', 'text'], 'string'],
         ]);
     }
 }
@@ -41,15 +43,15 @@ function benchItems(int $n): array
         $type = $types[$i % count($types)];
 
         return [
-            'type' => $type,
-            'title' => 'Item ' . $i,
-            'start_time' => 1.0,
-            'end_time' => 2.0,
-            'position' => 'top',
-            'text' => 'hello',
-            'image_url' => $type === 'image' ? 'https://example.com/x.png' : null,
+            'type'           => $type,
+            'title'          => 'Item ' . $i,
+            'start_time'     => 1.0,
+            'end_time'       => 2.0,
+            'position'       => 'top',
+            'text'           => 'hello',
+            'image_url'      => $type === 'image' ? 'https://example.com/x.png' : null,
             'should_fade_in' => true,
-            'style' => ['top' => '0px', 'left' => '0px'],
+            'style'          => ['top' => '0px', 'left' => '0px'],
         ];
     }, range(0, $n - 1))];
 }
@@ -60,17 +62,17 @@ function benchNativeRules(): array
     $types = ['button', 'hotspot', 'image', 'text', 'chapter', 'menu', 'pause'];
 
     return [
-        'interactions' => 'required|array|min:1',
-        'interactions.*.type' => ['required', 'string', LaravelRule::in($types)],
-        'interactions.*.title' => ['nullable', 'string'],
-        'interactions.*.start_time' => ['required', 'numeric', 'min:0'],
-        'interactions.*.end_time' => ['required_unless:interactions.*.type,pause', 'numeric', 'gte:interactions.*.start_time'],
-        'interactions.*.position' => ['exclude_unless:interactions.*.type,chapter,menu', 'string'],
-        'interactions.*.text' => ['exclude_unless:interactions.*.type,button,hotspot,text', 'nullable', 'string'],
-        'interactions.*.image_url' => ['exclude_unless:interactions.*.type,image,hotspot', 'required_if:interactions.*.type,image', 'nullable', 'string'],
+        'interactions'                  => 'required|array|min:1',
+        'interactions.*.type'           => ['required', 'string', LaravelRule::in($types)],
+        'interactions.*.title'          => ['nullable', 'string'],
+        'interactions.*.start_time'     => ['required', 'numeric', 'min:0'],
+        'interactions.*.end_time'       => ['required_unless:interactions.*.type,pause', 'numeric', 'gte:interactions.*.start_time'],
+        'interactions.*.position'       => ['exclude_unless:interactions.*.type,chapter,menu', 'string'],
+        'interactions.*.text'           => ['exclude_unless:interactions.*.type,button,hotspot,text', 'nullable', 'string'],
+        'interactions.*.image_url'      => ['exclude_unless:interactions.*.type,image,hotspot', 'required_if:interactions.*.type,image', 'nullable', 'string'],
         'interactions.*.should_fade_in' => ['exclude_unless:interactions.*.type,button,hotspot,image,text', 'boolean'],
-        'interactions.*.style.top' => ['exclude_unless:interactions.*.type,button,hotspot,image,text', 'string'],
-        'interactions.*.style.left' => ['exclude_unless:interactions.*.type,button,hotspot,image,text', 'string'],
+        'interactions.*.style.top'      => ['exclude_unless:interactions.*.type,button,hotspot,image,text', 'string'],
+        'interactions.*.style.left'     => ['exclude_unless:interactions.*.type,button,hotspot,image,text', 'string'],
     ];
 }
 
@@ -92,8 +94,16 @@ it('benchmarks FluentValidator vs native vs RuleSet::validate (conditional impor
         $fluent = benchmarkMedian(fn () => new BenchImportValidator($data)->validate(), 3);
         $ruleSet = benchmarkMedian(fn () => RuleSet::from($nativeRules)->validate($data), 3);
 
-        fprintf(STDERR, "  %-6d %10.0fms %12.0fms (%4.1fx) %10.0fms (%4.1fx)\n",
-            $n, $native, $fluent, $native / $fluent, $ruleSet, $native / $ruleSet);
+        fprintf(
+            STDERR,
+            "  %-6d %10.0fms %12.0fms (%4.1fx) %10.0fms (%4.1fx)\n",
+            $n,
+            $native,
+            $fluent,
+            $native / $fluent,
+            $ruleSet,
+            $native / $ruleSet,
+        );
     }
 
     fprintf(STDERR, "\n");

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Encoding;
 
@@ -25,17 +27,17 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
  */
 final class Base64 implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail/validation::validation.base64')->translate();
-        }
-    }
-
     public static function passes(string $value): bool
     {
         $decoded = base64_decode($value, true);
 
         return $decoded !== false && base64_encode($decoded) === $value;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || ! self::passes($value)) {
+            $fail('laranail/validation::validation.base64')->translate();
+        }
     }
 }

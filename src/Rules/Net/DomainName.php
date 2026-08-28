@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -37,16 +39,9 @@ final readonly class DomainName implements ValidationRule
     private const string NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/iD';
 
     /**
-     * @param  bool  $requireTld  Reject single-label names such as `localhost`.
+     * @param bool $requireTld Reject single-label names such as `localhost`.
      */
     public function __construct(private bool $requireTld = true) {}
-
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->requireTld)) {
-            $fail('laranail/validation::validation.domain_name')->translate();
-        }
-    }
 
     public static function passes(mixed $value, bool $requireTld = true): bool
     {
@@ -84,6 +79,13 @@ final readonly class DomainName implements ValidationRule
     public static function supportsInternationalNames(): bool
     {
         return function_exists('idn_to_ascii');
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->requireTld)) {
+            $fail('laranail/validation::validation.domain_name')->translate();
+        }
     }
 
     /**

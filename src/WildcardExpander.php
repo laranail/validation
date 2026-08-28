@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
@@ -14,7 +16,8 @@ class WildcardExpander
      * regex-matching every key (Laravel's O(n²) approach), this traverses
      * the data structure directly — O(n) where n = matching paths.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
+     *
      * @return list<string>
      */
     public static function expand(string $pattern, array $data): array
@@ -27,9 +30,10 @@ class WildcardExpander
     }
 
     /**
-     * @param  list<string>  $segments
-     * @param  list<string>  $path
-     * @param  bool  $afterWildcard  Whether we've passed through a * segment
+     * @param list<string> $segments
+     * @param list<string> $path
+     * @param bool $afterWildcard Whether we've passed through a * segment
+     *
      * @return list<string>
      */
     private static function resolve(array $segments, mixed $current, array $path, bool $afterWildcard = false): array

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Postal;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Arr;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
@@ -43,7 +45,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
     private readonly array $countries;
 
     /**
-     * @param  string|list<string>  $countries
+     * @param string|list<string> $countries
      */
     public function __construct(string|array $countries = [], private readonly ?string $countryField = null)
     {
@@ -104,53 +106,6 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
         }
 
         $fail('laranail/validation::validation.postal_code')->translate();
-    }
-
-    /** @return list<string> */
-    private function resolveCountries(string $attribute): array
-    {
-        if ($this->countryField === null) {
-            return $this->countries;
-        }
-
-        $country = Arr::get($this->data, $this->siblingPath($attribute));
-
-        return is_string($country) && $country !== '' ? [strtoupper(trim($country))] : [];
-    }
-
-    /**
-     * Rewrite a wildcard reference to point at the row currently being
-     * validated. Without this, `addresses.*.country` inside
-     * `addresses.2.postcode` would read `addresses.0.country` — every row
-     * validated against the first row's country, which is wrong in a way that
-     * only shows up when two rows differ.
-     */
-    private function siblingPath(string $attribute): string
-    {
-        if (! str_contains((string) $this->countryField, '*')) {
-            return (string) $this->countryField;
-        }
-
-        $keys = [];
-        foreach (explode('.', $attribute) as $segment) {
-            if (is_numeric($segment)) {
-                $keys[] = $segment;
-            }
-        }
-
-        $path = (string) $this->countryField;
-
-        foreach ($keys as $key) {
-            $position = strpos($path, '*');
-
-            if ($position === false) {
-                break;
-            }
-
-            $path = substr_replace($path, $key, $position, 1);
-        }
-
-        return $path;
     }
 
     /**
@@ -217,5 +172,52 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
         $flags = str_replace(['u', 'D'], '', $m[2]);
 
         return $flags === '' ? $body : '(?' . $flags . ':' . $body . ')';
+    }
+
+    /** @return list<string> */
+    private function resolveCountries(string $attribute): array
+    {
+        if ($this->countryField === null) {
+            return $this->countries;
+        }
+
+        $country = Arr::get($this->data, $this->siblingPath($attribute));
+
+        return is_string($country) && $country !== '' ? [strtoupper(trim($country))] : [];
+    }
+
+    /**
+     * Rewrite a wildcard reference to point at the row currently being
+     * validated. Without this, `addresses.*.country` inside
+     * `addresses.2.postcode` would read `addresses.0.country` — every row
+     * validated against the first row's country, which is wrong in a way that
+     * only shows up when two rows differ.
+     */
+    private function siblingPath(string $attribute): string
+    {
+        if (! str_contains((string) $this->countryField, '*')) {
+            return (string) $this->countryField;
+        }
+
+        $keys = [];
+        foreach (explode('.', $attribute) as $segment) {
+            if (is_numeric($segment)) {
+                $keys[] = $segment;
+            }
+        }
+
+        $path = (string) $this->countryField;
+
+        foreach ($keys as $key) {
+            $position = strpos($path, '*');
+
+            if ($position === false) {
+                break;
+            }
+
+            $path = substr_replace($path, $key, $position, 1);
+        }
+
+        return $path;
     }
 }

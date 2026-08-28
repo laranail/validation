@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
@@ -24,13 +26,13 @@ use Simtabi\Laranail\Validation\Support\I18n\CodeFile;
 final class Salutation implements ValidationRule
 {
     /** @var array<string, true>|null */
-    private readonly ?array $accepted;
-
-    /** @var array<string, true>|null */
     private static ?array $bundled = null;
 
+    /** @var array<string, true>|null */
+    private readonly ?array $accepted;
+
     /**
-     * @param  list<string>|null  $accepted  Replacement list, lowercase without dots.
+     * @param list<string>|null $accepted Replacement list, lowercase without dots.
      */
     public function __construct(?array $accepted = null)
     {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\FluentValidator;
@@ -31,8 +33,8 @@ use Simtabi\Laranail\Validation\FluentValidator;
 final class ArrayValueParityValidator extends FluentValidator
 {
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $rules
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $rules
      */
     public function __construct(array $data, array $rules)
     {

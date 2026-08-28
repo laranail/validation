@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Email;
 
@@ -33,6 +35,19 @@ final readonly class EmailDomainIs implements ValidationRule
     /** @param  list<string>  $domains */
     public function __construct(private array $domains) {}
 
+    /**
+     * The matching itself lives in {@see HostPattern}, because the URL rules
+     * need exactly these semantics for their host lists. Two copies of an
+     * allow-list matcher is two chances to leave a gap, and a gap in one would
+     * be a bypass in the other.
+     *
+     * @param list<string> $patterns
+     */
+    public static function matches(string $domain, array $patterns): bool
+    {
+        return HostPattern::matches($domain, $patterns);
+    }
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $address = Address::split($value);
@@ -47,18 +62,5 @@ final readonly class EmailDomainIs implements ValidationRule
             $fail('laranail/validation::validation.email.domain_is')
                 ->translate(['domains' => implode(', ', $this->domains)]);
         }
-    }
-
-    /**
-     * The matching itself lives in {@see HostPattern}, because the URL rules
-     * need exactly these semantics for their host lists. Two copies of an
-     * allow-list matcher is two chances to leave a gap, and a gap in one would
-     * be a bypass in the other.
-     *
-     * @param  list<string>  $patterns
-     */
-    public static function matches(string $domain, array $patterns): bool
-    {
-        return HostPattern::matches($domain, $patterns);
     }
 }

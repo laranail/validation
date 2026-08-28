@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FastCheck\CoreValueCompiler;
-use Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler;
 use Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder;
+use Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler;
 
 /**
  * Direct unit coverage for {@see RuleConfigBuilder} and the bailout

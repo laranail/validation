@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
-use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
-use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
-use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
+use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
+use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
 use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 
 /**
@@ -28,9 +30,9 @@ use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 function clientCheckableArguments(): array
 {
     return [
-        CaseStyle::class => [CaseStyle::KEBAB],
+        CaseStyle::class        => [CaseStyle::KEBAB],
         VendorIdentifier::class => [VendorIdentifier::AWS_REGION],
-        HashDigest::class => ['sha256'],
+        HashDigest::class       => ['sha256'],
     ];
 }
 
@@ -72,7 +74,8 @@ it('advertises only rules the browser runner implements', function (): void {
 /**
  * The advertised rules as a native Laravel rule string.
  *
- * @param  list<array{rule: string, params: array<array-key, string>}>  $advertised
+ * @param list<array{rule: string, params: array<array-key, string>}> $advertised
+ *
  * @return list<string>
  */
 function asLaravelRules(array $advertised): array
@@ -136,10 +139,14 @@ it('gives the same verdict as the rule itself', function (): void {
             $advertisedSaysPass = Validator::make(['v' => $value], ['v' => $asRules])->passes();
 
             if ($ruleSaysPass !== $advertisedSaysPass) {
-                $mismatches[] = sprintf('%s on %s: rule=%s advertised(%s)=%s',
-                    class_basename($class), var_export($value, true),
-                    var_export($ruleSaysPass, true), implode('|', $asRules),
-                    var_export($advertisedSaysPass, true));
+                $mismatches[] = sprintf(
+                    '%s on %s: rule=%s advertised(%s)=%s',
+                    class_basename($class),
+                    var_export($value, true),
+                    var_export($ruleSaysPass, true),
+                    implode('|', $asRules),
+                    var_export($advertisedSaysPass, true),
+                );
             }
         }
     }

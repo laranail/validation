@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Geo;
 
@@ -44,13 +46,6 @@ final class CaProvince implements ValidationRule
         'NL' => 'Newfoundland & Labrador',
     ];
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.ca_province')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value)) {
@@ -59,5 +54,12 @@ final class CaProvince implements ValidationRule
 
         return Subdivisions::contains($value, self::PROVINCES)
             || Subdivisions::contains($value, self::ALIASES);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.ca_province')->translate();
+        }
     }
 }

@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
+use Simtabi\Laranail\Validation\Rules\Net\Url;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
-use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
-use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Rules\Net\Support\HostPattern;
-use Simtabi\Laranail\Validation\Rules\Net\Url;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
+use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 
 /**
  * A URL field.
@@ -75,7 +77,7 @@ class UrlRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     /**
      * Accept only these schemes. Written without `://`.
      *
-     * @param  list<string>|string  $schemes
+     * @param list<string>|string $schemes
      */
     public function scheme(array|string $schemes): static
     {
@@ -95,7 +97,7 @@ class UrlRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * bare domain. List both when both are wanted — see the note on
      * {@see HostPattern}.
      *
-     * @param  list<string>|string  $hosts
+     * @param list<string>|string $hosts
      */
     public function hostIs(array|string $hosts): static
     {
@@ -107,7 +109,7 @@ class UrlRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     /**
      * Bar these hosts, same syntax. Applied after the allow-list.
      *
-     * @param  list<string>|string  $hosts
+     * @param list<string>|string $hosts
      */
     public function hostIsNot(array|string $hosts): static
     {
@@ -120,7 +122,7 @@ class UrlRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * Accept only these ports. A URL with no port is accepted only if the
      * default for its scheme is in the list — state 80 or 443 explicitly.
      *
-     * @param  list<int>|int  $ports
+     * @param list<int>|int $ports
      */
     public function port(array|int $ports): static
     {

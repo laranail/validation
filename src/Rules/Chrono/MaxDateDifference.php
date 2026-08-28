@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
 use Closure;
+use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Arr;
 
 /**
  * The value lies within `$hours` of a reference instant — either way: a

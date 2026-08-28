@@ -1,22 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
+use Illuminate\Validation\Rules\Email;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\Rules\Email;
+use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
+use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
+use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
-use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
-use Simtabi\Laranail\Validation\Rules\Email\NoSubaddressing;
-use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
-use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
-use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 
 class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -80,7 +82,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      */
     public function notDisposable(?string $message = null): static
     {
-        return $this->rule(new NotDisposableEmail(), $message);
+        return $this->rule(new NotDisposableEmail, $message);
     }
 
     /**
@@ -88,7 +90,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      */
     public function notRole(?string $message = null): static
     {
-        return $this->rule(new NotRoleEmail(), $message);
+        return $this->rule(new NotRoleEmail, $message);
     }
 
     /**
@@ -97,7 +99,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * `*.example.com` matches any subdomain and NOT the bare domain; list
      * both when both are wanted. See EmailDomainIs for why that is strict.
      *
-     * @param  list<string>|string  $domains
+     * @param list<string>|string $domains
      */
     public function domainIs(array|string $domains, ?string $message = null): static
     {
@@ -107,7 +109,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     /**
      * Bar the address from the given domains, same pattern syntax.
      *
-     * @param  list<string>|string  $domains
+     * @param list<string>|string $domains
      */
     public function domainIsNot(array|string $domains, ?string $message = null): static
     {
@@ -133,7 +135,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      */
     public function deliverable(?string $message = null): static
     {
-        return $this->rule(new DeliverableEmail(), $message);
+        return $this->rule(new DeliverableEmail, $message);
     }
 
     /**
@@ -151,7 +153,7 @@ class EmailRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      */
     public function withoutSubaddressing(?string $message = null): static
     {
-        return $this->rule(new NoSubaddressing(), $message);
+        return $this->rule(new NoSubaddressing, $message);
     }
 
     /**

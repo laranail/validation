@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
+use Stringable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
-use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
 use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
-use Stringable;
+use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
 
 /**
  * Validator subclass that fast-checks expanded wildcard attributes
@@ -31,8 +33,47 @@ class OptimizedValidator extends MemoizingValidator
     private array $fastCheckGroups = [];
 
     /**
+     * The rules as they stood before the fast-check and conditional phases
+     * removed any, so questions Laravel asks about OTHER fields still get the
+     * answer they would have got unoptimized.
+     *
+     * @var array<array-key, mixed>
+     */
+    private array $rulesBeforeOptimization = [];
+
+    /**
+     * Build fast-check closures from compiled rule strings.
+     * Returns closures keyed by wildcard pattern that accept a single value.
+     *
+     * Only string-only rules are eligible. Object rules, date comparisons,
+     * cross-field references, distinct, size/between are skipped.
+     *
+     * @param array<string, mixed> $compiledRules Compiled rules keyed by wildcard pattern
+     *
+     * @return array<string, Closure(mixed): bool>
+     */
+    public static function buildFastChecks(array $compiledRules): array
+    {
+        $checks = [];
+
+        foreach ($compiledRules as $pattern => $rule) {
+            if (! is_string($rule)) {
+                continue;
+            }
+
+            $check = FastCheckCompiler::compile($rule);
+
+            if ($check instanceof Closure) {
+                $checks[$pattern] = $check;
+            }
+        }
+
+        return $checks;
+    }
+
+    /**
      * @param array<string, Closure(mixed): bool> $fastChecks
-     * @param  array<string, string>  $attributePatternMap
+     * @param array<string, string> $attributePatternMap
      */
     public function withFastChecks(array $fastChecks, array $attributePatternMap): static
     {
@@ -46,39 +87,6 @@ class OptimizedValidator extends MemoizingValidator
         }
 
         return $this;
-    }
-
-    /**
-     * The rules as they stood before the fast-check and conditional phases
-     * removed any, so questions Laravel asks about OTHER fields still get the
-     * answer they would have got unoptimized.
-     *
-     * @var array<array-key, mixed>
-     */
-    private array $rulesBeforeOptimization = [];
-
-    /**
-     * Answer from the pre-optimization rules, not the pruned ones.
-     *
-     * Laravel's dependent rules — required_if, exclude_if, prohibited_if and
-     * the rest — convert their `true`/`false` parameters to real booleans only
-     * when the DEPENDENT field is declared `boolean`, which it learns by
-     * reading `$this->rules[$parameter]`. The fast-check phase removes a
-     * satisfied attribute from `$this->rules` before Laravel validates, so a
-     * dependent that passed its own `boolean` rule vanished from that lookup,
-     * the conversion was skipped, and `required_if:items.*.notify,true` no
-     * longer matched a notify of 1 — leaving a required field unenforced
-     * rather than reporting an error.
-     *
-     * @param  string  $parameter
-     */
-    protected function shouldConvertToBoolean($parameter): bool
-    {
-        $rules = $this->rules[$parameter]
-            ?? $this->rulesBeforeOptimization[$parameter]
-            ?? [];
-
-        return in_array('boolean', (array) $rules, true);
     }
 
     /**
@@ -110,6 +118,30 @@ class OptimizedValidator extends MemoizingValidator
         }
 
         return $result;
+    }
+
+    /**
+     * Answer from the pre-optimization rules, not the pruned ones.
+     *
+     * Laravel's dependent rules — required_if, exclude_if, prohibited_if and
+     * the rest — convert their `true`/`false` parameters to real booleans only
+     * when the DEPENDENT field is declared `boolean`, which it learns by
+     * reading `$this->rules[$parameter]`. The fast-check phase removes a
+     * satisfied attribute from `$this->rules` before Laravel validates, so a
+     * dependent that passed its own `boolean` rule vanished from that lookup,
+     * the conversion was skipped, and `required_if:items.*.notify,true` no
+     * longer matched a notify of 1 — leaving a required field unenforced
+     * rather than reporting an error.
+     *
+     * @param string $parameter
+     */
+    protected function shouldConvertToBoolean($parameter): bool
+    {
+        $rules = $this->rules[$parameter]
+            ?? $this->rulesBeforeOptimization[$parameter]
+            ?? [];
+
+        return in_array('boolean', (array) $rules, true);
     }
 
     /**
@@ -170,7 +202,7 @@ class OptimizedValidator extends MemoizingValidator
      */
     private function runConditionalPhase(array &$removedRules): void
     {
-        $phase = new ConditionalEvaluationPhase();
+        $phase = new ConditionalEvaluationPhase;
         // Closure (not [$this, 'getValue']) because parent::getValue() is
         // protected — only invokable from inside this class scope.
         $getValue = fn (string $field): mixed => $this->getValue($field);
@@ -210,7 +242,7 @@ class OptimizedValidator extends MemoizingValidator
      * portion of an attribute's rules. Returns true when the closure
      * compiled and the value passed — caller may then drop the attribute.
      *
-     * @param  list<mixed>  $rules
+     * @param list<mixed> $rules
      */
     private function tryFastCheckRemaining(string $attribute, array $rules): bool
     {
@@ -236,7 +268,7 @@ class OptimizedValidator extends MemoizingValidator
      */
     private function finalizeWithoutParent(): bool
     {
-        $this->messages = new MessageBag();
+        $this->messages = new MessageBag;
         $this->failedRules = [];
 
         foreach ($this->after as $after) {
@@ -252,7 +284,7 @@ class OptimizedValidator extends MemoizingValidator
      * Extract the non-conditional string rules from an attribute's rule array
      * and join them into a pipe-delimited string for fast-check compilation.
      *
-     * @param  list<mixed>  $rules
+     * @param list<mixed> $rules
      */
     private function extractNonConditionalRule(array $rules): ?string
     {
@@ -280,34 +312,5 @@ class OptimizedValidator extends MemoizingValidator
         }
 
         return $stringParts !== [] ? implode('|', $stringParts) : null;
-    }
-
-    /**
-     * Build fast-check closures from compiled rule strings.
-     * Returns closures keyed by wildcard pattern that accept a single value.
-     *
-     * Only string-only rules are eligible. Object rules, date comparisons,
-     * cross-field references, distinct, size/between are skipped.
-     *
-     * @param  array<string, mixed>  $compiledRules  Compiled rules keyed by wildcard pattern
-     * @return array<string, Closure(mixed): bool>
-     */
-    public static function buildFastChecks(array $compiledRules): array
-    {
-        $checks = [];
-
-        foreach ($compiledRules as $pattern => $rule) {
-            if (! is_string($rule)) {
-                continue;
-            }
-
-            $check = FastCheckCompiler::compile($rule);
-
-            if ($check instanceof Closure) {
-                $checks[$pattern] = $check;
-            }
-        }
-
-        return $checks;
     }
 }

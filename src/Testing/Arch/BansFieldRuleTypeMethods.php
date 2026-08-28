@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Testing\Arch;
 
-use FilesystemIterator;
-use PhpParser\Error;
+use SplFileInfo;
 use PhpParser\Node;
-use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Expr\StaticCall;
-use PhpParser\Node\Identifier;
+use PhpParser\Error;
+use RuntimeException;
+use FilesystemIterator;
 use PhpParser\Node\Name;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
-use RecursiveDirectoryIterator;
+use PhpParser\Node\Identifier;
 use RecursiveIteratorIterator;
-use RuntimeException;
-use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
+use RecursiveDirectoryIterator;
+use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
+use PhpParser\NodeVisitor\NameResolver;
 use Simtabi\Laranail\Validation\FluentRule;
-use SplFileInfo;
+use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
 
 /**
  * Pest / PHPUnit arch helper that returns every PHP file under the given
@@ -47,7 +49,7 @@ final class BansFieldRuleTypeMethods
         if (! class_exists(ParserFactory::class)) {
             throw new RuntimeException(
                 'BansFieldRuleTypeMethods requires nikic/php-parser ^5.0. '
-                . 'Add it to your dev dependencies: composer require --dev "nikic/php-parser:^5.0"'
+                . 'Add it to your dev dependencies: composer require --dev "nikic/php-parser:^5.0"',
             );
         }
 
@@ -123,12 +125,13 @@ final class BansFieldRuleTypeMethods
     }
 
     /**
-     * @param  array<Node>  $ast
-     * @param  array<string, int>  $banned
+     * @param array<Node> $ast
+     * @param array<string, int> $banned
      */
     private static function containsViolation(array $ast, array $banned): bool
     {
-        $visitor = new class ($banned) extends NodeVisitorAbstract {
+        $visitor = new class($banned) extends NodeVisitorAbstract
+        {
             public bool $found = false;
 
             /** @param  array<string, int>  $banned */
@@ -197,12 +200,12 @@ final class BansFieldRuleTypeMethods
         // before NameResolver's `enterNode` had a chance to resolve that
         // child's class Name. Running name resolution as a separate first
         // pass guarantees the whole AST is resolved before we walk it.
-        $resolve = new NodeTraverser();
-        $resolve->addVisitor(new NameResolver());
+        $resolve = new NodeTraverser;
+        $resolve->addVisitor(new NameResolver);
 
         $ast = $resolve->traverse($ast);
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

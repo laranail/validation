@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
 
@@ -175,13 +177,13 @@ it('validates numeric with different', function (): void {
 it('validates numeric with confirmed', function (): void {
     $v = makeValidator(
         ['amount' => 100, 'amount_confirmation' => 100],
-        ['amount' => FluentRule::numeric()->confirmed()]
+        ['amount' => FluentRule::numeric()->confirmed()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['amount' => 100, 'amount_confirmation' => 200],
-        ['amount' => FluentRule::numeric()->confirmed()]
+        ['amount' => FluentRule::numeric()->confirmed()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -189,13 +191,13 @@ it('validates numeric with confirmed', function (): void {
 it('validates numeric with inArray', function (): void {
     $v = makeValidator(
         ['val' => 2, 'allowed' => [1, 2, 3]],
-        ['val' => FluentRule::numeric()->inArray('allowed.*')]
+        ['val' => FluentRule::numeric()->inArray('allowed.*')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['val' => 9, 'allowed' => [1, 2, 3]],
-        ['val' => FluentRule::numeric()->inArray('allowed.*')]
+        ['val' => FluentRule::numeric()->inArray('allowed.*')],
     );
     expect($v->passes())->toBeFalse();
 });

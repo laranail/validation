@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Postal;
 
@@ -32,15 +34,15 @@ final class Patterns
         'MA, MC, ME, MH, MP, MQ, MY, NC, PK, PR, PW, RE, RS, SM, TH, TR, UA, US, VI, XK,' .
         'YT' => '/^[0-9]{5}$/D',
         'AM, AR, AT, AU, BD, BE, BG, CH, CY, DK, GE, GL, HU, LI, LU, LV, MD, MK, NO, NZ,' .
-        'PH, SI, TN, ZA' => '/^[0-9]{4}$/D',
+        'PH, SI, TN, ZA'                         => '/^[0-9]{4}$/D',
         'BY, CN, EC, IN, KG, KZ, RO, RU, SG, TJ' => '/^[0-9]{6}$/D',
-        'CZ, GR, SE, SK' => '/^[0-9]{3} [0-9]{2}$/D',
-        'FO, IS, MG, PG' => '/^[0-9]{3}$/D',
-        'GG, JE' => '/^[a-z]{2}[0-9][0-9]? [0-9][a-z]{2}$/iD',
-        'MV, MX' => '/^[0-9]{4}[0-9]?$/D',
-        'AZ' => '/^[0-9]{4}([0-9]{2})?$/D',
-        'BN' => '/^[a-z]{2}[0-9]{4}$/iD',
-        'BR' => '/^[0-9]{5}(-?[0-9]{3})?$/D',
+        'CZ, GR, SE, SK'                         => '/^[0-9]{3} [0-9]{2}$/D',
+        'FO, IS, MG, PG'                         => '/^[0-9]{3}$/D',
+        'GG, JE'                                 => '/^[a-z]{2}[0-9][0-9]? [0-9][a-z]{2}$/iD',
+        'MV, MX'                                 => '/^[0-9]{4}[0-9]?$/D',
+        'AZ'                                     => '/^[0-9]{4}([0-9]{2})?$/D',
+        'BN'                                     => '/^[a-z]{2}[0-9]{4}$/iD',
+        'BR'                                     => '/^[0-9]{5}(-?[0-9]{3})?$/D',
         // Corrected from the source table, which made the final digit optional
         // and so accepted the five-character 'K1A 0B'. A Canadian postal code is
         // always A1A 1A1. Canada Post also excludes D, F, I, O, Q and U in every

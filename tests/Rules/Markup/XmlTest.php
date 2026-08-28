@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Translation\PotentiallyTranslatedString;
 use Simtabi\Laranail\Validation\Rules\Markup\Xml;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 it('accepts well-formed XML and rejects malformed', function (): void {
-    expect(ruleAccepts(new Xml(), '<root><child>x</child></root>'))->toBeTrue()
-        ->and(ruleAccepts(new Xml(), '<root><child></root>'))->toBeFalse()
-        ->and(ruleAccepts(new Xml(), 'not xml at all'))->toBeFalse();
+    expect(ruleAccepts(new Xml, '<root><child>x</child></root>'))->toBeTrue()
+        ->and(ruleAccepts(new Xml, '<root><child></root>'))->toBeFalse()
+        ->and(ruleAccepts(new Xml, 'not xml at all'))->toBeFalse();
 });
 
 it('guards blank and non-string input when called directly', function (mixed $value): void {
@@ -34,7 +36,7 @@ it('does not expand external entities', function (): void {
         <root>&xxe;</root>
         XML;
 
-    $document = new DOMDocument();
+    $document = new DOMDocument;
     $previous = libxml_use_internal_errors(true);
     $document->loadXML($xxe, LIBXML_NONET);
     libxml_use_internal_errors($previous);
@@ -83,7 +85,7 @@ it('leaves libxml error handling as it found it', function (): void {
     $before = libxml_use_internal_errors(false);
     libxml_use_internal_errors($before);
 
-    ruleAccepts(new Xml(), '<root/>');
+    ruleAccepts(new Xml, '<root/>');
 
     $after = libxml_use_internal_errors(false);
     libxml_use_internal_errors($after);

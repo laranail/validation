@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Validation\Rules\Password;
 use Simtabi\Laranail\Validation\FluentRule;
@@ -10,7 +12,7 @@ use Simtabi\Laranail\Validation\FluentRule;
 it('validates password with PasswordRule', function (): void {
     $validator = makeValidator(
         ['password' => 'SecureP@ss1'],
-        ['password' => FluentRule::password()->required()->letters()->mixedCase()->numbers()->symbols()]
+        ['password' => FluentRule::password()->required()->letters()->mixedCase()->numbers()->symbols()],
     );
     expect($validator->passes())->toBeTrue();
 });
@@ -18,7 +20,7 @@ it('validates password with PasswordRule', function (): void {
 it('rejects weak password', function (): void {
     $validator = makeValidator(
         ['password' => 'weak'],
-        ['password' => FluentRule::password(8)->required()->letters()->numbers()]
+        ['password' => FluentRule::password(8)->required()->letters()->numbers()],
     );
     expect($validator->passes())->toBeFalse();
 });
@@ -26,13 +28,13 @@ it('rejects weak password', function (): void {
 it('validates password min length', function (): void {
     $v = makeValidator(
         ['password' => 'abcdefgh'],
-        ['password' => FluentRule::password(8)->required()]
+        ['password' => FluentRule::password(8)->required()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['password' => 'short'],
-        ['password' => FluentRule::password(8)->required()]
+        ['password' => FluentRule::password(8)->required()],
     );
     expect($v->passes())->toBeFalse();
 });
@@ -40,7 +42,7 @@ it('validates password min length', function (): void {
 it('validates password max length', function (): void {
     $validator = makeValidator(
         ['password' => str_repeat('a', 256)],
-        ['password' => FluentRule::password()->required()->max(255)]
+        ['password' => FluentRule::password()->required()->max(255)],
     );
     expect($validator->passes())->toBeFalse();
 });

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net\Support;
 
-use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
+use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
 
 /**
  * Decides whether an IP address is publicly routable.
@@ -124,7 +126,7 @@ final class IpClassifier
     }
 
     /**
-     * @param  list<array{string, int}>  $ranges
+     * @param list<array{string, int}> $ranges
      */
     private static function matchesAny(string $ip, array $ranges): bool
     {

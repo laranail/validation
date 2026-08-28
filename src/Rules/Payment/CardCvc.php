@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Payment;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Arr;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 
 /**
  * A card security code. Alone, 3 or 4 digits; given `numberField:`, the

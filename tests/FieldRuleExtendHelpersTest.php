@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\RuleSet;
+use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
-use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Phase 2 — FieldRule::addChildRule / mergeChildRules.

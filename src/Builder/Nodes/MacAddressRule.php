@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
+use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
 
 /**
  * A MAC address field.
@@ -83,7 +85,7 @@ class MacAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAwar
     /**
      * Accept only these notations.
      *
-     * @param  list<string>|string  $formats  {@see MacAddress::COLON} and friends.
+     * @param list<string>|string $formats {@see MacAddress::COLON} and friends.
      */
     public function format(array|string $formats): static
     {
@@ -139,7 +141,7 @@ class MacAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAwar
      * Written in any notation and any length — a 24-bit OUI, or a longer
      * MA-M/MA-S assignment.
      *
-     * @param  list<string>|string  $ouis
+     * @param list<string>|string $ouis
      */
     public function oui(array|string $ouis): static
     {

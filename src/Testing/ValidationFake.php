@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Testing;
 
 use Closure;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\MessageBag;
 use PHPUnit\Framework\Assert;
-use Simtabi\Laranail\Validation\Events\ValidationCompleted;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Event;
 use Simtabi\Laranail\Validation\Events\ValidationFailed;
+use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 
 /**
  * Records RuleSet runs for assertion — created via `Validation::fake()`.

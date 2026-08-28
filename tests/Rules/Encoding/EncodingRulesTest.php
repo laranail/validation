@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Encoding\Base64;
-use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
 use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
+use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
 use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 
 /** A real 1x1 PNG, 70 bytes decoded. */
@@ -14,14 +16,14 @@ const PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8B
 // =========================================================================
 
 it('accepts canonical base64', function (string $value): void {
-    expect(ruleAccepts(new Base64(), $value))->toBeTrue();
+    expect(ruleAccepts(new Base64, $value))->toBeTrue();
 })->with(['aGVsbG8=', 'aGVsbG8gd29ybGQ=', PNG_B64]);
 
 it('rejects non-canonical and malformed base64', function (mixed $value): void {
     // Round-tripping catches what a charset regex cannot: missing padding,
     // embedded whitespace, and non-zero discarded bits ('aGVsbG9=' decodes,
     // but nothing ever encodes TO it).
-    expect(ruleAccepts(new Base64(), $value))->toBeFalse();
+    expect(ruleAccepts(new Base64, $value))->toBeFalse();
 })->with(['aGVsbG9', "aGVsbG8=\n", 'aGVsbG 8=', '!!!!', 'aGVsbG9=', 12345, null]);
 
 // =========================================================================
@@ -29,16 +31,16 @@ it('rejects non-canonical and malformed base64', function (mixed $value): void {
 // =========================================================================
 
 it('accepts a real image, bare and as a data URI', function (): void {
-    expect(ruleAccepts(new Base64Image(), PNG_B64))->toBeTrue()
-        ->and(ruleAccepts(new Base64Image(), 'data:image/png;base64,' . PNG_B64))->toBeTrue();
+    expect(ruleAccepts(new Base64Image, PNG_B64))->toBeTrue()
+        ->and(ruleAccepts(new Base64Image, 'data:image/png;base64,' . PNG_B64))->toBeTrue();
 });
 
 it('rejects non-images and images outside the allowed types', function (): void {
     // 'aGVsbG8=' is valid base64 of text — the MIME sniff is what rejects it.
-    expect(ruleAccepts(new Base64Image(), 'aGVsbG8='))->toBeFalse()
+    expect(ruleAccepts(new Base64Image, 'aGVsbG8='))->toBeFalse()
         ->and(ruleAccepts(new Base64Image(mimes: ['jpeg']), PNG_B64))->toBeFalse()
-        ->and(ruleAccepts(new Base64Image(), 'not base64 at all'))->toBeFalse()
-        ->and(ruleAccepts(new Base64Image(), 12345))->toBeFalse();
+        ->and(ruleAccepts(new Base64Image, 'not base64 at all'))->toBeFalse()
+        ->and(ruleAccepts(new Base64Image, 12345))->toBeFalse();
 });
 
 it('enforces the decoded size cap with a human-readable message', function (): void {
@@ -72,7 +74,7 @@ it('bridges a validated image to an UploadedFile for Laravel file rules', functi
 // =========================================================================
 
 it('accepts well-formed data URIs', function (string $value): void {
-    expect(ruleAccepts(new DataUri(), $value))->toBeTrue();
+    expect(ruleAccepts(new DataUri, $value))->toBeTrue();
 })->with([
     'data:image/png;base64,' . PNG_B64,
     'data:text/plain,hello%20world',
@@ -81,7 +83,7 @@ it('accepts well-formed data URIs', function (string $value): void {
 ]);
 
 it('rejects malformed data URIs', function (mixed $value): void {
-    expect(ruleAccepts(new DataUri(), $value))->toBeFalse();
+    expect(ruleAccepts(new DataUri, $value))->toBeFalse();
 })->with([
     'data:image/png;base64,!!!!',      // base64 flag with non-base64 payload
     'data:image/png;base64',           // no comma, no data

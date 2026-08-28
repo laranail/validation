@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Validation\ValidationRule;
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
-use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Simtabi\Laranail\Validation\Rules\Text\Slug;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
-use Simtabi\Laranail\Validation\Rules\Text\Slug;
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 use Simtabi\Laranail\Validation\Tests\Fixtures\Registry\EvenNumber;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 
 /**
  * The §5.2.2 registry — one place the alias map, the console command, the
@@ -29,7 +31,7 @@ it('accepts a consumer registration with an alias factory', function (): void {
     resolve(RuleRegistrar::class)->register(
         EvenNumber::class,
         alias: 'acme_even',
-        factory: fn (array $parameters): EvenNumber => new EvenNumber(),
+        factory: fn (array $parameters): EvenNumber => new EvenNumber,
     );
 
     expect(resolve(RuleRegistrar::class)->classes())->toContain(EvenNumber::class);
@@ -68,7 +70,8 @@ it('is one singleton, so every consumer sees the same registry', function (): vo
 it('implementing ClientCheckable is the whole browser opt-in for a custom rule', function (): void {
     // No registry call needed for the wire: the exporter reads the
     // interface off the rule object itself.
-    $rule = new class implements ClientCheckable, ValidationRule {
+    $rule = new class implements ClientCheckable, ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void {}
 
         public function clientRules(): array

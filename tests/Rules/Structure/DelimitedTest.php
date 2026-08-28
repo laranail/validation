@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
@@ -13,17 +15,17 @@ function delimitedError(Delimited $rule, mixed $value): string
 it('accepts a list whose every item passes the sub-rules', function (string $value): void {
     expect(ruleAccepts(new Delimited(['email']), $value))->toBeTrue();
 })->with([
-    'single' => 'alice@example.com',
-    'two' => 'alice@example.com,bob@example.com',
-    'spaced' => 'alice@example.com, bob@example.com',
+    'single'        => 'alice@example.com',
+    'two'           => 'alice@example.com,bob@example.com',
+    'spaced'        => 'alice@example.com, bob@example.com',
     'lots of space' => '  alice@example.com  ,  bob@example.com  ',
 ]);
 
 it('rejects the list when any single item fails', function (string $value): void {
     expect(ruleAccepts(new Delimited(['email']), $value))->toBeFalse();
 })->with([
-    'first bad' => 'nope,bob@example.com',
-    'last bad' => 'alice@example.com,nope',
+    'first bad'  => 'nope,bob@example.com',
+    'last bad'   => 'alice@example.com,nope',
     'middle bad' => 'alice@example.com,nope,bob@example.com',
 ]);
 
@@ -78,7 +80,7 @@ it('can be told not to trim', function (): void {
 it('accepts rule objects as well as strings', function (): void {
     // The sub-rules are whatever Laravel accepts, so the rest of this library
     // composes into it without special-casing.
-    $rule = new Delimited([new Isbn()]);
+    $rule = new Delimited([new Isbn]);
 
     expect(ruleAccepts($rule, '0306406152,9780306406157'))->toBeTrue()
         ->and(ruleAccepts($rule, '0306406152,not-an-isbn'))->toBeFalse();
@@ -88,7 +90,7 @@ it('rejects a non-string value', function (mixed $value): void {
     expect(ruleAccepts(new Delimited(['string']), $value))->toBeFalse();
 })->with([
     'array' => [['a', 'b']],
-    'int' => [42],
+    'int'   => [42],
 ]);
 
 it('refuses an empty separator at construction', function (): void {

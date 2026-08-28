@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Crypto\Support;
 
@@ -66,7 +68,7 @@ final class Base58Check
                 return null;
             }
 
-            for ($i = count($bytes) - 1; $i >= 0; --$i) {
+            for ($i = count($bytes) - 1; $i >= 0; $i--) {
                 $carry += $bytes[$i] * 58;
                 $bytes[$i] = $carry & 0xFF;
                 $carry >>= 8;

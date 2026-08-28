@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\FastCheckCompiler;
@@ -216,15 +218,15 @@ function itemAwareDateParityGrid(): iterable
     ];
 
     $items = [
-        'both-valid-after' => ['value' => '2030-06-05', 'start_date' => '2030-06-01'],
-        'both-valid-before' => ['value' => '2030-05-15', 'start_date' => '2030-06-01'],
-        'both-valid-equal' => ['value' => '2030-06-01', 'start_date' => '2030-06-01'],
+        'both-valid-after'   => ['value' => '2030-06-05', 'start_date' => '2030-06-01'],
+        'both-valid-before'  => ['value' => '2030-05-15', 'start_date' => '2030-06-01'],
+        'both-valid-equal'   => ['value' => '2030-06-01', 'start_date' => '2030-06-01'],
         'value-invalid-date' => ['value' => 'not-a-date', 'start_date' => '2030-06-01'],
-        'ref-invalid-date' => ['value' => '2030-06-01', 'start_date' => 'not-a-date'],
-        'value-null' => ['value' => null, 'start_date' => '2030-06-01'],
-        'value-empty' => ['value' => '', 'start_date' => '2030-06-01'],
-        'ref-null' => ['value' => '2030-06-01', 'start_date' => null],
-        'ref-missing' => ['value' => '2030-06-01'],
+        'ref-invalid-date'   => ['value' => '2030-06-01', 'start_date' => 'not-a-date'],
+        'value-null'         => ['value' => null, 'start_date' => '2030-06-01'],
+        'value-empty'        => ['value' => '', 'start_date' => '2030-06-01'],
+        'ref-null'           => ['value' => '2030-06-01', 'start_date' => null],
+        'ref-missing'        => ['value' => '2030-06-01'],
     ];
 
     foreach ($rules as $rule) {
@@ -288,17 +290,17 @@ function itemAwareSameDifferentParityGrid(): iterable
     ];
 
     $items = [
-        'equal-strings' => ['value' => 'foo', 'other' => 'foo'],
-        'different-strings' => ['value' => 'foo', 'other' => 'bar'],
-        'equal-ints' => ['value' => 7, 'other' => 7],
-        'int-vs-string' => ['value' => 1, 'other' => '1'],
-        'string-vs-int' => ['value' => '1', 'other' => 1],
-        'both-null' => ['value' => null, 'other' => null],
+        'equal-strings'           => ['value' => 'foo', 'other' => 'foo'],
+        'different-strings'       => ['value' => 'foo', 'other' => 'bar'],
+        'equal-ints'              => ['value' => 7, 'other' => 7],
+        'int-vs-string'           => ['value' => 1, 'other' => '1'],
+        'string-vs-int'           => ['value' => '1', 'other' => 1],
+        'both-null'               => ['value' => null, 'other' => null],
         'value-null-other-string' => ['value' => null, 'other' => 'foo'],
         'value-string-other-null' => ['value' => 'foo', 'other' => null],
-        'value-empty' => ['value' => '', 'other' => 'foo'],
-        'other-missing' => ['value' => 'foo'],
-        'value-and-other-empty' => ['value' => '', 'other' => ''],
+        'value-empty'             => ['value' => '', 'other' => 'foo'],
+        'other-missing'           => ['value' => 'foo'],
+        'value-and-other-empty'   => ['value' => '', 'other' => ''],
     ];
 
     foreach ($rules as $rule) {
@@ -359,10 +361,10 @@ it('compileWithItemContext returns null for rules that have no date comparison o
     expect(FastCheckCompiler::compileWithItemContext($rule))->toBeNull();
 })->with([
     'plain string rule' => ['required|string|max:255'],
-    'numeric rule' => ['required|numeric|min:0'],
-    'email rule' => ['nullable|email'],
-    'in-list rule' => ['required|in:a,b,c'],
-    'regex rule' => ['required|regex:/^[a-z]+$/'],
+    'numeric rule'      => ['required|numeric|min:0'],
+    'email rule'        => ['nullable|email'],
+    'in-list rule'      => ['required|in:a,b,c'],
+    'regex rule'        => ['required|regex:/^[a-z]+$/'],
     'integer with size' => ['required|integer|min:1|max:100'],
 ]);
 
@@ -487,21 +489,21 @@ function itemAwarePresenceConditionalParityGrid(): iterable
 
     $items = [
         // Basic presence shapes.
-        'a-present-target-ok' => ['value' => 'label', 'a' => 'x'],
+        'a-present-target-ok'      => ['value' => 'label', 'a' => 'x'],
         'a-present-target-missing' => ['value' => null, 'a' => 'x', 'b' => 'y'],
-        'a-absent-target-missing' => ['value' => null],
+        'a-absent-target-missing'  => ['value' => null],
 
         // Whitespace-only sibling (Laravel treats as absent).
-        'a-whitespace-target-ok' => ['value' => 'label', 'a' => '   '],
+        'a-whitespace-target-ok'      => ['value' => 'label', 'a' => '   '],
         'a-whitespace-target-missing' => ['value' => null, 'a' => '   '],
 
         // Whitespace-only target with sibling present.
         'a-present-target-whitespace' => ['value' => '   ', 'a' => 'x'],
 
         // Multi-param for _all variants.
-        'ab-present-target-ok' => ['value' => 'label', 'a' => 'x', 'b' => 'y'],
+        'ab-present-target-ok'          => ['value' => 'label', 'a' => 'x', 'b' => 'y'],
         'ab-one-missing-target-missing' => ['value' => null, 'a' => 'x'],
-        'ab-whitespace-target-missing' => ['value' => null, 'a' => '   ', 'b' => '   '],
+        'ab-whitespace-target-missing'  => ['value' => null, 'a' => '   ', 'b' => '   '],
 
         // Empty array sibling (Laravel treats as absent).
         'a-empty-array-target-missing' => ['value' => null, 'a' => []],
@@ -690,26 +692,26 @@ function itemAwareSizeComparisonParityGrid(): iterable
 
     $items = [
         // Numeric shapes
-        'num:5-vs-3' => ['value' => 5, 'other' => 3],
-        'num:3-vs-5' => ['value' => 3, 'other' => 5],
-        'num:5-vs-5' => ['value' => 5, 'other' => 5],
-        'num:5-vs-str5' => ['value' => 5, 'other' => '5'],
-        'num:5-vs-abc' => ['value' => 5, 'other' => 'abc'],  // ref falls through to mb_strlen
-        'num:5-vs-null' => ['value' => 5, 'other' => null],
+        'num:5-vs-3'       => ['value' => 5, 'other' => 3],
+        'num:3-vs-5'       => ['value' => 3, 'other' => 5],
+        'num:5-vs-5'       => ['value' => 5, 'other' => 5],
+        'num:5-vs-str5'    => ['value' => 5, 'other' => '5'],
+        'num:5-vs-abc'     => ['value' => 5, 'other' => 'abc'],  // ref falls through to mb_strlen
+        'num:5-vs-null'    => ['value' => 5, 'other' => null],
         'num:5-vs-missing' => ['value' => 5],
 
         // String shapes (lengths)
-        'str:hello-vs-hi' => ['value' => 'hello', 'other' => 'hi'],      // 5 vs 2
-        'str:hi-vs-hello' => ['value' => 'hi', 'other' => 'hello'],      // 2 vs 5
+        'str:hello-vs-hi'  => ['value' => 'hello', 'other' => 'hi'],      // 5 vs 2
+        'str:hi-vs-hello'  => ['value' => 'hi', 'other' => 'hello'],      // 2 vs 5
         'str:same-vs-same' => ['value' => 'same', 'other' => 'same'],    // 4 vs 4
-        'str:hi-vs-null' => ['value' => 'hi', 'other' => null],          // 2 vs 0
-        'str:hi-vs-array' => ['value' => 'hi', 'other' => ['a', 'b']],   // 2 vs count=2
+        'str:hi-vs-null'   => ['value' => 'hi', 'other' => null],          // 2 vs 0
+        'str:hi-vs-array'  => ['value' => 'hi', 'other' => ['a', 'b']],   // 2 vs count=2
 
         // Array shapes (counts)
-        'arr:3-vs-1' => ['value' => [1, 2, 3], 'other' => [1]],
+        'arr:3-vs-1'     => ['value' => [1, 2, 3], 'other' => [1]],
         'arr:empty-vs-1' => ['value' => [], 'other' => [1]],
-        'arr:1-vs-1' => ['value' => [1], 'other' => [1]],
-        'arr:2-vs-str3' => ['value' => [1, 2], 'other' => 'abc'],        // count 2 vs mb_strlen 3
+        'arr:1-vs-1'     => ['value' => [1], 'other' => [1]],
+        'arr:2-vs-str3'  => ['value' => [1, 2], 'other' => 'abc'],        // count 2 vs mb_strlen 3
 
         // Nullable-value-null (should skip on nullable + non-implicit).
         'null-value' => ['value' => null, 'other' => 3],

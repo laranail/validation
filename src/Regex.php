@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
-use InvalidArgumentException;
-use LogicException;
 use Stringable;
+use LogicException;
+use InvalidArgumentException;
 
 /**
  * A regex that is safe by construction — and never required.
@@ -50,6 +52,11 @@ final class Regex implements Stringable
 
     private function __construct() {}
 
+    public function __toString(): string
+    {
+        return $this->compile();
+    }
+
     /**
      * Wrap a complete raw pattern. Undelimited input gains delimiters and
      * the `D` modifier (the end-of-string safety that prevents the
@@ -58,7 +65,7 @@ final class Regex implements Stringable
      */
     public static function of(string $pattern): self
     {
-        $regex = new self();
+        $regex = new self;
         $regex->raw = self::normalizeRaw($pattern);
 
         return $regex;
@@ -67,7 +74,7 @@ final class Regex implements Stringable
     /** Start a fluent build. Anchored by default; see {@see unanchored()}. */
     public static function build(): self
     {
-        return new self();
+        return new self;
     }
 
     public function digits(?int $count = null): self
@@ -202,62 +209,6 @@ final class Regex implements Stringable
         return $pattern;
     }
 
-    public function __toString(): string
-    {
-        return $this->compile();
-    }
-
-    private function quantified(string $atom, ?int $count): self
-    {
-        if ($count !== null && $count < 1) {
-            throw new InvalidArgumentException('A count must be at least 1.');
-        }
-
-        $this->fragments[] = $atom . ($count === null ? '+' : ($count === 1 ? '' : '{' . $count . '}'));
-        $this->hasUnbounded = $this->hasUnbounded || $count === null;
-
-        return $this;
-    }
-
-    /** Build a nested part into a non-capturing group. */
-    private function subPattern(Closure|string $part, bool $forbidUnbounded = false): string
-    {
-        $inner = $this->innerPattern($part);
-
-        if ($forbidUnbounded && $this->looksUnbounded($inner)) {
-            throw new LogicException(
-                'An unbounded quantifier inside an unbounded group is the catastrophic-backtracking shape. '
-                . 'Bound the inner part, or opt in explicitly with dangerouslyUnbounded().',
-            );
-        }
-
-        return '(?:' . $inner . ')';
-    }
-
-    private function innerPattern(Closure|string $part): string
-    {
-        if (is_string($part)) {
-            return preg_quote($part, '/');
-        }
-
-        $sub = new self();
-        $sub->allowUnbounded = $this->allowUnbounded;
-
-        $built = $part($sub);
-
-        if (! $built instanceof self) {
-            throw new InvalidArgumentException('A builder closure must return the Regex it received.');
-        }
-
-        return implode('', $built->fragments);
-    }
-
-    /** Whether a fragment carries an unbounded quantifier (`+`, `*`, `{n,}`). */
-    private function looksUnbounded(string $fragment): bool
-    {
-        return preg_match('/(?<!\\\\)[+*]|\{\d+,\}/', $fragment) === 1;
-    }
-
     /** Wrap an undelimited body with the first delimiter it does not contain. */
     private static function wrap(string $body): string
     {
@@ -296,5 +247,56 @@ final class Regex implements Stringable
                 'The pattern does not compile: ' . $pattern . ' (' . preg_last_error_msg() . ')',
             );
         }
+    }
+
+    private function quantified(string $atom, ?int $count): self
+    {
+        if ($count !== null && $count < 1) {
+            throw new InvalidArgumentException('A count must be at least 1.');
+        }
+
+        $this->fragments[] = $atom . ($count === null ? '+' : ($count === 1 ? '' : '{' . $count . '}'));
+        $this->hasUnbounded = $this->hasUnbounded || $count === null;
+
+        return $this;
+    }
+
+    /** Build a nested part into a non-capturing group. */
+    private function subPattern(Closure|string $part, bool $forbidUnbounded = false): string
+    {
+        $inner = $this->innerPattern($part);
+
+        if ($forbidUnbounded && $this->looksUnbounded($inner)) {
+            throw new LogicException(
+                'An unbounded quantifier inside an unbounded group is the catastrophic-backtracking shape. '
+                . 'Bound the inner part, or opt in explicitly with dangerouslyUnbounded().',
+            );
+        }
+
+        return '(?:' . $inner . ')';
+    }
+
+    private function innerPattern(Closure|string $part): string
+    {
+        if (is_string($part)) {
+            return preg_quote($part, '/');
+        }
+
+        $sub = new self;
+        $sub->allowUnbounded = $this->allowUnbounded;
+
+        $built = $part($sub);
+
+        if (! $built instanceof self) {
+            throw new InvalidArgumentException('A builder closure must return the Regex it received.');
+        }
+
+        return implode('', $built->fragments);
+    }
+
+    /** Whether a fragment carries an unbounded quantifier (`+`, `*`, `{n,}`). */
+    private function looksUnbounded(string $fragment): bool
+    {
+        return preg_match('/(?<!\\\\)[+*]|\{\d+,\}/', $fragment) === 1;
     }
 }

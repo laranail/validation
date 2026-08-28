@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Carbon\CarbonImmutable;
 use Simtabi\Laranail\Validation\FluentRule;
@@ -10,7 +12,7 @@ use Simtabi\Laranail\Validation\FluentRule;
 it('validates date with after', function (): void {
     $validator = makeValidator(
         ['date' => '2099-01-01'],
-        ['date' => FluentRule::date()->after('today')]
+        ['date' => FluentRule::date()->after('today')],
     );
 
     expect($validator->passes())->toBeTrue();
@@ -31,14 +33,14 @@ it('validates date with nullable', function (): void {
 it('validates date with format', function (): void {
     $v = makeValidator(
         ['date' => '01/15/2025'],
-        ['date' => FluentRule::date()->format('m/d/Y')]
+        ['date' => FluentRule::date()->format('m/d/Y')],
     );
 
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
         ['date' => '2025-01-15'],
-        ['date' => FluentRule::date()->format('m/d/Y')]
+        ['date' => FluentRule::date()->format('m/d/Y')],
     );
 
     expect($v->passes())->toBeFalse();
@@ -47,7 +49,7 @@ it('validates date with format', function (): void {
 it('validates datetime shortcut', function (): void {
     $validator = makeValidator(
         ['timestamp' => '2025-01-15 14:30:00'],
-        ['timestamp' => FluentRule::dateTime()]
+        ['timestamp' => FluentRule::dateTime()],
     );
 
     expect($validator->passes())->toBeTrue();

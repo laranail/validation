@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
 
@@ -22,7 +24,7 @@ return [
 
     'aliases' => [
         'enabled' => env('LARANAIL_VALIDATION_ALIASES', false),
-        'prefix' => 'laranail_',
+        'prefix'  => 'laranail_',
     ],
 
     /*

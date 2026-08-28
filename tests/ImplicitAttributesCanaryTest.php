@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
+declare(strict_types=1);
+
 use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 /**
  * Canary for the package's one reach into Laravel's internals.

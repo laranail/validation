@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
 use Simtabi\Laranail\Validation\Rules\Payment\CardExpiry;
 use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 
 afterEach(function (): void {
     Date::setTestNow();
@@ -17,7 +19,7 @@ afterEach(function (): void {
 // =========================================================================
 
 it('accepts valid numbers across the brand catalogue', function (string $number, string $brand): void {
-    expect(ruleAccepts(new CardNumber(), $number))->toBeTrue()
+    expect(ruleAccepts(new CardNumber, $number))->toBeTrue()
         ->and(resolve(CardBrandCatalogue::class)->identify(preg_replace('/\D/', '', $number) ?? '')?->name)
         ->toBe($brand);
 })->with([
@@ -43,7 +45,7 @@ it('accepts valid numbers across the brand catalogue', function (string $number,
 ]);
 
 it('rejects failing checksums, wrong lengths and unknown ranges', function (mixed $value): void {
-    expect(ruleAccepts(new CardNumber(), $value))->toBeFalse();
+    expect(ruleAccepts(new CardNumber, $value))->toBeFalse();
 })->with([
     '4242424242424241',    // Luhn fails
     '424242424242424',     // 15 digits is not a Visa length
@@ -67,7 +69,7 @@ it('separates the failure messages a cardholder can act on', function (): void {
     // different corrections.
     $messages = static fn (string $number): string => Validator::make(
         ['card' => $number],
-        ['card' => new CardNumber()],
+        ['card' => new CardNumber],
     )->errors()->first('card');
 
     expect($messages('424242424242424'))->toContain('digits')
@@ -76,7 +78,8 @@ it('separates the failure messages a cardholder can act on', function (): void {
 });
 
 it('honours a bound catalogue', function (): void {
-    $this->app->instance(CardBrandCatalogue::class, new class implements CardBrandCatalogue {
+    $this->app->instance(CardBrandCatalogue::class, new class implements CardBrandCatalogue
+    {
         /** @return list<CardBrand> */
         public function brands(): array
         {
@@ -94,8 +97,8 @@ it('honours a bound catalogue', function (): void {
         }
     });
 
-    expect(ruleAccepts(new CardNumber(), '9990000000'))->toBeTrue()
-        ->and(ruleAccepts(new CardNumber(), '4242424242424242'))->toBeFalse();
+    expect(ruleAccepts(new CardNumber, '9990000000'))->toBeTrue()
+        ->and(ruleAccepts(new CardNumber, '4242424242424242'))->toBeFalse();
 });
 
 // =========================================================================
@@ -103,12 +106,12 @@ it('honours a bound catalogue', function (): void {
 // =========================================================================
 
 it('accepts 3 or 4 digits when no brand context is given', function (): void {
-    expect(ruleAccepts(new CardCvc(), '123'))->toBeTrue()
-        ->and(ruleAccepts(new CardCvc(), '1234'))->toBeTrue()
-        ->and(ruleAccepts(new CardCvc(), '12'))->toBeFalse()
-        ->and(ruleAccepts(new CardCvc(), '12345'))->toBeFalse()
-        ->and(ruleAccepts(new CardCvc(), '12a'))->toBeFalse()
-        ->and(ruleAccepts(new CardCvc(), 123))->toBeFalse();
+    expect(ruleAccepts(new CardCvc, '123'))->toBeTrue()
+        ->and(ruleAccepts(new CardCvc, '1234'))->toBeTrue()
+        ->and(ruleAccepts(new CardCvc, '12'))->toBeFalse()
+        ->and(ruleAccepts(new CardCvc, '12345'))->toBeFalse()
+        ->and(ruleAccepts(new CardCvc, '12a'))->toBeFalse()
+        ->and(ruleAccepts(new CardCvc, 123))->toBeFalse();
 });
 
 it('narrows to the brand of a sibling card number', function (): void {
@@ -133,13 +136,13 @@ it('narrows to the brand of a sibling card number', function (): void {
 it('accepts current and future expiries in the common spellings', function (string $value): void {
     Date::setTestNow('2026-08-24 12:00:00');
 
-    expect(ruleAccepts(new CardExpiry(), $value))->toBeTrue();
+    expect(ruleAccepts(new CardExpiry, $value))->toBeTrue();
 })->with(['08/26', '09/26', '12/2027', '08-26', '11-2030', '2027-03', '8/27']);
 
 it('rejects past, malformed and implausibly distant expiries', function (mixed $value): void {
     Date::setTestNow('2026-08-24 12:00:00');
 
-    expect(ruleAccepts(new CardExpiry(), $value))->toBeFalse();
+    expect(ruleAccepts(new CardExpiry, $value))->toBeFalse();
 })->with([
     '07/26',       // last month
     '12/25',       // last year

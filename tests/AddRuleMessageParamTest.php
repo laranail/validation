@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Validation\Rules\In;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
@@ -12,7 +14,8 @@ use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
 
 function exposeAddRule(): object
 {
-    return new class {
+    return new class
+    {
         use HasFieldModifiers;
 
         /** @var list<string> */
@@ -21,7 +24,7 @@ function exposeAddRule(): object
         protected ?string $compiledCache = null;
 
         /**
-         * @param  array<int, string>|string|object  $rules
+         * @param array<int, string>|string|object $rules
          */
         public function callAddRule(array|string|object $rules, ?string $message = null): static
         {
@@ -76,6 +79,6 @@ it('coexists with messages for different rule keys', function (): void {
 
     expect($rule->getCustomMessages())->toBe([
         'required' => 'Name required.',
-        'min' => 'Too short.',
+        'min'      => 'Too short.',
     ]);
 });

@@ -1,28 +1,30 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;
 
 final class Post extends Model
 {
-    protected $table = 'posts';
-
     public $timestamps = false;
+
+    protected $table = 'posts';
 
     protected $guarded = [];
 }
 
 final class Tag extends Model
 {
-    protected $table = 'tags';
-
     public $timestamps = false;
+
+    protected $table = 'tags';
 
     protected $guarded = [];
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -22,20 +24,11 @@ use Illuminate\Support\Arr;
 abstract class AbstractConditionalReducer
 {
     /**
-     * Parse a single rule string into `[ruleName, rawParam]` when it matches
-     * one of the family's recognised conditionals. Subclasses define the
-     * recognised set; longest-prefix order is each subclass's responsibility.
-     *
-     * @return array{0: string, 1: string}|null
-     */
-    abstract protected static function parse(string $rule): ?array;
-
-    /**
      * Cheap pre-check: does any rule in the set carry a conditional this
      * reducer recognises? Used by callers to decide whether the per-item
      * reducer path must engage.
      *
-     * @param  array<string, mixed>  $itemRules
+     * @param array<string, mixed> $itemRules
      */
     public static function hasAny(array $itemRules): bool
     {
@@ -64,7 +57,7 @@ abstract class AbstractConditionalReducer
      * Subclasses' `apply()` methods bind their per-call context (field,
      * itemData, etc.) into a closure and hand it here.
      *
-     * @param  Closure(string): ?string  $rewriteOne
+     * @param Closure(string): ?string $rewriteOne
      */
     protected static function applyTemplate(mixed $rule, Closure $rewriteOne): mixed
     {
@@ -112,7 +105,7 @@ abstract class AbstractConditionalReducer
      * rewrite path doesn't bypass a `{field}.{rule}`-style override at
      * message-formatting time. Identical across all conditional reducers.
      *
-     * @param  array<string, string>  $itemMessages
+     * @param array<string, string> $itemMessages
      */
     protected static function hasCustomMessage(string $field, string $ruleName, array $itemMessages): bool
     {
@@ -169,4 +162,13 @@ abstract class AbstractConditionalReducer
 
         return static::parse($rule) !== null;
     }
+
+    /**
+     * Parse a single rule string into `[ruleName, rawParam]` when it matches
+     * one of the family's recognised conditionals. Subclasses define the
+     * recognised set; longest-prefix order is each subclass's responsibility.
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    abstract protected static function parse(string $rule): ?array;
 }

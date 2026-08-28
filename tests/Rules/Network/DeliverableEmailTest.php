@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Cache\Repository;
+declare(strict_types=1);
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Cache\Repository;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
+use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
-use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
 
 /**
@@ -18,11 +20,12 @@ use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
  * precognitive request performs no lookup at all.
  */
 /**
- * @param  list<string>  $deliverable
+ * @param list<string> $deliverable
  */
 function fakeResolver(array $deliverable, ?Closure $onCall = null): DnsResolver
 {
-    return new readonly class ($deliverable, $onCall) implements DnsResolver {
+    return new readonly class($deliverable, $onCall) implements DnsResolver
+    {
         /** @param  list<string>  $deliverable */
         public function __construct(private array $deliverable, private ?Closure $onCall) {}
 
@@ -88,8 +91,8 @@ it('still runs when the request is not precognitive', function (): void {
 it('resolves the resolver from the container when none is given', function (): void {
     app()->instance(DnsResolver::class, fakeResolver(['example.com']));
 
-    expect(Validator::make(['e' => 'a@example.com'], ['e' => [new DeliverableEmail()]])->passes())->toBeTrue()
-        ->and(Validator::make(['e' => 'a@other.test'], ['e' => [new DeliverableEmail()]])->passes())->toBeFalse();
+    expect(Validator::make(['e' => 'a@example.com'], ['e' => [new DeliverableEmail]])->passes())->toBeTrue()
+        ->and(Validator::make(['e' => 'a@other.test'], ['e' => [new DeliverableEmail]])->passes())->toBeFalse();
 });
 
 it('binds the bundled resolver so the rule works with nothing configured', function (): void {
@@ -114,7 +117,8 @@ it('answers even when the cache backend itself is broken', function (): void {
     // store whose table was never migrated is the canonical case — crashed
     // the lookup mid-validation. A caching layer is an optimization; its
     // infrastructure failing must cost speed, never a verdict.
-    $broken = new class implements Repository {
+    $broken = new class implements Repository
+    {
         use ThrowsOnEveryCacheCall;
     };
 
@@ -128,7 +132,7 @@ it('reports a domain as reachable when the lookup itself fails', function (): vo
     // not the same as an undeliverable domain, and rejecting every signup for
     // the duration of a DNS outage is the worse error. Exercised against the
     // real resolver with a name that cannot resolve.
-    $resolver = new CachedDnsResolver();
+    $resolver = new CachedDnsResolver;
 
     // .invalid is reserved by RFC 2606 and must never resolve, so a false here
     // is a genuine negative answer rather than an outage.

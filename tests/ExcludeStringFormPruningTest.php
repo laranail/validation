@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentValidator;
@@ -22,12 +24,12 @@ enum PruneType: string
 }
 
 /**
- * @param  array<string, mixed>  $rules
- * @param  array<string, mixed>  $data
+ * @param array<string, mixed> $rules
+ * @param array<string, mixed> $data
  */
 function makePruneValidator(array $rules, array $data): FluentValidator
 {
-    return new class ($data, $rules) extends FluentValidator {};
+    return new class($data, $rules) extends FluentValidator {};
 }
 
 /** @return array<string, mixed> */
@@ -41,14 +43,14 @@ it('prunes flat fluent excludeUnless like the array-tuple form', function (): vo
 
     $tuple = makePruneValidator([
         'items.*.type' => ['required', 'string'],
-        'items.*.a' => [['exclude_unless', 'items.*.type', 'chapter'], 'required', 'string'],
-        'items.*.b' => [['exclude_unless', 'items.*.type', 'chapter'], 'required', 'string'],
+        'items.*.a'    => [['exclude_unless', 'items.*.type', 'chapter'], 'required', 'string'],
+        'items.*.b'    => [['exclude_unless', 'items.*.type', 'chapter'], 'required', 'string'],
     ], $data);
 
     $fluent = makePruneValidator([
         'items.*.type' => ['required', 'string'],
-        'items.*.a' => FluentRule::field()->excludeUnless('items.*.type', 'chapter')->required()->rule('string'),
-        'items.*.b' => FluentRule::field()->excludeUnless('items.*.type', 'chapter')->required()->rule('string'),
+        'items.*.a'    => FluentRule::field()->excludeUnless('items.*.type', 'chapter')->required()->rule('string'),
+        'items.*.b'    => FluentRule::field()->excludeUnless('items.*.type', 'chapter')->required()->rule('string'),
     ], $data);
 
     // All 'pause' items exclude a + b → only the 10 `type` rules remain.
@@ -60,9 +62,9 @@ it('prunes fluent excludeUnless on a nested child keyed off the parent wildcard 
     $data = pauseItems(10);
 
     $validator = makePruneValidator([
-        'items.*.type' => ['required', 'string'],
+        'items.*.type'  => ['required', 'string'],
         'items.*.style' => FluentRule::array()->children([
-            'top' => FluentRule::string()->excludeUnless('items.*.type', 'chapter')->required(),
+            'top'  => FluentRule::string()->excludeUnless('items.*.type', 'chapter')->required(),
             'left' => FluentRule::string()->excludeUnless('items.*.type', 'chapter')->required(),
         ]),
     ], $data);
@@ -83,7 +85,7 @@ it('prunes fluent excludeUnless with BackedEnum value args', function (): void {
 
     $validator = makePruneValidator([
         'items.*.type' => ['required', 'string'],
-        'items.*.a' => FluentRule::field()->excludeUnless('items.*.type', PruneType::CHAPTER, PruneType::MENU)->required()->rule('string'),
+        'items.*.a'    => FluentRule::field()->excludeUnless('items.*.type', PruneType::CHAPTER, PruneType::MENU)->required()->rule('string'),
     ], $data);
 
     // enum cases serialize to their ->value ('chapter','menu'); 'pause' is in
@@ -96,7 +98,7 @@ it('benchmarks fluent excludeUnless: linear after pruning', function (): void {
         $data = ['items' => array_map(static fn (int $i): array => ['type' => 'pause', 'start_time' => 1.0], range(1, $n))];
         $rules = ['items.*.type' => ['required', 'string']];
         // 20 fluent excludeUnless fields per item, all excluded for 'pause'.
-        for ($f = 0; $f < 20; ++$f) {
+        for ($f = 0; $f < 20; $f++) {
             $rules["items.*.f{$f}"] = FluentRule::field()->excludeUnless('items.*.type', 'chapter')->required()->rule('string');
         }
 

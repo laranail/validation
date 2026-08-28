@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Storage;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * The value names a file that exists on a Laravel disk, optionally scoped

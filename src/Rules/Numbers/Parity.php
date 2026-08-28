@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Numbers;
 
@@ -31,13 +33,6 @@ final readonly class Parity implements ValidationRule
 
     public function __construct(private string $parity) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->parity)) {
-            $fail('laranail/validation::validation.parity.' . $this->normalised())->translate();
-        }
-    }
-
     public static function passes(mixed $value, string $parity): bool
     {
         $integer = self::asInteger($value);
@@ -53,16 +48,16 @@ final readonly class Parity implements ValidationRule
 
         return match (mb_strtolower(trim($parity))) {
             self::EVEN => $remainder === 0,
-            self::ODD => $remainder === 1,
-            default => false,
+            self::ODD  => $remainder === 1,
+            default    => false,
         };
     }
 
-    private function normalised(): string
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $parity = mb_strtolower(trim($this->parity));
-
-        return $parity === self::ODD ? self::ODD : self::EVEN;
+        if (! self::passes($value, $this->parity)) {
+            $fail('laranail/validation::validation.parity.' . $this->normalised())->translate();
+        }
     }
 
     private static function asInteger(mixed $value): ?int
@@ -86,5 +81,12 @@ final readonly class Parity implements ValidationRule
         // ctype_digit would reject "-4" and accept "0004"; a bounded pattern
         // says exactly what is meant.
         return preg_match('/^[+-]?\d+$/D', $trimmed) === 1 ? (int) $trimmed : null;
+    }
+
+    private function normalised(): string
+    {
+        $parity = mb_strtolower(trim($this->parity));
+
+        return $parity === self::ODD ? self::ODD : self::EVEN;
     }
 }

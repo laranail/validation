@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
-use Simtabi\Laranail\Validation\FluentRule;
 
 afterEach(function (): void {
     FieldRule::flushMacros();
@@ -57,7 +59,8 @@ it('dispatches macros registered statically via __callStatic', function (): void
 });
 
 it('dispatches non-Closure invokable macros (e.g. object with __invoke)', function (): void {
-    $invokable = new class {
+    $invokable = new class
+    {
         public function __invoke(string $arg): string
         {
             return 'invokable:' . $arg;

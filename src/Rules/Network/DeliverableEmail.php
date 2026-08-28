@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Network;
 
@@ -6,8 +8,8 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Concerns\SkipsPrecognition;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
-use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
+use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 /**
  * The address's domain can actually receive mail.

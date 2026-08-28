@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
+use ReflectionProperty;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator as IlluminateValidator;
-use ReflectionProperty;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
 
 /**

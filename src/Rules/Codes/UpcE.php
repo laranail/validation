@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Codes;
 
@@ -22,13 +24,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class UpcE implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail/validation::validation.upc_e')->translate();
-        }
-    }
-
     public static function passes(string $value): bool
     {
         if (preg_match('/^[01]\d{7}$/D', $value) !== 1) {
@@ -42,11 +37,18 @@ final class UpcE implements ValidationRule
         // GS1's zero-suppression patterns, keyed by the sixth data digit.
         $body = match (true) {
             in_array($selector, ['0', '1', '2'], true) => $numberSystem . substr($data, 0, 2) . $selector . '0000' . substr($data, 2, 3),
-            $selector === '3' => $numberSystem . substr($data, 0, 3) . '00000' . substr($data, 3, 2),
-            $selector === '4' => $numberSystem . substr($data, 0, 4) . '00000' . $data[4],
-            default => $numberSystem . substr($data, 0, 5) . '0000' . $selector,
+            $selector === '3'                          => $numberSystem . substr($data, 0, 3) . '00000' . substr($data, 3, 2),
+            $selector === '4'                          => $numberSystem . substr($data, 0, 4) . '00000' . $data[4],
+            default                                    => $numberSystem . substr($data, 0, 5) . '0000' . $selector,
         };
 
         return Gtin::passes($body . $value[7], [12]);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || ! self::passes($value)) {
+            $fail('laranail/validation::validation.upc_e')->translate();
+        }
     }
 }

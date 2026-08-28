@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Codes;
 
@@ -20,17 +22,17 @@ use Illuminate\Contracts\Validation\ValidationRule;
  */
 final class Ismn implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value) || ! self::passes($value)) {
-            $fail('laranail/validation::validation.ismn')->translate();
-        }
-    }
-
     public static function passes(string $value): bool
     {
         $digits = str_replace(['-', ' '], '', $value);
 
         return str_starts_with($digits, '9790') && Gtin::passes($digits, [13]);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value) || ! self::passes($value)) {
+            $fail('laranail/validation::validation.ismn')->translate();
+        }
     }
 }

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Support\MessageBag;
-use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\Check;
-use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Validation;
+use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 
 /**
  * §6.10 ergonomics: Check for one-off boolean guards without building a
@@ -38,8 +40,8 @@ it('answers regex guards with the same pattern contract as matches()', function 
 });
 
 it('runs any rule object through the generic escape hatch', function (): void {
-    expect(Check::rule(new Iban(), 'DE89370400440532013000'))->toBeTrue()
-        ->and(Check::rule(new Iban(), 'nope'))->toBeFalse();
+    expect(Check::rule(new Iban, 'DE89370400440532013000'))->toBeTrue()
+        ->and(Check::rule(new Iban, 'nope'))->toBeFalse();
 });
 
 // ---------------------------------------------------------------------------
@@ -80,7 +82,7 @@ it('asserts the silence too', function (): void {
 it('toSchema() exports the wire schema in one call', function (): void {
     $schema = RuleSet::from([
         'email' => 'required|email|unique:users',
-        'age' => 'nullable|integer|min:18',
+        'age'   => 'nullable|integer|min:18',
     ])->toSchema(attributes: ['email' => 'work email']);
 
     expect($schema['version'])->toBe(1)

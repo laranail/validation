@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support\Payment;
 
@@ -20,10 +22,10 @@ use LogicException;
 final readonly class CardBrand
 {
     /**
-     * @param  string  $name  Machine slug (`visa`), used in `brands:` restrictions.
-     * @param  list<array{string, string}>  $ranges  Inclusive prefix intervals, equal-width bounds.
-     * @param  list<int>  $lengths
-     * @param  list<int>  $cvcLengths
+     * @param string $name Machine slug (`visa`), used in `brands:` restrictions.
+     * @param list<array{string, string}> $ranges Inclusive prefix intervals, equal-width bounds.
+     * @param list<int> $lengths
+     * @param list<int> $cvcLengths
      */
     public function __construct(
         public string $name,

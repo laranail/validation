@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Contracts;
 
-use BackedEnum;
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use BackedEnum;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderWhenProxy;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * Contract implemented by every rule class shipped in
@@ -131,7 +133,7 @@ interface FluentRuleContract extends ValidationRule
     // ---------- Escape hatch ----------
 
     /**
-     * @param  object|string|array<int, string>  $rule
+     * @param object|string|array<int, string> $rule
      */
     public function rule(object|string|array $rule): static;
 
@@ -149,25 +151,27 @@ interface FluentRuleContract extends ValidationRule
      * return is `$this|\Illuminate\Conditionable\HigherOrderWhenProxy`
      * depending on whether a callback is supplied.
      *
-     * @param  mixed  $value
-     * @param  (callable(static, mixed): mixed)|null  $callback
-     * @param  (callable(static, mixed): mixed)|null  $default
+     * @param mixed $value
+     * @param (callable(static, mixed): mixed)|null $callback
+     * @param (callable(static, mixed): mixed)|null $default
+     *
      * @return static|HigherOrderWhenProxy
      */
     public function when($value = null, ?callable $callback = null, ?callable $default = null);
 
     /**
-     * @param  mixed  $value
-     * @param  (callable(static, mixed): mixed)|null  $callback
-     * @param  (callable(static, mixed): mixed)|null  $default
+     * @param mixed $value
+     * @param (callable(static, mixed): mixed)|null $callback
+     * @param (callable(static, mixed): mixed)|null $default
+     *
      * @return static|HigherOrderWhenProxy
      */
     public function unless($value = null, ?callable $callback = null, ?callable $default = null);
 
     /**
-     * @param  Closure(Fluent<string, mixed>): bool  $condition
-     * @param  Closure(static): static|string|list<string>  $rules
-     * @param  Closure(static): static|string|list<string>  $defaultRules
+     * @param Closure(Fluent<string, mixed>): bool $condition
+     * @param Closure(static): static|string|list<string> $rules
+     * @param Closure(static): static|string|list<string> $defaultRules
      */
     public function whenInput(Closure $condition, Closure|string|array $rules, Closure|string|array $defaultRules = []): static;
 

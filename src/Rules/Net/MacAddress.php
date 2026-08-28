@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -48,11 +50,11 @@ final readonly class MacAddress implements ValidationRule
     public const string BARE = 'bare';
 
     /**
-     * @param  list<string>  $formats  Accepted notations; empty accepts all four.
-     * @param  int|null  $bytes  6 for EUI-48, 8 for EUI-64; null accepts either.
-     * @param  bool  $requireUnicast  Reject multicast addresses (I/G bit set).
-     * @param  bool  $requireUniversal  Reject locally-administered addresses (U/L bit set).
-     * @param  list<string>  $ouis  Accepted OUI prefixes, in any notation; empty accepts any.
+     * @param list<string> $formats Accepted notations; empty accepts all four.
+     * @param int|null $bytes 6 for EUI-48, 8 for EUI-64; null accepts either.
+     * @param bool $requireUnicast Reject multicast addresses (I/G bit set).
+     * @param bool $requireUniversal Reject locally-administered addresses (U/L bit set).
+     * @param list<string> $ouis Accepted OUI prefixes, in any notation; empty accepts any.
      */
     public function __construct(
         private array $formats = [],
@@ -61,72 +63,6 @@ final readonly class MacAddress implements ValidationRule
         private bool $requireUniversal = false,
         private array $ouis = [],
     ) {}
-
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! is_string($value)) {
-            $fail('laranail/validation::validation.mac_address.malformed')->translate();
-
-            return;
-        }
-
-        $format = self::formatOf($value);
-
-        if ($format === null) {
-            $fail('laranail/validation::validation.mac_address.malformed')->translate();
-
-            return;
-        }
-
-        if ($this->formats !== [] && ! in_array($format, $this->formats, true)) {
-            $fail('laranail/validation::validation.mac_address.format')
-                ->translate(['formats' => implode(', ', $this->formats)]);
-
-            return;
-        }
-
-        $octets = self::octets($value);
-
-        if ($this->bytes !== null && count($octets) !== $this->bytes) {
-            $fail('laranail/validation::validation.mac_address.length')
-                ->translate(['bytes' => $this->bytes]);
-
-            return;
-        }
-
-        // Before the bit checks, because both of these have the bits of a
-        // perfectly ordinary address and neither names a device — reporting
-        // "must be unicast" for the broadcast address would be true and
-        // useless.
-        if ($this->isBroadcast($octets)) {
-            $fail('laranail/validation::validation.mac_address.broadcast')->translate();
-
-            return;
-        }
-
-        if ($this->isNull($octets)) {
-            $fail('laranail/validation::validation.mac_address.null')->translate();
-
-            return;
-        }
-
-        if ($this->requireUnicast && (($octets[0] & 0b1) !== 0)) {
-            $fail('laranail/validation::validation.mac_address.multicast')->translate();
-
-            return;
-        }
-
-        if ($this->requireUniversal && (($octets[0] & 0b10) !== 0)) {
-            $fail('laranail/validation::validation.mac_address.local')->translate();
-
-            return;
-        }
-
-        if ($this->ouis !== [] && ! $this->matchesAnyOui($octets, $this->ouis)) {
-            $fail('laranail/validation::validation.mac_address.oui')
-                ->translate(['ouis' => implode(', ', $this->ouis)]);
-        }
-    }
 
     public static function passes(mixed $value): bool
     {
@@ -199,6 +135,72 @@ final readonly class MacAddress implements ValidationRule
         ));
     }
 
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! is_string($value)) {
+            $fail('laranail/validation::validation.mac_address.malformed')->translate();
+
+            return;
+        }
+
+        $format = self::formatOf($value);
+
+        if ($format === null) {
+            $fail('laranail/validation::validation.mac_address.malformed')->translate();
+
+            return;
+        }
+
+        if ($this->formats !== [] && ! in_array($format, $this->formats, true)) {
+            $fail('laranail/validation::validation.mac_address.format')
+                ->translate(['formats' => implode(', ', $this->formats)]);
+
+            return;
+        }
+
+        $octets = self::octets($value);
+
+        if ($this->bytes !== null && count($octets) !== $this->bytes) {
+            $fail('laranail/validation::validation.mac_address.length')
+                ->translate(['bytes' => $this->bytes]);
+
+            return;
+        }
+
+        // Before the bit checks, because both of these have the bits of a
+        // perfectly ordinary address and neither names a device — reporting
+        // "must be unicast" for the broadcast address would be true and
+        // useless.
+        if ($this->isBroadcast($octets)) {
+            $fail('laranail/validation::validation.mac_address.broadcast')->translate();
+
+            return;
+        }
+
+        if ($this->isNull($octets)) {
+            $fail('laranail/validation::validation.mac_address.null')->translate();
+
+            return;
+        }
+
+        if ($this->requireUnicast && (($octets[0] & 0b1) !== 0)) {
+            $fail('laranail/validation::validation.mac_address.multicast')->translate();
+
+            return;
+        }
+
+        if ($this->requireUniversal && (($octets[0] & 0b10) !== 0)) {
+            $fail('laranail/validation::validation.mac_address.local')->translate();
+
+            return;
+        }
+
+        if ($this->ouis !== [] && ! $this->matchesAnyOui($octets, $this->ouis)) {
+            $fail('laranail/validation::validation.mac_address.oui')
+                ->translate(['ouis' => implode(', ', $this->ouis)]);
+        }
+    }
+
     /** @param  list<int>  $octets */
     private function isBroadcast(array $octets): bool
     {
@@ -218,8 +220,8 @@ final readonly class MacAddress implements ValidationRule
     }
 
     /**
-     * @param  list<int>  $octets
-     * @param  list<string>  $ouis
+     * @param list<int> $octets
+     * @param list<string> $ouis
      */
     private function matchesAnyOui(array $octets, array $ouis): bool
     {

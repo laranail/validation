@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
 use Simtabi\Laranail\Validation\FluentRule;
@@ -110,7 +112,7 @@ it('file absent without required passes', function (): void {
 it('file bail stops on first failure', function (): void {
     $validator = makeValidator(
         ['doc' => 'not-a-file'],
-        ['doc' => FluentRule::file()->bail()->max(2048)]
+        ['doc' => FluentRule::file()->bail()->max(2048)],
     );
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->get('doc'))->toHaveCount(1);

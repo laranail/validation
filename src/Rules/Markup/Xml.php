@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Markup;
 
 use Closure;
 use DOMDocument;
-use Illuminate\Contracts\Validation\ValidationRule;
 use LibXMLError;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * Well-formed XML, optionally valid against an XSD schema.
@@ -47,7 +49,7 @@ final readonly class Xml implements ValidationRule
         libxml_clear_errors();
 
         try {
-            $document = new DOMDocument();
+            $document = new DOMDocument;
 
             // LIBXML_NONET: no network fetches for entities or includes.
             // LIBXML_NOENT is deliberately NOT set — expanding entities is the

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
@@ -16,7 +18,7 @@ final class ItemErrorCollector
 {
     /**
      * @param iterable<Closure(array<string, mixed>): bool> $fastChecks
-     * @param  array<string, mixed>  $itemData
+     * @param array<string, mixed> $itemData
      */
     public function passesAllFastChecks(iterable $fastChecks, array $itemData): bool
     {
@@ -33,7 +35,7 @@ final class ItemErrorCollector
      * Append errors from a failed per-item validator into the accumulator,
      * keyed by full dotted path (`{parent}.{index}.{field}` or `{parent}.{index}` for scalar each).
      *
-     * @param  array<string, list<string>>  $errors
+     * @param array<string, list<string>> $errors
      */
     public function collectErrors(Validator $validator, string $parent, int|string $index, bool $isScalar, array &$errors): void
     {

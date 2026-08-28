@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Runs the batched whereIn query for exists/unique presence verification,
@@ -17,8 +19,9 @@ final class BatchPresenceQuery
     private const int CHUNK_SIZE = 1000;
 
     /**
-     * @param  array<int, mixed>  $values
-     * @param  array<int, array{column: string, value: string}>  $wheres
+     * @param array<int, mixed> $values
+     * @param array<int, array{column: string, value: string}> $wheres
+     *
      * @return array<int, mixed>
      */
     public static function run(
@@ -34,7 +37,8 @@ final class BatchPresenceQuery
         $chunks = [];
 
         foreach (array_chunk($values, self::CHUNK_SIZE) as $chunk) {
-            $query = ($connection !== null
+            $query = (
+                $connection !== null
                 ? DB::connection($connection)->table($table)
                 : DB::table($table)
             )->useWritePdo();
@@ -59,7 +63,7 @@ final class BatchPresenceQuery
     /**
      * Apply a single Laravel-style where condition to the query.
      *
-     * @param  array{column: string, value: string}  $where
+     * @param array{column: string, value: string} $where
      */
     private static function applyWhere(Builder $query, array $where): void
     {

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests;
 
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use SplFileInfo;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 /**
  * Every message key a rule can emit must resolve to a real sentence.
@@ -20,6 +22,19 @@ use SplFileInfo;
  */
 final class RuleMessagesResolveTest extends TestCase
 {
+    /**
+     * The one message that is about SEVERAL fields rather than one.
+     *
+     * `PersonNameSchema`'s at-least-one requirement is attached to a single
+     * field for the mundane reason that attaching it to all of them reports one
+     * mistake three times — but what it asks for is any of them. Naming the
+     * carrier would be worse than naming none: "The first name field: please
+     * provide at least one of first name, middle name or last name" tells the
+     * user to fill in the box they just declined to fill in. It names every
+     * field through `:values` instead.
+     */
+    private const string NAMES_SEVERAL_FIELDS = 'laranail/validation::validation.person_name_required';
+
     public function test_every_key_the_rules_reference_resolves(): void
     {
         $unresolved = [];
@@ -86,19 +101,6 @@ final class RuleMessagesResolveTest extends TestCase
             $this->assertSame([], array_values($extra), "Locale {$locale} has keys en does not — add them to en first.");
         }
     }
-
-    /**
-     * The one message that is about SEVERAL fields rather than one.
-     *
-     * `PersonNameSchema`'s at-least-one requirement is attached to a single
-     * field for the mundane reason that attaching it to all of them reports one
-     * mistake three times — but what it asks for is any of them. Naming the
-     * carrier would be worse than naming none: "The first name field: please
-     * provide at least one of first name, middle name or last name" tells the
-     * user to fill in the box they just declined to fill in. It names every
-     * field through `:values` instead.
-     */
-    private const string NAMES_SEVERAL_FIELDS = 'laranail/validation::validation.person_name_required';
 
     public function test_no_message_is_left_as_a_placeholder(): void
     {

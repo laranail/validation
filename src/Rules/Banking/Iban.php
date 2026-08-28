@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Banking;
 
@@ -50,13 +52,6 @@ final class Iban implements ValidationRule
 
     private const string PATTERN = '/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/D';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.iban')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value)) {
@@ -78,6 +73,13 @@ final class Iban implements ValidationRule
         }
 
         return self::checksumIsValid($iban);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.iban')->translate();
+        }
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -25,13 +27,6 @@ final class Subdomain implements ClientCheckable, ValidationRule
 {
     private const string PATTERN = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/iD';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.subdomain')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) || preg_match(self::PATTERN, $value) !== 1) {
@@ -39,6 +34,13 @@ final class Subdomain implements ClientCheckable, ValidationRule
         }
 
         return ! str_starts_with(strtolower($value), 'xn--');
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.subdomain')->translate();
+        }
     }
 
     /**

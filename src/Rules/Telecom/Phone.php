@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Telecom;
 
 use Closure;
-use Illuminate\Contracts\Validation\DataAwareRule;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Arr;
 use RuntimeException;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Illuminate\Support\Arr;
 use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Phone\PhoneNumberValue;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * A phone number, checked against Google's numbering-plan metadata.
@@ -42,8 +44,8 @@ final class Phone implements DataAwareRule, ValidationRule
     private array $data = [];
 
     /**
-     * @param list<string>          $countries  ISO 3166-1 alpha-2 codes; empty means any country
-     * @param list<PhoneNumberType> $types      Acceptable line types; empty means any
+     * @param list<string> $countries ISO 3166-1 alpha-2 codes; empty means any country
+     * @param list<PhoneNumberType> $types Acceptable line types; empty means any
      */
     public function __construct(
         private readonly array $countries = [],

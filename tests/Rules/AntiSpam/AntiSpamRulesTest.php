@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Support\Facades\Crypt;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Crypt;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 
@@ -55,11 +57,11 @@ it('rejects a plain, tampered or foreign token', function (mixed $value): void {
     // blank input at all. Requiring the field is `required`'s job.
     // The whole point of encrypting: a plain timestamp is attacker-supplied,
     // and a bot would simply post one that passes.
-    expect(ruleAccepts(new SubmissionTiming(), $value))->toBeFalse();
+    expect(ruleAccepts(new SubmissionTiming, $value))->toBeFalse();
 })->with([
     'plain timestamp' => '1700000000',
-    'garbage' => 'not-a-token',
-    'non-string' => 12345,
+    'garbage'         => 'not-a-token',
+    'non-string'      => 12345,
 ]);
 
 it('rejects a token from the future rather than treating it as instant', function (): void {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\WildcardExpander;
 
@@ -61,7 +63,7 @@ it('returns empty when wildcard target is not an array', function (): void {
 it('handles associative array keys', function (): void {
     $data = [
         'users' => [
-            'admin' => ['name' => 'Alice'],
+            'admin'  => ['name' => 'Alice'],
             'editor' => ['name' => 'Bob'],
         ],
     ];
@@ -107,7 +109,7 @@ it('stops expanding at recursion depth limit', function (): void {
     // Build data nested 60 levels deep with wildcards at each level.
     $data = [];
     $current = &$data;
-    for ($i = 0; $i < 60; ++$i) {
+    for ($i = 0; $i < 60; $i++) {
         $current['a'] = [[]];
         $current = &$current['a'][0];
     }

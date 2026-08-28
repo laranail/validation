@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Identifiers;
 
@@ -21,13 +23,6 @@ use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
  */
 final class Imei implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.imei')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) && ! is_int($value)) {
@@ -41,5 +36,12 @@ final class Imei implements ValidationRule
         }
 
         return Luhn::passes($imei);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.imei')->translate();
+        }
     }
 }

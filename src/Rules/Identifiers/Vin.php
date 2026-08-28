@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Identifiers;
 
@@ -42,13 +44,6 @@ final readonly class Vin implements ValidationRule
 
     public function __construct(private bool $checkDigit = false) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->checkDigit)) {
-            $fail('laranail/validation::validation.vin')->translate();
-        }
-    }
-
     public static function passes(mixed $value, bool $checkDigit = false): bool
     {
         if (! is_string($value)) {
@@ -62,6 +57,13 @@ final readonly class Vin implements ValidationRule
         }
 
         return ! $checkDigit || self::checkDigitIsValid($vin);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->checkDigit)) {
+            $fail('laranail/validation::validation.vin')->translate();
+        }
     }
 
     private static function checkDigitIsValid(string $vin): bool

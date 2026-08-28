@@ -1,17 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests;
 
-use Illuminate\Contracts\Config\Repository;
-use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Config\Repository;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 
 class TestCase extends Orchestra
 {
     /**
-     * @param  Application  $app
+     * @param Application $app
+     *
      * @return list<class-string>
      */
     protected function getPackageProviders(mixed $app): array
@@ -33,7 +36,7 @@ class TestCase extends Orchestra
      * (directly or via a trait) keeps it — we don't silently clobber
      * key-sensitive behavior in key-dependent assertions.
      *
-     * @param  Application  $app
+     * @param Application $app
      */
     protected function defineEnvironment(mixed $app): void
     {

@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
 use Simtabi\Laranail\Validation\FastCheck\CoreValueCompiler;
+use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 use Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler;
 use Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler;
-use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 
 /**
  * Thin dispatcher over per-family compilers under {@see FastCheck}.
@@ -79,15 +81,6 @@ final class FastCheckCompiler
         self::$compileCache = [];
     }
 
-    private static function hasDateComparison(string $ruleString): bool
-    {
-        return str_contains($ruleString, 'after:')
-            || str_contains($ruleString, 'before:')
-            || str_contains($ruleString, 'after_or_equal:')
-            || str_contains($ruleString, 'before_or_equal:')
-            || str_contains($ruleString, 'date_equals:');
-    }
-
     /**
      * Compile a rule string with presence-conditional rewriting
      * (`required_with`, `required_without`, `required_with_all`,
@@ -116,5 +109,14 @@ final class FastCheckCompiler
     public static function compileWithItemContext(string $ruleString, ?string $attributeName = null): ?Closure
     {
         return ItemContextCompiler::compile($ruleString, $attributeName);
+    }
+
+    private static function hasDateComparison(string $ruleString): bool
+    {
+        return str_contains($ruleString, 'after:')
+            || str_contains($ruleString, 'before:')
+            || str_contains($ruleString, 'after_or_equal:')
+            || str_contains($ruleString, 'before_or_equal:')
+            || str_contains($ruleString, 'date_equals:');
     }
 }

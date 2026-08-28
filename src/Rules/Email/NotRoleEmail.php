@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Email;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 
 /**
  * The address belongs to a person rather than a function.
@@ -31,11 +33,6 @@ final class NotRoleEmail implements ValidationRule
      */
     public function __construct(private ?RoleAccountList $localParts = null) {}
 
-    private function localParts(): RoleAccountList
-    {
-        return $this->localParts ??= resolve(RoleAccountList::class);
-    }
-
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $address = Address::split($value);
@@ -59,5 +56,10 @@ final class NotRoleEmail implements ValidationRule
         if ($this->localParts()->contains($localPart)) {
             $fail('laranail/validation::validation.email.role')->translate();
         }
+    }
+
+    private function localParts(): RoleAccountList
+    {
+        return $this->localParts ??= resolve(RoleAccountList::class);
     }
 }

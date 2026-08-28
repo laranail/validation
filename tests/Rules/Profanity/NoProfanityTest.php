@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Translation\PotentiallyTranslatedString;
 use Simtabi\Laranail\Validation\Contracts\TermList;
+use Illuminate\Translation\PotentiallyTranslatedString;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 
 /**
@@ -12,8 +14,8 @@ use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
  * test is about the MATCHING rather than about any particular vocabulary.
  */
 /**
- * @param  list<string>  $terms
- * @param  list<string>  $allowed
+ * @param list<string> $terms
+ * @param list<string> $allowed
  */
 function termList(array $terms, array $allowed = []): NoProfanity
 {
@@ -86,7 +88,8 @@ it('passes everything when no terms are configured', function (): void {
 });
 
 it('accepts a TermList implementation', function (): void {
-    $list = new class implements TermList {
+    $list = new class implements TermList
+    {
         public function terms(): array
         {
             return ['badger'];

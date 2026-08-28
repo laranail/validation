@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Email;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 
 /**
  * The address is not at a known throwaway-mail provider.
@@ -34,11 +36,6 @@ final class NotDisposableEmail implements ValidationRule
      */
     public function __construct(private ?DisposableDomainList $domains = null) {}
 
-    private function domains(): DisposableDomainList
-    {
-        return $this->domains ??= resolve(DisposableDomainList::class);
-    }
-
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $address = Address::split($value);
@@ -52,5 +49,10 @@ final class NotDisposableEmail implements ValidationRule
         if ($this->domains()->contains($address[1])) {
             $fail('laranail/validation::validation.email.disposable')->translate();
         }
+    }
+
+    private function domains(): DisposableDomainList
+    {
+        return $this->domains ??= resolve(DisposableDomainList::class);
     }
 }

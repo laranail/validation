@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
+use ReflectionProperty;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
-use ReflectionProperty;
 use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
 
 /**
@@ -33,10 +35,10 @@ abstract class FluentValidator extends OptimizedValidator
     use PreparesOptimizedRules;
 
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $rules
-     * @param  array<string, string>  $messages
-     * @param  array<string, string>  $attributes
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $rules
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
      */
     public function __construct(
         array $data,

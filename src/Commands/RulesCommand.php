@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Commands;
 
 use Illuminate\Foundation\Auth\User;
 use Simtabi\Laranail\Console\Tools\Commands\Command;
-use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
-use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 use Simtabi\Laranail\Validation\Support\RuleAliases;
 use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
 
 /**
  * Lists every rule the registry knows — the package's discovered library
@@ -62,19 +64,19 @@ final class RulesCommand extends Command
     private function aliasIndex(): array
     {
         $samples = [
-            'models_exist' => [User::class],
-            'authorized' => ['view', User::class],
-            'parity' => ['even'],
-            'vendor_identifier' => ['aws_region'],
+            'models_exist'        => [User::class],
+            'authorized'          => ['view', User::class],
+            'parity'              => ['even'],
+            'vendor_identifier'   => ['aws_region'],
             'national_identifier' => ['nl'],
-            'minute_in' => ['0', '15', '30', '45'],
+            'minute_in'           => ['0', '15', '30', '45'],
             'max_date_difference' => ['48', '2026-08-24 00:00:00'],
-            'minimum_age' => ['18'],
-            'compare_to_column' => ['posts', 'owner_id', 'gte', 'id', '1'],
+            'minimum_age'         => ['18'],
+            'compare_to_column'   => ['posts', 'owner_id', 'gte', 'id', '1'],
             'file_exists_on_disk' => ['local'],
-            'hash_digest' => ['sha256'],
-            'max_words' => ['200'],
-            'min_words' => ['2'],
+            'hash_digest'         => ['sha256'],
+            'max_words'           => ['200'],
+            'min_words'           => ['2'],
         ];
         $index = [];
 

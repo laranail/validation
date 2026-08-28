@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Database;
 
@@ -29,12 +31,12 @@ enum Comparison: string
         }
 
         return match ($this) {
-            self::LessThan => $left < $right,
-            self::LessThanOrEqual => $left <= $right,
-            self::GreaterThan => $left > $right,
+            self::LessThan           => $left < $right,
+            self::LessThanOrEqual    => $left <= $right,
+            self::GreaterThan        => $left > $right,
             self::GreaterThanOrEqual => $left >= $right,
-            self::Equal => ($left <=> $right) === 0,
-            self::NotEqual => ($left <=> $right) !== 0,
+            self::Equal              => ($left <=> $right) === 0,
+            self::NotEqual           => ($left <=> $right) !== 0,
         };
     }
 }

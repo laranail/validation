@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
 use Closure;
-use DateTimeImmutable;
-use DateTimeZone;
 use Exception;
+use DateTimeZone;
+use DateTimeImmutable;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /**

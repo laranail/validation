@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -35,16 +37,8 @@ final readonly class InCidrRange implements ValidationRule
     /** @param  list<string>  $networks  CIDR notation; an invalid entry never matches. */
     public function __construct(private array $networks) {}
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value, $this->networks)) {
-            $fail('laranail/validation::validation.in_cidr_range')
-                ->translate(['networks' => implode(', ', $this->networks)]);
-        }
-    }
-
     /**
-     * @param  list<string>  $networks
+     * @param list<string> $networks
      */
     public static function passes(mixed $value, array $networks): bool
     {
@@ -84,6 +78,14 @@ final readonly class InCidrRange implements ValidationRule
         }
 
         return self::sharesPrefix($packedAddress, $packedBase, (int) $prefix);
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value, $this->networks)) {
+            $fail('laranail/validation::validation.in_cidr_range')
+                ->translate(['networks' => implode(', ', $this->networks)]);
+        }
     }
 
     /** `::ffff:10.0.0.1` is 10.0.0.1; anything else is returned unchanged. */

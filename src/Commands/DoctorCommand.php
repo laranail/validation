@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Commands;
 
-use Simtabi\Laranail\Console\Tools\Commands\Command;
-use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Throwable;
 use Simtabi\Laranail\Phone\PhoneFormatter;
+use Simtabi\Laranail\Console\Tools\Commands\Command;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Support\RuleRegistrar;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
-use Simtabi\Laranail\Validation\Support\RuleRegistrar;
-use Throwable;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
 
 /**
  * The package's boot-health surface (failure-handling standard: degraded
@@ -55,7 +57,7 @@ final class DoctorCommand extends Command
                     : ['WARN', $list::class . ' does not flag a canonical disposable domain'];
             }],
             ['role-account list', fn (): array => ['OK', resolve(RoleAccountList::class)::class]],
-            ['dns resolver', fn (): array => ['OK', resolve(DnsResolver::class)::class]],
+            ['dns resolver', fn (): array      => ['OK', resolve(DnsResolver::class)::class]],
             ['batch query cap', function (): array {
                 $limit = BatchDatabaseChecker::$maxValuesPerGroup;
 

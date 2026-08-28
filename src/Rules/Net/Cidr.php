@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net;
 
@@ -20,13 +22,6 @@ use Simtabi\Laranail\Validation\Rules\Net\Support\IpClassifier;
  */
 final class Cidr implements ValidationRule
 {
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.cidr')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value) || substr_count($value, '/') !== 1) {
@@ -48,5 +43,12 @@ final class Cidr implements ValidationRule
         $max = filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false ? 32 : 128;
 
         return (int) $prefix <= $max;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.cidr')->translate();
+        }
     }
 }

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
-use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Contracts\Validation\ValidationRule;
+declare(strict_types=1);
+
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 // =========================================================================
 // EmailRule
@@ -68,7 +70,8 @@ it('EmailRule compiles same and different', function (): void {
 });
 
 it('EmailRule compiledRules returns array for non-Stringable rule', function (): void {
-    $nonStringable = new class implements ValidationRule {
+    $nonStringable = new class implements ValidationRule
+    {
         public function validate(string $attribute, mixed $value, Closure $fail): void {}
     };
 

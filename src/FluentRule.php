@@ -1,32 +1,34 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use BackedEnum;
 use Closure;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Traits\Macroable;
+use BackedEnum;
 use Illuminate\Validation\Rules\AnyOf;
-use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
-use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Support\Arrayable;
 use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
 
 class FluentRule
 {
@@ -34,7 +36,7 @@ class FluentRule
 
     public static function string(?string $label = null, ?string $message = null): StringRule
     {
-        $stringRule = new StringRule();
+        $stringRule = new StringRule;
         if ($label !== null) {
             $stringRule->label($label);
         }
@@ -48,7 +50,7 @@ class FluentRule
 
     public static function numeric(?string $label = null, ?string $message = null): NumericRule
     {
-        $numericRule = new NumericRule();
+        $numericRule = new NumericRule;
         if ($label !== null) {
             $numericRule->label($label);
         }
@@ -90,7 +92,7 @@ class FluentRule
 
     public static function boolean(?string $label = null, ?string $message = null): BooleanRule
     {
-        $booleanRule = new BooleanRule();
+        $booleanRule = new BooleanRule;
         if ($label !== null) {
             $booleanRule->label($label);
         }
@@ -104,7 +106,7 @@ class FluentRule
 
     public static function accepted(?string $label = null, ?string $message = null): AcceptedRule
     {
-        $acceptedRule = new AcceptedRule();
+        $acceptedRule = new AcceptedRule;
         if ($label !== null) {
             $acceptedRule->label($label);
         }
@@ -118,7 +120,7 @@ class FluentRule
 
     public static function declined(?string $label = null, ?string $message = null): DeclinedRule
     {
-        $declinedRule = new DeclinedRule();
+        $declinedRule = new DeclinedRule;
         if ($label !== null) {
             $declinedRule->label($label);
         }
@@ -147,7 +149,7 @@ class FluentRule
 
     public static function file(?string $label = null, ?string $message = null): FileRule
     {
-        $fileRule = new FileRule();
+        $fileRule = new FileRule;
         if ($label !== null) {
             $fileRule->label($label);
         }
@@ -182,7 +184,7 @@ class FluentRule
      */
     public static function phone(?string $label = null, ?string $message = null): PhoneRule
     {
-        $phoneRule = new PhoneRule();
+        $phoneRule = new PhoneRule;
         if ($label !== null) {
             $phoneRule->label($label);
         }
@@ -196,7 +198,7 @@ class FluentRule
 
     public static function image(?string $label = null, ?string $message = null): ImageRule
     {
-        $imageRule = new ImageRule();
+        $imageRule = new ImageRule;
         if ($label !== null) {
             $imageRule->label($label);
         }
@@ -236,7 +238,7 @@ class FluentRule
      */
     public static function url(?string $label = null, ?string $message = null): UrlRule
     {
-        $urlRule = new UrlRule();
+        $urlRule = new UrlRule;
         if ($label !== null) {
             $urlRule->label($label);
         }
@@ -269,7 +271,7 @@ class FluentRule
      */
     public static function ip(?string $label = null, ?string $message = null): IpAddressRule
     {
-        $ipRule = new IpAddressRule();
+        $ipRule = new IpAddressRule;
         if ($label !== null) {
             $ipRule->label($label);
         }
@@ -299,7 +301,7 @@ class FluentRule
      */
     public static function macAddress(?string $label = null, ?string $message = null): MacAddressRule
     {
-        $macRule = new MacAddressRule();
+        $macRule = new MacAddressRule;
         if ($label !== null) {
             $macRule->label($label);
         }
@@ -340,7 +342,7 @@ class FluentRule
      */
     public static function subdomain(?string $label = null, ?string $message = null): StringRule
     {
-        return self::string($label)->rule(new Subdomain(), $message);
+        return self::string($label)->rule(new Subdomain, $message);
     }
 
     /** A fully-qualified domain name, internationalised names included. */
@@ -387,13 +389,13 @@ class FluentRule
 
     public static function field(?string $label = null): FieldRule
     {
-        $fieldRule = new FieldRule();
+        $fieldRule = new FieldRule;
 
         return $label !== null ? $fieldRule->label($label) : $fieldRule;
     }
 
     /**
-     * @param  array<int, mixed>  $rules
+     * @param array<int, mixed> $rules
      */
     public static function anyOf(array $rules): AnyOf
     {

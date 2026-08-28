@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Codes;
 
@@ -19,13 +21,6 @@ final class Issn implements ValidationRule
 {
     private const string PATTERN = '/^[0-9]{4}-?[0-9]{3}[0-9X]$/D';
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! self::passes($value)) {
-            $fail('laranail/validation::validation.issn')->translate();
-        }
-    }
-
     public static function passes(mixed $value): bool
     {
         if (! is_string($value)) {
@@ -42,7 +37,7 @@ final class Issn implements ValidationRule
 
         // Weights run 8 down to 2 across the first seven characters.
         $sum = 0;
-        for ($i = 0; $i < 7; ++$i) {
+        for ($i = 0; $i < 7; $i++) {
             $sum += ((int) $digits[$i]) * (8 - $i);
         }
 
@@ -50,5 +45,12 @@ final class Issn implements ValidationRule
         $check = $remainder === 0 ? '0' : (string) (11 - $remainder);
 
         return ($check === '10' ? 'X' : $check) === $digits[7];
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (! self::passes($value)) {
+            $fail('laranail/validation::validation.issn')->translate();
+        }
     }
 }
