@@ -57,12 +57,27 @@ jobs:
           vendor/bin/testbench laranail::package-tools.sbom --print > sbom.cdx.json
           php -r 'json_decode(file_get_contents("sbom.cdx.json"), flags: JSON_THROW_ON_ERROR);'
 
-      - name: Create GitHub release
+      - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            --title "$GITHUB_REF_NAME" \
-            --notes-file release-body.md \
-            --generate-notes \
-            sbom.cdx.json
+          # v0.1.0 is a moving tag -- it is force-pushed on every change, so this
+          # workflow re-fires against a release that already exists. `gh release
+          # create` refuses outright in that case ("a release with the same tag
+          # name already exists: v0.1.0") and exits 1, which turns every routine
+          # tag move into a red run and buries any real release failure.
+          #
+          # Editing when it exists is what laranail/password-tools already does.
+          # The SBOM has to be re-uploaded explicitly on that path: `gh release
+          # edit` does not take assets, and without --clobber the upload fails on
+          # the asset name already being present.
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --notes-file release-body.md
+            gh release upload "$GITHUB_REF_NAME" sbom.cdx.json --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes-file release-body.md \
+              --generate-notes \
+              sbom.cdx.json
+          fi
