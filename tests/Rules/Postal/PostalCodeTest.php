@@ -13,32 +13,32 @@ use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
 it('accepts postcodes matching the given country', function (string $country, string $value): void {
     expect(ruleAccepts(new PostalCode($country), $value))->toBeTrue();
 })->with([
-    'US 5-digit'        => ['US', '90210'],
+    'US 5-digit' => ['US', '90210'],
     'GB outward+inward' => ['GB', 'SW1A 1AA'],
-    'GB short'          => ['GB', 'M1 1AE'],
-    'NL digits only'    => ['NL', '1012'],
-    'NL with letters'   => ['NL', '1012 AB'],
-    'CA'                => ['CA', 'K1A 0B1'],
-    'CA no space'       => ['CA', 'K1A0B1'],
-    'JP'                => ['JP', '100-0001'],
-    'DE'                => ['DE', '10115'],
-    'BR'                => ['BR', '01310-100'],
-    'lowercase input'   => ['GB', 'sw1a 1aa'],
+    'GB short' => ['GB', 'M1 1AE'],
+    'NL digits only' => ['NL', '1012'],
+    'NL with letters' => ['NL', '1012 AB'],
+    'CA' => ['CA', 'K1A 0B1'],
+    'CA no space' => ['CA', 'K1A0B1'],
+    'JP' => ['JP', '100-0001'],
+    'DE' => ['DE', '10115'],
+    'BR' => ['BR', '01310-100'],
+    'lowercase input' => ['GB', 'sw1a 1aa'],
     'surrounding space' => ['US', ' 90210 '],
 ]);
 
 it('rejects postcodes that do not match the given country', function (string $country, string $value): void {
     expect(ruleAccepts(new PostalCode($country), $value))->toBeFalse();
 })->with([
-    'US too short'               => ['US', '9021'],
-    'US too long'                => ['US', '902101'],
-    'US letters'                 => ['US', 'ABCDE'],
-    'GB malformed'               => ['GB', '12345'],
-    'CA missing final digit'     => ['CA', 'K1A 0B'],
-    'CA barred letter D'         => ['CA', 'D1A 0B1'],
+    'US too short' => ['US', '9021'],
+    'US too long' => ['US', '902101'],
+    'US letters' => ['US', 'ABCDE'],
+    'GB malformed' => ['GB', '12345'],
+    'CA missing final digit' => ['CA', 'K1A 0B'],
+    'CA barred letter D' => ['CA', 'D1A 0B1'],
     'CA barred letter as second' => ['CA', 'K1I 0B1'],
-    'JP without hyphen'          => ['JP', '1000001'],
-    'NL too many letters'        => ['NL', '1012 ABC'],
+    'JP without hyphen' => ['JP', '1000001'],
+    'NL too many letters' => ['NL', '1012 ABC'],
 ]);
 
 it('accepts a value valid for any of several countries', function (): void {
@@ -62,7 +62,7 @@ it('fails for an unsupported or missing country rather than passing', function (
 
 it('reads the country from another field', function (): void {
     $rules = [
-        'country'  => ['required', 'string'],
+        'country' => ['required', 'string'],
         'postcode' => PostalCode::reference('country'),
     ];
 
@@ -82,7 +82,7 @@ it('resolves a wildcard reference to the same row', function (): void {
     // Without per-row resolution, every row would be validated against the
     // FIRST row's country — wrong in a way that only shows when rows differ.
     $rules = [
-        'addresses.*.country'  => ['required', 'string'],
+        'addresses.*.country' => ['required', 'string'],
         'addresses.*.postcode' => PostalCode::reference('addresses.*.country'),
     ];
 
@@ -118,10 +118,10 @@ it('contains no country code the ICU database does not recognise', function (): 
     // two are not countries at all.
     $unknown = array_values(array_filter(
         Patterns::countries(),
-        static fn (string $code): bool => Locale::getDisplayRegion('-' . $code, 'en') === $code,
+        static fn (string $code): bool => Locale::getDisplayRegion('-'.$code, 'en') === $code,
     ));
 
-    expect($unknown)->toBeEmpty('unrecognised country codes: ' . implode(', ', $unknown));
+    expect($unknown)->toBeEmpty('unrecognised country codes: '.implode(', ', $unknown));
 })->skip(fn (): bool => ! class_exists(Locale::class), 'ext-intl not installed');
 
 it('uses only bounded quantifiers, so no pattern can backtrack catastrophically', function (): void {

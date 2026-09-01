@@ -34,28 +34,28 @@ final class RuleConfigBuilder
     public static function initialConfig(): array
     {
         return [
-            'required'     => false, 'filled' => false,
-            'nullable'     => false, 'sometimes' => false,
-            'string'       => false, 'numeric' => false, 'integer' => false, 'integer.strict' => false,
-            'boolean'      => false, 'array' => false, 'email' => false, 'date' => false,
-            'url'          => false, 'ip' => false, 'uuid' => false, 'ulid' => false,
-            'accepted'     => false, 'declined' => false,
-            'alpha'        => false, 'alphaDash' => false, 'alphaNum' => false,
-            'min'          => null, 'max' => null,
-            'digits'       => null, 'digitsMin' => null, 'digitsMax' => null,
-            'in'           => null, 'notIn' => null,
-            'regex'        => null, 'notRegex' => null,
-            'dateFormat'   => null,
-            'after'        => null, 'before' => null,
+            'required' => false, 'filled' => false,
+            'nullable' => false, 'sometimes' => false,
+            'string' => false, 'numeric' => false, 'integer' => false, 'integer.strict' => false,
+            'boolean' => false, 'array' => false, 'email' => false, 'date' => false,
+            'url' => false, 'ip' => false, 'uuid' => false, 'ulid' => false,
+            'accepted' => false, 'declined' => false,
+            'alpha' => false, 'alphaDash' => false, 'alphaNum' => false,
+            'min' => null, 'max' => null,
+            'digits' => null, 'digitsMin' => null, 'digitsMax' => null,
+            'in' => null, 'notIn' => null,
+            'regex' => null, 'notRegex' => null,
+            'dateFormat' => null,
+            'after' => null, 'before' => null,
             'afterOrEqual' => null, 'beforeOrEqual' => null,
-            'dateEquals'   => null,
+            'dateEquals' => null,
             // Item-context field-reference keys — populated by ItemContextCompiler.
-            'afterField'        => null, 'beforeField' => null,
+            'afterField' => null, 'beforeField' => null,
             'afterOrEqualField' => null, 'beforeOrEqualField' => null,
-            'dateEqualsField'   => null,
-            'sameField'         => null, 'differentField' => null,
-            'gtField'           => null, 'gteField' => null,
-            'ltField'           => null, 'lteField' => null,
+            'dateEqualsField' => null,
+            'sameField' => null, 'differentField' => null,
+            'gtField' => null, 'gteField' => null,
+            'ltField' => null, 'lteField' => null,
         ];
     }
 
@@ -65,8 +65,7 @@ final class RuleConfigBuilder
      * rules (`same:FIELD`, `gt:FIELD`, etc.) are NOT handled here — see
      * `ItemContextCompiler::parsePartWithItemContext` for that path.
      *
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>|null
      */
     public static function parseValuePart(string $part, array $config): ?array
@@ -86,34 +85,34 @@ final class RuleConfigBuilder
         }
 
         return match (true) {
-            $part === 'integer'                                  => [...$config, 'integer' => true],
-            $part === 'integer:strict'                           => [...$config, 'integer' => true, 'integer.strict' => true],
-            $part === 'alpha', $part === 'alpha:ascii'           => [...$config, 'alpha' => true],
+            $part === 'integer' => [...$config, 'integer' => true],
+            $part === 'integer:strict' => [...$config, 'integer' => true, 'integer.strict' => true],
+            $part === 'alpha', $part === 'alpha:ascii' => [...$config, 'alpha' => true],
             $part === 'alpha_dash', $part === 'alpha_dash:ascii' => [...$config, 'alphaDash' => true],
-            $part === 'alpha_num', $part === 'alpha_num:ascii'   => [...$config, 'alphaNum' => true],
-            $part === 'nullable'                                 => [...$config, 'nullable' => true],
+            $part === 'alpha_num', $part === 'alpha_num:ascii' => [...$config, 'alphaNum' => true],
+            $part === 'nullable' => [...$config, 'nullable' => true],
             // 'sometimes' not fast-checkable: distinguishing absent from
             // present-null requires presence info the closure doesn't have.
             $part === 'sometimes' => null,
-            $part === 'bail'      => $config,
+            $part === 'bail' => $config,
             // Not (int): NumericRule::min() accepts int|float, and Laravel
             // compares with BigNumber against the raw parameter. Casting
             // `min:2.5` to 2 lets 2.2 through.
-            str_starts_with($part, 'min:')             => [...$config, 'min' => self::parseSize(substr($part, 4))],
-            str_starts_with($part, 'max:')             => [...$config, 'max' => self::parseSize(substr($part, 4))],
-            str_starts_with($part, 'digits:')          => [...$config, 'digits' => (int) substr($part, 7)],
-            str_starts_with($part, 'digits_between:')  => self::parseDigitsBetween($config, substr($part, 15)),
-            str_starts_with($part, 'in:')              => [...$config, 'in' => self::parseInValues(substr($part, 3))],
-            str_starts_with($part, 'not_in:')          => [...$config, 'notIn' => self::parseInValues(substr($part, 7))],
-            str_starts_with($part, 'regex:')           => [...$config, 'regex' => substr($part, 6)],
-            str_starts_with($part, 'not_regex:')       => [...$config, 'notRegex' => substr($part, 10)],
-            str_starts_with($part, 'date_format:')     => [...$config, 'dateFormat' => substr($part, 12)],
-            str_starts_with($part, 'date_equals:')     => self::parseDateLiteral($config, 'dateEquals', substr($part, 12)),
-            str_starts_with($part, 'after_or_equal:')  => self::parseDateLiteral($config, 'afterOrEqual', substr($part, 15)),
+            str_starts_with($part, 'min:') => [...$config, 'min' => self::parseSize(substr($part, 4))],
+            str_starts_with($part, 'max:') => [...$config, 'max' => self::parseSize(substr($part, 4))],
+            str_starts_with($part, 'digits:') => [...$config, 'digits' => (int) substr($part, 7)],
+            str_starts_with($part, 'digits_between:') => self::parseDigitsBetween($config, substr($part, 15)),
+            str_starts_with($part, 'in:') => [...$config, 'in' => self::parseInValues(substr($part, 3))],
+            str_starts_with($part, 'not_in:') => [...$config, 'notIn' => self::parseInValues(substr($part, 7))],
+            str_starts_with($part, 'regex:') => [...$config, 'regex' => substr($part, 6)],
+            str_starts_with($part, 'not_regex:') => [...$config, 'notRegex' => substr($part, 10)],
+            str_starts_with($part, 'date_format:') => [...$config, 'dateFormat' => substr($part, 12)],
+            str_starts_with($part, 'date_equals:') => self::parseDateLiteral($config, 'dateEquals', substr($part, 12)),
+            str_starts_with($part, 'after_or_equal:') => self::parseDateLiteral($config, 'afterOrEqual', substr($part, 15)),
             str_starts_with($part, 'before_or_equal:') => self::parseDateLiteral($config, 'beforeOrEqual', substr($part, 16)),
-            str_starts_with($part, 'after:')           => self::parseDateLiteral($config, 'after', substr($part, 6)),
-            str_starts_with($part, 'before:')          => self::parseDateLiteral($config, 'before', substr($part, 7)),
-            default                                    => null,
+            str_starts_with($part, 'after:') => self::parseDateLiteral($config, 'after', substr($part, 6)),
+            str_starts_with($part, 'before:') => self::parseDateLiteral($config, 'before', substr($part, 7)),
+            default => null,
         };
     }
 
@@ -122,7 +121,7 @@ final class RuleConfigBuilder
      * measure: string length, array count, or numeric value. Without one,
      * Laravel infers from runtime type — not fast-checkable.
      *
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public static function validateSizeRuleHasType(array $config): bool
     {
@@ -147,7 +146,7 @@ final class RuleConfigBuilder
      *    loose subset semantics (array_diff), which the scalar closure
      *    cannot reproduce.
      *
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public static function validateCompilableCombinations(array $config): bool
     {
@@ -170,8 +169,7 @@ final class RuleConfigBuilder
      * Build the value-only closure from a parsed config. ItemContextCompiler
      * wraps the result in an item-aware closure for cross-field comparisons.
      *
-     * @param array<string, mixed> $c
-     *
+     * @param  array<string, mixed>  $c
      * @return Closure(mixed): bool
      */
     public static function buildValueClosure(array $c): Closure
@@ -315,8 +313,7 @@ final class RuleConfigBuilder
     }
 
     /**
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>
      */
     private static function parseDigitsBetween(array $config, string $value): array
@@ -381,7 +378,7 @@ final class RuleConfigBuilder
      * through a strict-comparison-friendly operator. Used to detect the
      * loose/strict DISAGREEMENT zone the fast path must not decide.
      *
-     * @param list<string> $haystack
+     * @param  list<string>  $haystack
      */
     private static function matchesLoosely(string $needle, array $haystack): bool
     {
@@ -410,8 +407,7 @@ final class RuleConfigBuilder
      * Parse a date comparison rule. Only compiles when the parameter is a
      * date literal (resolvable by strtotime), not a field reference.
      *
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>|null
      */
     private static function parseDateLiteral(array $config, string $key, string $param): ?array
@@ -432,8 +428,8 @@ final class RuleConfigBuilder
      * Mutates `$checks` in place; closures capture the type literals they
      * compare against.
      *
-     * @param array<string, mixed> $c
-     * @param list<Closure(mixed): bool> $checks
+     * @param  array<string, mixed>  $c
+     * @param  list<Closure(mixed): bool>  $checks
      */
     private static function addTypeChecks(array $c, array &$checks): void
     {
@@ -471,8 +467,8 @@ final class RuleConfigBuilder
     /**
      * Append format-check closures (email, url, ip, uuid, ulid, alpha-family).
      *
-     * @param array<string, mixed> $c
-     * @param list<Closure(mixed): bool> $checks
+     * @param  array<string, mixed>  $c
+     * @param  list<Closure(mixed): bool>  $checks
      */
     private static function addFormatChecks(array $c, array &$checks): void
     {
@@ -517,8 +513,8 @@ final class RuleConfigBuilder
     /**
      * Append date-check closure when any date-literal rule is set.
      *
-     * @param array<string, mixed> $c
-     * @param list<Closure(mixed): bool> $checks
+     * @param  array<string, mixed>  $c
+     * @param  list<Closure(mixed): bool>  $checks
      */
     private static function addDateChecks(array $c, array &$checks): void
     {
@@ -547,7 +543,7 @@ final class RuleConfigBuilder
                 }
 
                 if ($dateFormat !== null) {
-                    $d = DateTime::createFromFormat('!' . $dateFormat, $v);
+                    $d = DateTime::createFromFormat('!'.$dateFormat, $v);
 
                     return $d !== false && $d->format($dateFormat) === $v;
                 }
@@ -594,8 +590,8 @@ final class RuleConfigBuilder
     /**
      * Append digit-check closure(s) when `digits:` or `digits_between:` is set.
      *
-     * @param array<string, mixed> $c
-     * @param list<Closure(mixed): bool> $checks
+     * @param  array<string, mixed>  $c
+     * @param  list<Closure(mixed): bool>  $checks
      */
     private static function addDigitChecks(array $c, array &$checks): void
     {

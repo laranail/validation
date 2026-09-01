@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Illuminate\Contracts\Validation\DataAwareRule;
-use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Rules\Telecom\UniquePhone;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Rules\Telecom\Phone;
+use Simtabi\Laranail\Validation\Rules\Telecom\UniquePhone;
 
 /**
  * A phone-number field.
@@ -72,7 +72,7 @@ class PhoneRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * does not — picking one arbitrarily would make the outcome depend on array order — so pair a
      * multi-country list with {@see countryFrom()} or expect international input.
      *
-     * @param string|list<string> $countries ISO 3166-1 alpha-2
+     * @param  string|list<string>  $countries  ISO 3166-1 alpha-2
      */
     public function country(string|array $countries): static
     {
@@ -110,7 +110,7 @@ class PhoneRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      *
      * `FixedLineOrMobile` satisfies a request for either — see {@see Phone::typeMatches()}.
      *
-     * @param PhoneNumberType|list<PhoneNumberType> $types
+     * @param  PhoneNumberType|list<PhoneNumberType>  $types
      */
     public function type(PhoneNumberType|array $types): static
     {
@@ -202,7 +202,7 @@ class PhoneRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * FluentRule::phone()->unique('contacts', 'phone', fn ($rule) => $rule->ignore($id));
      * ```
      *
-     * @param (Closure(UniquePhone): void)|null $callback Receives the rule, for `ignore()`
+     * @param  (Closure(UniquePhone): void)|null  $callback  Receives the rule, for `ignore()`
      */
     public function unique(string $table, ?string $column = null, ?Closure $callback = null, ?string $message = null): static
     {

@@ -6,9 +6,9 @@ namespace Simtabi\Laranail\Validation;
 
 use Closure;
 use Simtabi\Laranail\Validation\FastCheck\CoreValueCompiler;
-use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 use Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler;
 use Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler;
+use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 
 /**
  * Thin dispatcher over per-family compilers under {@see FastCheck}.

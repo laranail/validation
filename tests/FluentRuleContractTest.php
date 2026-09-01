@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\FluentRule;
 
 // =========================================================================
 // FluentRuleContract — medium-contract marker interface implemented by
@@ -74,8 +74,8 @@ it('end-to-end: validation works through the FluentRuleContract type alias', fun
     // `array<string, FluentRuleContract>` instead of a concrete-type union.
     /** @var array<string, FluentRuleContract> $rules */
     $rules = [
-        'name'  => FluentRule::string()->required()->min(2),
-        'age'   => FluentRule::numeric()->nullable()->integer()->min(0),
+        'name' => FluentRule::string()->required()->min(2),
+        'age' => FluentRule::numeric()->nullable()->integer()->min(0),
         'email' => FluentRule::email()->required(),
         'agree' => FluentRule::accepted(),
     ];

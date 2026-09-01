@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Translation\Translator;
-use Simtabi\Laranail\Validation\Contracts\TermList;
 use Illuminate\Translation\PotentiallyTranslatedString;
+use Simtabi\Laranail\Validation\Contracts\TermList;
 use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 
 /**
@@ -14,8 +14,8 @@ use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
  * test is about the MATCHING rather than about any particular vocabulary.
  */
 /**
- * @param list<string> $terms
- * @param list<string> $allowed
+ * @param  list<string>  $terms
+ * @param  list<string>  $allowed
  */
 function termList(array $terms, array $allowed = []): NoProfanity
 {
@@ -138,7 +138,7 @@ it('does not hang on input designed to make it backtrack', function (): void {
     // possessive and matches a disjoint class from the character repeats, so
     // the two never compete for the same input.
     $rule = termList(['badger'], allowed: ['badgerline']);
-    $hostile = str_repeat('b', 20000) . str_repeat('.', 20000) . str_repeat('a', 20000);
+    $hostile = str_repeat('b', 20000).str_repeat('.', 20000).str_repeat('a', 20000);
 
     $start = microtime(true);
     $rule->containsTerm($hostile);

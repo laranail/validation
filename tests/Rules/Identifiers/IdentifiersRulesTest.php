@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
 use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
 use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
 
 // =========================================================================
 // IMEI
@@ -118,7 +118,7 @@ it('resists catastrophic backtracking', function (): void {
     // is the shape that usually signals a ReDoS. Measure rather than assume:
     // a vulnerable pattern takes exponential time on a long almost-matching
     // prerelease, so anything near-instant here rules it out.
-    $pathological = '1.0.0-' . str_repeat('a.', 5000) . '!';
+    $pathological = '1.0.0-'.str_repeat('a.', 5000).'!';
 
     $start = hrtime(true);
     $result = ruleAccepts(new SemVer, $pathological);

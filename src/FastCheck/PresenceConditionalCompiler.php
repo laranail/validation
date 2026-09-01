@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\FastCheck;
 
 use Closure;
-use Simtabi\Laranail\Validation\FastCheck\Shared\LaravelEmptiness;
 use Simtabi\Laranail\Validation\FastCheck\Shared\ItemAwareBranchBuilder;
+use Simtabi\Laranail\Validation\FastCheck\Shared\LaravelEmptiness;
 
 /**
  * Compiles rule strings that contain presence conditionals —
@@ -95,8 +95,8 @@ final class PresenceConditionalCompiler
      * A field is "present" by Laravel's `validateRequired` criteria: not null,
      * not whitespace-only string, not empty array/Countable.
      *
-     * @param list<string> $fields
-     * @param array<string, mixed> $item
+     * @param  list<string>  $fields
+     * @param  array<string, mixed>  $item
      */
     private static function presenceConditionActive(string $type, array $fields, array $item): bool
     {
@@ -106,11 +106,11 @@ final class PresenceConditionalCompiler
         }
 
         return match ($type) {
-            'required_with'        => in_array(true, $present, true),
-            'required_without'     => in_array(false, $present, true),
-            'required_with_all'    => ! in_array(false, $present, true),
+            'required_with' => in_array(true, $present, true),
+            'required_without' => in_array(false, $present, true),
+            'required_with_all' => ! in_array(false, $present, true),
             'required_without_all' => ! in_array(true, $present, true),
-            default                => false,
+            default => false,
         };
     }
 }

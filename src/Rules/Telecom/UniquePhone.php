@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Telecom;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Database\DatabaseManager;
-use Simtabi\Laranail\Phone\PhoneFormatter;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
+use RuntimeException;
+use Simtabi\Laranail\Phone\PhoneFormatter;
 
 /**
  * Uniqueness for a phone column, compared in E.164 rather than as typed.
@@ -39,10 +39,10 @@ final class UniquePhone implements DataAwareRule, ValidationRule
     private string $ignoreColumn = 'id';
 
     /**
-     * @param string $table The table to search
-     * @param string $column The column holding E.164
-     * @param string|null $country ISO 3166-1 alpha-2 hint for parsing bare national input
-     * @param string|null $countryField A sibling field to read that hint from instead
+     * @param  string  $table  The table to search
+     * @param  string  $column  The column holding E.164
+     * @param  string|null  $country  ISO 3166-1 alpha-2 hint for parsing bare national input
+     * @param  string|null  $countryField  A sibling field to read that hint from instead
      */
     public function __construct(
         private readonly string $table,
@@ -67,7 +67,7 @@ final class UniquePhone implements DataAwareRule, ValidationRule
     }
 
     /**
-     * @param array<array-key, mixed> $data
+     * @param  array<array-key, mixed>  $data
      */
     public function setData(array $data): static
     {
@@ -131,8 +131,8 @@ final class UniquePhone implements DataAwareRule, ValidationRule
         if (! class_exists(PhoneFormatter::class)) {
             throw new RuntimeException(
                 'The phone rules require laranail/phone. Install it with `composer require laranail/phone`. '
-                . "It is a suggested rather than a required dependency because it carries libphonenumber's "
-                . 'numbering-plan metadata, which a project validating only strings and dates should not have to install.',
+                ."It is a suggested rather than a required dependency because it carries libphonenumber's "
+                .'numbering-plan metadata, which a project validating only strings and dates should not have to install.',
             );
         }
 

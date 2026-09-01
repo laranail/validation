@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Exceptions\CannotExtendListShapedEach;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Phase 1 — ArrayRule::addEachRule / mergeEachRules.

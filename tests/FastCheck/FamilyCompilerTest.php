@@ -6,9 +6,9 @@ namespace Simtabi\Laranail\Validation\Tests\FastCheck;
 
 use Closure;
 use Simtabi\Laranail\Validation\FastCheck\CoreValueCompiler;
-use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 use Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler;
 use Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler;
+use Simtabi\Laranail\Validation\FastCheck\ProhibitedCompiler;
 
 it('CoreValueCompiler returns null for rule strings it does not handle', function (): void {
     expect(CoreValueCompiler::compile('prohibited'))->toBeNull()

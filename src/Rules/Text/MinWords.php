@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Text;
 
 use Closure;
-use LogicException;
 use Illuminate\Contracts\Validation\ValidationRule;
+use LogicException;
 
 /**
  * At least `$min` words — the usual guard on a free-text field that must be

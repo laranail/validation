@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
 use Simtabi\Laranail\Validation\Rules\Text\MaxWords;
 use Simtabi\Laranail\Validation\Rules\Text\MinWords;
-use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
 use Simtabi\Laranail\Validation\Rules\Text\Salutation;
 
 // =========================================================================

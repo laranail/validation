@@ -39,11 +39,11 @@ it('rejects non-string, non-integer values', function (string $ruleClass, mixed 
     expect(ruleAccepts(new $ruleClass, $value))->toBeFalse();
 })->with([
     'luhn array' => [Luhn::class, ['x']],
-    'luhn bool'  => [Luhn::class, true],
+    'luhn bool' => [Luhn::class, true],
     'iban array' => [Iban::class, ['x']],
-    'iban int'   => [Iban::class, 12345],
+    'iban int' => [Iban::class, 12345],
     'isin array' => [Isin::class, ['x']],
-    'bic array'  => [Bic::class, ['x']],
+    'bic array' => [Bic::class, ['x']],
 ]);
 
 it('leaves an empty value to required, as Laravel does', function (): void {

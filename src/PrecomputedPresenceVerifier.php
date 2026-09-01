@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Stringable;
-use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\DatabasePresenceVerifierInterface;
+use Illuminate\Validation\PresenceVerifierInterface;
+use Stringable;
 
 /**
  * A presence verifier that returns pre-computed results from batch queries.
@@ -36,7 +36,7 @@ final class PrecomputedPresenceVerifier implements DatabasePresenceVerifierInter
      * Values are cast to strings for loose comparison matching database behavior
      * (databases do implicit type coercion on WHERE column = value).
      *
-     * @param array<int, mixed> $values Values that exist in the database
+     * @param  array<int, mixed>  $values  Values that exist in the database
      */
     public function addLookup(string $table, string $column, array $values): void
     {
@@ -54,13 +54,13 @@ final class PrecomputedPresenceVerifier implements DatabasePresenceVerifierInter
             }
         }
 
-        $this->lookups[$table . ':' . $column] = $map;
+        $this->lookups[$table.':'.$column] = $map;
     }
 
     /** @param  array<mixed>  $extra */
     public function getCount(mixed $collection, mixed $column, mixed $value, mixed $excludeId = null, mixed $idColumn = null, array $extra = []): int
     {
-        $key = $collection . ':' . $column;
+        $key = $collection.':'.$column;
 
         if (! isset($this->lookups[$key])) {
             if ($this->fallback instanceof PresenceVerifierInterface) {
@@ -74,12 +74,12 @@ final class PrecomputedPresenceVerifier implements DatabasePresenceVerifierInter
     }
 
     /**
-     * @param array<int|string, mixed> $values
-     * @param array<mixed> $extra
+     * @param  array<int|string, mixed>  $values
+     * @param  array<mixed>  $extra
      */
     public function getMultiCount(mixed $collection, mixed $column, array $values, array $extra = []): int
     {
-        $key = $collection . ':' . $column;
+        $key = $collection.':'.$column;
 
         if (! isset($this->lookups[$key])) {
             if ($this->fallback instanceof PresenceVerifierInterface) {

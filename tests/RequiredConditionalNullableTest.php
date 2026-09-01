@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Validation\Rule;
-use Simtabi\Laranail\Validation\RuleSet;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Regression matrix: a conditional-required modifier combined with nullable()
@@ -73,21 +73,21 @@ function conditionalRequiredFamilies(): array
 
         // ---- field-value string forms -----------------------------------
         ['requiredIf(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredIf('role', 'admin'),
-            'required_if:role,admin', [['active', ['role'                                => 'admin']], ['inactive', ['role' => 'guest']]]],
+            'required_if:role,admin', [['active', ['role' => 'admin']], ['inactive', ['role' => 'guest']]]],
         ['requiredUnless(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredUnless('role', 'admin'),
-            'required_unless:role,admin', [['active', ['role'                                => 'guest']], ['inactive', ['role' => 'admin']]]],
+            'required_unless:role,admin', [['active', ['role' => 'guest']], ['inactive', ['role' => 'admin']]]],
         ['requiredWith(other)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredWith('other'),
-            'required_with:other', [['active', ['other'                               => 'y']], ['inactive', []]]],
+            'required_with:other', [['active', ['other' => 'y']], ['inactive', []]]],
         ['requiredWithAll(a,b)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredWithAll('a', 'b'),
-            'required_with_all:a,b', [['active', ['a'                                  => 1, 'b' => 2]], ['inactive', ['a' => 1]]]],
+            'required_with_all:a,b', [['active', ['a' => 1, 'b' => 2]], ['inactive', ['a' => 1]]]],
         ['requiredWithout(other)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredWithout('other'),
-            'required_without:other', [['active', []], ['inactive', ['other'             => 'y']]]],
+            'required_without:other', [['active', []], ['inactive', ['other' => 'y']]]],
         ['requiredWithoutAll(a,b)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredWithoutAll('a', 'b'),
-            'required_without_all:a,b', [['active', []], ['inactive', ['a'                => 1]]]],
+            'required_without_all:a,b', [['active', []], ['inactive', ['a' => 1]]]],
         ['requiredIfAccepted(terms)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredIfAccepted('terms'),
-            'required_if_accepted:terms', [['active', ['terms'                              => 'yes']], ['inactive', ['terms' => 'no']]]],
+            'required_if_accepted:terms', [['active', ['terms' => 'yes']], ['inactive', ['terms' => 'no']]]],
         ['requiredIfDeclined(terms)', static fn (FluentRuleContract $r): FluentRuleContract => $r->requiredIfDeclined('terms'),
-            'required_if_declined:terms', [['active', ['terms'                              => 'no']], ['inactive', ['terms' => 'yes']]]],
+            'required_if_declined:terms', [['active', ['terms' => 'no']], ['inactive', ['terms' => 'yes']]]],
     ];
 }
 
@@ -99,10 +99,10 @@ function conditionalRequiredFamilies(): array
 function conditionalFieldValueStates(): array
 {
     return [
-        'absent'       => FIELD_ABSENT,
-        'null'         => null,
+        'absent' => FIELD_ABSENT,
+        'null' => null,
         'empty-string' => '',
-        'valid'        => 'x',
+        'valid' => 'x',
     ];
 }
 
@@ -123,23 +123,23 @@ function presenceForcingFamilies(): array
         ['present', static fn (FluentRuleContract $r): FluentRuleContract => $r->present(),
             'present', [['always', []]]],
         ['presentIf(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->presentIf('role', 'admin'),
-            'present_if:role,admin', [['trigger', ['role'                               => 'admin']], ['no-trigger', ['role' => 'guest']]]],
+            'present_if:role,admin', [['trigger', ['role' => 'admin']], ['no-trigger', ['role' => 'guest']]]],
         ['presentUnless(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->presentUnless('role', 'admin'),
-            'present_unless:role,admin', [['trigger', ['role'                               => 'guest']], ['no-trigger', ['role' => 'admin']]]],
+            'present_unless:role,admin', [['trigger', ['role' => 'guest']], ['no-trigger', ['role' => 'admin']]]],
         ['presentWith(other)', static fn (FluentRuleContract $r): FluentRuleContract => $r->presentWith('other'),
-            'present_with:other', [['trigger', ['other'                              => 'y']], ['no-trigger', []]]],
+            'present_with:other', [['trigger', ['other' => 'y']], ['no-trigger', []]]],
         ['presentWithAll(a,b)', static fn (FluentRuleContract $r): FluentRuleContract => $r->presentWithAll('a', 'b'),
-            'present_with_all:a,b', [['trigger', ['a'                                 => 1, 'b' => 2]], ['no-trigger', ['a' => 1]]]],
+            'present_with_all:a,b', [['trigger', ['a' => 1, 'b' => 2]], ['no-trigger', ['a' => 1]]]],
         ['missing', static fn (FluentRuleContract $r): FluentRuleContract => $r->missing(),
             'missing', [['always', []]]],
         ['missingIf(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->missingIf('role', 'admin'),
-            'missing_if:role,admin', [['trigger', ['role'                               => 'admin']], ['no-trigger', ['role' => 'guest']]]],
+            'missing_if:role,admin', [['trigger', ['role' => 'admin']], ['no-trigger', ['role' => 'guest']]]],
         ['missingUnless(role,admin)', static fn (FluentRuleContract $r): FluentRuleContract => $r->missingUnless('role', 'admin'),
-            'missing_unless:role,admin', [['trigger', ['role'                               => 'guest']], ['no-trigger', ['role' => 'admin']]]],
+            'missing_unless:role,admin', [['trigger', ['role' => 'guest']], ['no-trigger', ['role' => 'admin']]]],
         ['missingWith(other)', static fn (FluentRuleContract $r): FluentRuleContract => $r->missingWith('other'),
-            'missing_with:other', [['trigger', ['other'                              => 'y']], ['no-trigger', []]]],
+            'missing_with:other', [['trigger', ['other' => 'y']], ['no-trigger', []]]],
         ['missingWithAll(a,b)', static fn (FluentRuleContract $r): FluentRuleContract => $r->missingWithAll('a', 'b'),
-            'missing_with_all:a,b', [['trigger', ['a'                                 => 1, 'b' => 2]], ['no-trigger', ['a' => 1]]]],
+            'missing_with_all:a,b', [['trigger', ['a' => 1, 'b' => 2]], ['no-trigger', ['a' => 1]]]],
 
         // Prohibited family — excluded from the presence-forcing set on purpose:
         // it is satisfied by an empty/null value, so the nullable short-circuit
@@ -156,8 +156,7 @@ function presenceForcingFamilies(): array
 /**
  * Expand a family list into a flat, labelled case map.
  *
- * @param list<array{0:string,1:Closure,2:string|object,3:list<array{0:string,1:array<string,mixed>}>}> $families
- *
+ * @param  list<array{0:string,1:Closure,2:string|object,3:list<array{0:string,1:array<string,mixed>}>}>  $families
  * @return array<string, array{native: string|object, nullable: bool, data: array<string, mixed>, modifier: Closure}>
  */
 function expandNullableCases(array $families): array
@@ -179,9 +178,9 @@ function expandNullableCases(array $families): array
                     $label = "{$familyLabel} | {$nullableLabel} | {$contextLabel} | {$valueLabel}";
 
                     $cases[$label] = [
-                        'native'   => $native,
+                        'native' => $native,
                         'nullable' => $withNullable,
-                        'data'     => $data,
+                        'data' => $data,
                         'modifier' => $modifier,
                     ];
                 }
@@ -239,7 +238,7 @@ function buildConditionalRule(Closure $modifier, bool $nullable): FluentRuleCont
  * self-validation (the bug site) and the compiled HasFluentRules pipeline —
  * and that both match native Laravel. Each path gets a fresh rule instance.
  *
- * @param array{native: string|object, nullable: bool, data: array<string, mixed>, modifier: Closure} $case
+ * @param  array{native: string|object, nullable: bool, data: array<string, mixed>, modifier: Closure}  $case
  */
 function assertNullableParityAcrossPaths(array $case): void
 {
@@ -277,11 +276,11 @@ it('requiredIf(true)->nullable() enforces the requirement', function (mixed $val
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'missing'       => [null, false, true],
-    'null'          => [null, true, true],
-    'empty string'  => ['', true, true],
+    'missing' => [null, false, true],
+    'null' => [null, true, true],
+    'empty string' => ['', true, true],
     'invalid email' => ['nope', true, true],
-    'valid email'   => ['a@b.com', true, false],
+    'valid email' => ['a@b.com', true, false],
 ]);
 
 it('requiredIf(false)->nullable() stays optional', function (mixed $value, bool $present, bool $shouldFail): void {
@@ -291,11 +290,11 @@ it('requiredIf(false)->nullable() stays optional', function (mixed $value, bool 
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'missing'                        => [null, false, false],
-    'null'                           => [null, true, false],
-    'empty string'                   => ['', true, false],
+    'missing' => [null, false, false],
+    'null' => [null, true, false],
+    'empty string' => ['', true, false],
     'invalid email still fails type' => ['nope', true, true],
-    'valid email'                    => ['a@b.com', true, false],
+    'valid email' => ['a@b.com', true, false],
 ]);
 
 it('string-form requiredWith->nullable() enforces when the trigger is present', function (array $data, bool $shouldFail): void {
@@ -305,11 +304,11 @@ it('string-form requiredWith->nullable() enforces when the trigger is present', 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
     'trigger present, field missing' => [['other' => 'y'], true],
-    'trigger present, field null'    => [['other' => 'y', 'field' => null], true],
-    'trigger present, field empty'   => [['other' => 'y', 'field' => ''], true],
-    'trigger present, field set'     => [['other' => 'y', 'field' => 'x'], false],
-    'trigger absent, field missing'  => [[], false],
-    'trigger absent, field null'     => [['field' => null], false],
+    'trigger present, field null' => [['other' => 'y', 'field' => null], true],
+    'trigger present, field empty' => [['other' => 'y', 'field' => ''], true],
+    'trigger present, field set' => [['other' => 'y', 'field' => 'x'], false],
+    'trigger absent, field missing' => [[], false],
+    'trigger absent, field null' => [['field' => null], false],
 ]);
 
 it('string-form requiredIfAccepted->nullable() enforces when accepted', function (array $data, bool $shouldFail): void {
@@ -318,11 +317,11 @@ it('string-form requiredIfAccepted->nullable() enforces when accepted', function
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'accepted, sig missing'     => [['terms' => 'yes'], true],
-    'accepted, sig null'        => [['terms' => 'yes', 'sig' => null], true],
-    'accepted, sig set'         => [['terms' => 'yes', 'sig' => 'signed'], false],
+    'accepted, sig missing' => [['terms' => 'yes'], true],
+    'accepted, sig null' => [['terms' => 'yes', 'sig' => null], true],
+    'accepted, sig set' => [['terms' => 'yes', 'sig' => 'signed'], false],
     'not accepted, sig missing' => [['terms' => 'no'], false],
-    'not accepted, sig null'    => [['terms' => 'no', 'sig' => null], false],
+    'not accepted, sig null' => [['terms' => 'no', 'sig' => null], false],
 ]);
 
 // -------------------------------------------------------------------------
@@ -358,8 +357,8 @@ it('present()->nullable() requires the key but allows a null value', function (a
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'key absent'         => [[], true],
-    'key present, null'  => [['field' => null], false],
+    'key absent' => [[], true],
+    'key present, null' => [['field' => null], false],
     'key present, value' => [['field' => 'x'], false],
 ]);
 
@@ -369,8 +368,8 @@ it('filled()->nullable() rejects a present-null value', function (array $data, b
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'key absent'         => [[], false],
-    'key present, null'  => [['field' => null], true],
+    'key absent' => [[], false],
+    'key present, null' => [['field' => null], true],
     'key present, empty' => [['field' => ''], true],
     'key present, value' => [['field' => 'x'], false],
 ]);
@@ -381,8 +380,8 @@ it('missing()->nullable() requires the key to be absent', function (array $data,
 
     expect($validator->fails())->toBe($shouldFail);
 })->with([
-    'key absent'         => [[], false],
-    'key present, null'  => [['field' => null], true],
+    'key absent' => [[], false],
+    'key present, null' => [['field' => null], true],
     'key present, value' => [['field' => 'x'], true],
 ]);
 
@@ -398,9 +397,9 @@ it('requiredArrayKeys()->nullable() is not treated as presence-forcing', functio
         ->and(makeValidator($data, ['field' => $rule])->fails())->toBe($shouldFail)
         ->and(RuleSet::from(['field' => $rule])->check($data)->fails())->toBe($shouldFail);
 })->with([
-    'null value'                 => [['field' => null], false],
-    'missing field'              => [[], false],
-    'valid array'                => [['field' => ['name' => 'x']], false],
+    'null value' => [['field' => null], false],
+    'missing field' => [[], false],
+    'valid array' => [['field' => ['name' => 'x']], false],
     'array missing required key' => [['field' => ['other' => 'x']], true],
 ]);
 
@@ -424,11 +423,11 @@ function nestedNullableCases(): array
     $eachRequiredNative = ['obj' => ['nullable', 'array'], 'obj.*.id' => ['integer', 'required']];
 
     return [
-        'children required, parent null'        => [$childrenRequired, $childrenRequiredNative, ['obj' => null]],
-        'children required, parent absent'      => [$childrenRequired, $childrenRequiredNative, []],
-        'children required, parent valid'       => [$childrenRequired, $childrenRequiredNative, ['obj' => ['id' => 1]]],
+        'children required, parent null' => [$childrenRequired, $childrenRequiredNative, ['obj' => null]],
+        'children required, parent absent' => [$childrenRequired, $childrenRequiredNative, []],
+        'children required, parent valid' => [$childrenRequired, $childrenRequiredNative, ['obj' => ['id' => 1]]],
         'children required, parent missing key' => [$childrenRequired, $childrenRequiredNative, ['obj' => ['other' => 1]]],
-        'children nullable child, parent null'  => [
+        'children nullable child, parent null' => [
             static fn (): FluentRuleContract => FluentRule::array()->nullable()->children(['id' => FluentRule::integer()->nullable()]),
             ['obj' => ['nullable', 'array'], 'obj.id' => ['integer', 'nullable']],
             ['obj' => null],
@@ -438,9 +437,9 @@ function nestedNullableCases(): array
             ['obj' => ['present', 'nullable', 'array'], 'obj.id' => ['integer', 'required']],
             ['obj' => null],
         ],
-        'each required, parent null'         => [$eachRequired, $eachRequiredNative, ['obj' => null]],
-        'each required, parent empty array'  => [$eachRequired, $eachRequiredNative, ['obj' => []]],
-        'each required, parent valid'        => [$eachRequired, $eachRequiredNative, ['obj' => [['id' => 1]]]],
+        'each required, parent null' => [$eachRequired, $eachRequiredNative, ['obj' => null]],
+        'each required, parent empty array' => [$eachRequired, $eachRequiredNative, ['obj' => []]],
+        'each required, parent valid' => [$eachRequired, $eachRequiredNative, ['obj' => [['id' => 1]]]],
         'each required, element missing key' => [$eachRequired, $eachRequiredNative, ['obj' => [['other' => 1]]]],
     ];
 }

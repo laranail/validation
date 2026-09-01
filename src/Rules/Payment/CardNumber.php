@@ -7,8 +7,8 @@ namespace Simtabi\Laranail\Validation\Rules\Payment;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
-use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
+use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
 
 /**
  * A payment card number: brand identified by IIN range (via the
@@ -36,7 +36,7 @@ use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 final class CardNumber implements ValidationRule
 {
     /**
-     * @param list<string>|null $brands Accepted brand slugs; null accepts the whole catalogue.
+     * @param  list<string>|null  $brands  Accepted brand slugs; null accepts the whole catalogue.
      */
     public function __construct(
         private readonly ?array $brands = null,
@@ -99,7 +99,7 @@ final class CardNumber implements ValidationRule
         if (! in_array(strlen($digits), $brand->lengths, true)) {
             $this->fail($fail, 'card_number_length', [
                 'lengths' => implode(' or ', $brand->lengths),
-                'brand'   => $brand->displayName,
+                'brand' => $brand->displayName,
             ]);
 
             return;
@@ -116,11 +116,11 @@ final class CardNumber implements ValidationRule
     }
 
     /**
-     * @param Closure(string): PotentiallyTranslatedString $fail
-     * @param array<string, string> $parameters
+     * @param  Closure(string): PotentiallyTranslatedString  $fail
+     * @param  array<string, string>  $parameters
      */
     private function fail(Closure $fail, string $key, array $parameters = []): void
     {
-        $fail('laranail/validation::validation.' . $key)->translate($parameters);
+        $fail('laranail/validation::validation.'.$key)->translate($parameters);
     }
 }

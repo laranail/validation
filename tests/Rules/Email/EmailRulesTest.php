@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
-use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
-use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
-use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
+use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
 use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
+use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 
 /**
  * A list that answers yes to exactly the entries given.
@@ -19,7 +19,7 @@ use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
  * disposable and role rules — and so the tests exercise the same seam
  * laranail/email will use to swap in the real implementations.
  *
- * @param list<string> $entries
+ * @param  list<string>  $entries
  */
 function fakeList(array $entries): DisposableDomainList&RoleAccountList
 {

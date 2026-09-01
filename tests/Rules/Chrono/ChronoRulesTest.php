@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Rules\Chrono\Rfc3339;
-use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
-use Simtabi\Laranail\Validation\Rules\Chrono\TimeOfDay;
-use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
 use Simtabi\Laranail\Validation\Rules\Chrono\DateInterval;
-use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
 use Simtabi\Laranail\Validation\Rules\Chrono\MaxDateDifference;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinimumAge;
+use Simtabi\Laranail\Validation\Rules\Chrono\MinuteIn;
+use Simtabi\Laranail\Validation\Rules\Chrono\Rfc3339;
+use Simtabi\Laranail\Validation\Rules\Chrono\TimeOfDay;
 use Simtabi\Laranail\Validation\Rules\Chrono\TimezoneAbbreviation;
+use Simtabi\Laranail\Validation\Rules\Chrono\UnixTimestamp;
 
 afterEach(function (): void {
     Date::setTestNow();
@@ -154,7 +154,7 @@ it('bounds the distance from a fixed reference', function (): void {
 it('reads an @-prefixed reference from a sibling field', function (): void {
     $rules = [
         'start_at' => 'required',
-        'end_at'   => [new MaxDateDifference(48, '@start_at')],
+        'end_at' => [new MaxDateDifference(48, '@start_at')],
     ];
 
     expect(Validator::make(

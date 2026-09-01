@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
-use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIs;
 use Simtabi\Laranail\Validation\Rules\Email\EmailDomainIsNot;
 use Simtabi\Laranail\Validation\Rules\Email\NotDisposableEmail;
+use Simtabi\Laranail\Validation\Rules\Email\NotRoleEmail;
 
 /**
  * The email node's own rule methods.
@@ -38,9 +38,9 @@ it('exposes each library rule under its own method', function (Closure $build, s
     expect($matching)->toHaveCount(1);
 })->with([
     'notDisposable' => [fn (EmailRule $e): EmailRule => $e->notDisposable(), NotDisposableEmail::class],
-    'notRole'       => [fn (EmailRule $e): EmailRule => $e->notRole(), NotRoleEmail::class],
-    'domainIs'      => [fn (EmailRule $e): EmailRule => $e->domainIs(['example.com']), EmailDomainIs::class],
-    'domainIsNot'   => [fn (EmailRule $e): EmailRule => $e->domainIsNot(['spam.test']), EmailDomainIsNot::class],
+    'notRole' => [fn (EmailRule $e): EmailRule => $e->notRole(), NotRoleEmail::class],
+    'domainIs' => [fn (EmailRule $e): EmailRule => $e->domainIs(['example.com']), EmailDomainIs::class],
+    'domainIsNot' => [fn (EmailRule $e): EmailRule => $e->domainIsNot(['spam.test']), EmailDomainIsNot::class],
 ]);
 
 it('accepts a single domain as a string', function (): void {

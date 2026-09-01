@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests\Fixtures\Consumer;
 
@@ -35,7 +37,7 @@ final class AcmeServiceProvider extends ServiceProvider
         $this->app->make(RuleRegistrar::class)->register(
             EvenNumber::class,
             alias: 'acme_even',
-            factory: fn (array $parameters): EvenNumber => new EvenNumber(),
+            factory: fn (array $parameters): EvenNumber => new EvenNumber,
         );
 
         // The notification seam: route failures wherever the app's

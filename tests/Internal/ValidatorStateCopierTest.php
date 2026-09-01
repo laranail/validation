@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Illuminate\Translation\Translator;
 use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Validator as BaseValidator;
 use Simtabi\Laranail\Validation\Internal\ValidatorStateCopier;
 
 /**
- * @param array<array-key, mixed> $data
- * @param array<array-key, mixed> $rules
+ * @param  array<array-key, mixed>  $data
+ * @param  array<array-key, mixed>  $rules
  */
 function stateCopierValidator(array $data, array $rules): BaseValidator
 {

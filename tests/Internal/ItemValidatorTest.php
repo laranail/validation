@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests\Internal;
 
-use Simtabi\Laranail\Validation\Internal\ItemValidator;
-use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
 use Simtabi\Laranail\Validation\Internal\ItemErrorCollector;
+use Simtabi\Laranail\Validation\Internal\ItemRuleCompiler;
+use Simtabi\Laranail\Validation\Internal\ItemValidator;
 
 function makeItemValidator(bool $stopOnFirstFailure = false): ItemValidator
 {
@@ -105,7 +105,7 @@ it('validate applies exclude_unless conditional reduction per item', function ()
             ['type' => 'draft', 'price' => null],
         ],
         itemRules: [
-            'type'  => 'required|string',
+            'type' => 'required|string',
             'price' => [['exclude_unless', 'type', 'product'], 'required', 'numeric'],
         ],
         itemMessages: [],

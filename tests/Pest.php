@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Validation\Validator;
-use Illuminate\Translation\Translator;
 use Illuminate\Translation\ArrayLoader;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\Validator;
 use Simtabi\Laranail\Validation\FluentSchema;
 use Simtabi\Laranail\Validation\HasFluentRules;
 use Simtabi\Laranail\Validation\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
 
-require_once __DIR__ . '/../src/Testing/PestExpectations.php';
+require_once __DIR__.'/../src/Testing/PestExpectations.php';
 
 /**
- * @param array<string, mixed> $data
- * @param array<string, mixed> $rules
+ * @param  array<string, mixed>  $data
+ * @param  array<string, mixed>  $rules
  */
 function makeValidator(array $data, array $rules): Validator
 {
@@ -30,8 +30,8 @@ function makeValidator(array $data, array $rules): Validator
 }
 
 /**
- * @param array<string, mixed> $rules
- * @param array<array-key, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<array-key, mixed>  $data
  */
 function createFormRequest(array $rules, array $data): FormRequest
 {
@@ -63,8 +63,8 @@ function createFormRequest(array $rules, array $data): FormRequest
  * Build a FormRequest that defines its rules through the FluentSchema
  * builder via a schema() method, mirroring createFormRequest().
  *
- * @param Closure(FluentSchema): array<string, mixed> $schema
- * @param array<array-key, mixed> $data
+ * @param  Closure(FluentSchema): array<string, mixed>  $schema
+ * @param  array<array-key, mixed>  $data
  */
 function createSchemaFormRequest(Closure $schema, array $data): FormRequest
 {
@@ -98,9 +98,8 @@ function createSchemaFormRequest(Closure $schema, array $data): FormRequest
  *
  * @template T of FormRequest
  *
- * @param T $formRequest
- * @param array<array-key, mixed> $data
- *
+ * @param  T  $formRequest
+ * @param  array<array-key, mixed>  $data
  * @return T
  */
 function bootFormRequest(FormRequest $formRequest, array $data): FormRequest

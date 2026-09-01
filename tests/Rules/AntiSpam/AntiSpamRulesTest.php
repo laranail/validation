@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\Honeypot;
 use Simtabi\Laranail\Validation\Rules\AntiSpam\SubmissionTiming;
 
@@ -60,8 +60,8 @@ it('rejects a plain, tampered or foreign token', function (mixed $value): void {
     expect(ruleAccepts(new SubmissionTiming, $value))->toBeFalse();
 })->with([
     'plain timestamp' => '1700000000',
-    'garbage'         => 'not-a-token',
-    'non-string'      => 12345,
+    'garbage' => 'not-a-token',
+    'non-string' => 12345,
 ]);
 
 it('rejects a token from the future rather than treating it as instant', function (): void {

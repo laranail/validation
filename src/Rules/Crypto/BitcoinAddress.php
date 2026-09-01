@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Validation\Rules\Crypto;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Rules\Crypto\Support\Bech32;
 use Simtabi\Laranail\Validation\Rules\Crypto\Support\Base58Check;
+use Simtabi\Laranail\Validation\Rules\Crypto\Support\Bech32;
 
 /**
  * A Bitcoin address, checksum-verified rather than pattern-matched.

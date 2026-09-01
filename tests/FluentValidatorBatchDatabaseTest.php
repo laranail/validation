@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentValidator;
 
 // =========================================================================
@@ -20,7 +20,7 @@ function setupFluentValidatorDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver'   => 'sqlite',
+        'driver' => 'sqlite',
         'database' => ':memory:',
     ]]);
 

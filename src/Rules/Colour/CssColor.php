@@ -118,7 +118,7 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
             $branches[] = $branch;
         }
 
-        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . implode('|', $branches) . ')$/iD']]];
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:'.implode('|', $branches).')$/iD']]];
     }
 
     private static function matches(string $value, string $notation): bool
@@ -127,12 +127,12 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
             // 3, 4, 6 and 8 digits: the 4- and 8-digit forms carry alpha.
             // Anything else — 5 digits, 7 digits — is not a colour, and a
             // pattern of {3,8} would accept them.
-            self::HEX  => preg_match('/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/iD', $value) === 1,
-            self::RGB  => self::functional($value, 'rgba?', 3),
-            self::HSL  => self::functional($value, 'hsla?', 3),
-            self::HSV  => self::functional($value, 'hsva?', 3),
+            self::HEX => preg_match('/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/iD', $value) === 1,
+            self::RGB => self::functional($value, 'rgba?', 3),
+            self::HSL => self::functional($value, 'hsla?', 3),
+            self::HSV => self::functional($value, 'hsva?', 3),
             self::NAME => Names::has($value),
-            default    => false,
+            default => false,
         };
     }
 
@@ -151,10 +151,10 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
         $component = '[+-]?(?:\d+\.?\d*|\.\d+)(?:%|deg|grad|rad|turn)?';
         $separator = '(?:\s*,\s*|\s+)';
 
-        $body = $component . str_repeat($separator . $component, $components - 1);
-        $alpha = '(?:\s*(?:,|\/)\s*' . $component . ')?';
+        $body = $component.str_repeat($separator.$component, $components - 1);
+        $alpha = '(?:\s*(?:,|\/)\s*'.$component.')?';
 
-        return preg_match('/^' . $function . '\(\s*' . $body . $alpha . '\s*\)$/iD', $value) === 1;
+        return preg_match('/^'.$function.'\(\s*'.$body.$alpha.'\s*\)$/iD', $value) === 1;
     }
 
     /** The unanchored body for one notation, or null if there is no such notation. */
@@ -162,15 +162,15 @@ final readonly class CssColor implements ClientCheckable, ValidationRule
     {
         $component = '[+-]?(?:\d+\.?\d*|\.\d+)(?:%|deg|grad|rad|turn)?';
         $separator = '(?:\s*,\s*|\s+)';
-        $body = static fn (string $function): string => $function . '\(\s*' . $component
-            . str_repeat($separator . $component, 2)
-            . '(?:\s*(?:,|\/)\s*' . $component . ')?\s*\)';
+        $body = static fn (string $function): string => $function.'\(\s*'.$component
+            .str_repeat($separator.$component, 2)
+            .'(?:\s*(?:,|\/)\s*'.$component.')?\s*\)';
 
         return match ($notation) {
-            self::HEX  => '#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})',
-            self::RGB  => $body('rgba?'),
-            self::HSL  => $body('hsla?'),
-            self::HSV  => $body('hsva?'),
+            self::HEX => '#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})',
+            self::RGB => $body('rgba?'),
+            self::HSL => $body('hsla?'),
+            self::HSV => $body('hsva?'),
             self::NAME => implode('|', array_map(
                 static fn (string $name): string => preg_quote($name, '/'),
                 Names::all(),

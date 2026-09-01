@@ -21,7 +21,7 @@ final class ConditionalParityValidator extends FluentValidator
     public function __construct(array $data)
     {
         parent::__construct($data, [
-            'interactions.*.type'       => ['required', 'string'],
+            'interactions.*.type' => ['required', 'string'],
             'interactions.*.start_time' => ['required', 'numeric', 'min:0'],
             // requiredUnless against the wildcard sibling path, multi-value.
             'interactions.*.end_time' => [['required_unless', 'interactions.*.type', 'pause', 'stop'], 'numeric'],
@@ -34,18 +34,17 @@ final class ConditionalParityValidator extends FluentValidator
 }
 
 /**
- * @param array<string, mixed> $data
- *
+ * @param  array<string, mixed>  $data
  * @return list<string> sorted failing attribute keys
  */
 function nativeConditionalFailures(array $data): array
 {
     $errors = validator($data, [
-        'interactions.*.type'       => ['required', 'string'],
+        'interactions.*.type' => ['required', 'string'],
         'interactions.*.start_time' => ['required', 'numeric', 'min:0'],
-        'interactions.*.end_time'   => ['required_unless:interactions.*.type,pause,stop', 'numeric'],
-        'interactions.*.position'   => ['exclude_unless:interactions.*.type,chapter,menu', 'required', 'string'],
-        'interactions.*.image_url'  => ['required_if:interactions.*.type,image', 'nullable', 'string'],
+        'interactions.*.end_time' => ['required_unless:interactions.*.type,pause,stop', 'numeric'],
+        'interactions.*.position' => ['exclude_unless:interactions.*.type,chapter,menu', 'required', 'string'],
+        'interactions.*.image_url' => ['required_if:interactions.*.type,image', 'nullable', 'string'],
     ])->errors()->keys();
 
     sort($errors);
@@ -54,8 +53,7 @@ function nativeConditionalFailures(array $data): array
 }
 
 /**
- * @param array<string, mixed> $data
- *
+ * @param  array<string, mixed>  $data
  * @return list<string> sorted failing attribute keys
  */
 function fluentConditionalFailures(array $data): array
@@ -76,22 +74,22 @@ it('FluentValidator conditional verdicts match native Laravel', function (array 
     $data = ['interactions' => [$item]];
 
     expect(fluentConditionalFailures($data))
-        ->toBe(nativeConditionalFailures($data), 'item: ' . json_encode($item));
+        ->toBe(nativeConditionalFailures($data), 'item: '.json_encode($item));
 })->with([
     // requiredUnless: type in (pause,stop) → end_time not required
     'pause, no end_time' => [['type' => 'pause', 'start_time' => 1.0]],
-    'stop, no end_time'  => [['type' => 'stop', 'start_time' => 1.0]],
+    'stop, no end_time' => [['type' => 'stop', 'start_time' => 1.0]],
     // requiredUnless: type not in list → end_time required
     'play, no end_time → error' => [['type' => 'play', 'start_time' => 1.0]],
-    'play, with end_time'       => [['type' => 'play', 'start_time' => 1.0, 'end_time' => 2.0]],
+    'play, with end_time' => [['type' => 'play', 'start_time' => 1.0, 'end_time' => 2.0]],
     // exclude_unless: position only required for chapter/menu
     'chapter, no position → error' => [['type' => 'chapter', 'start_time' => 1.0, 'end_time' => 2.0]],
-    'chapter, with position'       => [['type' => 'chapter', 'start_time' => 1.0, 'end_time' => 2.0, 'position' => 'top']],
-    'button, no position ok'       => [['type' => 'button', 'start_time' => 1.0, 'end_time' => 2.0]],
-    'menu, no position → error'    => [['type' => 'menu', 'start_time' => 1.0, 'end_time' => 2.0]],
+    'chapter, with position' => [['type' => 'chapter', 'start_time' => 1.0, 'end_time' => 2.0, 'position' => 'top']],
+    'button, no position ok' => [['type' => 'button', 'start_time' => 1.0, 'end_time' => 2.0]],
+    'menu, no position → error' => [['type' => 'menu', 'start_time' => 1.0, 'end_time' => 2.0]],
     // required_if: image_url required when type=image
     'image, no url → error' => [['type' => 'image', 'start_time' => 1.0, 'end_time' => 2.0]],
-    'image, with url'       => [['type' => 'image', 'start_time' => 1.0, 'end_time' => 2.0, 'image_url' => 'x.png']],
+    'image, with url' => [['type' => 'image', 'start_time' => 1.0, 'end_time' => 2.0, 'image_url' => 'x.png']],
     // missing start_time always fails
     'missing start_time' => [['type' => 'pause']],
 ]);
@@ -105,9 +103,9 @@ it('FluentValidator conditional verdicts match native Laravel', function (array 
 // =========================================================================
 
 /**
- * @param array<string, mixed> $rules native rule strings keyed by wildcard path
- * @param array<string, mixed> $fluentRules
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $rules  native rule strings keyed by wildcard path
+ * @param  array<string, mixed>  $fluentRules
+ * @param  array<string, mixed>  $data
  */
 function assertFvExcludeParity(array $rules, array $fluentRules, array $data): void
 {
@@ -132,7 +130,7 @@ it('exclude_unless with null dependent matches native (defers coercion)', functi
     assertFvExcludeParity(
         ['items.*.detail' => ['exclude_unless:items.*.state,null', 'required', 'string']],
         ['items.*.detail' => [['exclude_unless', 'items.*.state', 'null'], 'required', 'string']],
-        ['items'          => [['state' => null]]], // state IS null → not excluded → required fires
+        ['items' => [['state' => null]]], // state IS null → not excluded → required fires
     );
 });
 
@@ -154,7 +152,7 @@ it('exclude_unless with associative-key wildcard matches native', function (): v
     assertFvExcludeParity(
         ['items.*.extra' => ['exclude_unless:items.*.type,a', 'required', 'string']],
         ['items.*.extra' => [['exclude_unless', 'items.*.type', 'a'], 'required', 'string']],
-        ['items'         => ['foo' => ['type' => 'a']]], // type matches → not excluded → required fires
+        ['items' => ['foo' => ['type' => 'a']]], // type matches → not excluded → required fires
     );
 });
 
@@ -165,7 +163,7 @@ it('exclude_unless on nested associative+numeric wildcard matches native', funct
     assertFvExcludeParity(
         ['items.*.rows.*.detail' => ['exclude_unless:items.*.type,keep', 'required', 'string']],
         ['items.*.rows.*.detail' => [['exclude_unless', 'items.*.type', 'keep'], 'required', 'string']],
-        ['items'                 => ['foo' => ['type' => 'drop', 'rows' => [['x' => 1]]]]],
+        ['items' => ['foo' => ['type' => 'drop', 'rows' => [['x' => 1]]]]],
     );
 });
 
@@ -179,9 +177,9 @@ it('deferred exclude_if does not leak the excluded field into validated()', func
     $data = ['items' => [['flag' => true, 'name' => 'present', 'label' => 'ok']]];
 
     $rules = static fn (mixed $excludeIf): array => [
-        'items.*.flag'  => ['boolean'],
+        'items.*.flag' => ['boolean'],
         'items.*.label' => ['string'],
-        'items.*.name'  => [$excludeIf, 'string'],
+        'items.*.name' => [$excludeIf, 'string'],
     ];
 
     $native = validator($data, $rules('exclude_if:items.*.flag,true'))->validate();

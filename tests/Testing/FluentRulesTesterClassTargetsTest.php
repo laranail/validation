@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 use Illuminate\Auth\GenericUser;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\AssertionFailedError;
 use Simtabi\Laranail\Validation\Testing\FluentRulesTester;
-use Simtabi\Laranail\Validation\Tests\Fixtures\ExampleFluentValidator;
-use Simtabi\Laranail\Validation\Tests\Fixtures\UserAwareFluentFormRequest;
-use Simtabi\Laranail\Validation\Tests\Fixtures\RouteAwareFluentFormRequest;
-use Simtabi\Laranail\Validation\Tests\Fixtures\BailMaxEachFluentFormRequest;
-use Simtabi\Laranail\Validation\Tests\Fixtures\UnauthorizedFluentFormRequest;
-use Simtabi\Laranail\Validation\Tests\Fixtures\BailMaxExistsFluentFormRequest;
 use Simtabi\Laranail\Validation\Tests\Fixtures\AuthorizedEachFluentFormRequest;
+use Simtabi\Laranail\Validation\Tests\Fixtures\BailMaxEachFluentFormRequest;
+use Simtabi\Laranail\Validation\Tests\Fixtures\BailMaxExistsFluentFormRequest;
+use Simtabi\Laranail\Validation\Tests\Fixtures\ExampleFluentValidator;
+use Simtabi\Laranail\Validation\Tests\Fixtures\RouteAwareFluentFormRequest;
+use Simtabi\Laranail\Validation\Tests\Fixtures\UnauthorizedFluentFormRequest;
+use Simtabi\Laranail\Validation\Tests\Fixtures\UserAwareFluentFormRequest;
 
 // =========================================================================
 // FormRequest class-string — authorized path
@@ -60,7 +60,7 @@ it('surfaces outer-array Max rule when each() carries a batched exists rule (par
     // failsWith($f, 'max') saw an empty failed() bag.
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver'   => 'sqlite',
+        'driver' => 'sqlite',
         'database' => ':memory:',
     ]]);
 

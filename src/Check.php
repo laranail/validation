@@ -5,32 +5,32 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Rules\Net\Cidr;
-use Simtabi\Laranail\Validation\Rules\Codes\Ean;
-use Simtabi\Laranail\Validation\Rules\Text\Slug;
-use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
-use Simtabi\Laranail\Validation\Rules\Codes\Issn;
 use Illuminate\Validation\InvokableValidationRule;
 use Simtabi\Laranail\Validation\Rules\Banking\Bic;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Rules\Banking\Iban;
 use Simtabi\Laranail\Validation\Rules\Banking\Isin;
 use Simtabi\Laranail\Validation\Rules\Banking\Luhn;
+use Simtabi\Laranail\Validation\Rules\Codes\Ean;
+use Simtabi\Laranail\Validation\Rules\Codes\Isbn;
+use Simtabi\Laranail\Validation\Rules\Codes\Issn;
+use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
-use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
-use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
+use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
+use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
+use Simtabi\Laranail\Validation\Rules\Net\Cidr;
 use Simtabi\Laranail\Validation\Rules\Net\DomainName;
 use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
-use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Jwt;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Vin;
-use Simtabi\Laranail\Validation\Rules\Text\PersonName;
-use Simtabi\Laranail\Validation\Rules\Identifiers\Imei;
-use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
-use Simtabi\Laranail\Validation\Rules\Identifiers\SemVer;
+use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
+use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Simtabi\Laranail\Validation\Rules\Text\Slug;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 
 /**
  * One-off boolean guards over the rule library — `Check::iban($v)` where

@@ -61,7 +61,7 @@ final readonly class VatNumber implements ValidationRule
     ];
 
     /**
-     * @param list<string>|null $countries Accepted prefixes; null accepts every known one.
+     * @param  list<string>|null  $countries  Accepted prefixes; null accepts every known one.
      */
     public function __construct(private ?array $countries = null) {}
 
@@ -87,19 +87,19 @@ final readonly class VatNumber implements ValidationRule
             return false;
         }
 
-        if (preg_match('/^(?:' . self::PATTERNS[$country] . ')$/D', $tail) !== 1) {
+        if (preg_match('/^(?:'.self::PATTERNS[$country].')$/D', $tail) !== 1) {
             return false;
         }
 
         return match ($country) {
-            'NL'    => $this->dutch($normalised, $tail),
-            'BE'    => (int) substr($tail, 8, 2) === 97 - ((int) substr($tail, 0, 8) % 97),
-            'DE'    => $this->germanMod11x10($tail),
-            'IT'    => $this->italianLuhn($tail),
-            'SE'    => str_ends_with($tail, '01') && $this->luhnPasses(substr($tail, 0, 10)),
-            'EL'    => $this->greekPowerSum($tail),
-            'LU'    => (int) substr($tail, 6, 2) === (int) substr($tail, 0, 6) % 89,
-            'FR'    => $this->frenchKey($tail),
+            'NL' => $this->dutch($normalised, $tail),
+            'BE' => (int) substr($tail, 8, 2) === 97 - ((int) substr($tail, 0, 8) % 97),
+            'DE' => $this->germanMod11x10($tail),
+            'IT' => $this->italianLuhn($tail),
+            'SE' => str_ends_with($tail, '01') && $this->luhnPasses(substr($tail, 0, 10)),
+            'EL' => $this->greekPowerSum($tail),
+            'LU' => (int) substr($tail, 6, 2) === (int) substr($tail, 0, 6) % 89,
+            'FR' => $this->frenchKey($tail),
             default => true,
         };
     }

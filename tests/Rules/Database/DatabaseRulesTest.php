@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Database\Authorized;
 use Simtabi\Laranail\Validation\Rules\Database\ModelsExist;

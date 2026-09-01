@@ -49,7 +49,7 @@ final class BundledCurrencyDataset implements CurrencyDataset
 
     public function isSymbol(string $symbol): bool
     {
-        $this->symbols ??= CodeFile::load(__DIR__ . '/../../../resources/data/currency-symbols.txt');
+        $this->symbols ??= CodeFile::load(__DIR__.'/../../../resources/data/currency-symbols.txt');
 
         return isset($this->symbols[$symbol]);
     }
@@ -57,6 +57,6 @@ final class BundledCurrencyDataset implements CurrencyDataset
     /** @return array<string, string> */
     private function codes(): array
     {
-        return $this->codes ??= CodeFile::loadMap(__DIR__ . '/../../../resources/data/iso-4217.txt');
+        return $this->codes ??= CodeFile::loadMap(__DIR__.'/../../../resources/data/iso-4217.txt');
     }
 }

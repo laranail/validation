@@ -6,17 +6,17 @@ namespace Simtabi\Laranail\Validation\Exceptions;
 
 use ReflectionClass;
 use ReflectionMethod;
-use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 
 /**
  * Maps method names to hints pointing at the typed builder(s) that
@@ -47,16 +47,16 @@ final class TypedBuilderHint
      * factory name inserted into generated hints.
      */
     private const array TYPED_BUILDERS = [
-        StringRule::class   => 'string',
-        NumericRule::class  => 'numeric',
-        DateRule::class     => 'date',
-        ArrayRule::class    => 'array',
-        FileRule::class     => 'file',
-        ImageRule::class    => 'image',
-        BooleanRule::class  => 'boolean',
+        StringRule::class => 'string',
+        NumericRule::class => 'numeric',
+        DateRule::class => 'date',
+        ArrayRule::class => 'array',
+        FileRule::class => 'file',
+        ImageRule::class => 'image',
+        BooleanRule::class => 'boolean',
         AcceptedRule::class => 'accepted',
         PasswordRule::class => 'password',
-        EmailRule::class    => 'email',
+        EmailRule::class => 'email',
     ];
 
     /**
@@ -113,14 +113,14 @@ final class TypedBuilderHint
     private static function specialCase(string $method): ?string
     {
         return match ($method) {
-            'accepted'               => 'Use `FluentRule::accepted()` for permissive accepted values (`\'yes\'`, `\'on\'`, `\'1\'`, `true`). Avoid `FluentRule::boolean()->accepted()` — the `boolean` base rule rejects `\'yes\'`/`\'on\'`.',
-            'declined'               => "Use `FluentRule::boolean()->declined(...)` for strict boolean-only input. If HTML form values (`'no'`, `'off'`) need to pass, use `->rule('declined')` on the untyped builder instead.",
-            'size'                   => 'No `size()` method — use `->exactly(...)` on a typed builder. (This package renames Laravel\'s `size:` rule to `exactly()` for clarity.)',
+            'accepted' => 'Use `FluentRule::accepted()` for permissive accepted values (`\'yes\'`, `\'on\'`, `\'1\'`, `true`). Avoid `FluentRule::boolean()->accepted()` — the `boolean` base rule rejects `\'yes\'`/`\'on\'`.',
+            'declined' => "Use `FluentRule::boolean()->declined(...)` for strict boolean-only input. If HTML form values (`'no'`, `'off'`) need to pass, use `->rule('declined')` on the untyped builder instead.",
+            'size' => 'No `size()` method — use `->exactly(...)` on a typed builder. (This package renames Laravel\'s `size:` rule to `exactly()` for clarity.)',
             'gt', 'gte', 'lt', 'lte' => 'No `gt()`/`lt()` methods — use `FluentRule::numeric()->greaterThan(FIELD)`, `->greaterThanOrEqualTo(FIELD)`, `->lessThan(FIELD)`, `->lessThanOrEqualTo(FIELD)`.',
-            'alphaNum'               => 'No `alphaNum()` method — use `FluentRule::string()->alphaNumeric(...)`.',
-            'contains'               => 'Use `FluentRule::array()->contains(...)` (this package exposes `contains` on `array()`, not `string()`).',
-            'format'                 => 'Use `FluentRule::date()->format(...)` for date format; for string-format regex use `FluentRule::string()->regex(...)`.',
-            default                  => null,
+            'alphaNum' => 'No `alphaNum()` method — use `FluentRule::string()->alphaNumeric(...)`.',
+            'contains' => 'Use `FluentRule::array()->contains(...)` (this package exposes `contains` on `array()`, not `string()`).',
+            'format' => 'Use `FluentRule::date()->format(...)` for date format; for string-format regex use `FluentRule::string()->regex(...)`.',
+            default => null,
         };
     }
 
@@ -157,8 +157,7 @@ final class TypedBuilderHint
     }
 
     /**
-     * @param class-string $class
-     *
+     * @param  class-string  $class
      * @return array<string, true>
      */
     private static function publicInstanceMethods(string $class): array
@@ -187,7 +186,7 @@ final class TypedBuilderHint
     }
 
     /**
-     * @param list<string> $factories
+     * @param  list<string>  $factories
      */
     private static function formatFactoryList(array $factories): string
     {
@@ -202,6 +201,6 @@ final class TypedBuilderHint
 
         $last = array_pop($formatted);
 
-        return implode(', ', $formatted) . ', or ' . $last;
+        return implode(', ', $formatted).', or '.$last;
     }
 }

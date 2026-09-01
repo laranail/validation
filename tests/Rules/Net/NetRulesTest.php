@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\Rules\Net\Cidr;
-use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
-use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
-use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
+use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
+use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
 
 // =========================================================================
 // DomainName
@@ -41,8 +41,8 @@ it('rejects invalid domain names', function (string $value): void {
 ]);
 
 it('rejects a label longer than 63 characters', function (): void {
-    expect(ruleAccepts(new DomainName, str_repeat('a', 63) . '.com'))->toBeTrue()
-        ->and(ruleAccepts(new DomainName, str_repeat('a', 64) . '.com'))->toBeFalse();
+    expect(ruleAccepts(new DomainName, str_repeat('a', 63).'.com'))->toBeTrue()
+        ->and(ruleAccepts(new DomainName, str_repeat('a', 64).'.com'))->toBeFalse();
 });
 
 it('rejects a name longer than 253 characters', function (): void {
@@ -50,8 +50,8 @@ it('rejects a name longer than 253 characters', function (): void {
     // length, which is one of the reasons it is not enough on its own.
     $label = str_repeat('a', 49);                            // under the 63 label cap
 
-    $atLimit = implode('.', array_fill(0, 5, $label)) . '.com';   // 5*49 + 4 dots + 4
-    $overLimit = $atLimit . 'm';
+    $atLimit = implode('.', array_fill(0, 5, $label)).'.com';   // 5*49 + 4 dots + 4
+    $overLimit = $atLimit.'m';
 
     // Written in Pest's toHaveLength idiom deliberately: expressed as
     // strlen($x)->toBe(n), Rector's Pest set rewrites it and silently changed

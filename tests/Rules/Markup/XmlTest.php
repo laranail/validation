@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Translation\Translator;
-use Simtabi\Laranail\Validation\Rules\Markup\Xml;
 use Illuminate\Translation\PotentiallyTranslatedString;
+use Simtabi\Laranail\Validation\Rules\Markup\Xml;
 
 it('accepts well-formed XML and rejects malformed', function (): void {
     expect(ruleAccepts(new Xml, '<root><child>x</child></root>'))->toBeTrue()
@@ -47,7 +47,7 @@ it('does not expand external entities', function (): void {
 });
 
 it('validates against an XSD schema', function (): void {
-    $schema = sys_get_temp_dir() . '/laranail-validation-test.xsd';
+    $schema = sys_get_temp_dir().'/laranail-validation-test.xsd';
     file_put_contents($schema, <<<'XSD'
         <?xml version="1.0"?>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">

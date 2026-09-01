@@ -24,8 +24,8 @@ class FakeFilamentBase
     public function validate(mixed $rules = null, mixed $messages = [], mixed $attributes = []): mixed
     {
         $this->lastValidateCall = [
-            'rules'      => $rules,
-            'messages'   => is_array($messages) ? $messages : [],
+            'rules' => $rules,
+            'messages' => is_array($messages) ? $messages : [],
             'attributes' => is_array($attributes) ? $attributes : [],
         ];
 
@@ -35,9 +35,9 @@ class FakeFilamentBase
     public function validateOnly(mixed $field, mixed $rules = null, mixed $messages = [], mixed $attributes = [], mixed $dataOverrides = []): mixed
     {
         $this->lastValidateOnlyCall = [
-            'field'      => is_string($field) ? $field : '',
-            'rules'      => $rules,
-            'messages'   => is_array($messages) ? $messages : [],
+            'field' => is_string($field) ? $field : '',
+            'rules' => $rules,
+            'messages' => is_array($messages) ? $messages : [],
             'attributes' => is_array($attributes) ? $attributes : [],
         ];
 
@@ -63,8 +63,8 @@ class FakeFilamentBase
 class FakeFilamentForm
 {
     /**
-     * @param array<string, mixed> $validationRules
-     * @param array<string, string> $validationAttributes
+     * @param  array<string, mixed>  $validationRules
+     * @param  array<string, string>  $validationAttributes
      */
     public function __construct(
         private readonly array $validationRules = [],
@@ -89,9 +89,9 @@ class TestableFilamentComponent extends FakeFilamentBase
     use HasFluentValidationForFilament;
 
     /**
-     * @param array<string, mixed> $fluentRules
-     * @param array<string, mixed> $data
-     * @param list<FakeFilamentForm> $forms
+     * @param  array<string, mixed>  $fluentRules
+     * @param  array<string, mixed>  $data
+     * @param  list<FakeFilamentForm>  $forms
      */
     public function __construct(
         private array $fluentRules = [],
@@ -106,8 +106,7 @@ class TestableFilamentComponent extends FakeFilamentBase
     }
 
     /**
-     * @param array<string, mixed> $rules
-     *
+     * @param  array<string, mixed>  $rules
      * @return array<string, mixed>
      */
     public function getDataForValidation(array $rules): array

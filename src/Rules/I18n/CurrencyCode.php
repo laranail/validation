@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\I18n;
 
 use Closure;
-use LogicException;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
+use LogicException;
 use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
 
 /**
@@ -50,8 +50,8 @@ final class CurrencyCode implements ValidationRule
 
         $passes = match (true) {
             $this->numeric => $this->dataset()->isNumericCode($value),
-            $this->symbol  => $this->dataset()->isSymbol($value),
-            default        => $this->dataset()->isCode($this->caseInsensitive ? strtoupper($value) : $value),
+            $this->symbol => $this->dataset()->isSymbol($value),
+            default => $this->dataset()->isCode($this->caseInsensitive ? strtoupper($value) : $value),
         };
 
         if (! $passes) {
@@ -64,8 +64,8 @@ final class CurrencyCode implements ValidationRule
     {
         $key = match (true) {
             $this->numeric => 'laranail/validation::validation.currency_code_numeric',
-            $this->symbol  => 'laranail/validation::validation.currency_symbol',
-            default        => 'laranail/validation::validation.currency_code',
+            $this->symbol => 'laranail/validation::validation.currency_symbol',
+            default => 'laranail/validation::validation.currency_code',
         };
 
         $fail($key)->translate();

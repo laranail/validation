@@ -16,7 +16,7 @@ use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 /** @return list<class-string<ValidationRule>> */
 function liveRuleClasses(): array
 {
-    $root = dirname(__DIR__) . '/src/Rules';
+    $root = dirname(__DIR__).'/src/Rules';
     $classes = [];
 
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
@@ -25,7 +25,7 @@ function liveRuleClasses(): array
         }
 
         $relative = substr($file->getPathname(), strlen($root) + 1, -4);
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . str_replace('/', '\\', $relative);
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\'.str_replace('/', '\\', $relative);
 
         if (class_exists($class) && is_subclass_of($class, ValidationRule::class)) {
             $classes[] = $class;
@@ -39,7 +39,7 @@ function liveRuleClasses(): array
 
 it('states the real rule count in the CHANGELOG', function (): void {
     $actual = count(liveRuleClasses());
-    $prose = (string) file_get_contents(dirname(__DIR__) . '/CHANGELOG.md');
+    $prose = (string) file_get_contents(dirname(__DIR__).'/CHANGELOG.md');
 
     preg_match_all('/(\d+) rules across/', $prose, $m);
 
@@ -56,17 +56,17 @@ it('states the real rule count in the CHANGELOG', function (): void {
 it('documents every rule family with a section in the rule reference', function (): void {
     // Directory name → the reference page's heading, where they differ.
     $headings = ['AntiSpam' => 'Anti-spam', 'Vendor' => 'Vendor identifiers'];
-    $reference = (string) file_get_contents(dirname(__DIR__) . '/docs/tools/rule-library.md');
+    $reference = (string) file_get_contents(dirname(__DIR__).'/docs/tools/rule-library.md');
 
-    $entries = scandir(dirname(__DIR__) . '/src/Rules');
+    $entries = scandir(dirname(__DIR__).'/src/Rules');
     $families = array_values(array_filter(
         $entries === false ? [] : $entries,
         static fn (string $entry): bool => ! str_starts_with($entry, '.')
-            && is_dir(dirname(__DIR__) . '/src/Rules/' . $entry),
+            && is_dir(dirname(__DIR__).'/src/Rules/'.$entry),
     ));
 
     foreach ($families as $family) {
-        $heading = '## ' . ($headings[$family] ?? $family);
+        $heading = '## '.($headings[$family] ?? $family);
 
         expect(str_contains($reference, "\n{$heading}\n"))->toBeTrue(
             "src/Rules/{$family} has no \"{$heading}\" section in docs/tools/rule-library.md — the whole family is undocumented.",
@@ -75,7 +75,7 @@ it('documents every rule family with a section in the rule reference', function 
 });
 
 it('names every ClientCheckable implementer in the CHANGELOG', function (): void {
-    $prose = (string) file_get_contents(dirname(__DIR__) . '/CHANGELOG.md');
+    $prose = (string) file_get_contents(dirname(__DIR__).'/CHANGELOG.md');
 
     $implementers = array_values(array_filter(
         liveRuleClasses(),

@@ -64,7 +64,7 @@ final readonly class NationalIdentifier implements ValidationRule
             self::GB => self::britishNino($value),
             self::FR => self::frenchNir($value),
             self::VN => self::vietnameseCccd($value),
-            default  => false,
+            default => false,
         };
     }
 
@@ -86,7 +86,7 @@ final readonly class NationalIdentifier implements ValidationRule
         $digits = self::digits($value);
 
         if (strlen($digits) === 8) {
-            $digits = '0' . $digits;
+            $digits = '0'.$digits;
         }
 
         if (strlen($digits) !== 9 || $digits === '000000000') {

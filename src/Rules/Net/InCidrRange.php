@@ -38,7 +38,7 @@ final readonly class InCidrRange implements ValidationRule
     public function __construct(private array $networks) {}
 
     /**
-     * @param list<string> $networks
+     * @param  list<string>  $networks
      */
     public static function passes(mixed $value, array $networks): bool
     {
@@ -97,7 +97,7 @@ final readonly class InCidrRange implements ValidationRule
             return $address;
         }
 
-        if (! str_starts_with($packed, str_repeat("\x00", 10) . "\xff\xff")) {
+        if (! str_starts_with($packed, str_repeat("\x00", 10)."\xff\xff")) {
             return $address;
         }
 

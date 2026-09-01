@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
-use Closure;
 use BackedEnum;
-use LogicException;
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Contains;
+use Illuminate\Validation\Rules\DoesntContain;
+use Illuminate\Validation\Rules\ExcludeIf;
+use Illuminate\Validation\Rules\ExcludeUnless;
+use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\Exists;
-use Illuminate\Validation\Rules\Unique;
-use Illuminate\Validation\Rules\Contains;
-use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\ProhibitedIf;
-use Illuminate\Validation\Rules\DoesntContain;
-use Illuminate\Validation\Rules\ExcludeUnless;
-use Illuminate\Validation\Rules\RequiredUnless;
 use Illuminate\Validation\Rules\ProhibitedUnless;
+use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\RequiredUnless;
+use Illuminate\Validation\Rules\Unique;
+use LogicException;
 
 trait HasFieldModifiers
 {
@@ -132,22 +132,22 @@ trait HasFieldModifiers
 
     public function presentIf(string $field, string|int|bool|BackedEnum ...$values): static
     {
-        return $this->addRule('present_if:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('present_if:'.$field.','.self::serializeValues($values));
     }
 
     public function presentUnless(string $field, string|int|bool|BackedEnum ...$values): static
     {
-        return $this->addRule('present_unless:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('present_unless:'.$field.','.self::serializeValues($values));
     }
 
     public function presentWith(string ...$fields): static
     {
-        return $this->addRule('present_with:' . implode(',', $fields));
+        return $this->addRule('present_with:'.implode(',', $fields));
     }
 
     public function presentWithAll(string ...$fields): static
     {
-        return $this->addRule('present_with_all:' . implode(',', $fields));
+        return $this->addRule('present_with_all:'.implode(',', $fields));
     }
 
     public function prohibited(?string $message = null): static
@@ -167,22 +167,22 @@ trait HasFieldModifiers
 
     public function missingIf(string $field, string|int|bool|BackedEnum ...$values): static
     {
-        return $this->addRule('missing_if:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('missing_if:'.$field.','.self::serializeValues($values));
     }
 
     public function missingUnless(string $field, string|int|bool|BackedEnum ...$values): static
     {
-        return $this->addRule('missing_unless:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('missing_unless:'.$field.','.self::serializeValues($values));
     }
 
     public function missingWith(string ...$fields): static
     {
-        return $this->addRule('missing_with:' . implode(',', $fields));
+        return $this->addRule('missing_with:'.implode(',', $fields));
     }
 
     public function missingWithAll(string ...$fields): static
     {
-        return $this->addRule('missing_with_all:' . implode(',', $fields));
+        return $this->addRule('missing_with_all:'.implode(',', $fields));
     }
 
     public function requiredIf(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -191,7 +191,7 @@ trait HasFieldModifiers
             return $this->addRule(new RequiredIf($field));
         }
 
-        return $this->addRule('required_if:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('required_if:'.$field.','.self::serializeValues($values));
     }
 
     public function requiredUnless(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -205,37 +205,37 @@ trait HasFieldModifiers
             return $this->addRule(new RequiredUnless($field));
         }
 
-        return $this->addRule('required_unless:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('required_unless:'.$field.','.self::serializeValues($values));
     }
 
     public function requiredWith(string ...$fields): static
     {
-        return $this->addRule('required_with:' . implode(',', $fields));
+        return $this->addRule('required_with:'.implode(',', $fields));
     }
 
     public function requiredWithAll(string ...$fields): static
     {
-        return $this->addRule('required_with_all:' . implode(',', $fields));
+        return $this->addRule('required_with_all:'.implode(',', $fields));
     }
 
     public function requiredWithout(string ...$fields): static
     {
-        return $this->addRule('required_without:' . implode(',', $fields));
+        return $this->addRule('required_without:'.implode(',', $fields));
     }
 
     public function requiredWithoutAll(string ...$fields): static
     {
-        return $this->addRule('required_without_all:' . implode(',', $fields));
+        return $this->addRule('required_without_all:'.implode(',', $fields));
     }
 
     public function requiredIfAccepted(string $field, ?string $message = null): static
     {
-        return $this->addRule('required_if_accepted:' . $field, $message);
+        return $this->addRule('required_if_accepted:'.$field, $message);
     }
 
     public function requiredIfDeclined(string $field, ?string $message = null): static
     {
-        return $this->addRule('required_if_declined:' . $field, $message);
+        return $this->addRule('required_if_declined:'.$field, $message);
     }
 
     public function excludeIf(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -251,7 +251,7 @@ trait HasFieldModifiers
             return $shouldExclude ? $this->addRule('exclude') : $this;
         }
 
-        return $this->addRule('exclude_if:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('exclude_if:'.$field.','.self::serializeValues($values));
     }
 
     public function excludeUnless(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -267,17 +267,17 @@ trait HasFieldModifiers
             return $shouldExclude ? $this->addRule('exclude') : $this;
         }
 
-        return $this->addRule('exclude_unless:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('exclude_unless:'.$field.','.self::serializeValues($values));
     }
 
     public function excludeWith(string $field): static
     {
-        return $this->addRule('exclude_with:' . $field);
+        return $this->addRule('exclude_with:'.$field);
     }
 
     public function excludeWithout(string $field): static
     {
-        return $this->addRule('exclude_without:' . $field);
+        return $this->addRule('exclude_without:'.$field);
     }
 
     public function prohibitedIf(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -286,7 +286,7 @@ trait HasFieldModifiers
             return $this->addRule(new ProhibitedIf($field));
         }
 
-        return $this->addRule('prohibited_if:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('prohibited_if:'.$field.','.self::serializeValues($values));
     }
 
     public function prohibitedUnless(Closure|bool|string $field, string|int|bool|BackedEnum ...$values): static
@@ -298,22 +298,22 @@ trait HasFieldModifiers
             return $this->addRule(new ProhibitedUnless($field));
         }
 
-        return $this->addRule('prohibited_unless:' . $field . ',' . self::serializeValues($values));
+        return $this->addRule('prohibited_unless:'.$field.','.self::serializeValues($values));
     }
 
     public function prohibits(string ...$fields): static
     {
-        return $this->addRule('prohibits:' . implode(',', $fields));
+        return $this->addRule('prohibits:'.implode(',', $fields));
     }
 
     public function prohibitedIfAccepted(string $field, ?string $message = null): static
     {
-        return $this->addRule('prohibited_if_accepted:' . $field, $message);
+        return $this->addRule('prohibited_if_accepted:'.$field, $message);
     }
 
     public function prohibitedIfDeclined(string $field, ?string $message = null): static
     {
-        return $this->addRule('prohibited_if_declined:' . $field, $message);
+        return $this->addRule('prohibited_if_declined:'.$field, $message);
     }
 
     /**
@@ -328,14 +328,14 @@ trait HasFieldModifiers
      * instance — there is no defensive copy. Clone first if you need
      * isolation: `(clone $ruleSet->get($field))->rule($extra)`.
      *
-     * @param object|string|array<int, string> $rule
+     * @param  object|string|array<int, string>  $rule
      */
     public function rule(object|string|array $rule, ?string $message = null): static
     {
         if (is_array($rule)) {
             $params = array_slice($rule, 1);
 
-            return $this->addRule($params === [] ? $rule[0] : $rule[0] . ':' . implode(',', $params), $message);
+            return $this->addRule($params === [] ? $rule[0] : $rule[0].':'.implode(',', $params), $message);
         }
 
         return $this->addRule($rule, $message);
@@ -353,9 +353,9 @@ trait HasFieldModifiers
      *         fn ($r) => $r->sometimes()->max(100),
      *     )
      *
-     * @param Closure(Fluent<string, mixed>): bool $condition
-     * @param Closure(static): static|string|list<string> $rules
-     * @param Closure(static): static|string|list<string> $defaultRules
+     * @param  Closure(Fluent<string, mixed>): bool  $condition
+     * @param  Closure(static): static|string|list<string>  $rules
+     * @param  Closure(static): static|string|list<string>  $defaultRules
      */
     public function whenInput(Closure $condition, Closure|string|array $rules, Closure|string|array $defaultRules = []): static
     {
@@ -385,7 +385,7 @@ trait HasFieldModifiers
      * resolved $lastConstraint key. Throws LogicException if $message is
      * set but no rule was added (e.g. an early-return branch in a caller).
      *
-     * @param array<int, string>|string|object $rules
+     * @param  array<int, string>|string|object  $rules
      */
     protected function addRule(array|string|object $rules, ?string $message = null): static
     {
@@ -395,19 +395,19 @@ trait HasFieldModifiers
             $this->rules[] = $rules;
 
             $this->lastConstraint = match (true) {
-                $rules instanceof RequiredIf       => 'required',
-                $rules instanceof RequiredUnless   => 'required',
-                $rules instanceof ProhibitedIf     => 'prohibited',
+                $rules instanceof RequiredIf => 'required',
+                $rules instanceof RequiredUnless => 'required',
+                $rules instanceof ProhibitedIf => 'prohibited',
                 $rules instanceof ProhibitedUnless => 'prohibited',
-                $rules instanceof ExcludeIf        => 'exclude',
-                $rules instanceof ExcludeUnless    => 'exclude',
-                $rules instanceof In               => 'in',
-                $rules instanceof NotIn            => 'not_in',
-                $rules instanceof Unique           => 'unique',
-                $rules instanceof Exists           => 'exists',
-                $rules instanceof Contains         => 'contains',
-                $rules instanceof DoesntContain    => 'doesnt_contain',
-                default                            => lcfirst(class_basename($rules)),
+                $rules instanceof ExcludeIf => 'exclude',
+                $rules instanceof ExcludeUnless => 'exclude',
+                $rules instanceof In => 'in',
+                $rules instanceof NotIn => 'not_in',
+                $rules instanceof Unique => 'unique',
+                $rules instanceof Exists => 'exists',
+                $rules instanceof Contains => 'contains',
+                $rules instanceof DoesntContain => 'doesnt_contain',
+                default => lcfirst(class_basename($rules)),
             };
         } else {
             $this->constraints = array_merge($this->constraints, Arr::wrap($rules));
@@ -432,8 +432,7 @@ trait HasFieldModifiers
      * appear before type and size constraints ("required" must come
      * before "must be a string").
      *
-     * @param list<string> $constraints
-     *
+     * @param  list<string>  $constraints
      * @return list<string>
      */
     protected function reorderConstraints(array $constraints): array
@@ -458,8 +457,8 @@ trait HasFieldModifiers
         return implode(',', array_map(
             static fn (string|int|bool|BackedEnum $v): string|int => match (true) {
                 $v instanceof BackedEnum => $v->value,
-                is_bool($v)              => $v ? '1' : '0',
-                default                  => $v,
+                is_bool($v) => $v ? '1' : '0',
+                default => $v,
             },
             $values,
         ));
@@ -475,8 +474,7 @@ trait HasFieldModifiers
     }
 
     /**
-     * @param Closure(static): static|string|list<string> $rules
-     *
+     * @param  Closure(static): static|string|list<string>  $rules
      * @return string|list<string|object>
      */
     private function compileConditionalBranch(Closure|string|array $rules): string|array

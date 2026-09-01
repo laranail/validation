@@ -41,7 +41,7 @@ final readonly class EmailDomainIs implements ValidationRule
      * allow-list matcher is two chances to leave a gap, and a gap in one would
      * be a bypass in the other.
      *
-     * @param list<string> $patterns
+     * @param  list<string>  $patterns
      */
     public static function matches(string $domain, array $patterns): bool
     {

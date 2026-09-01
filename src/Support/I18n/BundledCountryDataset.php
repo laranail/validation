@@ -26,14 +26,14 @@ final class BundledCountryDataset implements CountryDataset
 
     public function isAlpha2(string $code): bool
     {
-        $this->alpha2 ??= CodeFile::load(__DIR__ . '/../../../resources/data/iso-3166-alpha2.txt');
+        $this->alpha2 ??= CodeFile::load(__DIR__.'/../../../resources/data/iso-3166-alpha2.txt');
 
         return isset($this->alpha2[$code]);
     }
 
     public function isAlpha3(string $code): bool
     {
-        $this->alpha3 ??= CodeFile::load(__DIR__ . '/../../../resources/data/iso-3166-alpha3.txt');
+        $this->alpha3 ??= CodeFile::load(__DIR__.'/../../../resources/data/iso-3166-alpha3.txt');
 
         return isset($this->alpha3[$code]);
     }

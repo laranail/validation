@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Illuminate\Validation\Validator;
 use Illuminate\Validation\ValidationRuleParser;
+use Illuminate\Validation\Validator;
 
 /**
  * Validator subclass that memoizes string-rule parsing. Behaviour-identical
@@ -68,9 +68,8 @@ class MemoizingValidator extends Validator
      * Get a rule and its parameters for a given attribute, memoizing the parse
      * of string rules. Byte-identical to the parent otherwise.
      *
-     * @param string $attribute
-     * @param string|array<array-key, mixed> $rules
-     *
+     * @param  string  $attribute
+     * @param  string|array<array-key, mixed>  $rules
      * @return array<int, mixed>|null
      */
     protected function getRule($attribute, $rules): ?array

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Acme;
 
@@ -6,7 +8,7 @@ final class FluentRule
 {
     public static function field(): self
     {
-        return new self();
+        return new self;
     }
 
     public function min(int $value): self

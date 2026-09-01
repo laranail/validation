@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use ReflectionMethod;
-use ReflectionProperty;
-use ReflectionNamedType;
 use Illuminate\Container\Container;
-use Illuminate\Validation\Validator;
-use Simtabi\Laranail\Validation\Internal\ValidatorStateCopier;
-use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\Validator;
+use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionProperty;
+use Simtabi\Laranail\Validation\Internal\PreparesOptimizedRules;
+use Simtabi\Laranail\Validation\Internal\ValidatorStateCopier;
 
 /**
  * Add this trait to a FormRequest to enable FluentRule features:
@@ -99,8 +99,8 @@ trait HasFluentRules
                 $this->container->call([$this, 'rules']),
             ),
             $hasSchema => $this->container->call([$this, 'schema']),
-            $hasRules  => $this->container->call([$this, 'rules']),
-            default    => [],
+            $hasRules => $this->container->call([$this, 'rules']),
+            default => [],
         };
 
         /** @var array<string, mixed> $data */
@@ -252,10 +252,10 @@ trait HasFluentRules
      * (extensions, container, presence verifier, excludeUnvalidatedArrayKeys)
      * without mutating the shared factory's resolver. Octane-safe.
      *
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      */
     private function makeOptimizedValidator(
         ValidationFactory $factory,

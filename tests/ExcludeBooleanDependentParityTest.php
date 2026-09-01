@@ -30,7 +30,7 @@ final class ExcludeUnlessBooleanValidator extends FluentValidator
     {
         parent::__construct($data, [
             'notify' => FluentRule::boolean(),
-            'email'  => FluentRule::string()->excludeUnless('notify', 'true')->required(),
+            'email' => FluentRule::string()->excludeUnless('notify', 'true')->required(),
         ]);
     }
 }
@@ -42,7 +42,7 @@ final class ExcludeIfBooleanValidator extends FluentValidator
     {
         parent::__construct($data, [
             'notify' => FluentRule::boolean(),
-            'email'  => FluentRule::string()->excludeIf('notify', 'true')->required(),
+            'email' => FluentRule::string()->excludeIf('notify', 'true')->required(),
         ]);
     }
 }
@@ -63,12 +63,12 @@ it('keeps exclude_unless in step with Laravel for every value boolean accepts', 
 
     expect(array_key_exists('email', $optimized))->toBe(array_key_exists('email', $vanilla));
 })->with([
-    'int one'     => 1,
-    'string one'  => '1',
-    'real true'   => true,
-    'int zero'    => 0,
+    'int one' => 1,
+    'string one' => '1',
+    'real true' => true,
+    'int zero' => 0,
     'string zero' => '0',
-    'real false'  => false,
+    'real false' => false,
 ]);
 
 it('keeps exclude_if in step with Laravel for the same values', function (mixed $notify): void {
@@ -77,12 +77,12 @@ it('keeps exclude_if in step with Laravel for the same values', function (mixed 
 
     expect(array_key_exists('email', $optimized))->toBe(array_key_exists('email', $vanilla));
 })->with([
-    'int one'     => 1,
-    'string one'  => '1',
-    'real true'   => true,
-    'int zero'    => 0,
+    'int one' => 1,
+    'string one' => '1',
+    'real true' => true,
+    'int zero' => 0,
     'string zero' => '0',
-    'real false'  => false,
+    'real false' => false,
 ]);
 
 it('still excludes when the dependent is not declared boolean', function (): void {
@@ -93,7 +93,7 @@ it('still excludes when the dependent is not declared boolean', function (): voi
 
     $vanilla = Validator::make($data, [
         'notify' => ['string'],
-        'email'  => ['exclude_unless:notify,true', 'required', 'string'],
+        'email' => ['exclude_unless:notify,true', 'required', 'string'],
     ])->validate();
 
     expect($vanilla)->not->toHaveKey('email');

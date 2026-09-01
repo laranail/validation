@@ -59,8 +59,7 @@ final class ConditionalEvaluationPhase
      * rule shape. Accepts the Validator's untyped `$rules` array directly;
      * non-string keys are filtered inside.
      *
-     * @param array<array-key, mixed> $rules
-     *
+     * @param  array<array-key, mixed>  $rules
      * @return array<string, list<array{action: string, field: string, values: list<string>}>>
      */
     public function indexConditionalAttrs(array $rules): array
@@ -98,13 +97,13 @@ final class ConditionalEvaluationPhase
      * because `Validator::getValue()` is protected — the closure must be
      * constructed inside the validator subclass to capture scope.
      *
-     * @param list<array{action: string, field: string, values: list<string>}> $tuples
-     * @param Closure(string): mixed $getValue
-     * @param array<array-key, mixed> $rules The validator's parsed rules, read
-     *                                       only to learn whether a dependent
-     *                                       is declared `boolean`. Defaults to
-     *                                       none, which simply skips the
-     *                                       conversion.
+     * @param  list<array{action: string, field: string, values: list<string>}>  $tuples
+     * @param  Closure(string): mixed  $getValue
+     * @param  array<array-key, mixed>  $rules  The validator's parsed rules, read
+     *                                          only to learn whether a dependent
+     *                                          is declared `boolean`. Defaults to
+     *                                          none, which simply skips the
+     *                                          conversion.
      */
     public function evaluate(string $attribute, array $tuples, Closure $getValue, array $rules = []): ConditionalVerdict
     {

@@ -28,7 +28,7 @@ abstract class AbstractConditionalReducer
      * reducer recognises? Used by callers to decide whether the per-item
      * reducer path must engage.
      *
-     * @param array<string, mixed> $itemRules
+     * @param  array<string, mixed>  $itemRules
      */
     public static function hasAny(array $itemRules): bool
     {
@@ -57,7 +57,7 @@ abstract class AbstractConditionalReducer
      * Subclasses' `apply()` methods bind their per-call context (field,
      * itemData, etc.) into a closure and hand it here.
      *
-     * @param Closure(string): ?string $rewriteOne
+     * @param  Closure(string): ?string  $rewriteOne
      */
     protected static function applyTemplate(mixed $rule, Closure $rewriteOne): mixed
     {
@@ -105,7 +105,7 @@ abstract class AbstractConditionalReducer
      * rewrite path doesn't bypass a `{field}.{rule}`-style override at
      * message-formatting time. Identical across all conditional reducers.
      *
-     * @param array<string, string> $itemMessages
+     * @param  array<string, string>  $itemMessages
      */
     protected static function hasCustomMessage(string $field, string $ruleName, array $itemMessages): bool
     {
@@ -115,8 +115,8 @@ abstract class AbstractConditionalReducer
         // Match any message whose key equals `{field}.{rule}` or ends with
         // `.{field}.{rule}` — covers bare-field, wildcard-prefixed, and
         // any parent-prefixed variant.
-        $suffix = '.' . $field . '.' . $ruleName;
-        $exactKey = $field . '.' . $ruleName;
+        $suffix = '.'.$field.'.'.$ruleName;
+        $exactKey = $field.'.'.$ruleName;
         foreach (array_keys($itemMessages) as $key) {
             $key = (string) $key;
             if ($key === $exactKey || str_ends_with($key, $suffix)) {
@@ -125,7 +125,7 @@ abstract class AbstractConditionalReducer
         }
 
         if (function_exists('trans')) {
-            $translatorKey = 'validation.custom.' . $field . '.' . $ruleName;
+            $translatorKey = 'validation.custom.'.$field.'.'.$ruleName;
             $translated = trans($translatorKey);
             if (is_string($translated) && $translated !== $translatorKey) {
                 return true;
@@ -137,10 +137,10 @@ abstract class AbstractConditionalReducer
             // `validation.custom` namespace — mirror Validator::getCustomMessageFromTranslator.
             $custom = trans('validation.custom');
             if (is_array($custom)) {
-                $shortKey = $field . '.' . $ruleName;
+                $shortKey = $field.'.'.$ruleName;
                 foreach (array_keys(Arr::dot($custom)) as $customKey) {
                     $customKey = (string) $customKey;
-                    if ($customKey === $shortKey || str_ends_with($customKey, '.' . $shortKey)) {
+                    if ($customKey === $shortKey || str_ends_with($customKey, '.'.$shortKey)) {
                         return true;
                     }
                 }

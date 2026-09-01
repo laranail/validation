@@ -39,7 +39,7 @@ final readonly class DomainName implements ValidationRule
     private const string NR_LDH_LABEL = '/^(?!-)[a-z0-9-]{1,63}(?<!-)$/iD';
 
     /**
-     * @param bool $requireTld Reject single-label names such as `localhost`.
+     * @param  bool  $requireTld  Reject single-label names such as `localhost`.
      */
     public function __construct(private bool $requireTld = true) {}
 

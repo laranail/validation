@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\Rules\Text\Slug;
-use Simtabi\Laranail\Validation\Rules\Text\Username;
+use Illuminate\Support\Str;
 use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Text\HtmlClean;
 use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Simtabi\Laranail\Validation\Rules\Text\Slug;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Rules\Text\WithoutSpaces;
 
 // =========================================================================
@@ -228,11 +228,11 @@ it('validates each casing convention', function (string $style, string $valid, s
     expect(ruleAccepts(new CaseStyle($style), $valid))->toBeTrue()
         ->and(ruleAccepts(new CaseStyle($style), $invalid))->toBeFalse();
 })->with([
-    'camel'  => [CaseStyle::CAMEL, 'helloWorld', 'HelloWorld'],
+    'camel' => [CaseStyle::CAMEL, 'helloWorld', 'HelloWorld'],
     'pascal' => [CaseStyle::PASCAL, 'HelloWorld', 'helloWorld'],
-    'snake'  => [CaseStyle::SNAKE, 'hello_world', 'hello__world'],
-    'kebab'  => [CaseStyle::KEBAB, 'hello-world', '-hello'],
-    'title'  => [CaseStyle::TITLE, 'Hello World', 'hello world'],
+    'snake' => [CaseStyle::SNAKE, 'hello_world', 'hello__world'],
+    'kebab' => [CaseStyle::KEBAB, 'hello-world', '-hello'],
+    'title' => [CaseStyle::TITLE, 'Hello World', 'hello world'],
 ]);
 
 it('rejects leading, trailing and doubled separators', function (string $style, string $value): void {

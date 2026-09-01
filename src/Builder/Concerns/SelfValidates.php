@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
 use Closure;
-use Stringable;
-use ReflectionProperty;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rules\In;
-use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\RequiredIf;
-use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\ExcludeUnless;
-use Illuminate\Validation\Rules\RequiredUnless;
+use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\ProhibitedUnless;
+use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\RequiredUnless;
+use ReflectionProperty;
+use Stringable;
 
 trait SelfValidates
 {
@@ -189,7 +189,7 @@ trait SelfValidates
         $messages = $this->validator->customMessages ?? [];
 
         foreach ($this->getCustomMessages() as $ruleName => $message) {
-            $messages[$ruleName === '' ? $attribute : $attribute . '.' . $ruleName] = $message;
+            $messages[$ruleName === '' ? $attribute : $attribute.'.'.$ruleName] = $message;
         }
 
         return $messages;
@@ -427,7 +427,7 @@ trait SelfValidates
      * `regex:/^(a|b)$/` pattern) cannot be safely pipe-joined — Laravel's parser
      * would split it. Rules with one fall back to array form instead.
      *
-     * @param list<string> $rules
+     * @param  list<string>  $rules
      */
     private function anyContainsPipe(array $rules): bool
     {

@@ -39,12 +39,12 @@ it('skips cache for date-comparison rules to keep relative timestamps fresh', fu
         ->and($second)->toBeInstanceOf(Closure::class)
         ->and($second)->not->toBe($first);
 })->with([
-    'after:today'             => ['required|date|after:today'],
-    'before:now'              => ['required|date|before:now'],
+    'after:today' => ['required|date|after:today'],
+    'before:now' => ['required|date|before:now'],
     'after_or_equal:tomorrow' => ['required|date|after_or_equal:tomorrow'],
     'before_or_equal:+1 week' => ['required|date|before_or_equal:+1 week'],
-    'date_equals:today'       => ['required|date|date_equals:today'],
-    'absolute date literal'   => ['required|date|after:2030-01-01'],
+    'date_equals:today' => ['required|date|date_equals:today'],
+    'absolute date literal' => ['required|date|after:2030-01-01'],
 ]);
 
 /**
@@ -58,7 +58,7 @@ it('caches up to COMPILE_CACHE_MAX entries before resetting', function (): void 
     // count >= MAX is checked BEFORE insert: at the 1024th call,
     // pre-insert count = 1023 (no reset), post-insert count = 1024.
     for ($i = 1; $i <= 1024; $i++) {
-        FastCheckCompiler::compile('required|string|max:' . $i);
+        FastCheckCompiler::compile('required|string|max:'.$i);
     }
 
     // Last entry must still be cached.
@@ -74,7 +74,7 @@ it('drops cache and recompiles fresh after the 1025th distinct rule', function (
 
     // Fill to 1024 (rule #1 already counts as one of those).
     for ($i = 2; $i <= 1024; $i++) {
-        FastCheckCompiler::compile('required|string|max:' . $i);
+        FastCheckCompiler::compile('required|string|max:'.$i);
     }
 
     // The 1025th distinct compile triggers the cap reset before insert.

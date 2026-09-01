@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Validator as BaseValidator;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * Regression guard: the per-item slow-rule path must honor a custom
@@ -35,10 +35,10 @@ final class CustomResolverAlwaysPassesRule implements ValidationRule
 }
 
 /**
- * @param array<array-key, mixed> $data
- * @param array<array-key, mixed> $rules
- * @param array<string, string> $messages
- * @param array<string, string> $attributes
+ * @param  array<array-key, mixed>  $data
+ * @param  array<array-key, mixed>  $rules
+ * @param  array<string, string>  $messages
+ * @param  array<string, string>  $attributes
  */
 function makeCustomResolverValidator(Translator $translator, array $data, array $rules, array $messages = [], array $attributes = []): BaseValidator
 {
@@ -53,7 +53,7 @@ it('uses the custom resolver validator for per-item slow-rule validation', funct
     // The custom Rule object makes `rows.*.a` non-fast-checkable, forcing the
     // per-item slow path (makeItemValidator) rather than a fast-check closure.
     $rules = [
-        'rows'     => 'required|array',
+        'rows' => 'required|array',
         'rows.*.a' => ['required', 'string', new CustomResolverAlwaysPassesRule],
     ];
 

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // Regression coverage for the per-call buildFastChecks memo ($fastChecksByReduced)
 // added to ItemValidator's sibling-conditional path. A value-conditional
@@ -18,8 +18,7 @@ use Simtabi\Laranail\Validation\FluentRule;
 // correct at volume.
 
 /**
- * @param list<array<string, mixed>> $items
- *
+ * @param  list<array<string, mixed>>  $items
  * @return array<string, array<int, string>>
  */
 function runMemoConditionalItems(array $items): array

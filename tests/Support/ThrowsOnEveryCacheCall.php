@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Tests\Support;
 
 use Closure;
-use UnitEnum;
 use DateInterval;
 use RuntimeException;
+use UnitEnum;
 
 /**
  * A cache repository whose every operation fails — the shape of a database

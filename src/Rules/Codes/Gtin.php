@@ -32,7 +32,7 @@ final readonly class Gtin implements ValidationRule
     private array $lengths;
 
     /**
-     * @param list<int> $lengths Widths to accept; defaults to all four.
+     * @param  list<int>  $lengths  Widths to accept; defaults to all four.
      */
     public function __construct(array $lengths = self::VALID_LENGTHS)
     {
@@ -40,7 +40,7 @@ final readonly class Gtin implements ValidationRule
     }
 
     /**
-     * @param list<int> $lengths
+     * @param  list<int>  $lengths
      */
     public static function passes(mixed $value, array $lengths = self::VALID_LENGTHS): bool
     {

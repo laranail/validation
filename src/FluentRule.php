@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Closure;
 use BackedEnum;
-use Illuminate\Validation\Rules\AnyOf;
-use Illuminate\Support\Traits\Macroable;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
-use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
-use Simtabi\Laranail\Validation\Rules\Text\Username;
-use Simtabi\Laranail\Validation\Rules\Net\DomainName;
-use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AnyOf;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
+use Simtabi\Laranail\Validation\Rules\Net\DomainName;
+use Simtabi\Laranail\Validation\Rules\Net\Subdomain;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 
 class FluentRule
 {
@@ -395,7 +395,7 @@ class FluentRule
     }
 
     /**
-     * @param array<int, mixed> $rules
+     * @param  array<int, mixed>  $rules
      */
     public static function anyOf(array $rules): AnyOf
     {

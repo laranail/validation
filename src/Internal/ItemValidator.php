@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Internal;
 
 use Closure;
-use ReflectionProperty;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\MemoizingValidator;
 use Illuminate\Validation\Validator as BaseValidator;
+use ReflectionProperty;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\ValueConditionalReducer;
-use Simtabi\Laranail\Validation\PresenceConditionalReducer;
+use Simtabi\Laranail\Validation\MemoizingValidator;
 use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
+use Simtabi\Laranail\Validation\PresenceConditionalReducer;
+use Simtabi\Laranail\Validation\ValueConditionalReducer;
 
 /**
  * Executes the per-item validation loop for a wildcard group. Applies
@@ -36,11 +36,10 @@ final readonly class ItemValidator
     ) {}
 
     /**
-     * @param array<int|string, mixed> $items
-     * @param array<string, mixed> $itemRules
-     * @param array<string, string> $itemMessages
-     * @param array<string, string> $itemAttributes
-     *
+     * @param  array<int|string, mixed>  $items
+     * @param  array<string, mixed>  $itemRules
+     * @param  array<string, string>  $itemMessages
+     * @param  array<string, string>  $itemAttributes
      * @return array<string, list<string>>
      */
     public function validate(array $items, array $itemRules, array $itemMessages, array $itemAttributes, string $parent, bool $isScalar): array
@@ -188,10 +187,10 @@ final readonly class ItemValidator
      * its own memoization, a consumer's overrides keep firing. Only the plain
      * default is safe to optimize.
      *
-     * @param array<string, mixed> $itemData
-     * @param array<string, mixed> $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, mixed>  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      */
     /**
      * Clear exclusions carried over from the previous item.
@@ -226,10 +225,10 @@ final readonly class ItemValidator
     }
 
     /**
-     * @param array<string, mixed> $itemData
-     * @param array<string, mixed> $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, mixed>  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      */
     private function makeItemValidator(array $itemData, array $rules, array $messages, array $attributes): BaseValidator
     {

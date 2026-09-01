@@ -25,9 +25,9 @@ use Simtabi\Laranail\Validation\Contracts\TermList;
 final readonly class InlineTermList implements TermList
 {
     /**
-     * @param list<string> $terms Lowercase terms to match.
-     * @param list<string> $allowed Words containing a term that are not one
-     *                              — the Scunthorpe problem.
+     * @param  list<string>  $terms  Lowercase terms to match.
+     * @param  list<string>  $allowed  Words containing a term that are not one
+     *                                 — the Scunthorpe problem.
      */
     public function __construct(
         private array $terms,

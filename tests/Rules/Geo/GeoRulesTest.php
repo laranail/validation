@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
-use Simtabi\Laranail\Validation\Rules\Geo\UsState;
-use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
-use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
 use Simtabi\Laranail\Validation\Rules\Geo\CaProvince;
+use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
+use Simtabi\Laranail\Validation\Rules\Geo\LatLng;
+use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
+use Simtabi\Laranail\Validation\Rules\Geo\UsState;
 
 // =========================================================================
 // Latitude / Longitude

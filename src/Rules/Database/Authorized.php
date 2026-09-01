@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Database;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * The submitted identifier names a record the current user may act on.
@@ -32,10 +32,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final readonly class Authorized implements ValidationRule
 {
     /**
-     * @param string $ability Ability name, as the policy declares it.
-     * @param class-string<Model> $model Model to resolve the value against.
-     * @param string|null $guard Auth guard, or null for the default.
-     * @param list<mixed> $arguments Extra arguments passed after the model.
+     * @param  string  $ability  Ability name, as the policy declares it.
+     * @param  class-string<Model>  $model  Model to resolve the value against.
+     * @param  string|null  $guard  Auth guard, or null for the default.
+     * @param  list<mixed>  $arguments  Extra arguments passed after the model.
      */
     public function __construct(
         private string $ability,

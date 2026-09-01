@@ -29,14 +29,14 @@ final class BundledDisposableDomainList implements DisposableDomainList
 
     public function contains(string $domain): bool
     {
-        $this->domains ??= DomainFile::load(__DIR__ . '/../../../resources/data/disposable-domains.txt');
+        $this->domains ??= DomainFile::load(__DIR__.'/../../../resources/data/disposable-domains.txt');
 
         return isset($this->domains[strtolower(trim($domain))]);
     }
 
     public function count(): int
     {
-        $this->domains ??= DomainFile::load(__DIR__ . '/../../../resources/data/disposable-domains.txt');
+        $this->domains ??= DomainFile::load(__DIR__.'/../../../resources/data/disposable-domains.txt');
 
         return count($this->domains);
     }

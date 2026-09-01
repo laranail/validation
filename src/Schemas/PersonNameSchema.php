@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Schemas;
 
-use LogicException;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
-use Simtabi\Laranail\Validation\RuleSet;
+use InvalidArgumentException;
+use LogicException;
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Rules\Text\PersonName;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * The rules for a person's name, across however many fields the system has.
@@ -93,7 +93,7 @@ final class PersonNameSchema
 
         if (count($fields) !== count(array_unique($fields))) {
             throw new InvalidArgumentException(
-                'A name field may only be declared once; got ' . implode(', ', $fields) . '.',
+                'A name field may only be declared once; got '.implode(', ', $fields).'.',
             );
         }
 
@@ -204,7 +204,7 @@ final class PersonNameSchema
      * Defaults are derived from the field name (`first_name` → "first name"),
      * which is what Laravel would have shown anyway.
      *
-     * @param array<string, string> $labels
+     * @param  array<string, string>  $labels
      */
     public function labels(array $labels): self
     {
@@ -249,8 +249,7 @@ final class PersonNameSchema
      * omitted it, so the caller writes a complete row rather than a partial one.
      * Keys the caller did not declare are dropped.
      *
-     * @param array<string, mixed> $input
-     *
+     * @param  array<string, mixed>  $input
      * @return array<string, string|null>
      */
     public function normalise(array $input): array
@@ -274,8 +273,7 @@ final class PersonNameSchema
     /**
      * The list form of {@see normalise()} — trimmed, blanks dropped, reindexed.
      *
-     * @param array<array-key, mixed> $names
-     *
+     * @param  array<array-key, mixed>  $names
      * @return list<string>
      */
     public function normaliseList(array $names): array
@@ -385,7 +383,7 @@ final class PersonNameSchema
         $labels = array_map($this->labelFor(...), $this->fields);
         $last = (string) array_pop($labels);
 
-        $values = $labels === [] ? $last : implode(', ', $labels) . ' or ' . $last;
+        $values = $labels === [] ? $last : implode(', ', $labels).' or '.$last;
 
         $key = 'laranail/validation::validation.person_name_required';
         $message = trans($key, ['values' => $values]);
@@ -413,7 +411,7 @@ final class PersonNameSchema
      * by one of them. The builders it produces are freshly constructed per
      * call, so nothing downstream shares state either.
      *
-     * @param callable(self): void $mutate
+     * @param  callable(self): void  $mutate
      */
     private function with(callable $mutate): self
     {

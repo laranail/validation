@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
-use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
-use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
-use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
+use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
+use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 
 /**
  * An IP address field.
@@ -102,7 +102,7 @@ class IpAddressRule implements DataAwareRule, FluentRuleContract, ValidatorAware
      * FluentRule::ip()->inRange(['203.0.113.0/24', '2001:db8::/32'])
      * ```
      *
-     * @param list<string>|string $networks
+     * @param  list<string>|string  $networks
      */
     public function inRange(array|string $networks, ?string $message = null): static
     {

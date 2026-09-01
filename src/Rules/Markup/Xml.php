@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Validation\Rules\Markup;
 
 use Closure;
 use DOMDocument;
-use LibXMLError;
 use Illuminate\Contracts\Validation\ValidationRule;
+use LibXMLError;
 
 /**
  * Well-formed XML, optionally valid against an XSD schema.

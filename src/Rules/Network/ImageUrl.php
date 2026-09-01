@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Network;
 
 use Closure;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use Simtabi\Laranail\Validation\Concerns\SkipsPrecognition;
-use Simtabi\Laranail\Validation\Rules\Net\Support\IpClassifier;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
+use Simtabi\Laranail\Validation\Rules\Net\Support\IpClassifier;
 
 /**
  * The URL currently serves an image — a HEAD probe expecting 200 with an
@@ -40,7 +40,7 @@ final readonly class ImageUrl implements PrecognitionSkippable, ValidationRule
     private const array LOOPBACK_NAMES = ['localhost', 'localhost.localdomain', 'ip6-localhost', 'ip6-loopback'];
 
     /**
-     * @param list<string> $mimes Accepted `image/*` subtypes; empty accepts any image.
+     * @param  list<string>  $mimes  Accepted `image/*` subtypes; empty accepts any image.
      */
     public function __construct(
         private array $mimes = [],

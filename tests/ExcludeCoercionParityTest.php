@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentValidator;
 use Simtabi\Laranail\Validation\Internal\ConditionalValueMatcher;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // exclude_unless / exclude_if dependent-value coercion in RuleSet's per-item
@@ -16,9 +16,9 @@ use Simtabi\Laranail\Validation\Internal\ConditionalValueMatcher;
 // =========================================================================
 
 /**
- * @param array<string, mixed> $native
- * @param array<string, mixed> $fluent
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $native
+ * @param  array<string, mixed>  $fluent
+ * @param  array<string, mixed>  $data
  */
 function assertExcludeParity(array $native, array $fluent, array $data): void
 {
@@ -34,7 +34,7 @@ it('exclude_unless with null dependent matches native', function (): void {
     assertExcludeParity(
         ['items.*.detail' => ['exclude_unless:items.*.state,null', 'required', 'string']],
         ['items.*.detail' => [['exclude_unless', 'items.*.state', 'null'], 'required', 'string']],
-        ['items'          => [['state' => null]]], // state IS null → not excluded → required fires
+        ['items' => [['state' => null]]], // state IS null → not excluded → required fires
     );
 });
 
@@ -42,7 +42,7 @@ it('exclude_if with null dependent matches native', function (): void {
     assertExcludeParity(
         ['items.*.detail' => ['exclude_if:items.*.state,null', 'required', 'string']],
         ['items.*.detail' => [['exclude_if', 'items.*.state', 'null'], 'required', 'string']],
-        ['items'          => [['state' => null]]], // state IS null → excluded → no error
+        ['items' => [['state' => null]]], // state IS null → excluded → no error
     );
 });
 
@@ -78,7 +78,7 @@ it('exclude_unless still loose-matches numeric strings (no regression)', functio
     assertExcludeParity(
         ['items.*.x' => ['exclude_unless:items.*.n,1', 'required', 'string']],
         ['items.*.x' => [['exclude_unless', 'items.*.n', '1'], 'required', 'string']],
-        ['items'     => [['n' => 1]]], // int 1 ↔ '1' loose match → not excluded → required fires
+        ['items' => [['n' => 1]]], // int 1 ↔ '1' loose match → not excluded → required fires
     );
 });
 
@@ -145,7 +145,7 @@ it('exclude_if with an ABSENT dependent does not exclude (matches native)', func
     assertExcludeParity(
         ['items.*.name' => ['exclude_if:items.*.flag,null', 'required', 'string']],
         ['items.*.name' => [['exclude_if', 'items.*.flag', 'null'], 'required', 'string']],
-        ['items'        => [['other' => 'x']]], // flag absent
+        ['items' => [['other' => 'x']]], // flag absent
     );
 });
 
@@ -153,7 +153,7 @@ it('exclude_if with an EXPLICIT null dependent excludes (matches native)', funct
     assertExcludeParity(
         ['items.*.name' => ['exclude_if:items.*.flag,null', 'required', 'string']],
         ['items.*.name' => [['exclude_if', 'items.*.flag', 'null'], 'required', 'string']],
-        ['items'        => [['flag' => null]]], // flag present and null → excluded → no error
+        ['items' => [['flag' => null]]], // flag present and null → excluded → no error
     );
 });
 
@@ -195,7 +195,7 @@ it('evaluates ALL exclude conditions on a field, not just the first (second fire
     assertExcludeParity(
         ['items.*.x' => ['exclude_unless:items.*.type,a', 'exclude_if:items.*.other,z', 'required', 'string']],
         ['items.*.x' => [['exclude_unless', 'items.*.type', 'a'], ['exclude_if', 'items.*.other', 'z'], 'required', 'string']],
-        ['items'     => [['type' => 'a', 'other' => 'z']]],
+        ['items' => [['type' => 'a', 'other' => 'z']]],
     );
 });
 
@@ -203,7 +203,7 @@ it('evaluates ALL exclude conditions on a field (none fires → kept)', function
     assertExcludeParity(
         ['items.*.x' => ['exclude_unless:items.*.type,a', 'exclude_if:items.*.other,z', 'required', 'string']],
         ['items.*.x' => [['exclude_unless', 'items.*.type', 'a'], ['exclude_if', 'items.*.other', 'z'], 'required', 'string']],
-        ['items'     => [['type' => 'a', 'other' => 'keep']]], // type=a (unless ok), other≠z → kept → required fires
+        ['items' => [['type' => 'a', 'other' => 'keep']]], // type=a (unless ok), other≠z → kept → required fires
     );
 });
 
@@ -216,7 +216,7 @@ it('keeps tuple-form required_if when a field survives its exclude condition', f
     assertExcludeParity(
         ['items.*.x' => ['exclude_unless:items.*.type,a', 'required_if:items.*.other,y', 'string']],
         ['items.*.x' => [['exclude_unless', 'items.*.type', 'a'], ['required_if', 'items.*.other', 'y'], 'string']],
-        ['items'     => [['type' => 'a', 'other' => 'y']]], // x missing
+        ['items' => [['type' => 'a', 'other' => 'y']]], // x missing
     );
 });
 
@@ -224,7 +224,7 @@ it('keeps tuple-form required_unless when a field survives its exclude condition
     assertExcludeParity(
         ['items.*.x' => ['exclude_unless:items.*.type,a', 'required_unless:items.*.other,skip', 'string']],
         ['items.*.x' => [['exclude_unless', 'items.*.type', 'a'], ['required_unless', 'items.*.other', 'skip'], 'string']],
-        ['items'     => [['type' => 'a', 'other' => 'go']]], // other≠skip → x required, missing → error
+        ['items' => [['type' => 'a', 'other' => 'go']]], // other≠skip → x required, missing → error
     );
 });
 

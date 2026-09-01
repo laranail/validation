@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Encoding;
 
 use Closure;
-use Illuminate\Support\Number;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Number;
 use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 
 /**
@@ -31,7 +31,7 @@ use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 final readonly class Base64Image implements ValidationRule
 {
     /**
-     * @param list<string> $mimes Accepted `image/*` subtypes.
+     * @param  list<string>  $mimes  Accepted `image/*` subtypes.
      */
     public function __construct(
         private array $mimes = ['jpeg', 'png', 'gif', 'webp', 'bmp'],

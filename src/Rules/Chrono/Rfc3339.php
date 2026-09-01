@@ -24,8 +24,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final class Rfc3339 implements ValidationRule
 {
     private const string GRAMMAR = '/^(?<y>\d{4})-(?<m>\d{2})-(?<d>\d{2})[Tt]'
-        . '(?<h>[01]\d|2[0-3]):(?<i>[0-5]\d):(?<s>[0-5]\d|60)(?:\.\d+)?'
-        . '(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/D';
+        .'(?<h>[01]\d|2[0-3]):(?<i>[0-5]\d):(?<s>[0-5]\d|60)(?:\.\d+)?'
+        .'(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/D';
 
     public static function passes(string $value): bool
     {

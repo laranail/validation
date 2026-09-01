@@ -131,9 +131,9 @@ it('buildFastChecks separates fast-checkable fields from slow rules', function (
     $compiler = new ItemRuleCompiler;
 
     [$checks, $slowRules] = $compiler->buildFastChecks([
-        'name'  => 'required|string',
+        'name' => 'required|string',
         'email' => 'required|email',
-        'meta'  => ['required', new In(['a', 'b'])],
+        'meta' => ['required', new In(['a', 'b'])],
     ]);
 
     expect($checks)->toHaveCount(2)

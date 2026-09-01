@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Simtabi\Laranail\Validation\FluentRule;
-use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Contracts\Validation\ValidationRule;
 
 // =========================================================================
 // EmailRule

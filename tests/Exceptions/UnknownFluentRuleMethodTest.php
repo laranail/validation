@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
 use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
+use Simtabi\Laranail\Validation\FluentRule;
 
 afterEach(function (): void {
     FieldRule::flushMacros();
@@ -41,7 +41,7 @@ it('falls back to a generic hint for methods not in the table', function (): voi
 });
 
 it('preserves registered macros after the override', function (): void {
-    FieldRule::macro('customMacro', fn (string $arg): string => 'macro:' . $arg);
+    FieldRule::macro('customMacro', fn (string $arg): string => 'macro:'.$arg);
 
     $builder = FluentRule::field();
 
@@ -63,7 +63,7 @@ it('dispatches non-Closure invokable macros (e.g. object with __invoke)', functi
     {
         public function __invoke(string $arg): string
         {
-            return 'invokable:' . $arg;
+            return 'invokable:'.$arg;
         }
     };
 

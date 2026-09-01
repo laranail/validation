@@ -48,15 +48,15 @@ final readonly class Parity implements ValidationRule
 
         return match (mb_strtolower(trim($parity))) {
             self::EVEN => $remainder === 0,
-            self::ODD  => $remainder === 1,
-            default    => false,
+            self::ODD => $remainder === 1,
+            default => false,
         };
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! self::passes($value, $this->parity)) {
-            $fail('laranail/validation::validation.parity.' . $this->normalised())->translate();
+            $fail('laranail/validation::validation.parity.'.$this->normalised())->translate();
         }
     }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Support\Text;
 
-use Simtabi\Laranail\Validation\Support\I18n\CodeFile;
 use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
+use Simtabi\Laranail\Validation\Support\I18n\CodeFile;
 
 /**
  * The full bundled reserved set: ~350 infrastructure, route and product
@@ -25,7 +25,7 @@ final class ExtendedReservedUsernameList implements ReservedUsernameList
     public function names(): array
     {
         return $this->names ??= array_keys(
-            CodeFile::load(dirname(__DIR__, 3) . '/resources/data/reserved-usernames.txt'),
+            CodeFile::load(dirname(__DIR__, 3).'/resources/data/reserved-usernames.txt'),
         );
     }
 }

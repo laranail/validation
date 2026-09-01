@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\Rules\Encoding\Base64;
-use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
 use Simtabi\Laranail\Validation\Rules\Encoding\Base64Image;
+use Simtabi\Laranail\Validation\Rules\Encoding\DataUri;
 use Simtabi\Laranail\Validation\Support\Encoding\Base64File;
 
 /** A real 1x1 PNG, 70 bytes decoded. */
@@ -32,7 +32,7 @@ it('rejects non-canonical and malformed base64', function (mixed $value): void {
 
 it('accepts a real image, bare and as a data URI', function (): void {
     expect(ruleAccepts(new Base64Image, PNG_B64))->toBeTrue()
-        ->and(ruleAccepts(new Base64Image, 'data:image/png;base64,' . PNG_B64))->toBeTrue();
+        ->and(ruleAccepts(new Base64Image, 'data:image/png;base64,'.PNG_B64))->toBeTrue();
 });
 
 it('rejects non-images and images outside the allowed types', function (): void {
@@ -57,7 +57,7 @@ it('enforces the decoded size cap with a human-readable message', function (): v
 });
 
 it('bridges a validated image to an UploadedFile for Laravel file rules', function (): void {
-    $file = Base64File::toUploadedFile('data:image/png;base64,' . PNG_B64, 'avatar.png');
+    $file = Base64File::toUploadedFile('data:image/png;base64,'.PNG_B64, 'avatar.png');
 
     expect($file)->not->toBeNull()
         ->and($file->getSize())->toBe(70)
@@ -76,7 +76,7 @@ it('bridges a validated image to an UploadedFile for Laravel file rules', functi
 it('accepts well-formed data URIs', function (string $value): void {
     expect(ruleAccepts(new DataUri, $value))->toBeTrue();
 })->with([
-    'data:image/png;base64,' . PNG_B64,
+    'data:image/png;base64,'.PNG_B64,
     'data:text/plain,hello%20world',
     'data:,bare%20form',                          // both parts are optional
     'data:text/plain;charset=utf-8,hi',
@@ -87,7 +87,7 @@ it('rejects malformed data URIs', function (mixed $value): void {
 })->with([
     'data:image/png;base64,!!!!',      // base64 flag with non-base64 payload
     'data:image/png;base64',           // no comma, no data
-    'dat:image/png;base64,' . PNG_B64, // scheme typo
+    'dat:image/png;base64,'.PNG_B64, // scheme typo
     'data:image;base64,abcd',          // media type missing its subtype
     'data:text/plain,hello world',     // raw space is not URL-encoded
     12345,
@@ -97,7 +97,7 @@ it('rejects malformed data URIs', function (mixed $value): void {
 it('can restrict the media types it accepts', function (): void {
     $imagesOnly = new DataUri(mediaTypes: ['image/*']);
 
-    expect(ruleAccepts($imagesOnly, 'data:image/png;base64,' . PNG_B64))->toBeTrue()
+    expect(ruleAccepts($imagesOnly, 'data:image/png;base64,'.PNG_B64))->toBeTrue()
         ->and(ruleAccepts($imagesOnly, 'data:text/plain,hi'))->toBeFalse()
         // Restricting to a type means an untyped URI no longer qualifies.
         ->and(ruleAccepts($imagesOnly, 'data:,hi'))->toBeFalse()

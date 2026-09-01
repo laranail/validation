@@ -33,8 +33,7 @@ use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 final class DatabaseClaimScanner
 {
     /**
-     * @param array<string, mixed> $rules Field (or expanded attribute) → rules
-     *
+     * @param  array<string, mixed>  $rules  Field (or expanded attribute) → rules
      * @return array<string, true>
      */
     public static function findPoisonedTableColumns(array $rules): array
@@ -115,9 +114,9 @@ final class DatabaseClaimScanner
 
         $signature = BatchDatabaseChecker::isBatchable($rule)
             ? BatchDatabaseChecker::batchableSignature($rule, $table, $column)
-            : 'unbatchable#' . $marker++;
+            : 'unbatchable#'.$marker++;
 
-        return [$table . ':' . $column, $signature];
+        return [$table.':'.$column, $signature];
     }
 
     /** @return array{0: string, 1: string}|null */
@@ -142,7 +141,7 @@ final class DatabaseClaimScanner
             $column = self::leafAttribute($field);
         }
 
-        return [$table . ':' . $column, 'string#' . $marker++];
+        return [$table.':'.$column, 'string#'.$marker++];
     }
 
     /**

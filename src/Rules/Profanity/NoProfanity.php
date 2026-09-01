@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Profanity;
 
 use Closure;
-use Normalizer;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Normalizer;
 use Simtabi\Laranail\Validation\Contracts\TermList;
 
 /**
@@ -52,8 +52,8 @@ final class NoProfanity implements ValidationRule
     private ?array $normalisedAllowed = null;
 
     /**
-     * @param TermList|list<string> $terms
-     * @param list<string> $allowed Ignored when $terms is a TermList, which carries its own.
+     * @param  TermList|list<string>  $terms
+     * @param  list<string>  $allowed  Ignored when $terms is a TermList, which carries its own.
      */
     public function __construct(
         private readonly TermList|array $terms,
@@ -177,11 +177,11 @@ final class NoProfanity implements ValidationRule
         }
 
         $body = implode($separator, array_map(
-            static fn (string $c): string => preg_quote($c, '/') . '+',
+            static fn (string $c): string => preg_quote($c, '/').'+',
             $characters,
         ));
 
-        return '/\b' . $body . '\b/u';
+        return '/\b'.$body.'\b/u';
     }
 
     /** @return list<string> */
@@ -197,8 +197,7 @@ final class NoProfanity implements ValidationRule
     }
 
     /**
-     * @param list<string> $values
-     *
+     * @param  list<string>  $values
      * @return list<string>
      */
     private function normaliseAll(array $values): array

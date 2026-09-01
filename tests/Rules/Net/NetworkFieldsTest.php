@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
-use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
 use Simtabi\Laranail\Validation\Rules\Net\InCidrRange;
+use Simtabi\Laranail\Validation\Rules\Net\MacAddress;
+use Simtabi\Laranail\Validation\RuleSet;
 
 function netCheck(mixed $rule, mixed $value): bool
 {
