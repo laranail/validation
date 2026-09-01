@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\ConnectionException;
-use Simtabi\Laranail\Validation\Rules\Network\ImageUrl;
-use Simtabi\Laranail\Validation\Rules\Network\HasGravatar;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
+use Simtabi\Laranail\Validation\Rules\Network\HasGravatar;
+use Simtabi\Laranail\Validation\Rules\Network\ImageUrl;
 
 // =========================================================================
 // ImageUrl — the redesigned image-URL probe (owner decision: implement,
@@ -78,8 +78,8 @@ it('is skipped during precognition', function (): void {
 
 it('reports whether the address has a gravatar via the sha256 endpoint', function (): void {
     Http::fake([
-        'gravatar.com/avatar/' . hash('sha256', 'alice@example.com') . '*' => Http::response('', 200),
-        'gravatar.com/*'                                                   => Http::response('', 404),
+        'gravatar.com/avatar/'.hash('sha256', 'alice@example.com').'*' => Http::response('', 200),
+        'gravatar.com/*' => Http::response('', 404),
     ]);
 
     expect(ruleAccepts(new HasGravatar, 'alice@example.com'))->toBeTrue()
@@ -88,8 +88,8 @@ it('reports whether the address has a gravatar via the sha256 endpoint', functio
 
 it('normalises the address before hashing, as gravatar does', function (): void {
     Http::fake([
-        'gravatar.com/avatar/' . hash('sha256', 'alice@example.com') . '*' => Http::response('', 200),
-        'gravatar.com/*'                                                   => Http::response('', 404),
+        'gravatar.com/avatar/'.hash('sha256', 'alice@example.com').'*' => Http::response('', 200),
+        'gravatar.com/*' => Http::response('', 404),
     ]);
 
     expect(ruleAccepts(new HasGravatar, '  Alice@Example.COM  '))->toBeTrue();

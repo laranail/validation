@@ -24,7 +24,7 @@ return [
 
     'aliases' => [
         'enabled' => env('LARANAIL_VALIDATION_ALIASES', false),
-        'prefix'  => 'laranail_',
+        'prefix' => 'laranail_',
     ],
 
     /*

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Validation\RuleSet;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Simtabi\Laranail\Validation\FluentRule;
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\HasFluentRules;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\HasFluentRules;
 use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Helper: set up in-memory SQLite for DB tests
@@ -27,7 +27,7 @@ function setupTestDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver'   => 'sqlite',
+        'driver' => 'sqlite',
         'database' => ':memory:',
     ]]);
 
@@ -86,7 +86,7 @@ it('precomputed verifier preserves custom messages keyed by rule name', function
 
     $validator = Validator::make(
         ['email' => 'unknown@example.com'],
-        ['email'        => ['required', Rule::exists('users', 'email')]],
+        ['email' => ['required', Rule::exists('users', 'email')]],
         ['email.exists' => 'Custom exists message'],
     );
     $validator->setPresenceVerifier($verifier);
@@ -783,8 +783,8 @@ it('duplicate values are deduplicated before batch query', function (): void {
 // =========================================================================
 
 /**
- * @param array<string, mixed> $rules
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<string, mixed>  $data
  */
 function createBatchFormRequest(array $rules, array $data): FormRequest
 {

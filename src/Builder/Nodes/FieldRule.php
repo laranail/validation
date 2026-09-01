@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
-use LogicException;
-use InvalidArgumentException;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use LogicException;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Exceptions\UnknownFluentRuleMethod;
 
 /**
@@ -50,7 +50,7 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * pointing at the correct typed builder instead of a bare
      * `BadMethodCallException`. See `UnknownFluentRuleMethod`.
      *
-     * @param array<int, mixed> $parameters
+     * @param  array<int, mixed>  $parameters
      */
     public function __call(string $method, array $parameters): mixed
     {
@@ -96,7 +96,7 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      *
      * Produces fixed paths (answer.email_address) without wildcards.
      *
-     * @param array<string, ValidationRule> $rules
+     * @param  array<string, ValidationRule>  $rules
      */
     public function children(array $rules): static
     {
@@ -137,7 +137,7 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         if (array_key_exists($key, $existing)) {
             throw new LogicException(sprintf(
                 "addChildRule('%s'): key '%s' already exists in children(). "
-                . 'Use mergeChildRules() if replacement is intentional.',
+                .'Use mergeChildRules() if replacement is intentional.',
                 $key,
                 $key,
             ));
@@ -152,7 +152,7 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     /**
      * Merge multiple keyed child rules, later-wins on collision.
      *
-     * @param array<string, ValidationRule> $rules
+     * @param  array<string, ValidationRule>  $rules
      */
     public function mergeChildRules(array $rules): static
     {
@@ -170,12 +170,12 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function same(string $field, ?string $message = null): static
     {
-        return $this->addRule('same:' . $field, $message);
+        return $this->addRule('same:'.$field, $message);
     }
 
     public function different(string $field, ?string $message = null): static
     {
-        return $this->addRule('different:' . $field, $message);
+        return $this->addRule('different:'.$field, $message);
     }
 
     public function confirmed(?string $message = null): static
@@ -191,7 +191,7 @@ class FieldRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         $nested = [];
 
         foreach ($this->childRules ?? [] as $field => $rule) {
-            $key = $attribute . '.' . $field;
+            $key = $attribute.'.'.$field;
             $rules[$key] = $rule;
 
             if ($rule instanceof ArrayRule

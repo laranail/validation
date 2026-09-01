@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * Exclusions must not carry from one array item to the next.
@@ -35,8 +35,7 @@ function itemExclusionRules(): RuleSet
 }
 
 /**
- * @param array<array-key, mixed> $data
- *
+ * @param  array<array-key, mixed>  $data
  * @return array<array-key, string>
  */
 function vanillaExclusionErrors(array $data): array

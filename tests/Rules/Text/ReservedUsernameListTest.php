@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
+use Simtabi\Laranail\Validation\Rules\Text\Username;
 use Simtabi\Laranail\Validation\Support\Text\ExtendedReservedUsernameList;
 
 it('keeps the floor as the default policy', function (): void {

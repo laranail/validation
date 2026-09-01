@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Rules\Payment\CardCvc;
 use Simtabi\Laranail\Validation\Rules\Payment\CardExpiry;
 use Simtabi\Laranail\Validation\Rules\Payment\CardNumber;
 use Simtabi\Laranail\Validation\Support\Payment\CardBrand;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 
 afterEach(function (): void {
     Date::setTestNow();

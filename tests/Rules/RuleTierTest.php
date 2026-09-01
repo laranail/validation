@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Client\Factory as HttpFactory;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 // =========================================================================
@@ -27,7 +27,7 @@ use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 /** @return list<string> Absolute paths of every rule class in the library. */
 function ruleSourceFiles(): array
 {
-    $directory = new RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/src/Rules');
+    $directory = new RecursiveDirectoryIterator(dirname(__DIR__, 2).'/src/Rules');
     $files = [];
 
     foreach (new RecursiveIteratorIterator($directory) as $file) {
@@ -87,7 +87,7 @@ it('has no rule that writes', function (): void {
 
         foreach ($writes as $write) {
             if (str_contains($source, $write)) {
-                $offenders[] = basename($file) . ' contains ' . $write;
+                $offenders[] = basename($file).' contains '.$write;
             }
         }
     }
@@ -109,11 +109,11 @@ it('confines database access to the Database tier', function (): void {
         // through it, and a rule outside the Database tier having one means
         // the tier label on its directory is now a lie.
         if (str_contains($source, '->newQuery(') || str_contains($source, 'DB::')) {
-            $offenders[] = tierOf($file) . '/' . basename($file);
+            $offenders[] = tierOf($file).'/'.basename($file);
         }
     }
 
-    expect($offenders)->toBeEmpty('database access outside the Database tier: ' . implode(', ', $offenders));
+    expect($offenders)->toBeEmpty('database access outside the Database tier: '.implode(', ', $offenders));
 });
 
 it('requires every Network-tier rule to be skippable during precognition', function (): void {
@@ -124,7 +124,7 @@ it('requires every Network-tier rule to be skippable during precognition', funct
     $network = array_filter(ruleSourceFiles(), static fn (string $f): bool => tierOf($f) === 'Network');
 
     foreach ($network as $file) {
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\Network\\' . basename($file, '.php');
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\Network\\'.basename($file, '.php');
 
         expect(class_exists($class) && is_a($class, PrecognitionSkippable::class, true))
             ->toBeTrue("{$class} performs network IO but is not PrecognitionSkippable");
@@ -142,7 +142,7 @@ it('keeps Database-tier rules out of the precognition opt-out', function (): voi
             continue;
         }
 
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\Database\\' . basename($file, '.php');
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\Database\\'.basename($file, '.php');
 
         expect(is_a($class, PrecognitionSkippable::class, true))
             ->toBeFalse("{$class} is database-tier and must not opt out of precognition");
@@ -164,5 +164,5 @@ it('resolves a tier for every rule file, on any platform', function (): void {
 
     $untiered = array_values(array_filter($files, static fn (string $f): bool => tierOf($f) === ''));
 
-    expect($untiered)->toBeEmpty('no tier resolved for: ' . implode(', ', $untiered));
+    expect($untiered)->toBeEmpty('no tier resolved for: '.implode(', ', $untiered));
 });

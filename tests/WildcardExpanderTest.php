@@ -63,7 +63,7 @@ it('returns empty when wildcard target is not an array', function (): void {
 it('handles associative array keys', function (): void {
     $data = [
         'users' => [
-            'admin'  => ['name' => 'Alice'],
+            'admin' => ['name' => 'Alice'],
             'editor' => ['name' => 'Bob'],
         ],
     ];
@@ -117,7 +117,7 @@ it('stops expanding at recursion depth limit', function (): void {
     $current['value'] = 'deep';
 
     // Pattern: a.*.a.*.a.*... (60 levels of a.*)
-    $pattern = implode('.', array_fill(0, 60, 'a.*')) . '.value';
+    $pattern = implode('.', array_fill(0, 60, 'a.*')).'.value';
 
     // Should return empty — depth limit (50) prevents stack overflow.
     $result = WildcardExpander::expand($pattern, $data);

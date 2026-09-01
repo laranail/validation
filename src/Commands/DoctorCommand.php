@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Commands;
 
-use Throwable;
-use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Console\Tools\Commands\Command;
+use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Simtabi\Laranail\Phone\PhoneFormatter;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
-use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Throwable;
 
 /**
  * The package's boot-health surface (failure-handling standard: degraded
@@ -46,7 +46,7 @@ final class DoctorCommand extends Command
                 $count = count($registrar->classes());
 
                 return $count > 0
-                    ? ['OK', $count . ' rules (' . count($registrar->clientCheckable()) . ' client-checkable)']
+                    ? ['OK', $count.' rules ('.count($registrar->clientCheckable()).' client-checkable)']
                     : ['FAIL', 'no rules discovered'];
             }],
             ['disposable-domain list', function (): array {
@@ -54,16 +54,16 @@ final class DoctorCommand extends Command
 
                 return $list->contains('mailinator.com')
                     ? ['OK', $list::class]
-                    : ['WARN', $list::class . ' does not flag a canonical disposable domain'];
+                    : ['WARN', $list::class.' does not flag a canonical disposable domain'];
             }],
             ['role-account list', fn (): array => ['OK', resolve(RoleAccountList::class)::class]],
-            ['dns resolver', fn (): array      => ['OK', resolve(DnsResolver::class)::class]],
+            ['dns resolver', fn (): array => ['OK', resolve(DnsResolver::class)::class]],
             ['batch query cap', function (): array {
                 $limit = BatchDatabaseChecker::$maxValuesPerGroup;
 
                 return $limit > 0
                     ? ['OK', (string) $limit]
-                    : ['FAIL', 'cap is ' . $limit . ' — every batch would be refused'];
+                    : ['FAIL', 'cap is '.$limit.' — every batch would be refused'];
             }],
             ['string aliases', function (): array {
                 if (config('laranail.validation.aliases.enabled') !== true) {
@@ -73,7 +73,7 @@ final class DoctorCommand extends Command
                 $prefix = config('laranail.validation.aliases.prefix');
 
                 return is_string($prefix) && $prefix !== ''
-                    ? ['OK', 'enabled, prefix "' . $prefix . '"']
+                    ? ['OK', 'enabled, prefix "'.$prefix.'"']
                     : ['FAIL', 'enabled with an empty prefix — bare generic names collide silently'];
             }],
             ['ext-intl', fn (): array => extension_loaded('intl')
@@ -88,7 +88,7 @@ final class DoctorCommand extends Command
             try {
                 [$status, $detail] = $check();
             } catch (Throwable $e) {
-                [$status, $detail] = ['FAIL', $e::class . ': ' . $e->getMessage()];
+                [$status, $detail] = ['FAIL', $e::class.': '.$e->getMessage()];
             }
 
             $failed = $failed || $status === 'FAIL';

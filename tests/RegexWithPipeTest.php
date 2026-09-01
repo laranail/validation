@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // A regex rule whose pattern contains a literal `|` (e.g. `regex:/^(a|b)$/`)
@@ -75,18 +75,18 @@ it('object-form regex with a pipe works alongside a conditional rule on a wildca
 
 it('every typed builder falls back to array form when a rule contains a pipe', function (string $factory): void {
     $rule = match ($factory) {
-        'string'   => FluentRule::string(),
-        'numeric'  => FluentRule::numeric(),
-        'integer'  => FluentRule::integer(),
-        'date'     => FluentRule::date(),
-        'boolean'  => FluentRule::boolean(),
-        'array'    => FluentRule::array(),
-        'file'     => FluentRule::file(),
-        'image'    => FluentRule::image(),
+        'string' => FluentRule::string(),
+        'numeric' => FluentRule::numeric(),
+        'integer' => FluentRule::integer(),
+        'date' => FluentRule::date(),
+        'boolean' => FluentRule::boolean(),
+        'array' => FluentRule::array(),
+        'file' => FluentRule::file(),
+        'image' => FluentRule::image(),
         'password' => FluentRule::password(),
-        'email'    => FluentRule::email(),
+        'email' => FluentRule::email(),
         'accepted' => FluentRule::accepted(),
-        default    => FluentRule::field(),
+        default => FluentRule::field(),
     };
 
     expect($rule->rule('regex:/^(foo|bar)$/')->compiledRules())->toBeArray();

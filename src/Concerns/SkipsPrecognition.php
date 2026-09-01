@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Concerns;
 
-use Illuminate\Http\Request;
 use Illuminate\Container\Container;
+use Illuminate\Http\Request;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 
 /**

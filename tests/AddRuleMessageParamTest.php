@@ -24,7 +24,7 @@ function exposeAddRule(): object
         protected ?string $compiledCache = null;
 
         /**
-         * @param array<int, string>|string|object $rules
+         * @param  array<int, string>|string|object  $rules
          */
         public function callAddRule(array|string|object $rules, ?string $message = null): static
         {
@@ -79,6 +79,6 @@ it('coexists with messages for different rule keys', function (): void {
 
     expect($rule->getCustomMessages())->toBe([
         'required' => 'Name required.',
-        'min'      => 'Too short.',
+        'min' => 'Too short.',
     ]);
 });

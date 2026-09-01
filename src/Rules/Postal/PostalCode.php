@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Postal;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Arr;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 
 /**
@@ -45,7 +45,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
     private readonly array $countries;
 
     /**
-     * @param string|list<string> $countries
+     * @param  string|list<string>  $countries
      */
     public function __construct(string|array $countries = [], private readonly ?string $countryField = null)
     {
@@ -72,7 +72,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
      * key type in the implementation is a contravariance violation — a caller holding the interface
      * may legitimately hand over an integer-keyed array.
      *
-     * @param array<array-key, mixed> $data
+     * @param  array<array-key, mixed>  $data
      */
     public function setData(array $data): static
     {
@@ -148,11 +148,11 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
         // Several countries: each pattern keeps its own anchors and flags
         // inside a group, since they do not all share the same flags.
         $alternation = implode('|', array_map(
-            static fn (string $p): string => '(?:' . self::inlineFlags($p) . ')',
+            static fn (string $p): string => '(?:'.self::inlineFlags($p).')',
             $patterns,
         ));
 
-        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:' . $alternation . ')$/D']]];
+        return [['rule' => 'regex', 'params' => ['pattern' => '/^(?:'.$alternation.')$/D']]];
     }
 
     /**
@@ -171,7 +171,7 @@ final class PostalCode implements ClientCheckable, DataAwareRule, ValidationRule
         $body = preg_replace('/^\^|\$$/', '', $m[1]) ?? $m[1];
         $flags = str_replace(['u', 'D'], '', $m[2]);
 
-        return $flags === '' ? $body : '(?' . $flags . ':' . $body . ')';
+        return $flags === '' ? $body : '(?'.$flags.':'.$body.')';
     }
 
     /** @return list<string> */

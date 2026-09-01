@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * End-to-end fast-check parity harness: every cell runs the same rules and
@@ -52,7 +52,7 @@ function assertVerdictParity(string $rule, mixed $value): void
 {
     $shapes = [
         'top-level' => [['f' => $rule], ['f' => $value]],
-        'wildcard'  => [['items.*.f' => $rule], ['items' => [['f' => $value], ['f' => $value]]]],
+        'wildcard' => [['items.*.f' => $rule], ['items' => [['f' => $value], ['f' => $value]]]],
     ];
 
     foreach ($shapes as $shape => [$rules, $data]) {
@@ -163,7 +163,7 @@ function ruleSetParityGrid(): iterable
 {
     foreach (harnessRules() as $rule) {
         foreach (harnessValues() as $i => $value) {
-            yield "{$rule} :: value #{$i} " . var_export($value, true) => [$rule, $value];
+            yield "{$rule} :: value #{$i} ".var_export($value, true) => [$rule, $value];
         }
     }
 }
@@ -184,7 +184,7 @@ it('RuleSet::validate() verdict matches a vanilla Laravel Validator', function (
  */
 it('P1: regex fast path fails closed when PCRE aborts, matching Laravel', function (): void {
     $pattern = '/^(a+)+$/';
-    $value = str_repeat('a', 200) . '!';
+    $value = str_repeat('a', 200).'!';
     $original = (string) ini_get('pcre.backtrack_limit');
 
     ini_set('pcre.backtrack_limit', '100');
@@ -196,10 +196,10 @@ it('P1: regex fast path fails closed when PCRE aborts, matching Laravel', functi
             ->and(preg_last_error())->not->toBe(PREG_NO_ERROR);
 
         // Laravel rejects on PCRE error…
-        expect(harnessVanillaVerdict(['f' => 'required|string|regex:' . $pattern], ['f' => $value]))->toBeFalse();
+        expect(harnessVanillaVerdict(['f' => 'required|string|regex:'.$pattern], ['f' => $value]))->toBeFalse();
 
         // …and the optimized pipeline must agree, in both shapes.
-        assertVerdictParity('required|string|regex:' . $pattern, $value);
+        assertVerdictParity('required|string|regex:'.$pattern, $value);
     } finally {
         ini_set('pcre.backtrack_limit', $original);
     }
@@ -213,7 +213,7 @@ it('P1: regex fast path fails closed when PCRE aborts, matching Laravel', functi
  */
 it('P1: not_regex fast path matches Laravel when PCRE aborts', function (): void {
     $pattern = '/^(a+)+$/';
-    $value = str_repeat('a', 200) . '!';
+    $value = str_repeat('a', 200).'!';
     $original = (string) ini_get('pcre.backtrack_limit');
 
     ini_set('pcre.backtrack_limit', '100');
@@ -222,7 +222,7 @@ it('P1: not_regex fast path matches Laravel when PCRE aborts', function (): void
         expect(preg_match($pattern, $value))
             ->toBeFalse();
 
-        assertVerdictParity('required|string|not_regex:' . $pattern, $value);
+        assertVerdictParity('required|string|not_regex:'.$pattern, $value);
     } finally {
         ini_set('pcre.backtrack_limit', $original);
     }

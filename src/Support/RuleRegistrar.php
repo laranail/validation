@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Support;
 
 use Closure;
-use SplFileInfo;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\ValidationRule;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use SplFileInfo;
 
 /**
  * The one registry of rule classes (§5.2.2) — the alias wiring, the console
@@ -52,9 +52,9 @@ final class RuleRegistrar
     /**
      * Register a consumer rule, optionally with a string alias.
      *
-     * @param class-string<ValidationRule> $rule
-     * @param Closure(list<string>): ValidationRule|null $factory Builds the rule from
-     *                                                            string-rule parameters; required for an alias.
+     * @param  class-string<ValidationRule>  $rule
+     * @param  Closure(list<string>): ValidationRule|null  $factory  Builds the rule from
+     *                                                               string-rule parameters; required for an alias.
      */
     public function register(string $rule, ?string $alias = null, ?Closure $factory = null): self
     {
@@ -119,7 +119,7 @@ final class RuleRegistrar
             return $this->discovered;
         }
 
-        $root = __DIR__ . '/../Rules';
+        $root = __DIR__.'/../Rules';
         $classes = [];
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root)) as $file) {
@@ -128,7 +128,7 @@ final class RuleRegistrar
             }
 
             $relative = substr((string) realpath($file->getPathname()), strlen((string) realpath($root)) + 1, -4);
-            $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+            $class = 'Simtabi\\Laranail\\Validation\\Rules\\'.str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
 
             if (class_exists($class) && is_subclass_of($class, ValidationRule::class)) {
                 $classes[] = $class;

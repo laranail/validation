@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Network;
 
 use Closure;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 use Simtabi\Laranail\Validation\Concerns\SkipsPrecognition;
-use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
+use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 
 /**
  * The email address has a Gravatar — a HEAD probe of the `d=404` avatar
@@ -61,7 +61,7 @@ final readonly class HasGravatar implements PrecognitionSkippable, ValidationRul
         try {
             $response = Http::timeout($this->timeoutSeconds)
                 ->connectTimeout($this->timeoutSeconds)
-                ->head('https://gravatar.com/avatar/' . $hash . '?d=404');
+                ->head('https://gravatar.com/avatar/'.$hash.'?d=404');
         } catch (ConnectionException) {
             return true;
         }

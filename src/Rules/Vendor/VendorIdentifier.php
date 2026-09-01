@@ -54,10 +54,10 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
 
     /** @var array<string, string> */
     private const array PATTERNS = [
-        self::GOOGLE_ANALYTICS   => '/^G-[A-Z0-9]{10}$/D',
+        self::GOOGLE_ANALYTICS => '/^G-[A-Z0-9]{10}$/D',
         self::GOOGLE_TAG_MANAGER => '/^GTM-[A-Z0-9]{6,8}$/D',
-        self::FACEBOOK_PIXEL     => '/^\d{15,16}$/D',
-        self::AWS_REGION         => '/^[a-z]{2}(?:-gov)?-[a-z]{4,9}-\d$/D',
+        self::FACEBOOK_PIXEL => '/^\d{15,16}$/D',
+        self::AWS_REGION => '/^[a-z]{2}(?:-gov)?-[a-z]{4,9}-\d$/D',
         // No consecutive periods, and cannot start or end with one.
         self::DISCORD_USERNAME => '/^(?!.*\.\.)[a-z0-9_.]{2,32}$/D',
     ];
@@ -88,7 +88,7 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
         // either way would admit a value Discord itself refuses.
         $candidate = match ($vendor) {
             self::GOOGLE_ANALYTICS, self::GOOGLE_TAG_MANAGER => mb_strtoupper($value),
-            default                                          => $value,
+            default => $value,
         };
 
         return preg_match(self::PATTERNS[$vendor], $candidate) === 1;
@@ -132,7 +132,7 @@ final readonly class VendorIdentifier implements ClientCheckable, ValidationRule
 
         $foldsCase = in_array($vendor, [self::GOOGLE_ANALYTICS, self::GOOGLE_TAG_MANAGER], true);
 
-        return [['rule' => 'regex', 'params' => ['pattern' => $foldsCase ? $pattern . 'i' : $pattern]]];
+        return [['rule' => 'regex', 'params' => ['pattern' => $foldsCase ? $pattern.'i' : $pattern]]];
     }
 
     /**

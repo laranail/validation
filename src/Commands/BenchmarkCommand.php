@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Commands;
 
-use Symfony\Component\Process\Process;
 use Simtabi\Laranail\Console\Tools\Commands\Command;
 use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
+use Symfony\Component\Process\Process;
 
 /**
  * The official face of the repo's benchmark harness. `benchmark.php` is a
@@ -25,12 +25,12 @@ final class BenchmarkCommand extends Command
 
     public function handle(): int
     {
-        $script = dirname(__DIR__, 2) . '/benchmark.php';
+        $script = dirname(__DIR__, 2).'/benchmark.php';
 
         if (! is_file($script)) {
             $this->error(
                 'benchmark.php ships only with a repository checkout, not the Composer archive. '
-                . 'Clone laranail/validation to benchmark: https://github.com/laranail/validation',
+                .'Clone laranail/validation to benchmark: https://github.com/laranail/validation',
             );
 
             return self::FAILURE;

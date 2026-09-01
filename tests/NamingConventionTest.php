@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Illuminate\Validation\Factory as ValidationFactory;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 
 // =========================================================================
 // Every public name this package registers must carry the vendor AND the
@@ -44,7 +44,7 @@ it('does not register any bare string rule alias', function (): void {
     ));
 
     expect($generic)->toBeEmpty(
-        'bare validator extensions registered: ' . implode(', ', $generic),
+        'bare validator extensions registered: '.implode(', ', $generic),
     );
 });
 

@@ -22,8 +22,8 @@ final class CannotExtendListShapedEach extends LogicException
     {
         return new self(sprintf(
             'Cannot call %s() on an ArrayRule whose each() is list-shaped '
-            . '(e.g. each(FluentRule::string())). Convert to keyed form '
-            . "first: each(['key' => FluentRule::…]).",
+            .'(e.g. each(FluentRule::string())). Convert to keyed form '
+            ."first: each(['key' => FluentRule::…]).",
             $method,
         ));
     }

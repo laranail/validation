@@ -20,9 +20,8 @@ use Stringable;
 final class ValueTypePredicates
 {
     /**
-     * @param array<mixed> $values
-     * @param array<mixed>|string $itemRules
-     *
+     * @param  array<mixed>  $values
+     * @param  array<mixed>|string  $itemRules
      * @return array<int, mixed>
      */
     public static function filter(array $values, array|string $itemRules): array
@@ -37,8 +36,7 @@ final class ValueTypePredicates
     }
 
     /**
-     * @param array<mixed>|string $itemRules
-     *
+     * @param  array<mixed>|string  $itemRules
      * @return list<Closure(mixed): bool>
      */
     private static function derive(array|string $itemRules): array
@@ -57,8 +55,7 @@ final class ValueTypePredicates
     }
 
     /**
-     * @param array<mixed>|string $itemRules
-     *
+     * @param  array<mixed>|string  $itemRules
      * @return list<string>
      */
     private static function stringRules(array|string $itemRules): array
@@ -93,11 +90,11 @@ final class ValueTypePredicates
 
         return match ($token) {
             'integer', 'int' => static fn (mixed $v): bool => filter_var($v, FILTER_VALIDATE_INT) !== false,
-            'numeric'        => is_numeric(...),
-            'uuid'           => static fn (mixed $v): bool => is_string($v) && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $v) === 1,
-            'ulid'           => static fn (mixed $v): bool => is_string($v) && preg_match('/^[0-9A-HJKMNP-TV-Z]{26}$/i', $v) === 1,
-            'string'         => static fn (mixed $v): bool => is_scalar($v) || $v instanceof Stringable,
-            default          => null,
+            'numeric' => is_numeric(...),
+            'uuid' => static fn (mixed $v): bool => is_string($v) && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $v) === 1,
+            'ulid' => static fn (mixed $v): bool => is_string($v) && preg_match('/^[0-9A-HJKMNP-TV-Z]{26}$/i', $v) === 1,
+            'string' => static fn (mixed $v): bool => is_scalar($v) || $v instanceof Stringable,
+            default => null,
         };
     }
 }

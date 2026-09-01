@@ -57,11 +57,11 @@ final readonly class Username implements ClientCheckable, ValidationRule
     private const string DEFAULT_SEPARATORS = '._-';
 
     /**
-     * @param int $min Fewest characters, counting separators.
-     * @param int $max Most characters, counting separators.
-     * @param string $separators Which characters may appear between others.
-     * @param bool $lowercase Reject uppercase rather than accepting and folding it.
-     * @param list<string>|null $reserved Replaces the default list; `[]` disables the check.
+     * @param  int  $min  Fewest characters, counting separators.
+     * @param  int  $max  Most characters, counting separators.
+     * @param  string  $separators  Which characters may appear between others.
+     * @param  bool  $lowercase  Reject uppercase rather than accepting and folding it.
+     * @param  list<string>|null  $reserved  Replaces the default list; `[]` disables the check.
      */
     public function __construct(
         private int $min = 3,
@@ -101,7 +101,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
      * per character. That is what makes this rule expressible as a pattern at
      * all, and why a rule with a Unicode class could not do the same.
      *
-     * @param string $separators Escaped for a character class before use.
+     * @param  string  $separators  Escaped for a character class before use.
      */
     public static function pattern(
         int $min = 3,
@@ -117,13 +117,13 @@ final readonly class Username implements ClientCheckable, ValidationRule
         if ($separators === '') {
             // No separators at all — a flat alphanumeric handle. The general
             // pattern below would still work, but this reads as what it is.
-            return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+$/D';
+            return '/^(?=.{'.$min.','.$max.'}$)['.$alphabet.']+$/D';
         }
 
         $class = self::escapeForCharacterClass($separators);
 
         // Alphanumeric at both ends; separators only between, never doubled.
-        return '/^(?=.{' . $min . ',' . $max . '}$)[' . $alphabet . ']+(?:[' . $class . '][' . $alphabet . ']+)*$/D';
+        return '/^(?=.{'.$min.','.$max.'}$)['.$alphabet.']+(?:['.$class.']['.$alphabet.']+)*$/D';
     }
 
     /**
@@ -133,7 +133,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
      * compared the literal value would let `a.d.m.i.n` and `ad-min` through,
      * and those are the same claim to anyone reading a profile page.
      *
-     * @param list<string> $reserved
+     * @param  list<string>  $reserved
      */
     public static function isReserved(string $value, array $reserved, string $separators = self::DEFAULT_SEPARATORS): bool
     {
@@ -148,7 +148,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
 
         $stripped = strtolower($separators === ''
             ? $value
-            : (string) preg_replace('/[' . self::escapeForCharacterClass($separators) . ']/', '', $value));
+            : (string) preg_replace('/['.self::escapeForCharacterClass($separators).']/', '', $value));
 
         $literal = strtolower($value);
 
@@ -193,7 +193,7 @@ final readonly class Username implements ClientCheckable, ValidationRule
     public function clientRules(): array
     {
         return [[
-            'rule'   => 'regex',
+            'rule' => 'regex',
             'params' => ['pattern' => self::pattern($this->min, $this->max, $this->separators, $this->lowercase)],
         ]];
     }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Cache\Repository;
 use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
-use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Contracts\PrecognitionSkippable;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Simtabi\Laranail\Validation\Rules\Network\DeliverableEmail;
 use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
 
 /**
@@ -20,7 +20,7 @@ use Simtabi\Laranail\Validation\Tests\Support\ThrowsOnEveryCacheCall;
  * precognitive request performs no lookup at all.
  */
 /**
- * @param list<string> $deliverable
+ * @param  list<string>  $deliverable
  */
 function fakeResolver(array $deliverable, ?Closure $onCall = null): DnsResolver
 {

@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use UnitEnum;
 use BackedEnum;
-use LogicException;
-use InvalidArgumentException;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\Rules\Contains;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Validation\Rules\DoesntContain;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\Contains;
+use Illuminate\Validation\Rules\DoesntContain;
+use InvalidArgumentException;
+use LogicException;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 use Simtabi\Laranail\Validation\Exceptions\CannotExtendListShapedEach;
+use UnitEnum;
 
 class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -143,7 +143,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         if (array_key_exists($key, $existing)) {
             throw new LogicException(sprintf(
                 "addEachRule('%s'): key '%s' already exists in each(). "
-                . 'Use mergeEachRules() if replacement is intentional.',
+                .'Use mergeEachRules() if replacement is intentional.',
                 $key,
                 $key,
             ));
@@ -159,7 +159,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * Merge multiple keyed sub-rules into the current each() shape,
      * later-wins on collision.
      *
-     * @param array<string, ValidationRule> $rules
+     * @param  array<string, ValidationRule>  $rules
      *
      * @throws CannotExtendListShapedEach when `eachRules` is list-shaped.
      */
@@ -187,7 +187,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * Unlike each() which produces wildcard paths (items.*.name),
      * children() produces fixed paths (search.value, search.regex).
      *
-     * @param array<string, ValidationRule> $rules
+     * @param  array<string, ValidationRule>  $rules
      */
     public function children(array $rules): static
     {
@@ -214,22 +214,22 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function min(int $value, ?string $message = null): static
     {
-        return $this->addRule('min:' . $value, $message);
+        return $this->addRule('min:'.$value, $message);
     }
 
     public function max(int $value, ?string $message = null): static
     {
-        return $this->addRule('max:' . $value, $message);
+        return $this->addRule('max:'.$value, $message);
     }
 
     public function between(int $min, int $max, ?string $message = null): static
     {
-        return $this->addRule('between:' . $min . ',' . $max, $message);
+        return $this->addRule('between:'.$min.','.$max, $message);
     }
 
     public function exactly(int $value, ?string $message = null): static
     {
-        return $this->addRule('size:' . $value, $message);
+        return $this->addRule('size:'.$value, $message);
     }
 
     public function list(?string $message = null): static
@@ -239,16 +239,16 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function requiredArrayKeys(string ...$keys): static
     {
-        return $this->addRule('required_array_keys:' . implode(',', $keys));
+        return $this->addRule('required_array_keys:'.implode(',', $keys));
     }
 
     public function distinct(?string $mode = null, ?string $message = null): static
     {
-        return $this->addRule($mode ? 'distinct:' . $mode : 'distinct', $message);
+        return $this->addRule($mode ? 'distinct:'.$mode : 'distinct', $message);
     }
 
     /**
-     * @param Arrayable<array-key, mixed>|UnitEnum|array<int, mixed>|string|int ...$values
+     * @param  Arrayable<array-key, mixed>|UnitEnum|array<int, mixed>|string|int  ...$values
      *
      * Note: `Arrayable` is template-invariant, so concrete types like
      * `Collection<int, string>` don't satisfy `Arrayable<array-key, mixed>`.
@@ -285,7 +285,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
             $this->keys,
         );
 
-        return 'array:' . implode(',', $keys);
+        return 'array:'.implode(',', $keys);
     }
 
     /** @return list<string|object> */
@@ -306,8 +306,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
      * Laravel's Rule::contains silently ignores extras, and leaving nested
      * arrays/Arrayables in the value list would crash Contains::__toString.
      *
-     * @param array<int|string, mixed> $values
-     *
+     * @param  array<int|string, mixed>  $values
      * @return array<int, mixed>
      */
     private function flattenContainsValues(array $values): array
@@ -328,7 +327,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
             if (is_array($value) || $value instanceof Arrayable) {
                 throw new InvalidArgumentException(
                     'contains()/doesntContain() does not accept multiple array or Arrayable arguments. '
-                    . 'Pass either a single iterable (->contains($values)) or variadic scalars (->contains($a, $b, $c)).',
+                    .'Pass either a single iterable (->contains($values)) or variadic scalars (->contains($a, $b, $c)).',
                 );
             }
         }
@@ -340,7 +339,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     private function buildEachNestedRules(string $attribute): array
     {
         if ($this->eachListRule instanceof ValidationRule) {
-            $key = $attribute . '.*';
+            $key = $attribute.'.*';
             $rules = [$key => $this->eachListRule];
 
             return $this->eachListRule instanceof self
@@ -357,7 +356,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         $nested = [];
 
         foreach ($this->eachRules as $field => $rule) {
-            $key = $attribute . '.*.' . $field;
+            $key = $attribute.'.*.'.$field;
             $rules[$key] = $rule;
 
             if ($rule instanceof self) {
@@ -376,7 +375,7 @@ class ArrayRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
         $nested = [];
 
         foreach ($this->childRules ?? [] as $field => $rule) {
-            $key = $attribute . '.' . $field;
+            $key = $attribute.'.'.$field;
             $rules[$key] = $rule;
 
             if ($rule instanceof self) {

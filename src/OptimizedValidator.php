@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
-use Stringable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
-use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
 use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
+use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
+use Stringable;
 
 /**
  * Validator subclass that fast-checks expanded wildcard attributes
@@ -48,8 +48,7 @@ class OptimizedValidator extends MemoizingValidator
      * Only string-only rules are eligible. Object rules, date comparisons,
      * cross-field references, distinct, size/between are skipped.
      *
-     * @param array<string, mixed> $compiledRules Compiled rules keyed by wildcard pattern
-     *
+     * @param  array<string, mixed>  $compiledRules  Compiled rules keyed by wildcard pattern
      * @return array<string, Closure(mixed): bool>
      */
     public static function buildFastChecks(array $compiledRules): array
@@ -72,8 +71,8 @@ class OptimizedValidator extends MemoizingValidator
     }
 
     /**
-     * @param array<string, Closure(mixed): bool> $fastChecks
-     * @param array<string, string> $attributePatternMap
+     * @param  array<string, Closure(mixed): bool>  $fastChecks
+     * @param  array<string, string>  $attributePatternMap
      */
     public function withFastChecks(array $fastChecks, array $attributePatternMap): static
     {
@@ -133,7 +132,7 @@ class OptimizedValidator extends MemoizingValidator
      * longer matched a notify of 1 — leaving a required field unenforced
      * rather than reporting an error.
      *
-     * @param string $parameter
+     * @param  string  $parameter
      */
     protected function shouldConvertToBoolean($parameter): bool
     {
@@ -198,7 +197,7 @@ class OptimizedValidator extends MemoizingValidator
      * {@see ConditionalEvaluationPhase} so this validator stays focused on
      * orchestration and Laravel-validator state mutation.
      *
-     * @param array<string, mixed> $removedRules
+     * @param  array<string, mixed>  $removedRules
      */
     private function runConditionalPhase(array &$removedRules): void
     {
@@ -242,7 +241,7 @@ class OptimizedValidator extends MemoizingValidator
      * portion of an attribute's rules. Returns true when the closure
      * compiled and the value passed — caller may then drop the attribute.
      *
-     * @param list<mixed> $rules
+     * @param  list<mixed>  $rules
      */
     private function tryFastCheckRemaining(string $attribute, array $rules): bool
     {
@@ -284,7 +283,7 @@ class OptimizedValidator extends MemoizingValidator
      * Extract the non-conditional string rules from an attribute's rule array
      * and join them into a pipe-delimited string for fast-check compilation.
      *
-     * @param list<mixed> $rules
+     * @param  list<mixed>  $rules
      */
     private function extractNonConditionalRule(array $rules): ?string
     {

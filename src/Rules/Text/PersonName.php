@@ -52,8 +52,8 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
     private const string LETTER = '/\p{L}/u';
 
     /**
-     * @param int $minNames Fewest whitespace-separated names the field may carry.
-     * @param int|null $maxNames Most it may carry; null for no upper bound.
+     * @param  int  $minNames  Fewest whitespace-separated names the field may carry.
+     * @param  int|null  $maxNames  Most it may carry; null for no upper bound.
      */
     public function __construct(
         private bool $allowDigits = false,
@@ -185,6 +185,6 @@ final readonly class PersonName implements ClientCheckable, ValidationRule
         $gaps = max(1, $this->minNames) - 1;
         $limit = $this->maxNames === null ? '' : (string) ($this->maxNames - 1);
 
-        return '/^\s*\S+(?:\s+\S+){' . $gaps . ',' . $limit . '}\s*$/uD';
+        return '/^\s*\S+(?:\s+\S+){'.$gaps.','.$limit.'}\s*$/uD';
     }
 }

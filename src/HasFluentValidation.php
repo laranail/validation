@@ -167,10 +167,9 @@ trait HasFluentValidation
      * Compile FluentRule objects to native format, expand wildcards
      * against actual data, and extract labels/messages.
      *
-     * @param array<string, mixed>|null $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
-     *
+     * @param  array<string, mixed>|null  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
      */
     protected function compileFluentRules(?array $rules, array $messages, array $attributes): array
@@ -219,8 +218,7 @@ trait HasFluentValidation
     /**
      * Merge with Livewire's rulesFromOutside (same as parent::getRules()).
      *
-     * @param array<string, mixed> $rules
-     *
+     * @param  array<string, mixed>  $rules
      * @return array<string, mixed>
      */
     private function mergeRulesFromOutside(array $rules): array

@@ -18,7 +18,7 @@ final class BundledLanguageDataset implements LanguageDataset
 
     public function isAlpha2(string $code): bool
     {
-        $this->alpha2 ??= CodeFile::load(__DIR__ . '/../../../resources/data/iso-639-1.txt');
+        $this->alpha2 ??= CodeFile::load(__DIR__.'/../../../resources/data/iso-639-1.txt');
 
         return isset($this->alpha2[$code]);
     }

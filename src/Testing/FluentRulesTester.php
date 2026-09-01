@@ -5,32 +5,31 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Testing;
 
 use Closure;
-use LogicException;
-use Livewire\Livewire;
-use Livewire\Component;
-use ReflectionProperty;
-use Illuminate\Support\Str;
-
-use function Livewire\store;
-
-use Illuminate\Http\Request;
-use PHPUnit\Framework\Assert;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\MessageBag;
-use Illuminate\Validation\Validator;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
+use Livewire\Component;
+use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
+use LogicException;
+use PHPUnit\Framework\Assert;
+use ReflectionProperty;
+use Simtabi\Laranail\Validation\FluentValidator;
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Validated;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Validation\ValidationException;
-use Livewire\Features\SupportTesting\Testable;
-use Illuminate\Contracts\Translation\Translator;
-use Simtabi\Laranail\Validation\FluentValidator;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+
+use function Livewire\store;
 
 /**
  * Fluent tester for FluentRule chains, RuleSets, FormRequests, and FluentValidator
@@ -72,8 +71,8 @@ final class FluentRulesTester
     private array $callQueue = [];
 
     /**
-     * @param class-string<FormRequest>|class-string<FluentValidator>|class-string<Component>|RuleSet|ValidationRule|array<string, mixed> $target
-     * @param list<mixed> $constructorArgs
+     * @param  class-string<FormRequest>|class-string<FluentValidator>|class-string<Component>|RuleSet|ValidationRule|array<string, mixed>  $target
+     * @param  list<mixed>  $constructorArgs
      */
     private function __construct(
         private readonly mixed $target,
@@ -83,8 +82,8 @@ final class FluentRulesTester
     /**
      * @api
      *
-     * @param class-string<FormRequest>|class-string<FluentValidator>|class-string<Component>|RuleSet|ValidationRule|array<string, mixed> $target
-     * @param mixed ...$constructorArgs Forwarded to FluentValidator subclass constructors after `$data`. Ignored for non-class targets.
+     * @param  class-string<FormRequest>|class-string<FluentValidator>|class-string<Component>|RuleSet|ValidationRule|array<string, mixed>  $target
+     * @param  mixed  ...$constructorArgs  Forwarded to FluentValidator subclass constructors after `$data`. Ignored for non-class targets.
      */
     public static function for(mixed $target, mixed ...$constructorArgs): self
     {
@@ -94,7 +93,7 @@ final class FluentRulesTester
     /**
      * @api
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function with(array $data): self
     {
@@ -119,7 +118,7 @@ final class FluentRulesTester
      *
      * @api
      *
-     * @param array<string, mixed> $parameters
+     * @param  array<string, mixed>  $parameters
      */
     public function withRoute(array $parameters): self
     {
@@ -159,7 +158,7 @@ final class FluentRulesTester
      *
      * @api
      *
-     * @param string|array<string, mixed> $key
+     * @param  string|array<string, mixed>  $key
      */
     public function set(string|array $key, mixed $value = null): self
     {
@@ -225,7 +224,7 @@ final class FluentRulesTester
      *
      * @api
      *
-     * @param array<string, mixed> $parameters
+     * @param  array<string, mixed>  $parameters
      */
     public function mount(array $parameters): self
     {
@@ -260,7 +259,7 @@ final class FluentRulesTester
         Assert::assertTrue(
             $result->passes(),
             'Failed asserting that validation passes. Errors: '
-                . $this->formatFirstErrors($result->errors()),
+                .$this->formatFirstErrors($result->errors()),
         );
 
         return $this;
@@ -274,7 +273,7 @@ final class FluentRulesTester
         Assert::assertTrue(
             $result->fails(),
             'Failed asserting that validation fails. Input data: '
-                . $this->shortJson($this->data ?? []),
+                .$this->shortJson($this->data ?? []),
         );
 
         return $this;
@@ -302,7 +301,7 @@ final class FluentRulesTester
         Assert::assertTrue(
             $result->errors()->has($field),
             "Expected error on field [{$field}]. Got errors on: ["
-                . implode(', ', $result->errors()->keys()) . '].',
+                .implode(', ', $result->errors()->keys()).'].',
         );
 
         if ($rule !== null) {
@@ -315,7 +314,7 @@ final class FluentRulesTester
                 $expected,
                 $rulesForField,
                 "Expected field [{$field}] to fail rule [{$expected}]. Failed rules: ["
-                    . implode(', ', array_keys($rulesForField)) . '].',
+                    .implode(', ', array_keys($rulesForField)).'].',
             );
         }
 
@@ -354,7 +353,7 @@ final class FluentRulesTester
             [$field],
             $keys,
             "Expected exactly [{$field}] to fail. Got errors on: ["
-                . implode(', ', $keys) . '].',
+                .implode(', ', $keys).'].',
         );
 
         if ($rule !== null) {
@@ -367,7 +366,7 @@ final class FluentRulesTester
                 $expected,
                 $rulesForField,
                 "Expected field [{$field}] to fail rule [{$expected}]. Failed rules: ["
-                    . implode(', ', array_keys($rulesForField)) . '].',
+                    .implode(', ', array_keys($rulesForField)).'].',
             );
         }
 
@@ -396,7 +395,7 @@ final class FluentRulesTester
             Assert::assertFalse(
                 $errors->has($field),
                 "Expected field [{$field}] to NOT have an error. Got errors on: ["
-                    . implode(', ', $errors->keys()) . '].',
+                    .implode(', ', $errors->keys()).'].',
             );
         }
 
@@ -430,7 +429,7 @@ final class FluentRulesTester
             return $this;
         }
 
-        $needle = $prefix . '.';
+        $needle = $prefix.'.';
         foreach ($result->errors()->keys() as $key) {
             if (str_starts_with($key, $needle)) {
                 return $this;
@@ -439,7 +438,7 @@ final class FluentRulesTester
 
         Assert::fail(
             "Expected an error matching [{$prefix}] or [{$prefix}.*]. Got errors on: ["
-                . implode(', ', $result->errors()->keys()) . '].',
+                .implode(', ', $result->errors()->keys()).'].',
         );
     }
 
@@ -454,7 +453,7 @@ final class FluentRulesTester
      *
      * @api
      *
-     * @param array<string, mixed> $replacements
+     * @param  array<string, mixed>  $replacements
      */
     public function failsWithMessage(string $field, string $translationKey, array $replacements = []): self
     {
@@ -465,7 +464,7 @@ final class FluentRulesTester
         Assert::assertTrue(
             $result->errors()->has($field),
             "Expected error on field [{$field}]. Got errors on: ["
-                . implode(', ', $result->errors()->keys()) . '].',
+                .implode(', ', $result->errors()->keys()).'].',
         );
 
         $expected = $this->renderTranslation($translationKey, $replacements);
@@ -568,8 +567,8 @@ final class FluentRulesTester
      * set container + redirector + user resolver, call validateResolved().
      * Internals shift subtly across Laravel majors; CI matrix exercises it.
      *
-     * @param class-string<FormRequest> $class
-     * @param array<string, mixed> $data
+     * @param  class-string<FormRequest>  $class
+     * @param  array<string, mixed>  $data
      */
     private function runFormRequest(string $class, array $data): Validated
     {
@@ -611,7 +610,7 @@ final class FluentRulesTester
      * exposes the same surface (`parameter()` + `parameters()`) so FormRequests
      * that introspect routes during `authorize()` or `rules()` Just Work.
      *
-     * @param array<string, mixed> $parameters
+     * @param  array<string, mixed>  $parameters
      */
     private function makeRouteShim(array $parameters): object
     {
@@ -648,8 +647,8 @@ final class FluentRulesTester
     }
 
     /**
-     * @param class-string<FluentValidator> $class
-     * @param array<string, mixed> $data
+     * @param  class-string<FluentValidator>  $class
+     * @param  array<string, mixed>  $data
      */
     private function runFluentValidator(string $class, array $data): Validated
     {
@@ -674,7 +673,7 @@ final class FluentRulesTester
      * `$this->target` is a `class-string<\Livewire\Component>` at this point.
      * Asserted at runtime to satisfy PHPStan without inline `@var` overrides.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function runLivewire(array $data): Validated
     {
@@ -739,7 +738,7 @@ final class FluentRulesTester
      * — in that case the caller falls back to a synthetic Validator so the
      * `Validated` DTO contract still holds.
      *
-     * @param Testable<Component> $component
+     * @param  Testable<Component>  $component
      */
     private function extractLivewireValidator(Testable $component): ?ValidatorContract
     {

@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation;
 
-use Closure;
 use BackedEnum;
-use Illuminate\Validation\Rules\AnyOf;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
-use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
+use Illuminate\Validation\Rules\AnyOf;
+use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DateRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\EmailRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\FieldRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\FileRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ImageRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\BooleanRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\AcceptedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\DeclinedRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
-use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\IpAddressRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\MacAddressRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PasswordRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\PhoneRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UrlRule;
+use Simtabi\Laranail\Validation\Builder\Nodes\UsernameRule;
 
 /**
  * Instance-based mirror of the {@see FluentRule} static factory.
@@ -51,7 +51,7 @@ final class FluentSchema
      * Forward anything not declared above to {@see FluentRule}, so macros
      * registered on the static factory are also reachable on the instance.
      *
-     * @param array<int, mixed> $arguments
+     * @param  array<int, mixed>  $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {
@@ -223,7 +223,7 @@ final class FluentSchema
     }
 
     /**
-     * @param array<int, mixed> $rules
+     * @param  array<int, mixed>  $rules
      */
     public function anyOf(array $rules): AnyOf
     {

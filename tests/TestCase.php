@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests;
 
-use Livewire\LivewireServiceProvider;
-use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Foundation\Application;
+use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
 
 class TestCase extends Orchestra
 {
     /**
-     * @param Application $app
-     *
+     * @param  Application  $app
      * @return list<class-string>
      */
     protected function getPackageProviders(mixed $app): array
@@ -36,14 +35,14 @@ class TestCase extends Orchestra
      * (directly or via a trait) keeps it — we don't silently clobber
      * key-sensitive behavior in key-dependent assertions.
      *
-     * @param Application $app
+     * @param  Application  $app
      */
     protected function defineEnvironment(mixed $app): void
     {
         $config = $app->make(Repository::class);
 
         if ($config->get('app.key') === null || $config->get('app.key') === '') {
-            $config->set('app.key', 'base64:' . base64_encode(str_repeat('a', 32)));
+            $config->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
         }
     }
 }

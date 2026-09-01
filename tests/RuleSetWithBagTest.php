@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // RuleSet::withBag() — routes ValidationException into a named error bag.
@@ -86,7 +86,7 @@ it('withBag() covers the Fortify use case end-to-end', function (): void {
     // with the other forms' error display.
     $ruleSet = RuleSet::from([
         'current_password' => FluentRule::string()->required()->min(8),
-        'new_password'     => FluentRule::string()->required()->min(12),
+        'new_password' => FluentRule::string()->required()->min(12),
     ])->withBag('updatePassword');
 
     try {

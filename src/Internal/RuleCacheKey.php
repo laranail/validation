@@ -24,8 +24,8 @@ final class RuleCacheKey
         $parts = [];
         foreach ($rules as $field => $rule) {
             $parts[] = is_string($rule)
-                ? $field . '=' . $rule
-                : $field . '=' . self::nonStringFingerprint($rule);
+                ? $field.'='.$rule
+                : $field.'='.self::nonStringFingerprint($rule);
         }
 
         return implode("\x1f", $parts);
@@ -44,14 +44,14 @@ final class RuleCacheKey
             foreach ($rule as $item) {
                 $parts[] = is_string($item)
                     ? $item
-                    : (is_object($item) ? '#' . spl_object_id($item) : gettype($item));
+                    : (is_object($item) ? '#'.spl_object_id($item) : gettype($item));
             }
 
-            return '[' . implode(',', $parts) . ']';
+            return '['.implode(',', $parts).']';
         }
 
         if (is_object($rule)) {
-            return '#' . spl_object_id($rule);
+            return '#'.spl_object_id($rule);
         }
 
         return gettype($rule);

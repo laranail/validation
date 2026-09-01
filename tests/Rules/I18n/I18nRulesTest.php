@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
-use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
-use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
 use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
+use Simtabi\Laranail\Validation\Rules\I18n\CountryCode;
+use Simtabi\Laranail\Validation\Rules\I18n\CurrencyCode;
+use Simtabi\Laranail\Validation\Rules\I18n\LanguageCode;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 // =========================================================================
 // CountryCode — ISO 3166-1, alpha-2 by default, alpha-3 by flag
@@ -157,7 +157,7 @@ it('keeps the generated datasets in step with their committed sources', function
     expect($php)->not->toBeEmpty();
 
     $process = new Process(
-        [$php, dirname(__DIR__, 3) . '/tools/build-datasets.php', '--check'],
+        [$php, dirname(__DIR__, 3).'/tools/build-datasets.php', '--check'],
     );
     $process->run();
 

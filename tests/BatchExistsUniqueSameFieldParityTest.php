@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * One field carrying BOTH `exists` and `unique` against the same
@@ -43,8 +43,8 @@ function setupExistsUniqueUsers(): void
 }
 
 /**
- * @param array<string, mixed> $rules
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<string, mixed>  $data
  */
 function existsUniqueRuleSetVerdict(array $rules, array $data): bool
 {
@@ -58,8 +58,8 @@ function existsUniqueRuleSetVerdict(array $rules, array $data): bool
 }
 
 /**
- * @param array<string, mixed> $rules
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<string, mixed>  $data
  */
 function existsUniqueVanillaVerdict(array $rules, array $data): bool
 {

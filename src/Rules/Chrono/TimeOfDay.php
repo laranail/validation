@@ -41,9 +41,9 @@ final readonly class TimeOfDay implements ValidationRule
         $sep = preg_quote($this->separator, '/');
 
         if ($this->twelveHour) {
-            return '/^(0?[1-9]|1[0-2])' . $sep . '[0-5]\d(?:' . $sep . '[0-5]\d)? ?[AaPp][Mm]$/D';
+            return '/^(0?[1-9]|1[0-2])'.$sep.'[0-5]\d(?:'.$sep.'[0-5]\d)? ?[AaPp][Mm]$/D';
         }
 
-        return '/^([01]?\d|2[0-3])' . $sep . '[0-5]\d(?:' . $sep . '[0-5]\d)?$/D';
+        return '/^([01]?\d|2[0-3])'.$sep.'[0-5]\d(?:'.$sep.'[0-5]\d)?$/D';
     }
 }

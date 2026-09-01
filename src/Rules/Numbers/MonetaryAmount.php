@@ -69,9 +69,9 @@ final readonly class MonetaryAmount implements ClientCheckable, ValidationRule
     public static function pattern(int $decimals = 2, bool $allowNegative = false): string
     {
         $sign = $allowNegative ? '[+-]?' : '\\+?';
-        $fraction = $decimals > 0 ? '(?:\\.\\d{1,' . $decimals . '})?' : '';
+        $fraction = $decimals > 0 ? '(?:\\.\\d{1,'.$decimals.'})?' : '';
 
-        return '/^' . $sign . '\\d+' . $fraction . '$/D';
+        return '/^'.$sign.'\\d+'.$fraction.'$/D';
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

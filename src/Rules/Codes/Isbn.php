@@ -32,7 +32,7 @@ final readonly class Isbn implements ValidationRule
     private array $editions;
 
     /**
-     * @param list<int> $editions 10, 13, or both (the default).
+     * @param  list<int>  $editions  10, 13, or both (the default).
      */
     public function __construct(array $editions = [self::EDITION_10, self::EDITION_13])
     {
@@ -40,7 +40,7 @@ final readonly class Isbn implements ValidationRule
     }
 
     /**
-     * @param list<int> $editions
+     * @param  list<int>  $editions
      */
     public static function passes(mixed $value, array $editions = [self::EDITION_10, self::EDITION_13]): bool
     {
@@ -51,8 +51,8 @@ final readonly class Isbn implements ValidationRule
         $isbn = strtoupper(str_replace([' ', '-'], '', (string) $value));
 
         return match (strlen($isbn)) {
-            10      => in_array(self::EDITION_10, $editions, true) && self::isbn10IsValid($isbn),
-            13      => in_array(self::EDITION_13, $editions, true) && self::isbn13IsValid($isbn),
+            10 => in_array(self::EDITION_10, $editions, true) && self::isbn10IsValid($isbn),
+            13 => in_array(self::EDITION_13, $editions, true) && self::isbn13IsValid($isbn),
             default => false,
         };
     }

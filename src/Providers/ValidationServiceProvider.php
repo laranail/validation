@@ -4,35 +4,35 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Providers;
 
-use Stringable;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Package\Tools\Package;
+use Illuminate\Support\Str;
 use Illuminate\Validation\InvokableValidationRule;
-use Simtabi\Laranail\Validation\Support\RuleAliases;
-use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\Commands\RulesCommand;
-use Simtabi\Laranail\Validation\Support\RuleRegistrar;
-use Simtabi\Laranail\Validation\Commands\DoctorCommand;
-use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
-use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
 use Illuminate\Validation\Validator as ValidationValidator;
+use Simtabi\Laranail\Package\Tools\Package;
+use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
+use Simtabi\Laranail\Validation\Actions\CachedDnsResolver;
+use Simtabi\Laranail\Validation\BatchDatabaseChecker;
+use Simtabi\Laranail\Validation\Commands\BenchmarkCommand;
+use Simtabi\Laranail\Validation\Commands\DoctorCommand;
+use Simtabi\Laranail\Validation\Commands\RulesCommand;
+use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
+use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
 use Simtabi\Laranail\Validation\Contracts\I18n\CountryDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\CurrencyDataset;
 use Simtabi\Laranail\Validation\Contracts\I18n\LanguageDataset;
+use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
 use Simtabi\Laranail\Validation\Contracts\ReservedUsernameList;
-use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
+use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
 use Simtabi\Laranail\Validation\Support\I18n\BundledCountryDataset;
-use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\Validation\Support\I18n\BundledCurrencyDataset;
 use Simtabi\Laranail\Validation\Support\I18n\BundledLanguageDataset;
-use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
-use Simtabi\Laranail\Validation\Contracts\Payment\CardBrandCatalogue;
-use Simtabi\Laranail\Validation\Support\Email\BundledRoleAccountList;
-use Simtabi\Laranail\Validation\Support\Text\DefaultReservedUsernameList;
-use Simtabi\Laranail\Validation\Support\Email\BundledDisposableDomainList;
 use Simtabi\Laranail\Validation\Support\Payment\BundledCardBrandCatalogue;
+use Simtabi\Laranail\Validation\Support\RuleAliases;
+use Simtabi\Laranail\Validation\Support\RuleRegistrar;
+use Simtabi\Laranail\Validation\Support\Text\DefaultReservedUsernameList;
+use Stringable;
 
 /**
  * The package is usable with no provider at all — every builder entry point is
@@ -109,8 +109,7 @@ class ValidationServiceProvider extends PackageServiceProvider
      * rather than coerced: `(string) []` is a fatal, and a rule string cannot
      * carry an array parameter in the first place.
      *
-     * @param array<array-key, mixed> $parameters
-     *
+     * @param  array<array-key, mixed>  $parameters
      * @return list<string>
      */
     private static function stringParameters(array $parameters): array
@@ -211,7 +210,7 @@ class ValidationServiceProvider extends PackageServiceProvider
         }
 
         foreach ($factories as $suffix => $factory) {
-            $alias = array_key_exists($suffix, RuleAliases::map()) ? $prefix . $suffix : $suffix;
+            $alias = array_key_exists($suffix, RuleAliases::map()) ? $prefix.$suffix : $suffix;
 
             // The key Laravel will look the message up under. It studly-cases
             // the rule string to dispatch and snake-cases it again to format,
@@ -242,7 +241,7 @@ class ValidationServiceProvider extends PackageServiceProvider
 
                     if ($messages !== []) {
                         $validator->setCustomMessages([
-                            $attribute . '.' . $messageKey => implode(' ', self::stringParameters($messages)),
+                            $attribute.'.'.$messageKey => implode(' ', self::stringParameters($messages)),
                         ]);
                     }
 

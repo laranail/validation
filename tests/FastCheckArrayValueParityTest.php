@@ -33,8 +33,8 @@ use Simtabi\Laranail\Validation\FluentValidator;
 final class ArrayValueParityValidator extends FluentValidator
 {
     /**
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $rules
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $rules
      */
     public function __construct(array $data, array $rules)
     {

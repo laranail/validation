@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Internal;
 
 use Closure;
-use Stringable;
 use Illuminate\Support\Arr;
-use Simtabi\Laranail\Validation\FastCheckCompiler;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
-use Simtabi\Laranail\Validation\ValueConditionalReducer;
-use Simtabi\Laranail\Validation\PresenceConditionalReducer;
+use Simtabi\Laranail\Validation\FastCheckCompiler;
 use Simtabi\Laranail\Validation\PrecomputedPresenceVerifier;
+use Simtabi\Laranail\Validation\PresenceConditionalReducer;
+use Simtabi\Laranail\Validation\ValueConditionalReducer;
+use Stringable;
 
 /**
  * Collaborator for {@see ItemValidator}. Extracts the rule-shape concerns
@@ -31,8 +31,7 @@ final class ItemRuleCompiler
      * evaluation. A field may carry more than one exclude_* rule; all of them
      * must be evaluated (the field is excluded if any fires), matching native.
      *
-     * @param array<string, mixed> $itemRules
-     *
+     * @param  array<string, mixed>  $itemRules
      * @return array<string, list<array{action: string, field: string, values: list<string>}>>
      */
     public function analyzeConditionals(array $itemRules): array
@@ -55,11 +54,10 @@ final class ItemRuleCompiler
     /**
      * Reduce item rules by evaluating conditional exclusions against the item data.
      *
-     * @param array<string, mixed> $itemRules
-     * @param array<string, mixed> $itemData
-     * @param array<string, list<array{action: string, field: string, values: list<string>}>> $conditionalFields
-     * @param array<string, string> $itemMessages
-     *
+     * @param  array<string, mixed>  $itemRules
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, list<array{action: string, field: string, values: list<string>}>>  $conditionalFields
+     * @param  array<string, string>  $itemMessages
      * @return array<string, mixed>
      */
     public function reduceRulesForItem(array $itemRules, array $itemData, array $conditionalFields, array $itemMessages = []): array
@@ -87,7 +85,7 @@ final class ItemRuleCompiler
      * same field. Returns the field name (e.g., "type") or null if conditions
      * reference different fields or there are no conditionals.
      *
-     * @param array<string, list<array{action: string, field: string, values: list<string>}>> $conditionalFields
+     * @param  array<string, list<array{action: string, field: string, values: list<string>}>>  $conditionalFields
      */
     public function findCommonDispatchField(array $conditionalFields): ?string
     {
@@ -114,7 +112,7 @@ final class ItemRuleCompiler
      * Delegate to `RuleCacheKey::for` — see that class for the rationale on
      * why field names alone are insufficient after per-item reducers engage.
      *
-     * @param array<string, mixed> $rules
+     * @param  array<string, mixed>  $rules
      */
     public function ruleCacheKey(array $rules): string
     {
@@ -125,8 +123,7 @@ final class ItemRuleCompiler
      * Build fast-check closures for eligible fields.
      * Returns fast checks for compilable fields and the remaining slow rules.
      *
-     * @param array<string, mixed> $compiledRules
-     *
+     * @param  array<string, mixed>  $compiledRules
      * @return array{0: list<Closure(array<string, mixed>): bool>, 1: array<string, mixed>}
      */
     public function buildFastChecks(array $compiledRules): array
@@ -236,8 +233,8 @@ final class ItemRuleCompiler
      * Build a PrecomputedPresenceVerifier by batching all exists/unique values
      * from slow rules across all items in a single whereIn query.
      *
-     * @param array<string, mixed> $slowRules
-     * @param array<int|string, mixed> $items
+     * @param  array<string, mixed>  $slowRules
+     * @param  array<int|string, mixed>  $items
      */
     public function buildBatchVerifier(array $slowRules, array $items, bool $isScalar): ?PrecomputedPresenceVerifier
     {
@@ -263,9 +260,9 @@ final class ItemRuleCompiler
      * Is the field excluded by ANY of its exclude_* conditions? Mirrors native
      * Laravel, which evaluates every exclude rule on a field.
      *
-     * @param list<array{action: string, field: string, values: list<string>}> $conditions
-     * @param array<string, mixed> $itemData
-     * @param array<string, mixed> $itemRules
+     * @param  list<array{action: string, field: string, values: list<string>}>  $conditions
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, mixed>  $itemRules
      */
     private function fieldIsExcluded(array $conditions, array $itemData, array $itemRules): bool
     {

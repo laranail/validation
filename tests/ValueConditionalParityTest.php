@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Lang;
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Validation\Rules\RequiredIf;
 use Simtabi\Laranail\Validation\FluentRule;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Phase 1 (spec: internal/specs/value-and-prohibited-conditionals.md)
@@ -20,9 +20,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 // =========================================================================
 
 /**
- * @param array<int, array<string, mixed>> $items
- * @param array<string, string> $messages
- *
+ * @param  array<int, array<string, mixed>>  $items
+ * @param  array<string, string>  $messages
  * @return array<string, array<int, string>>
  */
 function runValueItems(Closure $ruleBuilder, array $items, array $messages = []): array
@@ -37,8 +36,8 @@ function runValueItems(Closure $ruleBuilder, array $items, array $messages = [])
  * Side-by-side parity assertion: native Laravel vs fluent wildcard-item
  * verdict must agree on pass/fail for every shape.
  *
- * @param list<array<string, mixed>> $shapes
- * @param array<string, string> $flatExtraRules
+ * @param  list<array<string, mixed>>  $shapes
+ * @param  array<string, string>  $flatExtraRules
  */
 function assertValueParity(string $flatRule, Closure $ruleBuilder, array $shapes, array $flatExtraRules = []): void
 {
@@ -50,7 +49,7 @@ function assertValueParity(string $flatRule, Closure $ruleBuilder, array $shapes
             ->check(['addresses' => [$shape]])
             ->fails();
 
-        expect($fluent)->toBe($native, 'shape: ' . json_encode($shape) . ' rule: ' . $flatRule);
+        expect($fluent)->toBe($native, 'shape: '.json_encode($shape).' rule: '.$flatRule);
     }
 }
 
@@ -101,10 +100,10 @@ it('required_if: verdicts match native Laravel across grid', function (): void {
             ['flag' => 'user', 'postcode' => 'X'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
-            ['flag'     => 'admin', 'postcode' => ''],
-            ['flag'     => 'admin', 'postcode' => null],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
+            ['flag' => 'admin', 'postcode' => ''],
+            ['flag' => 'admin', 'postcode' => null],
         ],
     );
 });
@@ -148,8 +147,8 @@ it('required_unless: verdicts match native Laravel across grid', function (): vo
             ['flag' => 'user', 'postcode' => 'X'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -214,7 +213,7 @@ it('prohibited_if: verdicts match native Laravel across grid', function (): void
             ['flag' => 'user'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -250,7 +249,7 @@ it('prohibited_unless: verdicts match native Laravel across grid', function (): 
             ['flag' => 'user'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -330,16 +329,16 @@ it('required_if: shouldConvertToBoolean fires when dep has boolean rule', functi
 
     foreach ($shapes as $shape) {
         $native = validator($shape, [
-            'flag'     => 'boolean',
+            'flag' => 'boolean',
             'postcode' => 'required_if:flag,true|string',
         ])->fails();
 
         $fluent = RuleSet::from([
-            'addresses.*.flag'     => FluentRule::boolean(),
+            'addresses.*.flag' => FluentRule::boolean(),
             'addresses.*.postcode' => FluentRule::field()->requiredIf('flag', 'true')->rule('string'),
         ])->check(['addresses' => [$shape]])->fails();
 
-        expect($fluent)->toBe($native, 'shape: ' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape: '.json_encode($shape));
     }
 });
 
@@ -397,9 +396,9 @@ it('prohibited_unless: "null" literal → null-conversion parity', function (): 
         static fn () => FluentRule::field()->prohibitedUnless('flag', 'null'),
         [
             [],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
-            ['flag'     => 'admin', 'postcode' => 'X'],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
+            ['flag' => 'admin', 'postcode' => 'X'],
             ['postcode' => 'X'],
         ],
     );

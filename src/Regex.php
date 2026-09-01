@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation;
 
 use Closure;
-use Stringable;
-use LogicException;
 use InvalidArgumentException;
+use LogicException;
+use Stringable;
 
 /**
  * A regex that is safe by construction — and never required.
@@ -99,7 +99,7 @@ final class Regex implements Stringable
     public function oneOf(string ...$alternatives): self
     {
         $escaped = array_map(static fn (string $alt): string => preg_quote($alt, '/'), $alternatives);
-        $this->fragments[] = '(?:' . implode('|', $escaped) . ')';
+        $this->fragments[] = '(?:'.implode('|', $escaped).')';
 
         return $this;
     }
@@ -107,7 +107,7 @@ final class Regex implements Stringable
     /** A group that may be absent. */
     public function optional(Closure|string $part): self
     {
-        $this->fragments[] = $this->subPattern($part) . '?';
+        $this->fragments[] = $this->subPattern($part).'?';
 
         return $this;
     }
@@ -121,7 +121,7 @@ final class Regex implements Stringable
     public function oneOrMore(Closure|string $part): self
     {
         $sub = $this->subPattern($part, forbidUnbounded: ! $this->allowUnbounded);
-        $this->fragments[] = $sub . '+';
+        $this->fragments[] = $sub.'+';
         $this->hasUnbounded = true;
 
         return $this;
@@ -139,7 +139,7 @@ final class Regex implements Stringable
     public function or(Closure|string $part): self
     {
         $left = implode('', $this->fragments);
-        $this->fragments = ['(?:' . $left . '|' . $this->innerPattern($part) . ')'];
+        $this->fragments = ['(?:'.$left.'|'.$this->innerPattern($part).')'];
 
         return $this;
     }
@@ -198,11 +198,11 @@ final class Regex implements Stringable
         $body = implode('', $this->fragments);
 
         if ($this->anchored) {
-            $body = '^(?:' . $body . ')$';
+            $body = '^(?:'.$body.')$';
         }
 
-        $flags = 'D' . ($this->caseInsensitive ? 'i' : '');
-        $pattern = self::wrap($body) . $flags;
+        $flags = 'D'.($this->caseInsensitive ? 'i' : '');
+        $pattern = self::wrap($body).$flags;
 
         self::assertCompiles($pattern);
 
@@ -214,7 +214,7 @@ final class Regex implements Stringable
     {
         foreach (self::DELIMITERS as $delimiter) {
             if (! str_contains($body, $delimiter)) {
-                return $delimiter . $body . $delimiter;
+                return $delimiter.$body.$delimiter;
             }
         }
 
@@ -228,7 +228,7 @@ final class Regex implements Stringable
     {
         $delimited = preg_match('/^([\/#~%])(.*)\1([a-zA-Z]*)$/s', $pattern) === 1;
 
-        $normalized = $delimited ? $pattern : self::wrap($pattern) . 'D';
+        $normalized = $delimited ? $pattern : self::wrap($pattern).'D';
 
         self::assertCompiles($normalized);
 
@@ -244,7 +244,7 @@ final class Regex implements Stringable
     {
         if (@preg_match($pattern, '') === false) {
             throw new InvalidArgumentException(
-                'The pattern does not compile: ' . $pattern . ' (' . preg_last_error_msg() . ')',
+                'The pattern does not compile: '.$pattern.' ('.preg_last_error_msg().')',
             );
         }
     }
@@ -255,7 +255,7 @@ final class Regex implements Stringable
             throw new InvalidArgumentException('A count must be at least 1.');
         }
 
-        $this->fragments[] = $atom . ($count === null ? '+' : ($count === 1 ? '' : '{' . $count . '}'));
+        $this->fragments[] = $atom.($count === null ? '+' : ($count === 1 ? '' : '{'.$count.'}'));
         $this->hasUnbounded = $this->hasUnbounded || $count === null;
 
         return $this;
@@ -269,11 +269,11 @@ final class Regex implements Stringable
         if ($forbidUnbounded && $this->looksUnbounded($inner)) {
             throw new LogicException(
                 'An unbounded quantifier inside an unbounded group is the catastrophic-backtracking shape. '
-                . 'Bound the inner part, or opt in explicitly with dangerouslyUnbounded().',
+                .'Bound the inner part, or opt in explicitly with dangerouslyUnbounded().',
             );
         }
 
-        return '(?:' . $inner . ')';
+        return '(?:'.$inner.')';
     }
 
     private function innerPattern(Closure|string $part): string

@@ -88,7 +88,7 @@ final class Iban implements ValidationRule
      */
     private static function checksumIsValid(string $iban): bool
     {
-        $rearranged = substr($iban, 4) . substr($iban, 0, 4);
+        $rearranged = substr($iban, 4).substr($iban, 0, 4);
 
         $numeric = '';
         foreach (str_split($rearranged) as $character) {
@@ -104,7 +104,7 @@ final class Iban implements ValidationRule
         foreach (str_split($numeric, 7) as $chunk) {
             // At most two carried digits plus a seven-digit chunk, so the
             // concatenation always fits an int and the cast is exact.
-            $remainder = ((int) ($remainder . $chunk)) % 97;
+            $remainder = ((int) ($remainder.$chunk)) % 97;
         }
 
         return $remainder === 1;

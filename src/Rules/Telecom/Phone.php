@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Telecom;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Arr;
-use Simtabi\Laranail\Phone\PhoneFormatter;
-use Simtabi\Laranail\Phone\PhoneNumberValue;
-use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Arr;
+use RuntimeException;
+use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Phone\PhoneFormatter;
+use Simtabi\Laranail\Phone\PhoneNumberValue;
 
 /**
  * A phone number, checked against Google's numbering-plan metadata.
@@ -44,8 +44,8 @@ final class Phone implements DataAwareRule, ValidationRule
     private array $data = [];
 
     /**
-     * @param list<string> $countries ISO 3166-1 alpha-2 codes; empty means any country
-     * @param list<PhoneNumberType> $types Acceptable line types; empty means any
+     * @param  list<string>  $countries  ISO 3166-1 alpha-2 codes; empty means any country
+     * @param  list<PhoneNumberType>  $types  Acceptable line types; empty means any
      */
     public function __construct(
         private readonly array $countries = [],
@@ -58,7 +58,7 @@ final class Phone implements DataAwareRule, ValidationRule
     ) {}
 
     /**
-     * @param array<array-key, mixed> $data
+     * @param  array<array-key, mixed>  $data
      */
     public function setData(array $data): static
     {
@@ -190,8 +190,8 @@ final class Phone implements DataAwareRule, ValidationRule
         if (! class_exists(PhoneFormatter::class)) {
             throw new RuntimeException(
                 'The phone rule requires laranail/phone. Install it with `composer require laranail/phone`. '
-                . "It is a suggested rather than a required dependency because it pulls libphonenumber's "
-                . 'numbering-plan metadata, which a project validating only strings and dates should not carry.',
+                ."It is a suggested rather than a required dependency because it pulls libphonenumber's "
+                .'numbering-plan metadata, which a project validating only strings and dates should not carry.',
             );
         }
 

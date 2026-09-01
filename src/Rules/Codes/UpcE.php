@@ -36,13 +36,13 @@ final class UpcE implements ValidationRule
 
         // GS1's zero-suppression patterns, keyed by the sixth data digit.
         $body = match (true) {
-            in_array($selector, ['0', '1', '2'], true) => $numberSystem . substr($data, 0, 2) . $selector . '0000' . substr($data, 2, 3),
-            $selector === '3'                          => $numberSystem . substr($data, 0, 3) . '00000' . substr($data, 3, 2),
-            $selector === '4'                          => $numberSystem . substr($data, 0, 4) . '00000' . $data[4],
-            default                                    => $numberSystem . substr($data, 0, 5) . '0000' . $selector,
+            in_array($selector, ['0', '1', '2'], true) => $numberSystem.substr($data, 0, 2).$selector.'0000'.substr($data, 2, 3),
+            $selector === '3' => $numberSystem.substr($data, 0, 3).'00000'.substr($data, 3, 2),
+            $selector === '4' => $numberSystem.substr($data, 0, 4).'00000'.$data[4],
+            default => $numberSystem.substr($data, 0, 5).'0000'.$selector,
         };
 
-        return Gtin::passes($body . $value[7], [12]);
+        return Gtin::passes($body.$value[7], [12]);
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

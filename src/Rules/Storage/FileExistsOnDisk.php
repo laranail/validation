@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Storage;
 
 use Closure;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * The value names a file that exists on a Laravel disk, optionally scoped
@@ -47,7 +47,7 @@ final readonly class FileExistsOnDisk implements ValidationRule
             return false;
         }
 
-        $path = $this->directory === '' ? $value : rtrim($this->directory, '/') . '/' . $value;
+        $path = $this->directory === '' ? $value : rtrim($this->directory, '/').'/'.$value;
 
         return Storage::disk($this->disk)->exists($path);
     }

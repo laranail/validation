@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Phone\Enums\PhoneNumberType;
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\Rules\Telecom\UniquePhone;
 
 // =========================================================================
@@ -21,10 +21,10 @@ it('accepts a valid international number and rejects nonsense', function (): voi
 it('accepts any country by default', function (string $number): void {
     expect(makeValidator(['phone' => $number], ['phone' => FluentRule::phone()])->passes())->toBeTrue();
 })->with([
-    'Kenya'          => ['+254712123456'],
-    'Türkiye'        => ['+905301111111'],
+    'Kenya' => ['+254712123456'],
+    'Türkiye' => ['+905301111111'],
     'United Kingdom' => ['+447400123456'],
-    'Brazil'         => ['+5511961234567'],
+    'Brazil' => ['+5511961234567'],
 ]);
 
 // =========================================================================
@@ -145,10 +145,10 @@ it('composes with the shared presence modifiers', function (): void {
 it('normalises what the user actually pasted', function (string $input): void {
     expect(makeValidator(['phone' => $input], ['phone' => FluentRule::phone()->country('KE')])->passes())->toBeTrue();
 })->with([
-    'international'   => ['+254712123456'],
-    'IDD prefix'      => ['00254712123456'],
+    'international' => ['+254712123456'],
+    'IDD prefix' => ['00254712123456'],
     'spaced national' => ['0712 123 456'],
-    'punctuated'      => ['(0712) 123-456'],
+    'punctuated' => ['(0712) 123-456'],
     // Typed on an Arabic keyboard. None of the surveyed packages handles this.
     'Arabic-Indic digits' => ['٠٠٢٥٤٧١٢١٢٣٤٥٦'],
 ]);

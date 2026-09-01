@@ -22,7 +22,7 @@ final class BundledRoleAccountList implements RoleAccountList
 
     public function contains(string $localPart): bool
     {
-        $this->localParts ??= DomainFile::load(__DIR__ . '/../../../resources/data/role-accounts.txt');
+        $this->localParts ??= DomainFile::load(__DIR__.'/../../../resources/data/role-accounts.txt');
 
         return isset($this->localParts[strtolower(trim($localPart))]);
     }

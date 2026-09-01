@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Testing\Arch;
 
-use SplFileInfo;
-use PhpParser\Node;
-use PhpParser\Error;
-use RuntimeException;
 use FilesystemIterator;
-use PhpParser\Node\Name;
-use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
-use PhpParser\Node\Identifier;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-use PhpParser\NodeVisitorAbstract;
+use PhpParser\Error;
+use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use Simtabi\Laranail\Validation\FluentRule;
+use PhpParser\NodeVisitorAbstract;
+use PhpParser\ParserFactory;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RuntimeException;
 use Simtabi\Laranail\Validation\Exceptions\TypedBuilderHint;
+use Simtabi\Laranail\Validation\FluentRule;
+use SplFileInfo;
 
 /**
  * Pest / PHPUnit arch helper that returns every PHP file under the given
@@ -49,7 +49,7 @@ final class BansFieldRuleTypeMethods
         if (! class_exists(ParserFactory::class)) {
             throw new RuntimeException(
                 'BansFieldRuleTypeMethods requires nikic/php-parser ^5.0. '
-                . 'Add it to your dev dependencies: composer require --dev "nikic/php-parser:^5.0"',
+                .'Add it to your dev dependencies: composer require --dev "nikic/php-parser:^5.0"',
             );
         }
 
@@ -61,8 +61,8 @@ final class BansFieldRuleTypeMethods
             $parser = new ParserFactory()->createForHostVersion();
         } catch (\Error $error) {
             throw new RuntimeException('BansFieldRuleTypeMethods requires nikic/php-parser ^5.0 '
-            . '(installed version is too old). '
-            . 'Upgrade: composer require --dev "nikic/php-parser:^5.0"', $error->getCode(), previous: $error);
+            .'(installed version is too old). '
+            .'Upgrade: composer require --dev "nikic/php-parser:^5.0"', $error->getCode(), previous: $error);
         }
 
         $banned = array_flip(TypedBuilderHint::knownMethods());
@@ -125,8 +125,8 @@ final class BansFieldRuleTypeMethods
     }
 
     /**
-     * @param array<Node> $ast
-     * @param array<string, int> $banned
+     * @param  array<Node>  $ast
+     * @param  array<string, int>  $banned
      */
     private static function containsViolation(array $ast, array $banned): bool
     {

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 use Symfony\Component\HttpFoundation\File\File;
 
 // =========================================================================
@@ -50,7 +50,7 @@ it('bare prohibited: verdict matches native Laravel across shape grid', function
         $fluent = RuleSet::from(['items.*.forbidden' => FluentRule::field()->prohibited()])
             ->check(['items' => [$shape]])
             ->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -71,7 +71,7 @@ it('prohibited|required: contradictory — every value fails (match Laravel)', f
     foreach ([['field' => 'X'], ['field' => null], ['field' => ''], ['field' => []], []] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|required'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -81,7 +81,7 @@ it('prohibited|accepted: contradictory — every value fails (match Laravel)', f
     foreach ([['field' => 'yes'], ['field' => null], ['field' => ''], ['field' => 'random']] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|accepted'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -91,7 +91,7 @@ it('prohibited|declined: contradictory — every value fails (match Laravel)', f
     foreach ([['field' => 'no'], ['field' => null], ['field' => ''], ['field' => 'random']] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|declined'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -104,7 +104,7 @@ it('prohibited|string|max:10: empty value passes (string is non-implicit, Larave
     foreach ([['field' => null], [], ['field' => ''], ['field' => '   ']] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|string|max:10'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 
     // Non-empty value: prohibited fails regardless of string/max.
@@ -131,7 +131,7 @@ it('prohibited|same:other: absent and explicit-null both match Laravel (slow-pat
     foreach ([[], ['other' => 'X'], ['field' => null, 'other' => 'X'], ['field' => 'X', 'other' => 'X']] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|same:other'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -141,7 +141,7 @@ it('prohibited|different:other: absent and explicit-null both match Laravel', fu
     foreach ([[], ['other' => 'X'], ['field' => null, 'other' => 'X'], ['field' => 'Y', 'other' => 'X']] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|different:other'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 
@@ -156,7 +156,7 @@ it('prohibited|after:start: date-ref path matches Laravel for absent and explici
     ] as $shape) {
         $native = validator($shape, ['field' => 'prohibited|after:start'])->fails();
         $fluent = $ruleSet->check(['items' => [$shape]])->fails();
-        expect($fluent)->toBe($native, 'shape=' . json_encode($shape));
+        expect($fluent)->toBe($native, 'shape='.json_encode($shape));
     }
 });
 

@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\In;
-use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\Rules\Exists;
-use Illuminate\Validation\Rules\Unique;
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Validation\Rules\Contains;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ExcludeIf;
-use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Contracts\Support\Arrayable;
-use Simtabi\Laranail\Validation\FluentRule;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
-use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestArrayKeyEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
+use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
+use Symfony\Component\VarDumper\VarDumper;
 
 // =========================================================================
 // BooleanRule
@@ -152,7 +152,7 @@ it('validates array each() with field mappings standalone', function (): void {
         ['items' => [['name' => 'John', 'age' => 25], ['name' => 'Jane', 'age' => 30]]],
         ['items' => FluentRule::array()->required()->each([
             'name' => FluentRule::string()->required()->min(2),
-            'age'  => FluentRule::numeric()->required()->min(0),
+            'age' => FluentRule::numeric()->required()->min(0),
         ])],
     );
 
@@ -162,7 +162,7 @@ it('validates array each() with field mappings standalone', function (): void {
         ['items' => [['name' => 'J', 'age' => 25]]],
         ['items' => FluentRule::array()->required()->each([
             'name' => FluentRule::string()->required()->min(2),
-            'age'  => FluentRule::numeric()->required()->min(0),
+            'age' => FluentRule::numeric()->required()->min(0),
         ])],
     );
 
@@ -273,7 +273,7 @@ it('validates each() + children() combined standalone', function (): void {
         ]],
         ['items' => FluentRule::array()->required()->each([
             'action' => FluentRule::array()->required()->children([
-                'type'   => FluentRule::string()->required(),
+                'type' => FluentRule::string()->required(),
                 'target' => FluentRule::string()->required(),
             ]),
         ])],
@@ -288,7 +288,7 @@ it('validates each() + children() combined standalone', function (): void {
         ]],
         ['items' => FluentRule::array()->required()->each([
             'action' => FluentRule::array()->required()->children([
-                'type'   => FluentRule::string()->required(),
+                'type' => FluentRule::string()->required(),
                 'target' => FluentRule::string()->required(),
             ]),
         ])],
@@ -1500,7 +1500,7 @@ it('clone allows extending rules for FormRequest inheritance', function (): void
 it('compiles fluent rules to native format', function (): void {
     $compiled = RuleSet::compile([
         'name' => FluentRule::string()->required()->min(2),
-        'age'  => FluentRule::numeric()->integer(),
+        'age' => FluentRule::numeric()->integer(),
     ]);
     expect($compiled)->toMatchArray(['name' => 'required|string|min:2', 'age' => 'numeric|integer']);
 });
@@ -1520,14 +1520,14 @@ it('compile passes through non-fluent rules unchanged', function (): void {
 it('compileToArrays returns arrays for fluent rules', function (): void {
     $compiled = RuleSet::compileToArrays([
         'name' => FluentRule::string()->required()->min(2),
-        'age'  => FluentRule::numeric()->integer(),
+        'age' => FluentRule::numeric()->integer(),
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string', 'min:2'], 'age' => ['numeric', 'integer']]);
 });
 
 it('compileToArrays explodes string rules into arrays', function (): void {
     $compiled = RuleSet::compileToArrays([
-        'name'  => 'required|string|max:255',
+        'name' => 'required|string|max:255',
         'email' => 'required|email',
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string', 'max:255'], 'email' => ['required', 'email']]);
@@ -1556,9 +1556,9 @@ it('compileToArrays wraps standalone objects in arrays', function (): void {
 
 it('compileToArrays handles mixed fluent and string rules', function (): void {
     $compiled = RuleSet::compileToArrays([
-        'name'  => FluentRule::string()->required(),
+        'name' => FluentRule::string()->required(),
         'email' => 'required|email',
-        'tags'  => ['required', 'array'],
+        'tags' => ['required', 'array'],
     ]);
     expect($compiled)->toMatchArray(['name' => ['required', 'string'], 'email' => ['required', 'email'], 'tags' => ['required', 'array']]);
 });
@@ -2181,14 +2181,14 @@ it('contains produces a Contains object equivalent to Rule::contains() for every
 
     expect((string) $fluentContains)->toBe((string) $directRule);
 })->with([
-    'single string'          => 'php',
-    'single int'             => 42,
+    'single string' => 'php',
+    'single int' => 42,
     'single array unwrapped' => [['a', 'b', 'c']],
     'Arrayable (Collection)' => fn () => collect(['a', 'b']),
-    'BackedEnum single'      => fn () => TestStringEnum::Active,
-    'UnitEnum single'        => fn () => TestUnitEnum::Foo,
-    'embedded comma'         => 'a,b',
-    'embedded quote'         => 'he said "hi"',
+    'BackedEnum single' => fn () => TestStringEnum::Active,
+    'UnitEnum single' => fn () => TestUnitEnum::Foo,
+    'embedded comma' => 'a,b',
+    'embedded quote' => 'he said "hi"',
 ]);
 
 // =========================================================================
@@ -2457,7 +2457,7 @@ it('toArray returns array from object-compiled rules', function (): void {
 
 it('RuleSet dump returns rules messages and attributes', function (): void {
     $dump = RuleSet::from([
-        'name'  => FluentRule::string('Full Name')->required()->max(255),
+        'name' => FluentRule::string('Full Name')->required()->max(255),
         'email' => FluentRule::email()->required(),
     ])->dump();
 

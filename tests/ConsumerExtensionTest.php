@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\Contracts\TermList;
-use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
 use Simtabi\Laranail\Validation\Providers\ValidationServiceProvider;
+use Simtabi\Laranail\Validation\Rules\Profanity\NoProfanity;
+use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\Consumer\AcmeServiceProvider;
 
 /**

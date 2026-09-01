@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
 use Closure;
-use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Illuminate\Support\Arr;
+use Exception;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Arr;
 
 /**
  * The value lies within `$hours` of a reference instant — either way: a

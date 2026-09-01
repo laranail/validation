@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Validation\Rules\Email;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 use Simtabi\Laranail\Validation\Contracts\Email\DisposableDomainList;
+use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 
 /**
  * The address is not at a known throwaway-mail provider.

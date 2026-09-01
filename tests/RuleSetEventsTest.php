@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Event;
-use Simtabi\Laranail\Validation\RuleSet;
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use Simtabi\Laranail\Validation\Events\RuleSetCompiling;
+use Simtabi\Laranail\Validation\Events\ValidationCompleted;
 use Simtabi\Laranail\Validation\Events\ValidationFailed;
 use Simtabi\Laranail\Validation\Events\ValidationStarting;
-use Simtabi\Laranail\Validation\Events\ValidationCompleted;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * The event vocabulary and closure hooks of §5.6 — the seams a consumer

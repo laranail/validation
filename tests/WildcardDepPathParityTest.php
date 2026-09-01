@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Regression: conditional rules whose dependent path is the FULL wildcard
@@ -23,9 +23,9 @@ use Simtabi\Laranail\Validation\FluentRule;
  * Assert RuleSet's optimized per-item verdict matches native Laravel for a
  * wildcard ruleset whose conditional dep references the full wildcard path.
  *
- * @param array<string, mixed> $nativeRules keyed by full wildcard path
- * @param array<string, Closure(): mixed> $fluentRules keyed by full wildcard path
- * @param list<array<string, mixed>> $items
+ * @param  array<string, mixed>  $nativeRules  keyed by full wildcard path
+ * @param  array<string, Closure(): mixed>  $fluentRules  keyed by full wildcard path
+ * @param  list<array<string, mixed>>  $items
  */
 function assertWildcardDepParity(array $nativeRules, array $fluentRules, array $items): void
 {
@@ -42,18 +42,18 @@ function assertWildcardDepParity(array $nativeRules, array $fluentRules, array $
         $fluent = RuleSet::from($builtRules)->check($data)->errors()->toArray();
 
         expect(array_keys($fluent))
-            ->toBe(array_keys($native), 'item: ' . json_encode($item));
+            ->toBe(array_keys($native), 'item: '.json_encode($item));
     }
 }
 
 it('required_unless object-form, wildcard dep, multi-value: parity with native', function (): void {
     assertWildcardDepParity(
         [
-            'items.*.type'     => ['required', 'string'],
+            'items.*.type' => ['required', 'string'],
             'items.*.end_time' => ['required_unless:items.*.type,pause,stop', 'numeric'],
         ],
         [
-            'items.*.type'     => static fn () => FluentRule::field()->required()->rule('string'),
+            'items.*.type' => static fn () => FluentRule::field()->required()->rule('string'),
             'items.*.end_time' => static fn () => FluentRule::field()
                 ->requiredUnless('items.*.type', 'pause', 'stop')
                 ->rule('numeric'),
@@ -70,11 +70,11 @@ it('required_unless object-form, wildcard dep, multi-value: parity with native',
 it('required_unless array-form, wildcard dep, multi-value: parity with native', function (): void {
     assertWildcardDepParity(
         [
-            'items.*.type'     => ['required', 'string'],
+            'items.*.type' => ['required', 'string'],
             'items.*.end_time' => ['required_unless:items.*.type,pause,stop', 'numeric'],
         ],
         [
-            'items.*.type'     => static fn () => ['required', 'string'],
+            'items.*.type' => static fn () => ['required', 'string'],
             'items.*.end_time' => static fn () => [['required_unless', 'items.*.type', 'pause', 'stop'], 'numeric'],
         ],
         [
@@ -90,7 +90,7 @@ it('object-form conditional preserves its label through per-item flattening', fu
     // surface in the message. Without extracting metadata before the rewrite, the
     // message would fall back to the raw attribute path ('items.0.end_time').
     $errors = RuleSet::from([
-        'items.*.type'     => ['required', 'string'],
+        'items.*.type' => ['required', 'string'],
         'items.*.end_time' => FluentRule::field('Finish Time')
             ->requiredUnless('items.*.type', 'pause')
             ->rule('numeric'),
@@ -104,11 +104,11 @@ it('object-form conditional preserves its label through per-item flattening', fu
 it('required_if object-form, wildcard dep, multi-value: parity with native', function (): void {
     assertWildcardDepParity(
         [
-            'items.*.type'      => ['required', 'string'],
+            'items.*.type' => ['required', 'string'],
             'items.*.image_url' => ['required_if:items.*.type,image,hotspot', 'nullable', 'string'],
         ],
         [
-            'items.*.type'      => static fn () => FluentRule::field()->required()->rule('string'),
+            'items.*.type' => static fn () => FluentRule::field()->required()->rule('string'),
             'items.*.image_url' => static fn () => FluentRule::field()
                 ->requiredIf('items.*.type', 'image', 'hotspot')
                 ->nullable()
@@ -126,11 +126,11 @@ it('required_if object-form, wildcard dep, multi-value: parity with native', fun
 it('exclude_unless object-form, wildcard dep, multi-value: parity with native', function (): void {
     assertWildcardDepParity(
         [
-            'items.*.type'     => ['required', 'string'],
+            'items.*.type' => ['required', 'string'],
             'items.*.position' => ['exclude_unless:items.*.type,chapter,menu', 'required', 'string'],
         ],
         [
-            'items.*.type'     => static fn () => FluentRule::field()->required()->rule('string'),
+            'items.*.type' => static fn () => FluentRule::field()->required()->rule('string'),
             'items.*.position' => static fn () => FluentRule::field()
                 ->excludeUnless('items.*.type', 'chapter', 'menu')
                 ->required()
@@ -148,11 +148,11 @@ it('exclude_unless object-form, wildcard dep, multi-value: parity with native', 
 it('prohibited_unless object-form, wildcard dep, multi-value: parity with native', function (): void {
     assertWildcardDepParity(
         [
-            'items.*.type'   => ['required', 'string'],
+            'items.*.type' => ['required', 'string'],
             'items.*.legacy' => ['prohibited_unless:items.*.type,old,ancient', 'string'],
         ],
         [
-            'items.*.type'   => static fn () => FluentRule::field()->required()->rule('string'),
+            'items.*.type' => static fn () => FluentRule::field()->required()->rule('string'),
             'items.*.legacy' => static fn () => FluentRule::field()
                 ->prohibitedUnless('items.*.type', 'old', 'ancient')
                 ->rule('string'),

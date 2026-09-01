@@ -30,7 +30,7 @@ namespace Simtabi\Laranail\Validation\Rules\Net\Support;
 final class HostPattern
 {
     /**
-     * @param list<string> $patterns
+     * @param  list<string>  $patterns
      */
     public static function matches(string $host, array $patterns): bool
     {
@@ -48,7 +48,7 @@ final class HostPattern
 
                 // The leading dot is the whole point: without it,
                 // `evilexample.com` matches `*.example.com`.
-                if ($parent !== '' && str_ends_with($host, '.' . $parent)) {
+                if ($parent !== '' && str_ends_with($host, '.'.$parent)) {
                     return true;
                 }
 

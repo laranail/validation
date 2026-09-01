@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-use Illuminate\Validation\Rule;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Validation\RuleSet;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 it('benchmarks all code paths', function (): void {
     $users500 = array_map(fn (int $i): array => [
-        'name'      => "User {$i}",
-        'email'     => "user{$i}@example.com",
-        'username'  => 'user-' . $i,
-        'phone'     => '+1' . str_pad((string) (2000000000 + $i), 10, '0', STR_PAD_LEFT),
-        'country'   => ['US', 'NL', 'DE', 'GB', 'FR'][$i % 5],
-        'website'   => 'https://example.com/' . $i,
+        'name' => "User {$i}",
+        'email' => "user{$i}@example.com",
+        'username' => 'user-'.$i,
+        'phone' => '+1'.str_pad((string) (2000000000 + $i), 10, '0', STR_PAD_LEFT),
+        'country' => ['US', 'NL', 'DE', 'GB', 'FR'][$i % 5],
+        'website' => 'https://example.com/'.$i,
         'agree_tos' => true,
     ], range(1, 500));
 
@@ -27,13 +27,13 @@ it('benchmarks all code paths', function (): void {
 
     // Native Laravel baseline (500 users × 7 fields)
     $nativeRules = [
-        'users'             => 'required|array',
-        'users.*.name'      => 'required|string|min:2|max:255',
-        'users.*.email'     => 'required|string|email|max:255',
-        'users.*.username'  => ['required', 'string', 'regex:/\A[a-zA-Z0-9_-]+\z/', 'max:40'],
-        'users.*.phone'     => 'nullable|string|max:20',
-        'users.*.country'   => ['required', 'string', Rule::in(['US', 'NL', 'DE', 'GB', 'FR'])],
-        'users.*.website'   => 'nullable|string|url',
+        'users' => 'required|array',
+        'users.*.name' => 'required|string|min:2|max:255',
+        'users.*.email' => 'required|string|email|max:255',
+        'users.*.username' => ['required', 'string', 'regex:/\A[a-zA-Z0-9_-]+\z/', 'max:40'],
+        'users.*.phone' => 'nullable|string|max:20',
+        'users.*.country' => ['required', 'string', Rule::in(['US', 'NL', 'DE', 'GB', 'FR'])],
+        'users.*.website' => 'nullable|string|url',
         'users.*.agree_tos' => 'required|accepted',
     ];
     $nativeData = ['users' => $users500];
@@ -45,34 +45,34 @@ it('benchmarks all code paths', function (): void {
     $scenarios = [
         ['7 fields (registration)', 'fast-check', fn () => RuleSet::from([
             'users' => FluentRule::array()->required()->each([
-                'name'      => FluentRule::string()->required()->min(2)->max(255),
-                'email'     => FluentRule::email()->required()->max(255),
-                'username'  => FluentRule::string()->required()->regex('/\A[a-zA-Z0-9_-]+\z/')->max(40),
-                'phone'     => FluentRule::string()->nullable()->max(20),
-                'country'   => FluentRule::string()->required()->in(['US', 'NL', 'DE', 'GB', 'FR']),
-                'website'   => FluentRule::string()->nullable()->url(),
+                'name' => FluentRule::string()->required()->min(2)->max(255),
+                'email' => FluentRule::email()->required()->max(255),
+                'username' => FluentRule::string()->required()->regex('/\A[a-zA-Z0-9_-]+\z/')->max(40),
+                'phone' => FluentRule::string()->nullable()->max(20),
+                'country' => FluentRule::string()->required()->in(['US', 'NL', 'DE', 'GB', 'FR']),
+                'website' => FluentRule::string()->nullable()->url(),
                 'agree_tos' => FluentRule::boolean()->accepted(),
             ]),
         ])->validate(['users' => $users500])],
 
         ['3 fields (simple)', 'fast-check', fn () => RuleSet::from([
             'users' => FluentRule::array()->required()->each([
-                'name'    => FluentRule::string()->required()->min(2)->max(255),
-                'email'   => FluentRule::string()->required()->max(255),
+                'name' => FluentRule::string()->required()->min(2)->max(255),
+                'email' => FluentRule::string()->required()->max(255),
                 'country' => FluentRule::string()->required()->in(['US', 'NL', 'DE', 'GB', 'FR']),
             ]),
         ])->validate(['users' => $users500])],
 
         ['string+date', 'per-item', fn () => RuleSet::from([
             'users' => FluentRule::array()->required()->each([
-                'name'  => FluentRule::string()->required()->min(2)->max(255),
+                'name' => FluentRule::string()->required()->min(2)->max(255),
                 'email' => FluentRule::date()->required()->after('2024-01-01'),
             ]),
         ])->validate(['users' => array_map(fn (array $u): array => [...$u, 'email' => '2025-06-15'], $users500)])],
 
         ['string+boolean', 'per-item', fn () => RuleSet::from([
             'users' => FluentRule::array()->required()->each([
-                'name'      => FluentRule::string()->required()->min(2)->max(255),
+                'name' => FluentRule::string()->required()->min(2)->max(255),
                 'agree_tos' => FluentRule::boolean()->required(),
             ]),
         ])->validate(['users' => $users500])],
@@ -129,7 +129,7 @@ it('benchmarks batched exists vs native exists', function (): void {
 
     // Native Laravel: N individual queries
     $nativeRules = [
-        'items'         => 'required|array',
+        'items' => 'required|array',
         'items.*.email' => ['required', 'string', Rule::exists('bench_db.users', 'email')],
     ];
     $nativeData = ['items' => $items];
@@ -173,24 +173,24 @@ it('benchmarks presence conditionals with nested dependent fields vs native', fu
     // and the remainder fast-checks as usual.
     $contacts = array_map(static fn (int $i): array => $i % 2 === 0 ? [
         'first_name' => "Contact {$i}",
-        'last_name'  => 'Test',
-        'postcode'   => "12{$i}AB",
-        'profile'    => [],
-        'phone'      => '+31612345' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+        'last_name' => 'Test',
+        'postcode' => "12{$i}AB",
+        'profile' => [],
+        'phone' => '+31612345'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
     ] : [
         'first_name' => "Contact {$i}",
-        'last_name'  => 'Test',
-        'profile'    => ['birthdate' => '1990-01-01'],
-        'phone'      => '+31612345' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+        'last_name' => 'Test',
+        'profile' => ['birthdate' => '1990-01-01'],
+        'phone' => '+31612345'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
     ], range(1, 500));
 
     $nativeRules = [
-        'contacts'                     => 'required|array',
-        'contacts.*.first_name'        => 'required|string|max:255',
-        'contacts.*.last_name'         => 'required|string|max:255',
-        'contacts.*.postcode'          => 'required_without:contacts.*.profile.birthdate|nullable|string|max:10',
+        'contacts' => 'required|array',
+        'contacts.*.first_name' => 'required|string|max:255',
+        'contacts.*.last_name' => 'required|string|max:255',
+        'contacts.*.postcode' => 'required_without:contacts.*.profile.birthdate|nullable|string|max:10',
         'contacts.*.profile.birthdate' => 'nullable|date',
-        'contacts.*.phone'             => 'nullable|string|max:20',
+        'contacts.*.phone' => 'nullable|string|max:20',
     ];
     $data = ['contacts' => $contacts];
 
@@ -204,11 +204,11 @@ it('benchmarks presence conditionals with nested dependent fields vs native', fu
 
     $ruleSetFn = fn () => RuleSet::from([
         'contacts' => FluentRule::array()->required()->each([
-            'first_name'        => FluentRule::string()->required()->max(255),
-            'last_name'         => FluentRule::string()->required()->max(255),
-            'postcode'          => FluentRule::field()->requiredWithout('profile.birthdate')->nullable()->rule('string')->rule('max:10'),
+            'first_name' => FluentRule::string()->required()->max(255),
+            'last_name' => FluentRule::string()->required()->max(255),
+            'postcode' => FluentRule::field()->requiredWithout('profile.birthdate')->nullable()->rule('string')->rule('max:10'),
             'profile.birthdate' => FluentRule::date()->nullable(),
-            'phone'             => FluentRule::string()->nullable()->max(20),
+            'phone' => FluentRule::string()->nullable()->max(20),
         ]),
     ])->validate($data);
 
@@ -233,24 +233,24 @@ it('benchmarks value conditionals vs native', function (): void {
     // and rewrites to bare `required` for admins — remainder fast-checks.
     $contacts = array_map(static fn (int $i): array => $i % 2 === 0 ? [
         'first_name' => "Contact {$i}",
-        'last_name'  => 'Test',
-        'postcode'   => "12{$i}AB",
-        'role'       => 'admin',
-        'phone'      => '+31612345' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+        'last_name' => 'Test',
+        'postcode' => "12{$i}AB",
+        'role' => 'admin',
+        'phone' => '+31612345'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
     ] : [
         'first_name' => "Contact {$i}",
-        'last_name'  => 'Test',
-        'role'       => 'user',
-        'phone'      => '+31612345' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+        'last_name' => 'Test',
+        'role' => 'user',
+        'phone' => '+31612345'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
     ], range(0, 499));
 
     $nativeRules = [
-        'contacts'              => 'required|array',
+        'contacts' => 'required|array',
         'contacts.*.first_name' => 'required|string|max:255',
-        'contacts.*.last_name'  => 'required|string|max:255',
-        'contacts.*.postcode'   => 'required_if:contacts.*.role,admin|nullable|string|max:10',
-        'contacts.*.role'       => 'required|string',
-        'contacts.*.phone'      => 'nullable|string|max:20',
+        'contacts.*.last_name' => 'required|string|max:255',
+        'contacts.*.postcode' => 'required_if:contacts.*.role,admin|nullable|string|max:10',
+        'contacts.*.role' => 'required|string',
+        'contacts.*.phone' => 'nullable|string|max:20',
     ];
     $data = ['contacts' => $contacts];
 
@@ -264,10 +264,10 @@ it('benchmarks value conditionals vs native', function (): void {
     $ruleSetFn = fn () => RuleSet::from([
         'contacts' => FluentRule::array()->required()->each([
             'first_name' => FluentRule::string()->required()->max(255),
-            'last_name'  => FluentRule::string()->required()->max(255),
-            'postcode'   => FluentRule::field()->requiredIf('role', 'admin')->nullable()->rule('string')->rule('max:10'),
-            'role'       => FluentRule::string()->required(),
-            'phone'      => FluentRule::string()->nullable()->max(20),
+            'last_name' => FluentRule::string()->required()->max(255),
+            'postcode' => FluentRule::field()->requiredIf('role', 'admin')->nullable()->rule('string')->rule('max:10'),
+            'role' => FluentRule::string()->required(),
+            'phone' => FluentRule::string()->nullable()->max(20),
         ]),
     ])->validate($data);
 

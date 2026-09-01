@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Actions;
 
-use Throwable;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Cache;
 use Simtabi\Laranail\Validation\Contracts\Email\DnsResolver;
+use Throwable;
 
 /**
  * The default {@see DnsResolver}: a cached MX lookup over PHP's resolver.
@@ -68,7 +68,7 @@ final readonly class CachedDnsResolver implements DnsResolver
     }
 
     /**
-     * @param callable(): bool $callback
+     * @param  callable(): bool  $callback
      */
     private function remember(string $domain, callable $callback): bool
     {
@@ -80,7 +80,7 @@ final readonly class CachedDnsResolver implements DnsResolver
 
         try {
             $value = $store->remember(
-                self::CACHE_PREFIX . $domain,
+                self::CACHE_PREFIX.$domain,
                 $this->ttl ?? $this->configuredTtl(),
                 static fn (): bool => $callback(),
             );

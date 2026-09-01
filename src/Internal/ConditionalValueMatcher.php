@@ -25,9 +25,9 @@ final class ConditionalValueMatcher
      * Does the dependent at `$depPath` match `$rawValues` under Laravel's
      * `validateRequiredIf`/`…Unless` comparison semantics?
      *
-     * @param list<?string> $rawValues The rule's value parameters.
-     * @param array<string, mixed> $itemData
-     * @param array<string, mixed> $itemRules Item-scoped rules, for the `boolean` declaration check.
+     * @param  list<?string>  $rawValues  The rule's value parameters.
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, mixed>  $itemRules  Item-scoped rules, for the `boolean` declaration check.
      */
     public static function matches(string $depPath, array $rawValues, array $itemData, array $itemRules): bool
     {
@@ -44,7 +44,7 @@ final class ConditionalValueMatcher
      * through a validator's protected `getValue()`), so they don't re-resolve
      * via `data_get`.
      *
-     * @param list<?string> $rawValues
+     * @param  list<?string>  $rawValues
      */
     public static function matchesValue(mixed $other, array $rawValues, bool $dependentHasBooleanRule = false): bool
     {
@@ -74,7 +74,7 @@ final class ConditionalValueMatcher
      * `array-key`, not `string`: the top-level caller hands over the
      * validator's own `$rules`, which Laravel types as a bare array.
      *
-     * @param array<array-key, mixed> $itemRules
+     * @param  array<array-key, mixed>  $itemRules
      */
     public static function dependentHasBooleanRule(string $depPath, array $itemRules): bool
     {
@@ -103,7 +103,7 @@ final class ConditionalValueMatcher
      * - any other scalar compares by string coercion, covering numeric-string ↔
      *   numeric (`'1'` ↔ `1`).
      *
-     * @param list<mixed> $values
+     * @param  list<mixed>  $values
      */
     private static function scalarLooseIn(int|float|string $other, array $values): bool
     {
@@ -128,15 +128,14 @@ final class ConditionalValueMatcher
      * value is already a bool; null conversion when the resolved value is
      * null. Order matters — bool first, then null.
      *
-     * @param list<mixed> $values
-     *
+     * @param  list<mixed>  $values
      * @return list<mixed>
      */
     private static function convertValues(array $values, mixed $other, bool $dependentHasBooleanRule): array
     {
         if (is_bool($other) || $dependentHasBooleanRule) {
             $values = array_map(static fn (mixed $v): mixed => match ($v) {
-                'true'  => true,
+                'true' => true,
                 'false' => false,
                 default => $v,
             }, $values);

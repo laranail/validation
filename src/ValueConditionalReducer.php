@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation;
 
 use Illuminate\Support\Arr;
-use Simtabi\Laranail\Validation\Internal\ConditionalValueMatcher;
 use Simtabi\Laranail\Validation\Internal\AbstractConditionalReducer;
+use Simtabi\Laranail\Validation\Internal\ConditionalValueMatcher;
 
 /**
  * Per-item pre-evaluation of Laravel's value-conditional rules
@@ -44,9 +44,9 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
      * @var array<string, string>
      */
     private const array REWRITE_TARGET = [
-        'required_if'       => 'required',
-        'required_unless'   => 'required',
-        'prohibited_if'     => 'prohibited',
+        'required_if' => 'required',
+        'required_unless' => 'required',
+        'prohibited_if' => 'prohibited',
         'prohibited_unless' => 'prohibited',
     ];
 
@@ -58,9 +58,9 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
      * can detect a `boolean` declaration on the dependent path and mirror
      * Laravel's `shouldConvertToBoolean`.
      *
-     * @param array<string, mixed> $itemData
-     * @param array<string, string> $itemMessages
-     * @param array<string, mixed> $itemRules
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, string>  $itemMessages
+     * @param  array<string, mixed>  $itemRules
      */
     public static function apply(mixed $rule, string $field, array $itemData, array $itemMessages, array $itemRules): mixed
     {
@@ -79,7 +79,7 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
     protected static function parse(string $rule): ?array
     {
         foreach (self::RULE_NAMES as $name) {
-            $prefix = $name . ':';
+            $prefix = $name.':';
             if (str_starts_with($rule, $prefix)) {
                 return [$name, substr($rule, strlen($prefix))];
             }
@@ -93,9 +93,9 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
      * collapse to plain `required` / `prohibited` when active and no custom
      * message overrides the original rule name, otherwise return unchanged.
      *
-     * @param array<string, mixed> $itemData
-     * @param array<string, string> $itemMessages
-     * @param array<string, mixed> $itemRules
+     * @param  array<string, mixed>  $itemData
+     * @param  array<string, string>  $itemMessages
+     * @param  array<string, mixed>  $itemRules
      */
     private static function rewriteOne(string $rule, string $field, array $itemData, array $itemMessages, array $itemRules): ?string
     {
@@ -133,9 +133,9 @@ final class ValueConditionalReducer extends AbstractConditionalReducer
         $match = ConditionalValueMatcher::matches($depPath, $rawValues, $itemData, $itemRules);
 
         $active = match ($ruleName) {
-            'required_if', 'prohibited_if'         => $match,
+            'required_if', 'prohibited_if' => $match,
             'required_unless', 'prohibited_unless' => ! $match,
-            default                                => false,
+            default => false,
         };
 
         if (! $active) {

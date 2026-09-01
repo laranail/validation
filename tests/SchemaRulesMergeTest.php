@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentSchema;
-use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\HasFluentRules;
+use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\MergeRulesBaseRequest;
 use Simtabi\Laranail\Validation\Tests\Fixtures\MergeSchemaBaseRequest;
 use Simtabi\Laranail\Validation\Tests\Fixtures\ProvidesMergeSchemaViaTrait;
@@ -29,7 +29,7 @@ function schemaBaseWithChildRules(): MergeSchemaBaseRequest
         public function rules(): array
         {
             return [
-                'shared'     => FluentRule::string()->required()->in(['child']),
+                'shared' => FluentRule::string()->required()->in(['child']),
                 'child_only' => FluentRule::string()->required(),
             ];
         }
@@ -44,7 +44,7 @@ function rulesBaseWithChildSchema(): MergeRulesBaseRequest
         public function schema(FluentSchema $rules): array
         {
             return [
-                'shared'     => $rules->string()->required()->in(['child']),
+                'shared' => $rules->string()->required()->in(['child']),
                 'child_only' => $rules->string()->required(),
             ];
         }
@@ -62,7 +62,7 @@ function traitSchemaWithBodyRules(): FormRequest
         public function rules(): array
         {
             return [
-                'shared'    => FluentRule::string()->required()->in(['body']),
+                'shared' => FluentRule::string()->required()->in(['body']),
                 'body_only' => FluentRule::string()->required(),
             ];
         }
@@ -78,8 +78,8 @@ function traitSchemaWithBodyRules(): FormRequest
 
 it('merges base schema() and child rules(), applying both layers', function (): void {
     $request = bootFormRequest(schemaBaseWithChildRules(), [
-        'shared'     => 'child',
-        'base_only'  => 'x',
+        'shared' => 'child',
+        'base_only' => 'x',
         'child_only' => 'y',
     ]);
 
@@ -94,8 +94,8 @@ it('lets the child rules() win the shared key over the base schema()', function 
     // 'base' satisfies the base schema() (in:base) but not the child rules()
     // (in:child); the more-derived child wins, so this must fail.
     bootFormRequest(schemaBaseWithChildRules(), [
-        'shared'     => 'base',
-        'base_only'  => 'x',
+        'shared' => 'base',
+        'base_only' => 'x',
         'child_only' => 'y',
     ])->validateResolved();
 })->throws(ValidationException::class);
@@ -104,7 +104,7 @@ it('still enforces the base schema() layer through the child', function (): void
     // base_only exists only on the base schema(); omitting it must fail,
     // proving the base layer is merged in rather than shadowed.
     bootFormRequest(schemaBaseWithChildRules(), [
-        'shared'     => 'child',
+        'shared' => 'child',
         'child_only' => 'y',
     ])->validateResolved();
 })->throws(ValidationException::class);
@@ -113,8 +113,8 @@ it('still enforces the base schema() layer through the child', function (): void
 
 it('merges base rules() and child schema(), applying both layers', function (): void {
     $request = bootFormRequest(rulesBaseWithChildSchema(), [
-        'shared'     => 'child',
-        'base_only'  => 'x',
+        'shared' => 'child',
+        'base_only' => 'x',
         'child_only' => 'y',
     ]);
 
@@ -127,8 +127,8 @@ it('merges base rules() and child schema(), applying both layers', function (): 
 
 it('lets the child schema() win the shared key over the base rules()', function (): void {
     bootFormRequest(rulesBaseWithChildSchema(), [
-        'shared'     => 'base',
-        'base_only'  => 'x',
+        'shared' => 'base',
+        'base_only' => 'x',
         'child_only' => 'y',
     ])->validateResolved();
 })->throws(ValidationException::class);
@@ -137,9 +137,9 @@ it('lets the child schema() win the shared key over the base rules()', function 
 
 it('lets a body rules() win over a trait-provided schema()', function (): void {
     $request = bootFormRequest(traitSchemaWithBodyRules(), [
-        'shared'     => 'body',
+        'shared' => 'body',
         'trait_only' => 'x',
-        'body_only'  => 'y',
+        'body_only' => 'y',
     ]);
 
     $request->validateResolved();
@@ -153,9 +153,9 @@ it('fails a trait+body request when the body rules() rejects the shared value', 
     // 'trait' satisfies the trait schema() but not the body rules(); the body
     // definition is more specific than the trait import, so it wins → fail.
     bootFormRequest(traitSchemaWithBodyRules(), [
-        'shared'     => 'trait',
+        'shared' => 'trait',
         'trait_only' => 'x',
-        'body_only'  => 'y',
+        'body_only' => 'y',
     ])->validateResolved();
 })->throws(ValidationException::class);
 
@@ -215,9 +215,9 @@ it('composes a parent::rules() call within the merge', function (): void {
     };
 
     $booted = bootFormRequest($request, [
-        'shared'      => 'base',
-        'base_only'   => 'x',
-        'child_only'  => 'y',
+        'shared' => 'base',
+        'base_only' => 'x',
+        'child_only' => 'y',
         'schema_only' => 'z',
     ]);
     $booted->validateResolved();

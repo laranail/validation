@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\AntiSpam;
 
 use Closure;
-use Throwable;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
+use Throwable;
 
 /**
  * The form was not submitted impossibly fast.

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
-use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentValidator;
 
 /**
@@ -32,7 +32,7 @@ final class WildcardRequiredIfValidator extends FluentValidator
     {
         parent::__construct($data, [
             'items.*.notify' => FluentRule::boolean(),
-            'items.*.email'  => FluentRule::string()->requiredIf('items.*.notify', 'true'),
+            'items.*.email' => FluentRule::string()->requiredIf('items.*.notify', 'true'),
         ]);
     }
 }
@@ -43,7 +43,7 @@ function vanillaWildcardFails(mixed $notify): bool
         ['items' => [['notify' => $notify]]],
         [
             'items.*.notify' => ['boolean'],
-            'items.*.email'  => ['required_if:items.*.notify,true', 'string'],
+            'items.*.email' => ['required_if:items.*.notify,true', 'string'],
         ],
     )->fails();
 }
@@ -64,12 +64,12 @@ it('still enforces required_if when the dependent was fast-checked away', functi
     // the fast-check phase, and not booleans, so the conversion mattered.
     expect(optimizedWildcardFails($notify))->toBe(vanillaWildcardFails($notify));
 })->with([
-    'int one'     => 1,
-    'string one'  => '1',
-    'real true'   => true,
-    'int zero'    => 0,
+    'int one' => 1,
+    'string one' => '1',
+    'real true' => true,
+    'int zero' => 0,
     'string zero' => '0',
-    'real false'  => false,
+    'real false' => false,
 ]);
 
 it('does not start requiring the field when the condition is genuinely unmet', function (): void {
@@ -85,7 +85,7 @@ it('leaves a dependent with no boolean declaration alone', function (): void {
 
     $vanilla = Validator::make($data, [
         'items.*.notify' => ['string'],
-        'items.*.email'  => ['required_if:items.*.notify,true', 'string'],
+        'items.*.email' => ['required_if:items.*.notify,true', 'string'],
     ]);
 
     expect($vanilla->fails())->toBeFalse();

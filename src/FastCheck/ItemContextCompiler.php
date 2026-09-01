@@ -74,9 +74,9 @@ final class ItemContextCompiler
 
         foreach ($parts as $i => $part) {
             if ($part === 'confirmed') {
-                $parts[$i] = 'same:' . $attributeName . '_confirmation';
+                $parts[$i] = 'same:'.$attributeName.'_confirmation';
             } elseif (str_starts_with($part, 'confirmed:')) {
-                $parts[$i] = 'same:' . substr($part, 10);
+                $parts[$i] = 'same:'.substr($part, 10);
             }
         }
 
@@ -143,8 +143,7 @@ final class ItemContextCompiler
     }
 
     /**
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>|null
      */
     private static function parsePartWithItemContext(string $part, array $config): ?array
@@ -152,18 +151,18 @@ final class ItemContextCompiler
         // For date rules, use the field-ref-aware parser. For everything else,
         // delegate to the value-only parser in RuleConfigBuilder.
         return match (true) {
-            str_starts_with($part, 'date_equals:')     => self::parseDateParamWithFieldRef($config, 'dateEquals', substr($part, 12)),
-            str_starts_with($part, 'after_or_equal:')  => self::parseDateParamWithFieldRef($config, 'afterOrEqual', substr($part, 15)),
+            str_starts_with($part, 'date_equals:') => self::parseDateParamWithFieldRef($config, 'dateEquals', substr($part, 12)),
+            str_starts_with($part, 'after_or_equal:') => self::parseDateParamWithFieldRef($config, 'afterOrEqual', substr($part, 15)),
             str_starts_with($part, 'before_or_equal:') => self::parseDateParamWithFieldRef($config, 'beforeOrEqual', substr($part, 16)),
-            str_starts_with($part, 'after:')           => self::parseDateParamWithFieldRef($config, 'after', substr($part, 6)),
-            str_starts_with($part, 'before:')          => self::parseDateParamWithFieldRef($config, 'before', substr($part, 7)),
-            str_starts_with($part, 'same:')            => self::parseFieldOnlyRef($config, 'sameField', substr($part, 5)),
-            str_starts_with($part, 'different:')       => self::parseFieldOnlyRef($config, 'differentField', substr($part, 10)),
-            str_starts_with($part, 'gte:')             => self::parseFieldOnlyRef($config, 'gteField', substr($part, 4)),
-            str_starts_with($part, 'lte:')             => self::parseFieldOnlyRef($config, 'lteField', substr($part, 4)),
-            str_starts_with($part, 'gt:')              => self::parseFieldOnlyRef($config, 'gtField', substr($part, 3)),
-            str_starts_with($part, 'lt:')              => self::parseFieldOnlyRef($config, 'ltField', substr($part, 3)),
-            default                                    => RuleConfigBuilder::parseValuePart($part, $config),
+            str_starts_with($part, 'after:') => self::parseDateParamWithFieldRef($config, 'after', substr($part, 6)),
+            str_starts_with($part, 'before:') => self::parseDateParamWithFieldRef($config, 'before', substr($part, 7)),
+            str_starts_with($part, 'same:') => self::parseFieldOnlyRef($config, 'sameField', substr($part, 5)),
+            str_starts_with($part, 'different:') => self::parseFieldOnlyRef($config, 'differentField', substr($part, 10)),
+            str_starts_with($part, 'gte:') => self::parseFieldOnlyRef($config, 'gteField', substr($part, 4)),
+            str_starts_with($part, 'lte:') => self::parseFieldOnlyRef($config, 'lteField', substr($part, 4)),
+            str_starts_with($part, 'gt:') => self::parseFieldOnlyRef($config, 'gtField', substr($part, 3)),
+            str_starts_with($part, 'lt:') => self::parseFieldOnlyRef($config, 'ltField', substr($part, 3)),
+            default => RuleConfigBuilder::parseValuePart($part, $config),
         };
     }
 
@@ -172,8 +171,7 @@ final class ItemContextCompiler
      * is a date literal, behaves like a literal parse. Otherwise, if it's a
      * plausible field name, stores it under `{$key}Field` for item-time resolution.
      *
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>|null
      */
     private static function parseDateParamWithFieldRef(array $config, string $key, string $param): ?array
@@ -189,7 +187,7 @@ final class ItemContextCompiler
             return null;
         }
 
-        return [...$config, $key . 'Field' => $param];
+        return [...$config, $key.'Field' => $param];
     }
 
     /**
@@ -197,8 +195,7 @@ final class ItemContextCompiler
      * parameter isn't a single plausible identifier — so multi-param forms
      * like `different:a,b` fall through to Laravel.
      *
-     * @param array<string, mixed> $config
-     *
+     * @param  array<string, mixed>  $config
      * @return array<string, mixed>|null
      */
     private static function parseFieldOnlyRef(array $config, string $key, string $param): ?array
@@ -215,8 +212,7 @@ final class ItemContextCompiler
      * against the item array. Delegates most checks to CoreValueCompiler's
      * value-only closure.
      *
-     * @param array<string, mixed> $c
-     *
+     * @param  array<string, mixed>  $c
      * @return Closure(mixed, array<string, mixed>): bool
      */
     private static function buildItemAwareClosure(array $c): Closure
@@ -438,7 +434,7 @@ final class ItemContextCompiler
      * missing, empty, non-string, unparseable) coerce to 0 — matches Laravel's
      * loose-comparison behavior when a referenced field doesn't parse.
      *
-     * @param array<array-key, mixed> $item
+     * @param  array<array-key, mixed>  $item
      */
     private static function resolveRefTimestamp(array $item, string $field): int
     {

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
 use Simtabi\Laranail\Validation\Internal\ConditionalEvaluationPhase;
+use Simtabi\Laranail\Validation\Internal\ConditionalVerdict;
 
 /**
  * Direct unit coverage for {@see ConditionalEvaluationPhase}. Previously
@@ -15,7 +15,7 @@ it('indexes exclude_unless tuples', function (): void {
 
     $rules = [
         'name' => [['exclude_unless', 'type', 'A', 'B'], 'string'],
-        'age'  => ['integer'],
+        'age' => ['integer'],
     ];
 
     expect($phase->indexConditionalAttrs($rules))->toBe([
@@ -44,7 +44,7 @@ it('skips non-conditional tuples', function (): void {
 
     $rules = [
         'name' => [['required_if', 'other', 'Y']],
-        'age'  => 'integer',
+        'age' => 'integer',
     ];
 
     expect($phase->indexConditionalAttrs($rules))

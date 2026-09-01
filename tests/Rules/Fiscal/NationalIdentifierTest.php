@@ -30,10 +30,10 @@ it('rejects a BSN that does not', function (string $value): void {
     expect(Id::passes($value, Id::NL))->toBeFalse();
 })->with([
     'wrong check' => '111222334',
-    'all zeroes'  => '000000000',
-    'too short'   => '1234567',
-    'too long'    => '1112223334',
-    'not digits'  => 'abcdefghi',
+    'all zeroes' => '000000000',
+    'too short' => '1234567',
+    'too long' => '1112223334',
+    'not digits' => 'abcdefghi',
 ]);
 
 it('weights the final BSN digit negatively', function (): void {
@@ -55,10 +55,10 @@ it('rejects a CPF with a bad check digit or a repeated digit', function (string 
     expect(Id::passes($value, Id::BR))->toBeFalse();
 })->with([
     'bad second digit' => '11144477736',
-    'bad first digit'  => '11144477745',
-    'all ones'         => '11111111111',
-    'all zeroes'       => '00000000000',
-    'too short'        => '1114447773',
+    'bad first digit' => '11144477745',
+    'all ones' => '11111111111',
+    'all zeroes' => '00000000000',
+    'too short' => '1114447773',
 ]);
 
 // =========================================================================
@@ -72,13 +72,13 @@ it('accepts a well-formed SSN in an issued range', function (string $value): voi
 it('rejects the ranges the SSA has never issued', function (string $value): void {
     expect(Id::passes($value, Id::US))->toBeFalse();
 })->with([
-    'area 000'    => '000-12-3456',
-    'area 666'    => '666-12-3456',
-    'area 900+'   => '900-12-3456',
-    'area 999'    => '999-12-3456',
-    'group 00'    => '078-00-1120',
+    'area 000' => '000-12-3456',
+    'area 666' => '666-12-3456',
+    'area 900+' => '900-12-3456',
+    'area 999' => '999-12-3456',
+    'group 00' => '078-00-1120',
     'serial 0000' => '078-05-0000',
-    'too short'   => '078-05-112',
+    'too short' => '078-05-112',
 ]);
 
 // =========================================================================
@@ -92,18 +92,18 @@ it('accepts a NINO with or without spaces and suffix', function (string $value):
 it('rejects reserved prefixes and letters the scheme never uses', function (string $value): void {
     expect(Id::passes($value, Id::GB))->toBeFalse();
 })->with([
-    'D first'     => 'DA123456C',
-    'F first'     => 'FA123456C',
-    'Q first'     => 'QQ123456C',
-    'U first'     => 'UA123456C',
-    'V first'     => 'VA123456C',
-    'O second'    => 'AO123456C',
+    'D first' => 'DA123456C',
+    'F first' => 'FA123456C',
+    'Q first' => 'QQ123456C',
+    'U first' => 'UA123456C',
+    'V first' => 'VA123456C',
+    'O second' => 'AO123456C',
     'reserved BG' => 'BG123456C',
     'reserved GB' => 'GB123456C',
     'reserved NK' => 'NK123456C',
     'reserved TN' => 'TN123456C',
     'reserved ZZ' => 'ZZ123456C',
-    'suffix E'    => 'AB123456E',
+    'suffix E' => 'AB123456E',
 ]);
 
 // =========================================================================
@@ -115,9 +115,9 @@ it('accepts a NIR whose key matches, including Corsica', function (string $value
     // substitutes 19 and 18 before the modulo.
     expect(Id::passes($value, Id::FR))->toBeTrue();
 })->with([
-    'mainland'   => '269054958815780',
-    'key of 97'  => '180126745108997',
-    'another'    => '184017512345658',
+    'mainland' => '269054958815780',
+    'key of 97' => '180126745108997',
+    'another' => '184017512345658',
     'Corsica 2A' => '199122A12345641',
     'Corsica 2B' => '199122B12345668',
 ]);
@@ -125,11 +125,11 @@ it('accepts a NIR whose key matches, including Corsica', function (string $value
 it('rejects a NIR whose key does not match', function (string $value): void {
     expect(Id::passes($value, Id::FR))->toBeFalse();
 })->with([
-    'wrong key'         => '269054958815781',
+    'wrong key' => '269054958815781',
     'Corsica wrong key' => '199122A12345642',
-    'bad sex digit'     => '369054958815780',
-    'bad month'         => '269134958815780',
-    'too short'         => '26905495881578',
+    'bad sex digit' => '369054958815780',
+    'bad month' => '269134958815780',
+    'too short' => '26905495881578',
 ]);
 
 // =========================================================================

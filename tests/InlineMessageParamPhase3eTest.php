@@ -147,9 +147,9 @@ it('factory message: and chained method message: coexist under separate keys', f
         ->max(255, message: 'Too long.');
 
     expect($rule->getCustomMessages())->toBe([
-        'email'    => 'Invalid email.',
+        'email' => 'Invalid email.',
         'required' => 'Email is required.',
-        'max'      => 'Too long.',
+        'max' => 'Too long.',
     ]);
 });
 

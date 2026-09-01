@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Illuminate\Validation\Rules\AnyOf;
-use Illuminate\Support\Traits\Macroable;
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AnyOf;
+use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\FluentSchema;
-use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\HasFluentRules;
-use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 
 /**
@@ -26,8 +26,8 @@ function preparedSnapshot(mixed $rule): array
     $prepared = RuleSet::from(['field' => $rule])->prepare(['field' => 'value']);
 
     return [
-        'rules'      => $prepared->rules,
-        'messages'   => $prepared->messages,
+        'rules' => $prepared->rules,
+        'messages' => $prepared->messages,
         'attributes' => $prepared->attributes,
     ];
 }
@@ -36,7 +36,7 @@ function preparedSnapshot(mixed $rule): array
  * A FormRequest that defines BOTH schema() and rules() — used to pin the
  * precedence contract (schema() wins).
  *
- * @param array<array-key, mixed> $data
+ * @param  array<array-key, mixed>  $data
  */
 function bootDualFormRequest(array $data): FormRequest
 {
@@ -123,7 +123,7 @@ it('matches the parameter signature of every FluentRule factory', function (Refl
             '%s $%s%s',
             (string) $p->getType(),
             $p->getName(),
-            $p->isDefaultValueAvailable() ? '=' . var_export($p->getDefaultValue(), true) : '',
+            $p->isDefaultValueAvailable() ? '='.var_export($p->getDefaultValue(), true) : '',
         ),
         $m->getParameters(),
     );
@@ -198,26 +198,26 @@ it('forwards every non-default argument identically to FluentRule', function (Cl
     // each one proves it forwards to the RIGHT FluentRule factory — a wrong
     // target (e.g. url() calling uuid()) survives the signature parity check but
     // produces a different compiled rule here.
-    'numeric'    => [fn (FluentSchema $s): mixed => $s->numeric('L', 'm')->required(), fn (): mixed => FluentRule::numeric('L', 'm')->required()],
-    'date'       => [fn (FluentSchema $s): mixed => $s->date('L', 'm')->required(), fn (): mixed => FluentRule::date('L', 'm')->required()],
-    'boolean'    => [fn (FluentSchema $s): mixed => $s->boolean('L', 'm')->required(), fn (): mixed => FluentRule::boolean('L', 'm')->required()],
-    'accepted'   => [fn (FluentSchema $s): mixed => $s->accepted('L', 'm')->required(), fn (): mixed => FluentRule::accepted('L', 'm')->required()],
-    'declined'   => [fn (FluentSchema $s): mixed => $s->declined('L', 'm')->required(), fn (): mixed => FluentRule::declined('L', 'm')->required()],
-    'file'       => [fn (FluentSchema $s): mixed => $s->file('L', 'm')->required(), fn (): mixed => FluentRule::file('L', 'm')->required()],
-    'image'      => [fn (FluentSchema $s): mixed => $s->image('L', 'm')->required(), fn (): mixed => FluentRule::image('L', 'm')->required()],
-    'url'        => [fn (FluentSchema $s): mixed => $s->url('L', 'm')->required(), fn (): mixed => FluentRule::url('L', 'm')->required()],
-    'uuid'       => [fn (FluentSchema $s): mixed => $s->uuid('L', 'm')->required(), fn (): mixed => FluentRule::uuid('L', 'm')->required()],
-    'ulid'       => [fn (FluentSchema $s): mixed => $s->ulid('L', 'm')->required(), fn (): mixed => FluentRule::ulid('L', 'm')->required()],
-    'ip'         => [fn (FluentSchema $s): mixed => $s->ip('L', 'm')->required(), fn (): mixed => FluentRule::ip('L', 'm')->required()],
-    'ipv4'       => [fn (FluentSchema $s): mixed => $s->ipv4('L', 'm')->required(), fn (): mixed => FluentRule::ipv4('L', 'm')->required()],
-    'ipv6'       => [fn (FluentSchema $s): mixed => $s->ipv6('L', 'm')->required(), fn (): mixed => FluentRule::ipv6('L', 'm')->required()],
+    'numeric' => [fn (FluentSchema $s): mixed => $s->numeric('L', 'm')->required(), fn (): mixed => FluentRule::numeric('L', 'm')->required()],
+    'date' => [fn (FluentSchema $s): mixed => $s->date('L', 'm')->required(), fn (): mixed => FluentRule::date('L', 'm')->required()],
+    'boolean' => [fn (FluentSchema $s): mixed => $s->boolean('L', 'm')->required(), fn (): mixed => FluentRule::boolean('L', 'm')->required()],
+    'accepted' => [fn (FluentSchema $s): mixed => $s->accepted('L', 'm')->required(), fn (): mixed => FluentRule::accepted('L', 'm')->required()],
+    'declined' => [fn (FluentSchema $s): mixed => $s->declined('L', 'm')->required(), fn (): mixed => FluentRule::declined('L', 'm')->required()],
+    'file' => [fn (FluentSchema $s): mixed => $s->file('L', 'm')->required(), fn (): mixed => FluentRule::file('L', 'm')->required()],
+    'image' => [fn (FluentSchema $s): mixed => $s->image('L', 'm')->required(), fn (): mixed => FluentRule::image('L', 'm')->required()],
+    'url' => [fn (FluentSchema $s): mixed => $s->url('L', 'm')->required(), fn (): mixed => FluentRule::url('L', 'm')->required()],
+    'uuid' => [fn (FluentSchema $s): mixed => $s->uuid('L', 'm')->required(), fn (): mixed => FluentRule::uuid('L', 'm')->required()],
+    'ulid' => [fn (FluentSchema $s): mixed => $s->ulid('L', 'm')->required(), fn (): mixed => FluentRule::ulid('L', 'm')->required()],
+    'ip' => [fn (FluentSchema $s): mixed => $s->ip('L', 'm')->required(), fn (): mixed => FluentRule::ip('L', 'm')->required()],
+    'ipv4' => [fn (FluentSchema $s): mixed => $s->ipv4('L', 'm')->required(), fn (): mixed => FluentRule::ipv4('L', 'm')->required()],
+    'ipv6' => [fn (FluentSchema $s): mixed => $s->ipv6('L', 'm')->required(), fn (): mixed => FluentRule::ipv6('L', 'm')->required()],
     'macAddress' => [fn (FluentSchema $s): mixed => $s->macAddress('L', 'm')->required(), fn (): mixed => FluentRule::macAddress('L', 'm')->required()],
-    'json'       => [fn (FluentSchema $s): mixed => $s->json('L', 'm')->required(), fn (): mixed => FluentRule::json('L', 'm')->required()],
-    'timezone'   => [fn (FluentSchema $s): mixed => $s->timezone('L', 'm')->required(), fn (): mixed => FluentRule::timezone('L', 'm')->required()],
-    'hexColor'   => [fn (FluentSchema $s): mixed => $s->hexColor('L', 'm')->required(), fn (): mixed => FluentRule::hexColor('L', 'm')->required()],
-    'activeUrl'  => [fn (FluentSchema $s): mixed => $s->activeUrl('L', 'm')->required(), fn (): mixed => FluentRule::activeUrl('L', 'm')->required()],
-    'list'       => [fn (FluentSchema $s): mixed => $s->list('L', 'm')->required(), fn (): mixed => FluentRule::list('L', 'm')->required()],
-    'field'      => [fn (FluentSchema $s): mixed => $s->field('L')->required(), fn (): mixed => FluentRule::field('L')->required()],
+    'json' => [fn (FluentSchema $s): mixed => $s->json('L', 'm')->required(), fn (): mixed => FluentRule::json('L', 'm')->required()],
+    'timezone' => [fn (FluentSchema $s): mixed => $s->timezone('L', 'm')->required(), fn (): mixed => FluentRule::timezone('L', 'm')->required()],
+    'hexColor' => [fn (FluentSchema $s): mixed => $s->hexColor('L', 'm')->required(), fn (): mixed => FluentRule::hexColor('L', 'm')->required()],
+    'activeUrl' => [fn (FluentSchema $s): mixed => $s->activeUrl('L', 'm')->required(), fn (): mixed => FluentRule::activeUrl('L', 'm')->required()],
+    'list' => [fn (FluentSchema $s): mixed => $s->list('L', 'm')->required(), fn (): mixed => FluentRule::list('L', 'm')->required()],
+    'field' => [fn (FluentSchema $s): mixed => $s->field('L')->required(), fn (): mixed => FluentRule::field('L')->required()],
 ]);
 
 it('forwards anyOf to FluentRule when AnyOf is available', function (): void {
@@ -231,14 +231,14 @@ it('forwards anyOf to FluentRule when AnyOf is available', function (): void {
 
 it('validates through RuleSet::define', function (): void {
     $validated = RuleSet::define(fn (FluentSchema $rules): array => [
-        'name'  => $rules->string('Full Name')->required()->min(2)->max(255),
+        'name' => $rules->string('Full Name')->required()->min(2)->max(255),
         'email' => $rules->email()->required(),
         'items' => $rules->array()->required()->each([
-            'id'   => $rules->integer()->required(),
+            'id' => $rules->integer()->required(),
             'name' => $rules->string()->required(),
         ]),
     ])->validate([
-        'name'  => 'Amara',
+        'name' => 'Amara',
         'email' => 'amara@example.com',
         'items' => [['id' => 1, 'name' => 'Widget']],
     ]);
@@ -336,7 +336,7 @@ it('answers rules() with the schema() output when a request defines only schema(
         public function schema(FluentSchema $rules): array
         {
             return [
-                'title'  => $rules->string()->required()->max(10),
+                'title' => $rules->string()->required()->max(10),
                 'author' => $rules->string()->required(),
             ];
         }

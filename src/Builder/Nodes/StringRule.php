@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use Closure;
-use Simtabi\Laranail\Validation\Regex;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
+use Simtabi\Laranail\Validation\Regex;
 
 class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -53,32 +53,32 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
 
     public function encoding(string $encoding, ?string $message = null): static
     {
-        return $this->addRule('encoding:' . $encoding, $message);
+        return $this->addRule('encoding:'.$encoding, $message);
     }
 
     public function between(int $min, int $max, ?string $message = null): static
     {
-        return $this->addRule('between:' . $min . ',' . $max, $message);
+        return $this->addRule('between:'.$min.','.$max, $message);
     }
 
     public function doesntEndWith(string ...$values): static
     {
-        return $this->addRule('doesnt_end_with:' . implode(',', $values));
+        return $this->addRule('doesnt_end_with:'.implode(',', $values));
     }
 
     public function doesntStartWith(string ...$values): static
     {
-        return $this->addRule('doesnt_start_with:' . implode(',', $values));
+        return $this->addRule('doesnt_start_with:'.implode(',', $values));
     }
 
     public function endsWith(string ...$values): static
     {
-        return $this->addRule('ends_with:' . implode(',', $values));
+        return $this->addRule('ends_with:'.implode(',', $values));
     }
 
     public function exactly(int $value, ?string $message = null): static
     {
-        return $this->addRule('size:' . $value, $message);
+        return $this->addRule('size:'.$value, $message);
     }
 
     public function lowercase(?string $message = null): static
@@ -88,17 +88,17 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
 
     public function max(int $value, ?string $message = null): static
     {
-        return $this->addRule('max:' . $value, $message);
+        return $this->addRule('max:'.$value, $message);
     }
 
     public function min(int $value, ?string $message = null): static
     {
-        return $this->addRule('min:' . $value, $message);
+        return $this->addRule('min:'.$value, $message);
     }
 
     public function startsWith(string ...$values): static
     {
-        return $this->addRule('starts_with:' . implode(',', $values));
+        return $this->addRule('starts_with:'.implode(',', $values));
     }
 
     public function uppercase(?string $message = null): static
@@ -157,11 +157,11 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
      * accepts a {@see Regex} or a builder closure; see {@see matches()} for
      * the raw-string spelling that adds delimiters and `D` for you.
      *
-     * @param string|Regex|Closure(Regex): Regex $pattern
+     * @param  string|Regex|Closure(Regex): Regex  $pattern
      */
     public function regex(string|Regex|Closure $pattern, ?string $message = null): static
     {
-        return $this->addRule('regex:' . (is_string($pattern) ? $pattern : $this->compileRegex($pattern)), $message);
+        return $this->addRule('regex:'.(is_string($pattern) ? $pattern : $this->compileRegex($pattern)), $message);
     }
 
     /**
@@ -176,7 +176,7 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
      * The builder is never required — a team that already has a pattern
      * just uses it.
      *
-     * @param string|Regex|Closure(Regex): Regex $pattern
+     * @param  string|Regex|Closure(Regex): Regex  $pattern
      */
     public function matches(string|Regex|Closure $pattern, ?string $message = null): static
     {
@@ -184,12 +184,12 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
             ? Regex::of($pattern)->compile()
             : $this->compileRegex($pattern);
 
-        return $this->addRule('regex:' . $compiled, $message);
+        return $this->addRule('regex:'.$compiled, $message);
     }
 
     public function notRegex(string $pattern, ?string $message = null): static
     {
-        return $this->addRule('not_regex:' . $pattern, $message);
+        return $this->addRule('not_regex:'.$pattern, $message);
     }
 
     public function timezone(?string $message = null): static
@@ -209,12 +209,12 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
 
     public function email(string ...$modes): static
     {
-        return $this->addRule($modes === [] ? 'email' : 'email:' . implode(',', $modes));
+        return $this->addRule($modes === [] ? 'email' : 'email:'.implode(',', $modes));
     }
 
     public function dateFormat(string $format, ?string $message = null): static
     {
-        return $this->addRule('date_format:' . $format, $message);
+        return $this->addRule('date_format:'.$format, $message);
     }
 
     public function confirmed(?string $message = null): static
@@ -224,32 +224,32 @@ class StringRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRul
 
     public function currentPassword(?string $guard = null, ?string $message = null): static
     {
-        return $this->addRule($guard ? 'current_password:' . $guard : 'current_password', $message);
+        return $this->addRule($guard ? 'current_password:'.$guard : 'current_password', $message);
     }
 
     public function same(string $field, ?string $message = null): static
     {
-        return $this->addRule('same:' . $field, $message);
+        return $this->addRule('same:'.$field, $message);
     }
 
     public function different(string $field, ?string $message = null): static
     {
-        return $this->addRule('different:' . $field, $message);
+        return $this->addRule('different:'.$field, $message);
     }
 
     public function inArray(string $field, ?string $message = null): static
     {
-        return $this->addRule('in_array:' . $field, $message);
+        return $this->addRule('in_array:'.$field, $message);
     }
 
     public function inArrayKeys(string $field, ?string $message = null): static
     {
-        return $this->addRule('in_array_keys:' . $field, $message);
+        return $this->addRule('in_array_keys:'.$field, $message);
     }
 
     public function distinct(?string $mode = null, ?string $message = null): static
     {
-        return $this->addRule($mode ? 'distinct:' . $mode : 'distinct', $message);
+        return $this->addRule($mode ? 'distinct:'.$mode : 'distinct', $message);
     }
 
     /** @return list<string|object> */

@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Fluent;
-use Illuminate\Routing\Redirector;
-use Illuminate\Validation\Validator;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rules\Unique;
-use Simtabi\Laranail\Validation\RuleSet;
-use Illuminate\Foundation\Http\FormRequest;
-use Simtabi\Laranail\Validation\FluentRule;
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Fluent;
+use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use Simtabi\Laranail\Validation\FluentFormRequest;
+use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\OptimizedValidator;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Unit: OptimizedValidator fast check compilation
@@ -148,8 +148,8 @@ it('handles in: values in fast checks', function (): void {
 
 it('builds fast checks for multiple patterns independently', function (): void {
     $checks = OptimizedValidator::buildFastChecks([
-        'items.*.name'  => 'string|required|max:255',
-        'items.*.qty'   => 'numeric|required|min:1',
+        'items.*.name' => 'string|required|max:255',
+        'items.*.qty' => 'numeric|required|min:1',
         'items.*.email' => 'required|string|email', // not fast-checkable
     ]);
 
@@ -220,7 +220,7 @@ it('validates correctly with fast-checkable wildcard rules', function (): void {
         rules: [
             'items' => FluentRule::array()->required()->each([
                 'name' => FluentRule::string('Name')->required()->max(255),
-                'qty'  => FluentRule::numeric('Quantity')->required()->min(1),
+                'qty' => FluentRule::numeric('Quantity')->required()->min(1),
             ]),
         ],
         data: [
@@ -333,7 +333,7 @@ it('validated() returns all wildcard data even when fast-checked', function (): 
         rules: [
             'items' => FluentRule::array()->required()->each([
                 'name' => FluentRule::string()->required()->max(255),
-                'qty'  => FluentRule::numeric()->required()->min(1),
+                'qty' => FluentRule::numeric()->required()->min(1),
             ]),
         ],
         data: [
@@ -413,7 +413,7 @@ it('handles cross-field wildcard references correctly', function (): void {
         rules: [
             'items' => FluentRule::array()->required()->each([
                 'start' => FluentRule::numeric()->required(),
-                'end'   => FluentRule::numeric()->required()->greaterThanOrEqualTo('items.*.start'),
+                'end' => FluentRule::numeric()->required()->greaterThanOrEqualTo('items.*.start'),
             ]),
         ],
         data: [
@@ -437,11 +437,11 @@ it('handles cross-field wildcard references correctly', function (): void {
 it('handles rules without wildcards', function (): void {
     $formRequest = createFluentFormRequest(
         rules: [
-            'name'  => FluentRule::string('Name')->required()->max(255),
+            'name' => FluentRule::string('Name')->required()->max(255),
             'email' => FluentRule::email('Email')->required(),
         ],
         data: [
-            'name'  => 'John',
+            'name' => 'John',
             'email' => 'john@example.com',
         ],
     );
@@ -636,7 +636,7 @@ it('bail prevents closure from running when earlier rule fails', function (): vo
     $formRequest = createFluentFormRequest(
         rules: [
             'items' => FluentRule::array()->required()->each([
-                'name'    => FluentRule::string()->required()->max(255),
+                'name' => FluentRule::string()->required()->max(255),
                 'user_id' => FluentRule::numeric()->bail()->required()->integer()
                     ->rule(function (string $attribute, mixed $value, Closure $fail) use (&$closureCalled): void {
                         $closureCalled = true;
@@ -669,7 +669,7 @@ it('closure runs when bail rules pass and value is valid', function (): void {
     $formRequest = createFluentFormRequest(
         rules: [
             'items' => FluentRule::array()->required()->each([
-                'name'    => FluentRule::string()->required()->max(255),
+                'name' => FluentRule::string()->required()->max(255),
                 'user_id' => FluentRule::numeric()->bail()->required()->integer()
                     ->rule(function (string $attribute, mixed $value, Closure $fail) use (&$closureCalled, &$closureValue): void {
                         $closureCalled = true;
@@ -699,7 +699,7 @@ it('fast check does not interfere with non-fast-checkable fields in same group',
     $formRequest = createFluentFormRequest(
         rules: [
             'items' => FluentRule::array()->required()->each([
-                'name'  => FluentRule::string()->required()->max(255),  // fast-checkable
+                'name' => FluentRule::string()->required()->max(255),  // fast-checkable
                 'score' => FluentRule::numeric()->required()->rule(function (string $attribute, mixed $value, Closure $fail) use (&$closureCalled): void {
                     $closureCalled = true;
                     if ($value > 100) {
@@ -865,7 +865,7 @@ it('fast-checks eligible fields while falling through for ineligible ones in the
     $formRequest = createFluentFormRequest(
         rules: [
             'items' => FluentRule::array()->required()->each([
-                'name'  => FluentRule::string()->required()->max(255),  // fast-checkable
+                'name' => FluentRule::string()->required()->max(255),  // fast-checkable
                 'email' => FluentRule::email()->required(),             // NOT fast-checkable (email rule)
             ]),
         ],
@@ -895,7 +895,7 @@ it('respects stopOnFirstFailure with fast-checked attributes', function (): void
         rules: [
             'items' => FluentRule::array()->required()->each([
                 'name' => FluentRule::string()->required()->max(255),
-                'qty'  => FluentRule::numeric()->required()->min(1),
+                'qty' => FluentRule::numeric()->required()->min(1),
             ]),
         ],
         data: [
@@ -924,13 +924,13 @@ it('handles children() rules without wildcards', function (): void {
         rules: [
             'address' => FluentRule::field()->children([
                 'street' => FluentRule::string()->required()->max(255),
-                'city'   => FluentRule::string()->required()->max(100),
+                'city' => FluentRule::string()->required()->max(100),
             ]),
         ],
         data: [
             'address' => [
                 'street' => '123 Main St',
-                'city'   => 'Springfield',
+                'city' => 'Springfield',
             ],
         ],
     );
@@ -947,13 +947,13 @@ it('reports errors in children() rules', function (): void {
         rules: [
             'address' => FluentRule::field()->children([
                 'street' => FluentRule::string()->required()->max(255),
-                'city'   => FluentRule::string()->required()->max(100),
+                'city' => FluentRule::string()->required()->max(100),
             ]),
         ],
         data: [
             'address' => [
                 'street' => '',
-                'city'   => 'Springfield',
+                'city' => 'Springfield',
             ],
         ],
     );
@@ -1048,7 +1048,7 @@ it('fast checks accepted and declined rules', function (): void {
 it('correctly identifies the specific invalid item among many valid ones', function (): void {
     $items = [];
     for ($i = 0; $i < 50; $i++) {
-        $items[] = ['name' => 'Valid Name ' . $i, 'qty' => $i + 1];
+        $items[] = ['name' => 'Valid Name '.$i, 'qty' => $i + 1];
     }
 
     // Make item 37 invalid.
@@ -1058,7 +1058,7 @@ it('correctly identifies the specific invalid item among many valid ones', funct
         rules: [
             'items' => FluentRule::array()->required()->each([
                 'name' => FluentRule::string()->required()->max(255),
-                'qty'  => FluentRule::numeric()->required()->min(1),
+                'qty' => FluentRule::numeric()->required()->min(1),
             ]),
         ],
         data: ['items' => $items],
@@ -1268,7 +1268,7 @@ it('respects stopOnFirstFailure on the FormRequest', function (): void {
         public function rules(): array
         {
             return [
-                'name'  => FluentRule::string()->required()->max(255),
+                'name' => FluentRule::string()->required()->max(255),
                 'email' => FluentRule::email()->required(),
             ];
         }
@@ -1295,7 +1295,7 @@ it('respects stopOnFirstFailure on the FormRequest', function (): void {
 it('does not stop on first failure by default', function (): void {
     $formRequest = createFluentFormRequest(
         rules: [
-            'name'  => FluentRule::string()->required()->max(255),
+            'name' => FluentRule::string()->required()->max(255),
             'email' => FluentRule::email()->required(),
         ],
         data: [],
@@ -1389,8 +1389,8 @@ it('auto-unwraps a RuleSet built via fluent chain in rules()', function (): void
 });
 
 /**
- * @param array<string, mixed> $rules
- * @param array<array-key, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<array-key, mixed>  $data
  */
 function createFluentFormRequest(array $rules, array $data): FormRequest
 {

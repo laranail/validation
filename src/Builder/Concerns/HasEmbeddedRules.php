@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Concerns;
 
-use Closure;
 use BackedEnum;
-use Illuminate\Validation\Rule;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Validation\Rule;
 
 trait HasEmbeddedRules
 {

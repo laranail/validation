@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
 use Simtabi\Laranail\Validation\HasFluentValidation;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Test doubles
@@ -55,8 +55,8 @@ class TestableComponent extends FakeLivewireBase
     use HasFluentValidation;
 
     /**
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $fluentRules
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $fluentRules
      */
     public function __construct(public array $data = [], private array $fluentRules = []) {}
 
@@ -69,8 +69,7 @@ class TestableComponent extends FakeLivewireBase
     /**
      * Simulates Livewire's data resolution.
      *
-     * @param array<string, mixed> $rules
-     *
+     * @param  array<string, mixed>  $rules
      * @return array<string, mixed>
      */
     public function getDataForValidation(array $rules): array
@@ -81,10 +80,9 @@ class TestableComponent extends FakeLivewireBase
     /**
      * Expose the protected compilation step for testing.
      *
-     * @param array<string, mixed>|null $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
-     *
+     * @param  array<string, mixed>|null  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
      */
     public function compile(?array $rules = null, array $messages = [], array $attributes = []): array
@@ -111,10 +109,9 @@ class TestableComponentNoRulesMethod extends FakeLivewireBase
     }
 
     /**
-     * @param array<string, mixed>|null $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
-     *
+     * @param  array<string, mixed>|null  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
      */
     public function compile(?array $rules = null, array $messages = [], array $attributes = []): array
@@ -132,9 +129,9 @@ class TestableComponentWithUnwrap extends FakeLivewireBase
     use HasFluentValidation;
 
     /**
-     * @param array<string, mixed> $rawData
-     * @param array<string, mixed> $unwrappedData
-     * @param array<string, mixed>|RuleSet $rules
+     * @param  array<string, mixed>  $rawData
+     * @param  array<string, mixed>  $unwrappedData
+     * @param  array<string, mixed>|RuleSet  $rules
      */
     public function __construct(public array $rawData, public array $unwrappedData, private array|RuleSet $rules = []) {}
 
@@ -145,8 +142,7 @@ class TestableComponentWithUnwrap extends FakeLivewireBase
     }
 
     /**
-     * @param array<string, mixed> $rules
-     *
+     * @param  array<string, mixed>  $rules
      * @return array<string, mixed>
      */
     public function getDataForValidation(array $rules): array
@@ -161,10 +157,9 @@ class TestableComponentWithUnwrap extends FakeLivewireBase
     }
 
     /**
-     * @param array<string, mixed>|null $rules
-     * @param array<string, string> $messages
-     * @param array<string, string> $attributes
-     *
+     * @param  array<string, mixed>|null  $rules
+     * @param  array<string, string>  $messages
+     * @param  array<string, string>  $attributes
      * @return array{0: array<string, mixed>|null, 1: array<string, string>, 2: array<string, string>}
      */
     public function compile(?array $rules = null, array $messages = [], array $attributes = []): array
@@ -344,8 +339,8 @@ it('expands wildcard rules into concrete keys', function (): void {
     $component = new TestableComponent(
         data: ['items' => [['name' => 'Foo'], ['name' => 'Bar']]],
         fluentRules: [
-            'items'        => FluentRule::array()->required(),
-            'items.*'      => FluentRule::array()->required(),
+            'items' => FluentRule::array()->required(),
+            'items.*' => FluentRule::array()->required(),
             'items.*.name' => FluentRule::string()->required()->max(255),
         ],
     );
@@ -379,8 +374,8 @@ it('uses unwrapDataForValidation() output when the method exists', function (): 
         rawData: ['items' => 'model-object'],
         unwrappedData: ['items' => [['name' => 'Foo'], ['name' => 'Bar']]],
         rules: [
-            'items'        => FluentRule::array()->required(),
-            'items.*'      => FluentRule::array()->required(),
+            'items' => FluentRule::array()->required(),
+            'items.*' => FluentRule::array()->required(),
             'items.*.name' => FluentRule::string()->required(),
         ],
     );
@@ -440,7 +435,7 @@ it('getRules() preserves flat wildcard keys', function (): void {
     $component = new TestableComponent(
         data: ['items' => [['name' => 'Foo']]],
         fluentRules: [
-            'items'        => FluentRule::array()->required(),
+            'items' => FluentRule::array()->required(),
             'items.*.name' => FluentRule::string()->required(),
         ],
     );
@@ -535,7 +530,7 @@ it('getRules() expands children() into fixed paths', function (): void {
         data: ['credentials' => ['base_uri' => 'https://example.com', 'client_id' => '123']],
         fluentRules: [
             'credentials' => FluentRule::array()->children([
-                'base_uri'  => FluentRule::string()->nullable()->url(),
+                'base_uri' => FluentRule::string()->nullable()->url(),
                 'client_id' => FluentRule::string()->required()->uuid(),
             ]),
         ],
@@ -594,7 +589,7 @@ it('getValidationAttributes() merges validationAttributesFromOutside with Fluent
     $component = new TestableComponent(
         data: ['name' => 'John', 'email' => 'john@example.com'],
         fluentRules: [
-            'name'  => FluentRule::string('Full Name')->required(),
+            'name' => FluentRule::string('Full Name')->required(),
             'email' => FluentRule::email()->required(),
         ],
     );

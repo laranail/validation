@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
+use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
+use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
 use Simtabi\Laranail\Validation\Rules\Geo\Latitude;
 use Simtabi\Laranail\Validation\Rules\Geo\Longitude;
-use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
-use Simtabi\Laranail\Validation\Rules\Colour\CssColor;
-use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
-use Simtabi\Laranail\Validation\Contracts\ClientCheckable;
 use Simtabi\Laranail\Validation\Rules\Identifiers\HashDigest;
+use Simtabi\Laranail\Validation\Rules\Postal\PostalCode;
+use Simtabi\Laranail\Validation\Rules\Text\CaseStyle;
 use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 
 /**
@@ -30,9 +30,9 @@ use Simtabi\Laranail\Validation\Rules\Vendor\VendorIdentifier;
 function clientCheckableArguments(): array
 {
     return [
-        CaseStyle::class        => [CaseStyle::KEBAB],
+        CaseStyle::class => [CaseStyle::KEBAB],
         VendorIdentifier::class => [VendorIdentifier::AWS_REGION],
-        HashDigest::class       => ['sha256'],
+        HashDigest::class => ['sha256'],
     ];
 }
 
@@ -74,8 +74,7 @@ it('advertises only rules the browser runner implements', function (): void {
 /**
  * The advertised rules as a native Laravel rule string.
  *
- * @param list<array{rule: string, params: array<array-key, string>}> $advertised
- *
+ * @param  list<array{rule: string, params: array<array-key, string>}>  $advertised
  * @return list<string>
  */
 function asLaravelRules(array $advertised): array
@@ -90,7 +89,7 @@ function asLaravelRules(array $advertised): array
         // Laravel's parser special-cases regex and does NOT split its
         // parameter on commas, which matters because a pattern routinely
         // contains one.
-        return $rule['rule'] . ':' . implode(',', $params);
+        return $rule['rule'].':'.implode(',', $params);
     }, $advertised);
 }
 
@@ -102,7 +101,7 @@ it('gives the same verdict as the rule itself', function (): void {
     // actually run rather than an approximation of it.
     $grid = [
         '', ' ', 'abc', 'ABC', 'abc-def', 'abc--def', '-abc', 'abc-', 'a b', "a\tb", "a\u{200B}b",
-        '1.0.0', '1.0.0-alpha.1', '1.0', 'v1.0.0', '0x' . str_repeat('a', 40), '0x' . str_repeat('g', 40),
+        '1.0.0', '1.0.0-alpha.1', '1.0', 'v1.0.0', '0x'.str_repeat('a', 40), '0x'.str_repeat('g', 40),
         'sub.domain', 'subdomain', str_repeat('a', 64), 'a_b', 'café', '123',
         'kebab-case', 'camelCase', 'PascalCase', 'snake_case',
         '12.34', '12.345', '-12.00', '+3', '1e3', '$12', '1,234.50',
@@ -172,7 +171,7 @@ it('is implemented only where the browser form is exactly equivalent', function 
     $offenders = [];
 
     foreach ($mustNotAdvertise as $suffix) {
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . $suffix;
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\'.$suffix;
 
         expect(class_exists($class))->toBeTrue("{$class} no longer exists — update this list");
 
@@ -182,7 +181,7 @@ it('is implemented only where the browser form is exactly equivalent', function 
     }
 
     expect($offenders)->toBeEmpty(
-        'performs a checksum, a query or IO but advertises a browser form: ' . implode(', ', $offenders),
+        'performs a checksum, a query or IO but advertises a browser form: '.implode(', ', $offenders),
     );
 });
 
@@ -263,5 +262,5 @@ it('declares the interface on every rule that has the method', function (): void
         }
     }
 
-    expect($undeclared)->toBeEmpty('has clientRules() but does not implement ClientCheckable: ' . implode(', ', $undeclared));
+    expect($undeclared)->toBeEmpty('has clientRules() but does not implement ClientCheckable: '.implode(', ', $undeclared));
 });

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Tests;
 
-use SplFileInfo;
-use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 
 /**
  * Every message key a rule can emit must resolve to a real sentence.
@@ -82,16 +82,16 @@ final class RuleMessagesResolveTest extends TestCase
      */
     public function test_every_shipped_locale_is_complete(): void
     {
-        $root = dirname(__DIR__) . '/resources/lang';
-        $reference = require $root . '/en/validation.php';
+        $root = dirname(__DIR__).'/resources/lang';
+        $reference = require $root.'/en/validation.php';
         $this->assertIsArray($reference);
 
-        $locales = glob($root . '/*', GLOB_ONLYDIR);
+        $locales = glob($root.'/*', GLOB_ONLYDIR);
         $this->assertNotFalse($locales);
 
         foreach ($locales as $localeDir) {
             $locale = basename($localeDir);
-            $messages = require $localeDir . '/validation.php';
+            $messages = require $localeDir.'/validation.php';
             $this->assertIsArray($messages, "{$locale}/validation.php did not return an array.");
 
             $missing = array_diff(array_keys($reference), array_keys($messages));
@@ -121,7 +121,7 @@ final class RuleMessagesResolveTest extends TestCase
     private function keysReferencedInSource(): array
     {
         $keys = [];
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__) . '/src'));
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__).'/src'));
 
         foreach ($files as $file) {
             // RecursiveIteratorIterator is typed as yielding mixed, and the

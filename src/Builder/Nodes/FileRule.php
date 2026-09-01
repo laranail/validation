@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 
 class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -29,37 +29,37 @@ class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function min(int|string $size, ?string $message = null): static
     {
-        return $this->addRule('min:' . $this->toKilobytes($size), $message);
+        return $this->addRule('min:'.$this->toKilobytes($size), $message);
     }
 
     public function max(int|string $size, ?string $message = null): static
     {
-        return $this->addRule('max:' . $this->toKilobytes($size), $message);
+        return $this->addRule('max:'.$this->toKilobytes($size), $message);
     }
 
     public function between(int|string $min, int|string $max, ?string $message = null): static
     {
-        return $this->addRule('between:' . $this->toKilobytes($min) . ',' . $this->toKilobytes($max), $message);
+        return $this->addRule('between:'.$this->toKilobytes($min).','.$this->toKilobytes($max), $message);
     }
 
     public function exactly(int|string $size, ?string $message = null): static
     {
-        return $this->addRule('size:' . $this->toKilobytes($size), $message);
+        return $this->addRule('size:'.$this->toKilobytes($size), $message);
     }
 
     public function extensions(string ...$extensions): static
     {
-        return $this->addRule('extensions:' . implode(',', $extensions));
+        return $this->addRule('extensions:'.implode(',', $extensions));
     }
 
     public function mimes(string ...$mimes): static
     {
-        return $this->addRule('mimes:' . implode(',', $mimes));
+        return $this->addRule('mimes:'.implode(',', $mimes));
     }
 
     public function mimetypes(string ...$mimetypes): static
     {
-        return $this->addRule('mimetypes:' . implode(',', $mimetypes));
+        return $this->addRule('mimetypes:'.implode(',', $mimetypes));
     }
 
     /**
@@ -82,10 +82,10 @@ class FileRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
             $unit = strtolower($matches[2]);
 
             return (int) round(match ($unit) {
-                'kb'    => $value,
-                'mb'    => $value * 1_000,
-                'gb'    => $value * 1_000_000,
-                'tb'    => $value * 1_000_000_000,
+                'kb' => $value,
+                'mb' => $value * 1_000,
+                'gb' => $value * 1_000_000,
+                'tb' => $value * 1_000_000_000,
                 default => $value,
             });
         }

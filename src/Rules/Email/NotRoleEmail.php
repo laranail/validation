@@ -6,8 +6,8 @@ namespace Simtabi\Laranail\Validation\Rules\Email;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 use Simtabi\Laranail\Validation\Contracts\Email\RoleAccountList;
+use Simtabi\Laranail\Validation\Rules\Email\Support\Address;
 
 /**
  * The address belongs to a person rather than a function.

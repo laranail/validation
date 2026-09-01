@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Simtabi\Laranail\Validation\RuleSet;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Http\FormRequest;
-use Simtabi\Laranail\Validation\FluentRule;
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Simtabi\Laranail\Validation\HasFluentRules;
 use Simtabi\Laranail\Validation\BatchDatabaseChecker;
 use Simtabi\Laranail\Validation\Exceptions\BatchLimitExceededException;
+use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\HasFluentRules;
+use Simtabi\Laranail\Validation\RuleSet;
 
 // =========================================================================
 // Helper: set up in-memory SQLite with mixed integer + uuid tables
@@ -26,7 +26,7 @@ function setupGuardsDatabase(): void
 {
     config(['database.default' => 'testing']);
     config(['database.connections.testing' => [
-        'driver'   => 'sqlite',
+        'driver' => 'sqlite',
         'database' => ':memory:',
     ]]);
 
@@ -44,8 +44,8 @@ function setupGuardsDatabase(): void
 }
 
 /**
- * @param array<string, mixed> $rules
- * @param array<string, mixed> $data
+ * @param  array<string, mixed>  $rules
+ * @param  array<string, mixed>  $data
  */
 function createGuardsFormRequest(array $rules, array $data): FormRequest
 {
@@ -372,11 +372,11 @@ it('exists and unique against same (table, column) fall back to per-item queries
 
     $groups = [
         'widgets:uuid:exists' => [
-            'rule'   => $existsRule,
+            'rule' => $existsRule,
             'values' => ['11111111-2222-3333-4444-555555555555'],
         ],
         'widgets:uuid:unique' => [
-            'rule'   => $uniqueRule,
+            'rule' => $uniqueRule,
             'values' => ['99999999-0000-0000-0000-000000000000'],
         ],
     ];
@@ -396,11 +396,11 @@ it('non-conflicting (different columns) exists and unique groups are both regist
 
     $groups = [
         'widgets:uuid:exists' => [
-            'rule'   => $existsRule,
+            'rule' => $existsRule,
             'values' => ['11111111-2222-3333-4444-555555555555'],
         ],
         'widgets:id:unique' => [
-            'rule'   => $uniqueRule,
+            'rule' => $uniqueRule,
             'values' => ['1'],
         ],
     ];
@@ -889,7 +889,7 @@ it('parent-max detection handles string-form parent rule (array|max:5)', functio
 
     $formRequest = createGuardsFormRequest(
         rules: [
-            'items'      => 'required|array|max:5',
+            'items' => 'required|array|max:5',
             'items.*.id' => ['required', 'integer', Rule::exists('testing.widgets', 'id')],
         ],
         data: ['items' => $items],

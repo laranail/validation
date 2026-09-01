@@ -32,7 +32,7 @@ final class Salutation implements ValidationRule
     private readonly ?array $accepted;
 
     /**
-     * @param list<string>|null $accepted Replacement list, lowercase without dots.
+     * @param  list<string>|null  $accepted  Replacement list, lowercase without dots.
      */
     public function __construct(?array $accepted = null)
     {
@@ -50,7 +50,7 @@ final class Salutation implements ValidationRule
         $normalised = rtrim(mb_strtolower(trim($value)), '.');
 
         if ($this->accepted === null) {
-            self::$bundled ??= CodeFile::load(dirname(__DIR__, 3) . '/resources/data/salutations.txt');
+            self::$bundled ??= CodeFile::load(dirname(__DIR__, 3).'/resources/data/salutations.txt');
         }
 
         $list = $this->accepted ?? self::$bundled ?? [];

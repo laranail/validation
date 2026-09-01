@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Builder\Nodes;
 
 use DateTimeInterface;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
-use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
-use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasEmbeddedRules;
 use Simtabi\Laranail\Validation\Builder\Concerns\HasFieldModifiers;
+use Simtabi\Laranail\Validation\Builder\Concerns\SelfValidates;
+use Simtabi\Laranail\Validation\Contracts\FluentRuleContract;
 
 class DateRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 {
@@ -109,22 +109,22 @@ class DateRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function before(DateTimeInterface|string $date, ?string $message = null): static
     {
-        return $this->addRule('before:' . $this->formatDate($date), $message);
+        return $this->addRule('before:'.$this->formatDate($date), $message);
     }
 
     public function after(DateTimeInterface|string $date, ?string $message = null): static
     {
-        return $this->addRule('after:' . $this->formatDate($date), $message);
+        return $this->addRule('after:'.$this->formatDate($date), $message);
     }
 
     public function beforeOrEqual(DateTimeInterface|string $date, ?string $message = null): static
     {
-        return $this->addRule('before_or_equal:' . $this->formatDate($date), $message);
+        return $this->addRule('before_or_equal:'.$this->formatDate($date), $message);
     }
 
     public function afterOrEqual(DateTimeInterface|string $date, ?string $message = null): static
     {
-        return $this->addRule('after_or_equal:' . $this->formatDate($date), $message);
+        return $this->addRule('after_or_equal:'.$this->formatDate($date), $message);
     }
 
     /**
@@ -148,17 +148,17 @@ class DateRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
 
     public function dateEquals(DateTimeInterface|string $date, ?string $message = null): static
     {
-        return $this->addRule('date_equals:' . $this->formatDate($date), $message);
+        return $this->addRule('date_equals:'.$this->formatDate($date), $message);
     }
 
     public function same(string $field, ?string $message = null): static
     {
-        return $this->addRule('same:' . $field, $message);
+        return $this->addRule('same:'.$field, $message);
     }
 
     public function different(string $field, ?string $message = null): static
     {
-        return $this->addRule('different:' . $field, $message);
+        return $this->addRule('different:'.$field, $message);
     }
 
     protected function formatDate(DateTimeInterface|string $date): string
@@ -172,7 +172,7 @@ class DateRule implements DataAwareRule, FluentRuleContract, ValidatorAwareRule
     protected function buildValidationRules(): array
     {
         return [
-            ...$this->reorderConstraints([$this->format === null ? 'date' : 'date_format:' . $this->format, ...$this->constraints]),
+            ...$this->reorderConstraints([$this->format === null ? 'date' : 'date_format:'.$this->format, ...$this->constraints]),
             ...$this->rules,
         ];
     }

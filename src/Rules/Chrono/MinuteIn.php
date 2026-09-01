@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Rules\Chrono;
 
 use Closure;
-use Exception;
-use LogicException;
 use DateTimeImmutable;
+use Exception;
 use Illuminate\Contracts\Validation\ValidationRule;
+use LogicException;
 
 /**
  * A time whose minute component is one of the allowed values —
@@ -26,7 +26,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 final readonly class MinuteIn implements ValidationRule
 {
     /**
-     * @param list<int> $minutes Allowed minute values, each 0–59.
+     * @param  list<int>  $minutes  Allowed minute values, each 0–59.
      */
     public function __construct(private array $minutes)
     {

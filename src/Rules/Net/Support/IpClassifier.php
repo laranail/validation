@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Rules\Net\Support;
 
-use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 use Simtabi\Laranail\Validation\Rules\Net\PrivateIp;
+use Simtabi\Laranail\Validation\Rules\Net\PublicIp;
 
 /**
  * Decides whether an IP address is publicly routable.
@@ -109,7 +109,7 @@ final class IpClassifier
         }
 
         // ::ffff:a.b.c.d — 80 zero bits, 16 one bits, then the v4 address.
-        $isMapped = str_starts_with($packed, str_repeat("\x00", 10) . "\xff\xff");
+        $isMapped = str_starts_with($packed, str_repeat("\x00", 10)."\xff\xff");
 
         // ::a.b.c.d, the deprecated IPv4-compatible form. `::` and `::1` are
         // handled by the v6 table, so exclude anything that low.
@@ -126,7 +126,7 @@ final class IpClassifier
     }
 
     /**
-     * @param list<array{string, int}> $ranges
+     * @param  list<array{string, int}>  $ranges
      */
     private static function matchesAny(string $ip, array $ranges): bool
     {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\Validation\Events;
 
 use Illuminate\Support\MessageBag;
-use Simtabi\Laranail\Validation\RuleSet;
 use Illuminate\Validation\ValidationException;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /**
  * Fired when a {@see RuleSet} run FAILS — the notification seam.

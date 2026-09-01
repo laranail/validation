@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use RectorPest\Set\PestSetList;
-use RectorLaravel\Set\LaravelSetList;
-use RectorPest\Rules\UseToMatchRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
+use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
+use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
+use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
+use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
-use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
-use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
+use RectorLaravel\Set\LaravelSetList;
+use RectorPest\Rules\UseToMatchRector;
+use RectorPest\Set\PestSetList;
 
 return RectorConfig::configure()
     ->withCache(
@@ -25,10 +25,10 @@ return RectorConfig::configure()
         containerCacheDirectory: './.cache/rectorContainer',
     )
     ->withPaths([
-        __DIR__ . '/src',
-        __DIR__ . '/tests',
+        __DIR__.'/src',
+        __DIR__.'/tests',
     ])
-    ->withSkipPath(__DIR__ . '/tests/Fixtures/MacroableFootgun')
+    ->withSkipPath(__DIR__.'/tests/Fixtures/MacroableFootgun')
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
@@ -78,6 +78,6 @@ return RectorConfig::configure()
         // Hot-path closure allocates a literal array on every invocation
         // when in_array() is used. Explicit === comparisons avoid that.
         RepeatedOrEqualToInArrayRector::class => [
-            __DIR__ . '/src/FastCheckCompiler.php',
+            __DIR__.'/src/FastCheckCompiler.php',
         ],
     ]);

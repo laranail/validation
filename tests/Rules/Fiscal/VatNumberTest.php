@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\Rules\Fiscal\VatNumber;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
+use Simtabi\Laranail\Validation\Rules\Fiscal\VatNumber;
 
 // =========================================================================
 // VatNumber — checksum countries

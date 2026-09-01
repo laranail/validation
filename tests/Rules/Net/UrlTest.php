@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Validation\RuleSet;
 
 /*
  * Every value in the first block passes Laravel's own `url` rule. That is the
@@ -39,7 +39,7 @@ it('rejects what is not a URL at all', function (): void {
 
     foreach ($values as $value) {
         expect(urlCheck(FluentRule::url()->required(), $value))
-            ->toBeFalse('accepted ' . json_encode($value));
+            ->toBeFalse('accepted '.json_encode($value));
     }
 });
 
@@ -173,7 +173,7 @@ it('rejects control characters anywhere in the value', function (string $value):
 ]);
 
 it('bounds the length', function (): void {
-    $long = 'https://example.com/' . str_repeat('a', 3000);
+    $long = 'https://example.com/'.str_repeat('a', 3000);
 
     expect(urlCheck(FluentRule::url(), $long))->toBeFalse()
         ->and(urlCheck(FluentRule::url()->maxLength(4000), $long))->toBeTrue();
