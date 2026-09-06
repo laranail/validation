@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Simtabi\Laranail\Validation\RuleSet;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Tests for conditional pre-evaluation optimizations in RuleSet::validate().
@@ -23,7 +23,7 @@ use Simtabi\Laranail\Validation\RuleSet;
 it('does not error on excluded conditional fields in RuleSet::validate()', function (): void {
     // isbn is required, but excluded for dvd. Should pass without error.
     $validated = RuleSet::from([
-        'items' => 'required|array',
+        'items'        => 'required|array',
         'items.*.type' => ['required', 'string', Rule::in(['book', 'dvd'])],
         'items.*.isbn' => [['exclude_unless', 'items.*.type', 'book'], 'required', 'string', 'min:10'],
     ])->validate([
@@ -38,7 +38,7 @@ it('does not error on excluded conditional fields in RuleSet::validate()', funct
 
 it('errors on surviving conditional fields that fail validation', function (): void {
     expect(fn () => RuleSet::from([
-        'items' => 'required|array',
+        'items'        => 'required|array',
         'items.*.type' => ['required', 'string', Rule::in(['book', 'dvd'])],
         'items.*.isbn' => [['exclude_unless', 'items.*.type', 'book'], 'required', 'string', 'min:10'],
     ])->validate([
@@ -51,8 +51,8 @@ it('errors on surviving conditional fields that fail validation', function (): v
 it('handles exclude_if conditions correctly', function (): void {
     // price is excluded when type=free. Should pass.
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string'],
+        'items'         => 'required|array',
+        'items.*.type'  => ['required', 'string'],
         'items.*.price' => [['exclude_if', 'items.*.type', 'free'], 'required', 'numeric', 'min:1'],
     ])->validate([
         'items' => [
@@ -68,8 +68,8 @@ it('handles multiple types in exclude_unless condition', function (): void {
     // style_top excluded unless type is button, text, or image.
     // frame type should pass even with invalid style_top.
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string', Rule::in(['button', 'text', 'image', 'frame'])],
+        'items'             => 'required|array',
+        'items.*.type'      => ['required', 'string', Rule::in(['button', 'text', 'image', 'frame'])],
         'items.*.style_top' => [['exclude_unless', 'items.*.type', 'button', 'text', 'image'], 'required', 'string', 'min:3'],
     ])->validate([
         'items' => [
@@ -89,13 +89,13 @@ it('handles multiple types in exclude_unless condition', function (): void {
 
 it('validates 20 items with 2 types using dispatch table', function (): void {
     $items = array_map(fn (int $i): array => [
-        'type' => $i % 2 === 0 ? 'chapter' : 'button',
+        'type'  => $i % 2 === 0 ? 'chapter' : 'button',
         'title' => "Item {$i}",
     ], range(1, 20));
 
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string', Rule::in(['chapter', 'button'])],
+        'items'         => 'required|array',
+        'items.*.type'  => ['required', 'string', Rule::in(['chapter', 'button'])],
         'items.*.title' => [['exclude_unless', 'items.*.type', 'chapter'], 'required', 'string'],
     ])->validate(['items' => $items]);
 
@@ -110,10 +110,10 @@ it('validates 20 items with 2 types using dispatch table', function (): void {
 it('validates conditional fields with fast-checkable rules after stripping', function (): void {
     // After stripping exclude_unless, "boolean" and "nullable|string" are fast-checkable.
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string', Rule::in(['chapter', 'button'])],
+        'items'             => 'required|array',
+        'items.*.type'      => ['required', 'string', Rule::in(['chapter', 'button'])],
         'items.*.collapsed' => [['exclude_unless', 'items.*.type', 'chapter'], 'boolean'],
-        'items.*.text' => [['exclude_unless', 'items.*.type', 'button'], 'nullable', 'string'],
+        'items.*.text'      => [['exclude_unless', 'items.*.type', 'button'], 'nullable', 'string'],
     ])->validate([
         'items' => [
             ['type' => 'chapter', 'collapsed' => false, 'text' => null],
@@ -128,8 +128,8 @@ it('validates conditional fields with fast-checkable rules after stripping', fun
 
 it('fast-checks stringified In/NotIn objects', function (): void {
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string', Rule::in(['chapter', 'button'])],
+        'items'         => 'required|array',
+        'items.*.type'  => ['required', 'string', Rule::in(['chapter', 'button'])],
         'items.*.speed' => [['exclude_unless', 'items.*.type', 'button'], 'string', Rule::in(['slow', 'normal', 'fast'])],
     ])->validate([
         'items' => [
@@ -143,8 +143,8 @@ it('fast-checks stringified In/NotIn objects', function (): void {
 
 it('errors when stringified In rule fails on non-excluded item', function (): void {
     expect(fn () => RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string', Rule::in(['chapter', 'button'])],
+        'items'         => 'required|array',
+        'items.*.type'  => ['required', 'string', Rule::in(['chapter', 'button'])],
         'items.*.speed' => [['exclude_unless', 'items.*.type', 'button'], 'string', Rule::in(['slow', 'normal', 'fast'])],
     ])->validate([
         'items' => [
@@ -159,9 +159,9 @@ it('errors when stringified In rule fails on non-excluded item', function (): vo
 
 it('handles mix of conditional and unconditional rules', function (): void {
     $validated = RuleSet::from([
-        'items' => 'required|array',
-        'items.*.type' => ['required', 'string'],
-        'items.*.name' => 'required|string|max:255',  // unconditional
+        'items'            => 'required|array',
+        'items.*.type'     => ['required', 'string'],
+        'items.*.name'     => 'required|string|max:255',  // unconditional
         'items.*.chapters' => [['exclude_unless', 'items.*.type', 'chapter'], 'array'],
     ])->validate([
         'items' => [
@@ -176,9 +176,9 @@ it('handles mix of conditional and unconditional rules', function (): void {
 
 it('handles items with no conditional rules', function (): void {
     $validated = RuleSet::from([
-        'items' => 'required|array',
+        'items'        => 'required|array',
         'items.*.name' => 'required|string|max:255',
-        'items.*.age' => 'required|numeric|min:0',
+        'items.*.age'  => 'required|numeric|min:0',
     ])->validate([
         'items' => [
             ['name' => 'Alice', 'age' => 30],
@@ -193,7 +193,7 @@ it('handles items with no conditional rules', function (): void {
 it('all items excluded for a conditional field still pass validation', function (): void {
     // All items are "dvd" — isbn excluded for all. required doesn't trigger.
     $validated = RuleSet::from([
-        'items' => 'required|array',
+        'items'        => 'required|array',
         'items.*.type' => ['required', 'string'],
         'items.*.isbn' => [['exclude_unless', 'items.*.type', 'book'], 'required', 'string'],
     ])->validate([

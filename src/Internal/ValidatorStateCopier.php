@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\Validation\Internal;
 
-use Illuminate\Validation\Validator;
 use ReflectionObject;
+use Illuminate\Validation\Validator;
 
 /**
  * Copies factory-applied state from a base {@see Validator} (built through the

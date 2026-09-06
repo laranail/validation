@@ -15,7 +15,22 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## Unreleased
 
-_Nothing yet._
+### Fixed
+
+- **The code-style CI job was formatting against Pint's defaults, not the shared laranail config.**
+  `fix-php-code-style-issues.yml` ran `aglipanci/laravel-pint-action` with `configPath: pint.json` -
+  a file this package does not ship. Pint handed a config path that does not exist falls back to its
+  own defaults and exits 0, so the job rewrote every touched file to the wrong style and committed
+  the result, while `composer pint` graded against
+  `vendor/laranail/package-tools/pint.json`. The job now installs dependencies and runs
+  `composer pint-fix`, which is the same command the `lint` gate checks. 259 files are reformatted
+  by this change; no behaviour is affected (6276 tests, 10486 assertions, identical before and after).
+
+### Changed
+
+- `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
+  `increment_style` rewrote every one of them back, so the two gates could never both pass.
+  Formatting belongs to Pint.
 
 ## v0.1.0 - 2026-08-27
 

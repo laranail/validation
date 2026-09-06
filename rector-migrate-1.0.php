@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 use Rector\Renaming\ValueObject\MethodCallRename;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
+use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
 
 /**
  * The 0.x → 1.0 migration set (UPGRADING.md, v1.0.0). Run it against an

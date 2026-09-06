@@ -30,8 +30,9 @@ function laravelSupportsIntegerStrict(): bool
  * be stringified during compilation — __toString() silently drops them. Use
  * this to assert the object itself survived rather than its lossy string form.
  *
- * @param  list<object|string>  $rules
- * @param  class-string  $type
+ * @param list<object|string> $rules
+ * @param class-string $type
+ *
  * @return list<object>
  */
 function rulesOfType(array $rules, string $type): array
@@ -83,12 +84,13 @@ function compiledArray(mixed $compiled): array
  * failed outright. Every Windows CI cell failed that way while every Linux one
  * passed.
  *
- * @param  class-string|null  $implementing  Restrict to classes of this type.
+ * @param class-string|null $implementing Restrict to classes of this type.
+ *
  * @return list<class-string>
  */
 function ruleClassesUnder(?string $implementing = null): array
 {
-    $base = dirname(__DIR__).'/src/Rules';
+    $base = dirname(__DIR__) . '/src/Rules';
     $classes = [];
 
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base)) as $file) {
@@ -100,7 +102,7 @@ function ruleClassesUnder(?string $implementing = null): array
         $path = str_replace('\\', '/', $file->getPathname());
         $relative = substr($path, strlen(str_replace('\\', '/', $base)) + 1, -4);
 
-        $class = 'Simtabi\\Laranail\\Validation\\Rules\\'.str_replace('/', '\\', $relative);
+        $class = 'Simtabi\\Laranail\\Validation\\Rules\\' . str_replace('/', '\\', $relative);
 
         if (! class_exists($class)) {
             continue;

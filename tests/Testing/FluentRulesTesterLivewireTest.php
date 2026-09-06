@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Auth\GenericUser;
 use Livewire\Component;
+use Illuminate\Auth\GenericUser;
 use Simtabi\Laranail\Validation\Testing\FluentRulesTester;
 use Simtabi\Laranail\Validation\Tests\Fixtures\AppealLivewireComponent;
 
