@@ -102,8 +102,8 @@ it('fails with wildcard attributes for invalid items', function (): void {
 it('uses custom error messages from the validator', function (): void {
     $v = new Validator(
         new Translator(new ArrayLoader, 'en'),
-        ['name'          => ''],
-        ['name'          => FluentRule::string()->required()],
+        ['name' => ''],
+        ['name' => FluentRule::string()->required()],
         ['name.required' => 'Please enter your name.'],
     );
 

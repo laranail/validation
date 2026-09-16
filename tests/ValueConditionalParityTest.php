@@ -101,10 +101,10 @@ it('required_if: verdicts match native Laravel across grid', function (): void {
             ['flag' => 'user', 'postcode' => 'X'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
-            ['flag'     => 'admin', 'postcode' => ''],
-            ['flag'     => 'admin', 'postcode' => null],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
+            ['flag' => 'admin', 'postcode' => ''],
+            ['flag' => 'admin', 'postcode' => null],
         ],
     );
 });
@@ -148,8 +148,8 @@ it('required_unless: verdicts match native Laravel across grid', function (): vo
             ['flag' => 'user', 'postcode' => 'X'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -214,7 +214,7 @@ it('prohibited_if: verdicts match native Laravel across grid', function (): void
             ['flag' => 'user'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -250,7 +250,7 @@ it('prohibited_unless: verdicts match native Laravel across grid', function (): 
             ['flag' => 'user'],
             [],
             ['postcode' => 'X'],
-            ['flag'     => null, 'postcode' => 'X'],
+            ['flag' => null, 'postcode' => 'X'],
         ],
     );
 });
@@ -397,9 +397,9 @@ it('prohibited_unless: "null" literal → null-conversion parity', function (): 
         static fn () => FluentRule::field()->prohibitedUnless('flag', 'null'),
         [
             [],
-            ['flag'     => null],
-            ['flag'     => null, 'postcode' => 'X'],
-            ['flag'     => 'admin', 'postcode' => 'X'],
+            ['flag' => null],
+            ['flag' => null, 'postcode' => 'X'],
+            ['flag' => 'admin', 'postcode' => 'X'],
             ['postcode' => 'X'],
         ],
     );

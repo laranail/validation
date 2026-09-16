@@ -57,7 +57,7 @@ final class DoctorCommand extends Command
                     : ['WARN', $list::class . ' does not flag a canonical disposable domain'];
             }],
             ['role-account list', fn (): array => ['OK', resolve(RoleAccountList::class)::class]],
-            ['dns resolver', fn (): array      => ['OK', resolve(DnsResolver::class)::class]],
+            ['dns resolver', fn (): array => ['OK', resolve(DnsResolver::class)::class]],
             ['batch query cap', function (): array {
                 $limit = BatchDatabaseChecker::$maxValuesPerGroup;
 
