@@ -90,7 +90,7 @@ function compiledArray(mixed $compiled): array
  */
 function ruleClassesUnder(?string $implementing = null): array
 {
-    $base = dirname(__DIR__) . '/src/Rules';
+    $base = __DIR__ . '/../src/Rules';
     $classes = [];
 
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base)) as $file) {

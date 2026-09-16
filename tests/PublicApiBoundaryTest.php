@@ -47,9 +47,9 @@ const STABLE_SURFACE = [
 
 it('marks every Internal\\ and FastCheck\\ class @internal', function (): void {
     $globs = [
-        glob(dirname(__DIR__) . '/src/Internal/*.php'),
-        glob(dirname(__DIR__) . '/src/FastCheck/*.php'),
-        glob(dirname(__DIR__) . '/src/FastCheck/Shared/*.php'),
+        glob(__DIR__ . '/../src/Internal/*.php'),
+        glob(__DIR__ . '/../src/FastCheck/*.php'),
+        glob(__DIR__ . '/../src/FastCheck/Shared/*.php'),
     ];
     $files = array_merge(...array_map(
         static fn (array|false $found): array => $found === false ? [] : $found,
@@ -67,7 +67,7 @@ it('marks every Internal\\ and FastCheck\\ class @internal', function (): void {
 
 it('marks every top-level optimizer class @internal', function (): void {
     foreach (INTERNAL_TOP_LEVEL as $path) {
-        expect(str_contains((string) file_get_contents(dirname(__DIR__) . '/' . $path), '@internal'))->toBeTrue(
+        expect(str_contains((string) file_get_contents(__DIR__ . '/../' . $path), '@internal'))->toBeTrue(
             $path . ' is optimizer machinery and must carry @internal.',
         );
     }
@@ -75,7 +75,7 @@ it('marks every top-level optimizer class @internal', function (): void {
 
 it('never marks the stable surface @internal at class level', function (): void {
     foreach (STABLE_SURFACE as $path) {
-        $source = (string) file_get_contents(dirname(__DIR__) . '/' . $path);
+        $source = (string) file_get_contents(__DIR__ . '/../' . $path);
 
         // Only the CLASS-level docblock counts: a stable class may still
         // mark an individual method @internal. Inspect the source up to the
