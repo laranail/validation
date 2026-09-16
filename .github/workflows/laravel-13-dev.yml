@@ -52,6 +52,35 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
+      # The pin here is deliberate and must stay. Everywhere else in the family
+      # a `composer require` before the suite is a defect -- it rewrites
+      # composer.json so CI tests a manifest the package does not ship. This
+      # workflow is the exception: its entire purpose is to resolve against the
+      # unreleased Laravel branch, which no published constraint selects, so
+      # without the pin it would quietly test stable and file issues about it.
+      - name: Resolve composer cache directory
+        id: composer-cache
+        shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore composer cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
+
+      - name: Drop cached laranail archives
+        # laranail/* resolve through a single MOVING v0.1.0 tag, so composer's dist
+        # cache is keyed on a name whose contents change underneath it. A restored
+        # archive is then silently stale: the install reports success and unpacks
+        # whatever was cached the first time. Everything else is immutable per
+        # version and stays cached.
+        # POSIX command via bash: Windows runners default to PowerShell, where this
+        # would be a parse error rather than a no-op.
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
       - name: Install dependencies (13.x-dev)
         id: install
         run: |
