@@ -7,12 +7,16 @@ permissions:
 # It had also been sitting in `scripts/` unwired, which is the same failure one
 # level up: a check nobody runs is a check nobody has.
 #
-# On every push to main, because that is exactly when the tag falls behind —
-# the commit lands and the moving tag stays where it was. And on a schedule,
-# because a tag can also be moved or deleted directly on the remote, which no
-# push to this repository would notice.
+# On a schedule, because a tag can be moved or deleted directly on the remote,
+# which no push to this repository would notice.
+#
+# NOT on pull_request, and that is the whole point. The tag falls behind at the
+# moment a pull request MERGES -- so on the pull request itself the tag is
+# always behind by exactly the commits under review, and the check fails for
+# every green branch. It gated a condition that can only be satisfied after it
+# has already run. The shared hygiene workflow in laranail/.github carries the
+# same guard for the same reason.
 on:
-  pull_request:
   schedule:
     # Monday 06:00 America/New_York, matching the Dependabot window. Cron has no
     # timezone, so this is 11:00 UTC and drifts an hour with DST — which does
