@@ -86,7 +86,7 @@ it('precomputed verifier preserves custom messages keyed by rule name', function
 
     $validator = Validator::make(
         ['email' => 'unknown@example.com'],
-        ['email'        => ['required', Rule::exists('users', 'email')]],
+        ['email' => ['required', Rule::exists('users', 'email')]],
         ['email.exists' => 'Custom exists message'],
     );
     $validator->setPresenceVerifier($verifier);

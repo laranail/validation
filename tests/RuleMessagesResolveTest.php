@@ -82,7 +82,7 @@ final class RuleMessagesResolveTest extends TestCase
      */
     public function test_every_shipped_locale_is_complete(): void
     {
-        $root = dirname(__DIR__) . '/resources/lang';
+        $root = __DIR__ . '/../resources/lang';
         $reference = require $root . '/en/validation.php';
         $this->assertIsArray($reference);
 
@@ -121,7 +121,7 @@ final class RuleMessagesResolveTest extends TestCase
     private function keysReferencedInSource(): array
     {
         $keys = [];
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__) . '/src'));
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__ . '/../src'));
 
         foreach ($files as $file) {
             // RecursiveIteratorIterator is typed as yielding mixed, and the

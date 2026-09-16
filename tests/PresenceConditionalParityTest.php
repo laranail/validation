@@ -81,12 +81,12 @@ it('required_without: sibling empty-string counts as absent (rule activates)', f
 it('required_without: verdicts match native Laravel for every shape', function (): void {
     $shapes = [
         ['postcode' => '1234AB', 'birthdate' => '1990-01-01'],
-        ['postcode'  => '1234AB'],
+        ['postcode' => '1234AB'],
         ['birthdate' => '1990-01-01'],
         [],
-        ['postcode'  => null],
-        ['postcode'  => ''],
-        ['postcode'  => []],
+        ['postcode' => null],
+        ['postcode' => ''],
+        ['postcode' => []],
         ['birthdate' => null],
         ['birthdate' => ''],
     ];
@@ -222,12 +222,12 @@ it('required_without_all: sibling absent → rule active → target absent fails
 it('phase 2: verdicts match native Laravel across all four rules × shape grid', function (): void {
     $shapes = [
         ['postcode' => '1234AB', 'birthdate' => '1990-01-01'],
-        ['postcode'  => '1234AB'],
+        ['postcode' => '1234AB'],
         ['birthdate' => '1990-01-01'],
         [],
-        ['postcode'  => null],
-        ['postcode'  => ''],
-        ['postcode'  => []],
+        ['postcode' => null],
+        ['postcode' => ''],
+        ['postcode' => []],
         ['birthdate' => null],
         ['birthdate' => '   '],
     ];
@@ -303,9 +303,9 @@ it('phase 3: multi-param parity matches native Laravel across full rule × shape
         ['b' => 'B'],                                   // one sibling present, target absent
         [],                                             // none present
         ['postcode' => 'X'],                            // only target present
-        ['a'        => '', 'b' => 'B'],                        // one sibling empty-string
-        ['a'        => null, 'b' => 'B'],                      // one sibling null
-        ['a'        => '   ', 'b' => 'B'],                     // one sibling whitespace-only
+        ['a' => '', 'b' => 'B'],                        // one sibling empty-string
+        ['a' => null, 'b' => 'B'],                      // one sibling null
+        ['a' => '   ', 'b' => 'B'],                     // one sibling whitespace-only
     ];
 
     $ruleNames = ['required_with', 'required_without', 'required_with_all', 'required_without_all'];
@@ -431,7 +431,7 @@ it('parity: leading-comma param (required_with:,birthdate) matches Laravel', fun
     $items = [
         ['postcode' => 'X', 'birthdate' => '1990-01-01'],   // birthdate present → rule active
         ['birthdate' => '1990-01-01'],                      // target absent, rule active → fail
-        ['postcode'  => 'X'],                                 // birthdate absent, but null slot matches full item → present
+        ['postcode' => 'X'],                                 // birthdate absent, but null slot matches full item → present
         [],                                                  // fully empty item
     ];
 
@@ -443,7 +443,7 @@ it('parity: trailing-comma param (required_without:birthdate,) matches Laravel',
     $items = [
         ['postcode' => 'X', 'birthdate' => '1990-01-01'],
         ['birthdate' => '1990-01-01'],
-        ['postcode'  => 'X'],
+        ['postcode' => 'X'],
         [],
     ];
 
@@ -458,7 +458,7 @@ it('parity: CSV-quoted params (required_with:"a,b",c) matches Laravel', function
     $items = [
         ['postcode' => 'X', 'a,b' => 1, 'c' => 1],
         ['a,b' => 1],
-        ['c'   => 1],
+        ['c' => 1],
         [],
     ];
 

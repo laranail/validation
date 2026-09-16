@@ -132,7 +132,7 @@ it('exclude_unless with null dependent matches native (defers coercion)', functi
     assertFvExcludeParity(
         ['items.*.detail' => ['exclude_unless:items.*.state,null', 'required', 'string']],
         ['items.*.detail' => [['exclude_unless', 'items.*.state', 'null'], 'required', 'string']],
-        ['items'          => [['state' => null]]], // state IS null → not excluded → required fires
+        ['items' => [['state' => null]]], // state IS null → not excluded → required fires
     );
 });
 
@@ -154,7 +154,7 @@ it('exclude_unless with associative-key wildcard matches native', function (): v
     assertFvExcludeParity(
         ['items.*.extra' => ['exclude_unless:items.*.type,a', 'required', 'string']],
         ['items.*.extra' => [['exclude_unless', 'items.*.type', 'a'], 'required', 'string']],
-        ['items'         => ['foo' => ['type' => 'a']]], // type matches → not excluded → required fires
+        ['items' => ['foo' => ['type' => 'a']]], // type matches → not excluded → required fires
     );
 });
 
@@ -165,7 +165,7 @@ it('exclude_unless on nested associative+numeric wildcard matches native', funct
     assertFvExcludeParity(
         ['items.*.rows.*.detail' => ['exclude_unless:items.*.type,keep', 'required', 'string']],
         ['items.*.rows.*.detail' => [['exclude_unless', 'items.*.type', 'keep'], 'required', 'string']],
-        ['items'                 => ['foo' => ['type' => 'drop', 'rows' => [['x' => 1]]]]],
+        ['items' => ['foo' => ['type' => 'drop', 'rows' => [['x' => 1]]]]],
     );
 });
 
