@@ -1,9 +1,10 @@
 # laranail/validation
 
-[![Latest version on Packagist](https://img.shields.io/packagist/v/laranail/validation.svg)](https://packagist.org/packages/laranail/validation)
 [![Tests](https://github.com/laranail/validation/actions/workflows/run-tests.yml/badge.svg)](https://github.com/laranail/validation/actions/workflows/run-tests.yml)
 [![Static analysis](https://github.com/laranail/validation/actions/workflows/phpstan.yml/badge.svg)](https://github.com/laranail/validation/actions/workflows/phpstan.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+`laranail/validation` is not published to Packagist, so there is no registry-version badge to show — see [Install](#install).
 
 > Write Laravel validation rules with IDE autocompletion instead of memorising string syntax — each rule type exposes only the methods that apply to it, `each()` and `children()` keep parent and child rules in one place, and large wildcard arrays validate tens of times faster — see the [benchmarks](docs/performance.md).
 
