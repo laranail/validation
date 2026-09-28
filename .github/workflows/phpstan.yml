@@ -5,11 +5,8 @@ permissions:
 
 on:
   pull_request:
-    paths:
-      - '**.php'
-      - 'phpstan.neon.dist'
-      - 'phpstan-baseline.neon'
-      - '.github/workflows/phpstan.yml'
+    # No path filter: this workflow gates merges as a required status check, and a
+    # required check that never reports (a docs-only pull request) blocks it for good.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

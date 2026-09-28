@@ -2,10 +2,8 @@ name: Rector
 
 on:
   pull_request:
-    paths:
-      - '**.php'
-      - 'rector.php'
-      - '.github/workflows/rector.yml'
+    # No path filter: this workflow gates merges as a required status check, and a
+    # required check that never reports (a docs-only pull request) blocks it for good.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
