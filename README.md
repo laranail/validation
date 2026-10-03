@@ -35,7 +35,19 @@ Targets PHP `^8.5` on Laravel `^13`.
 composer require laranail/validation
 ```
 
-## Quick start
+## Quick start guide and usage
+
+### Getting started
+
+Nothing to configure: the service provider registers itself through package discovery and the
+builders work without publishing anything. Publish the config only for the global safety fuse
+or the opt-in string rule aliases:
+
+```bash
+php artisan vendor:publish --tag=laranail::validation-config
+```
+
+### Usage
 
 Add `HasFluentRules` to a form request and return fluent rules from `rules()`. The trait is
 what enables the optimized path — without it the builders still work, they just compile to
