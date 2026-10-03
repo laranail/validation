@@ -43,7 +43,7 @@ final class ValidationFake
     public function assertValidated(?Closure $matching = null): void
     {
         if (! $matching instanceof Closure) {
-            Assert::assertNotEmpty($this->completed, 'Expected at least one passing validation run; none happened.');
+            Assert::assertNotSame([], $this->completed, 'Expected at least one passing validation run; none happened.');
 
             return;
         }
@@ -58,7 +58,7 @@ final class ValidationFake
     public function assertFailed(?Closure $matching = null): void
     {
         if (! $matching instanceof Closure) {
-            Assert::assertNotEmpty($this->failed, 'Expected at least one failing validation run; none happened.');
+            Assert::assertNotSame([], $this->failed, 'Expected at least one failing validation run; none happened.');
 
             return;
         }
