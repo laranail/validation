@@ -13,8 +13,7 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 > *Internal history* below were cut as tags during development and later withdrawn; their content is
 > part of `v0.1.0`. They are kept for provenance, not because those versions are installable.
 
-## Unreleased
-
+## [Unreleased]
 ### Fixed
 
 - **The code-style CI job was formatting against Pint's defaults, not the shared laranail config.**
