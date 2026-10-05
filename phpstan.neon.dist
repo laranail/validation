@@ -53,6 +53,13 @@ parameters:
     treatPhpDocTypesAsCertain: false
 
     ignoreErrors:
+        # Livewire 3's Testable is not generic; v4.0.0 added @template TComponent. require-dev allows
+        # ^3.0||^4.0, so a prefer-lowest resolve (v3.8.x) rejects the Testable<Component> PHPDoc that
+        # v4 needs at this level. Unmatched under v4, hence reportUnmatched: false.
+        -
+            identifier: generics.notGeneric
+            path: src/Testing/FluentRulesTester.php
+            reportUnmatched: false
         -
             identifier: trait.unused
             reportUnmatched: false
