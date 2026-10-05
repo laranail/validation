@@ -24,6 +24,12 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   `vendor/laranail/package-tools/pint.json`. The job now installs dependencies and runs
   `composer pint-fix`, which is the same command the `lint` gate checks. 259 files are reformatted
   by this change; no behaviour is affected (6276 tests, 10486 assertions, identical before and after).
+- **`RuleMessagesResolveTest` asserted that the dashed translation namespace does not resolve.**
+  `laranail/package-tools` 0.1.3 made `hasTranslations()` register `laranail-validation` as an alias
+  of `laranail/validation` over the same files, so against fresh dependencies the test went red on
+  `main` with no change here. It now asserts the alias resolves to exactly the canonical message,
+  and `require` raises `laranail/package-tools` to `^0.1.3` so a `prefer-lowest` resolve gets a
+  version that registers it.
 
 ### Changed
 
@@ -34,6 +40,22 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   (`Redirector`). It arrived only transitively before.
 - Dropped the `vcs` repositories for `laranail/atlas` and `laranail/enumerator`: nothing in this package's `require` or
   `require-dev` closure installs them (checked with `composer why` after a fresh `composer update`).
+- `require` now declares every Illuminate component `src/` uses: `illuminate/auth`,
+  `illuminate/cache`, `illuminate/config`, `illuminate/container`, `illuminate/database`,
+  `illuminate/encryption`, `illuminate/events`, `illuminate/filesystem` and
+  `illuminate/translation`, plus `laravel/framework ^13.0`. `FluentFormRequest` extends
+  `Illuminate\Foundation\Http\FormRequest`, which has no split package, and the global helpers
+  `src/` calls (`config()`, `app()`, `trans()`, `event()`, `config_path()`, ...) are defined only in
+  `Illuminate/Foundation/helpers.php`. All of them arrived only transitively before.
+  `tests/DeclaredRequirementsTest.php` scans `src/` and fails on any use the manifest does not
+  declare.
+- `require-dev` raises `tomasvotruba/cognitive-complexity` to `^1.3`, and the PHPStan baseline
+  records the values 1.3.0 measures. 1.3.0 (2026-09-29) scores the same source differently from
+  1.2.0, mostly higher (`RuleSet` 141 -> 157, `RuleConfigBuilder::buildValueClosure()` 52 -> 76,
+  ...), so every complexity entry stopped matching and the required `phpstan` check went red with no
+  code change. Each entry is re-measured, none is removed, and four newly reported ones
+  (`BatchDatabaseChecker` and `DoctorCommand::handle()`) are added at their measured values. The
+  floor keeps a prefer-lowest resolve on the same scale; no limit was raised.
 
 ### Added
 

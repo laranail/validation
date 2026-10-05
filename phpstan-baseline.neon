@@ -1,5 +1,17 @@
 parameters:
 	ignoreErrors:
+		# Every complexity.* value below was re-measured on 2026-10-05 with
+		# tomasvotruba/cognitive-complexity 1.3.0, whose scoring differs from
+		# 1.2.0 (which the earlier numbers in the comments below were written
+		# against). No source changed between the two measurements, so the
+		# difference is the scorer's alone; composer.json floors the package at
+		# ^1.3 so a prefer-lowest resolve scores on the same scale.
+		# 1.2.0 -> 1.3.0: RuleConfigBuilder class 118 -> 155, buildValueClosure
+		# 52 -> 76; ItemContextCompiler class 98 -> 125, buildItemAwareClosure
+		# 59 -> 86; PresenceConditionalCompiler::compile 25 -> 24; RuleSet class
+		# 141 -> 157; ItemRuleCompiler class 88 -> 111, buildFastChecks 46 -> 68;
+		# ItemValidator::validate 49 -> 64. BatchDatabaseChecker and
+		# DoctorCommand::handle were under the limits on 1.2.0 and are new here.
 		# Hot-path closure builders: complexity comes from intentional
 		# inlining (size, in/regex, date comparisons) to avoid closure
 		# allocation + call overhead on every validated item.
@@ -15,31 +27,31 @@ parameters:
 		# was extracted, and addDateChecks() dropped under its own limit —
 		# its entry is gone.
 		-
-			rawMessage: 'Class cognitive complexity is 118, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 155, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/FastCheck/RuleConfigBuilder.php
 
 		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::buildValueClosure()" is 52, keep it under 20'
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\RuleConfigBuilder::buildValueClosure()" is 76, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/FastCheck/RuleConfigBuilder.php
 
 		-
-			rawMessage: 'Class cognitive complexity is 98, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 125, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/FastCheck/ItemContextCompiler.php
 
 		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler::buildItemAwareClosure()" is 59, keep it under 20'
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\ItemContextCompiler::buildItemAwareClosure()" is 86, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/FastCheck/ItemContextCompiler.php
 
 		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler::compile()" is 25, keep it under 20'
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\FastCheck\PresenceConditionalCompiler::compile()" is 24, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/FastCheck/PresenceConditionalCompiler.php
@@ -67,7 +79,7 @@ parameters:
 		# missing-dependency guard. The after() route itself lives in
 		# Internal\VanillaAfterRoute, not here.
 		-
-			rawMessage: 'Class cognitive complexity is 141, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 157, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/RuleSet.php
@@ -78,7 +90,7 @@ parameters:
 		# for native-parity. Dropping the class under 80 is a whole-class refactor
 		# out of scope.
 		-
-			rawMessage: 'Class cognitive complexity is 88, keep it under 80'
+			rawMessage: 'Class cognitive complexity is 111, keep it under 80'
 			identifier: complexity.classLike
 			count: 1
 			path: src/Internal/ItemRuleCompiler.php
@@ -87,7 +99,7 @@ parameters:
 		# flat × item-aware vs value-only) — structural complexity that
 		# refactoring would only move.
 		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemRuleCompiler::buildFastChecks()" is 46, keep it under 20'
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemRuleCompiler::buildFastChecks()" is 68, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/Internal/ItemRuleCompiler.php
@@ -99,10 +111,35 @@ parameters:
 		# carries the score, and refactoring those caches has measurable
 		# perf cost (per-item validator reuse + dispatch reduction).
 		-
-			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemValidator::validate()" is 49, keep it under 20'
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Internal\ItemValidator::validate()" is 64, keep it under 20'
 			identifier: complexity.functionLike
 			count: 1
 			path: src/Internal/ItemValidator.php
+
+		# New on cognitive-complexity 1.3.0 (under the limits on 1.2.0, same code).
+		-
+			rawMessage: 'Class cognitive complexity is 100, keep it under 80'
+			identifier: complexity.classLike
+			count: 1
+			path: src/BatchDatabaseChecker.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\BatchDatabaseChecker::collectValues()" is 22, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/BatchDatabaseChecker.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\BatchDatabaseChecker::collectExpandedValues()" is 23, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/BatchDatabaseChecker.php
+
+		-
+			rawMessage: 'Cognitive complexity for "Simtabi\Laranail\Validation\Commands\DoctorCommand::handle()" is 23, keep it under 20'
+			identifier: complexity.functionLike
+			count: 1
+			path: src/Commands/DoctorCommand.php
 
 		# Cross-version Filament guard. The trait may be mixed into components
 		# that lack getCachedForms (plain Livewire without InteractsWithForms),

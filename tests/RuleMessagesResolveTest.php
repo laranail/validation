@@ -67,11 +67,16 @@ final class RuleMessagesResolveTest extends TestCase
         // translator's hasForLocale(): that method is on the concrete
         // Translator and not on the contract, so reaching it means either a
         // string container key or a type-hint that does not declare it.
+        //
+        // The dashed form is laranail/package-tools' alias (registered by
+        // hasTranslations() since package-tools 0.1.3), so a host that published
+        // or wrote the older spelling still gets the same sentence. It must
+        // resolve to exactly what the canonical name does, never to its own copy.
         $slashed = 'laranail/validation::validation.iban';
         $dashed = 'laranail-validation::validation.iban';
 
         $this->assertNotSame($slashed, trans($slashed), 'The composer-package namespace did not resolve.');
-        $this->assertSame($dashed, trans($dashed), 'The dashed namespace resolved, so both are registered.');
+        $this->assertSame(trans($slashed), trans($dashed), 'The dashed alias does not resolve to the canonical message.');
     }
 
     /**
