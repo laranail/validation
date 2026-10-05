@@ -18,14 +18,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/laranail/atlas"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/laranail/enumerator"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/laranail/validation-js"
         },
         {
@@ -77,6 +69,7 @@
         "php": "^8.5",
         "illuminate/contracts": "^13.0",
         "illuminate/http": "^13.0",
+        "illuminate/routing": "^13.0",
         "illuminate/support": "^13.0",
         "illuminate/validation": "^13.0",
         "laranail/package-tools": "^0.1",

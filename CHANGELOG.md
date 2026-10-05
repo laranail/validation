@@ -30,6 +30,16 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 - `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
   `increment_style` rewrote every one of them back, so the two gates could never both pass.
   Formatting belongs to Pint.
+- `require` now declares `illuminate/routing`, which `Testing\FluentRulesTester` imports
+  (`Redirector`). It arrived only transitively before.
+- Dropped the `vcs` repositories for `laranail/atlas` and `laranail/enumerator`: nothing in this package's `require` or
+  `require-dev` closure installs them (checked with `composer why` after a fresh `composer update`).
+
+### Added
+
+- The `PHPStan` workflow also runs `composer pint` (`laranail-pint --test`). The auto-fix
+  workflow rewrites and commits but is path-filtered and pushes with `GITHUB_TOKEN`, which starts
+  no new run, so it could never fail a pull request. This step can, and has no path filter.
 
 ## v0.1.0 - 2026-08-27
 
@@ -100,13 +110,6 @@ The 1.0 major: the package graduates to real SemVer, the README's stability cont
 binding (stable surfaces break only in a major; deprecations live at least one minor), and the
 `rector-migrate-1.0.php` set auto-migrates the one mechanical break. See `UPGRADING.md`.
 
-### Fixed
-
-- `CachedDnsResolver` crashed mid-validation when the cache backend resolved but could not
-  answer — a database store with no migrated cache table being the canonical case. The store
-  erroring now falls back to a direct lookup, the same contract as having no cache at all: an
-  optimization's infrastructure failure costs speed, never a verdict.
-
 ### Added
 
 - Initial laranail release. Type-aware fluent rule builders (`FluentRule` and the twelve
@@ -161,6 +164,11 @@ binding (stable surfaces break only in a major; deprecations live at least one m
   documented surface — did not move. See `UPGRADING.md` for the mapping.
 
 ### Fixed
+
+- `CachedDnsResolver` crashed mid-validation when the cache backend resolved but could not
+  answer — a database store with no migrated cache table being the canonical case. The store
+  erroring now falls back to a direct lookup, the same contract as having no cache at all: an
+  optimization's infrastructure failure costs speed, never a verdict.
 
 Divergences from Laravel's own validator, found by differential testing against it. Each can
 change whether input an application previously accepted still passes, so read `UPGRADING.md`

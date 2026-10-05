@@ -38,3 +38,15 @@ jobs:
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan --error-format=github --no-interaction
+
+      # The gate the auto-fix job is not. fix-php-code-style-issues.yml rewrites and
+      # commits, but it is path-filtered and pushes with GITHUB_TOKEN, which starts
+      # no new run -- so it can never report a failure and cannot be a required
+      # check. This step can: laranail-pint --test against the shared config in
+      # vendor/laranail/package-tools. When the auto-fix job has pushed a fix, this
+      # run stays red on the old head until the next push re-runs it.
+      # `composer pint` rather than `composer lint`, because lint also runs PHPStan
+      # (the step above) and Rector (rector.yml).
+      - name: Check formatting
+        if: ${{ !cancelled() }}
+        run: composer pint
