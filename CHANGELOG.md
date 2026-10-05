@@ -49,6 +49,13 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   `Illuminate/Foundation/helpers.php`. All of them arrived only transitively before.
   `tests/DeclaredRequirementsTest.php` scans `src/` and fails on any use the manifest does not
   declare.
+- `require-dev` raises `tomasvotruba/cognitive-complexity` to `^1.3`, and the PHPStan baseline
+  records the values 1.3.0 measures. 1.3.0 (2026-09-29) scores the same source differently from
+  1.2.0, mostly higher (`RuleSet` 141 -> 157, `RuleConfigBuilder::buildValueClosure()` 52 -> 76,
+  ...), so every complexity entry stopped matching and the required `phpstan` check went red with no
+  code change. Each entry is re-measured, none is removed, and four newly reported ones
+  (`BatchDatabaseChecker` and `DoctorCommand::handle()`) are added at their measured values. The
+  floor keeps a prefer-lowest resolve on the same scale; no limit was raised.
 
 ### Added
 
