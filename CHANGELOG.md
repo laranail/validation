@@ -30,6 +30,17 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   `main` with no change here. It now asserts the alias resolves to exactly the canonical message,
   and `require` raises `laranail/package-tools` to `^0.1.3` so a `prefer-lowest` resolve gets a
   version that registers it.
+- **PHPStan 2.3.0 failed the `phpstan` job with 50 errors in `tests/`, with no change here.** It
+  now binds `$this` inside `Closure::call()`, so `(fn () => $this->createDefaultValidator(...))->call($request)`
+  is typed as `FormRequest`'s declared return, the Validator contract, which has no `passes()`;
+  44 `expect($validator->passes())` calls could not resolve `TValue`, and two
+  `@phpstan-ignore argument.type` comments stopped matching. The 68 call sites now go through a
+  typed `defaultValidatorFor()` helper in `tests/Pest.php`, which asserts the concrete
+  `Illuminate\Validation\Validator` that `HasFluentRules` returns, and the stale ignores are gone.
+  Its bleeding-edge unused-variable rule found three test values that were never checked: the
+  null-values batch test now asserts validation passed, the custom-rule message test asserts the
+  rule object survives `RuleSet::compile()`, and the `BadMethodCallException` test asserts the
+  caught exception is `UnknownFluentRuleMethod`. Clean under both 2.2.17 and 2.3.0.
 
 ### Changed
 

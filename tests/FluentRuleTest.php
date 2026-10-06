@@ -558,6 +558,9 @@ it('message works on custom ValidationRule via class name fallback', function ()
     $stringRule = FluentRule::string()->rule($customRule)->message('Custom message!');
     $compiled = RuleSet::compile(['field' => $stringRule]);
 
+    // The custom rule object survives compilation as-is
+    expect($compiled['field'])->toContain($customRule);
+
     // The message is keyed by the class basename
     [$messages] = RuleSet::extractMetadata(['field' => $stringRule]);
     $key = array_key_first($messages);

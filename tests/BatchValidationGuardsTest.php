@@ -213,7 +213,7 @@ it('FormRequest path skips bad-type integer values when batching exists', functi
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
     $validator->passes();
 
     $queryLog = DB::connection('testing')->getQueryLog();
@@ -257,7 +257,7 @@ it('FormRequest path skips malformed UUID values when batching exists', function
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
     $validator->passes();
 
     $queryLog = DB::connection('testing')->getQueryLog();
@@ -297,7 +297,7 @@ it('FormRequest path preserves current behaviour when no type rule present', fun
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
     $validator->passes();
 
     $queryLog = DB::connection('testing')->getQueryLog();
@@ -543,7 +543,7 @@ it('FormRequest path remaps hard-cap breach to ValidationException', function ()
         $caught = null;
 
         try {
-            (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+            defaultValidatorFor($formRequest, $factory);
         } catch (ValidationException $e) {
             $caught = $e;
         }
@@ -737,7 +737,7 @@ it('FormRequest path short-circuits when flat parent array exceeds max:N', funct
     $caught = null;
     try {
         $factory = resolve(Factory::class);
-        (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        defaultValidatorFor($formRequest, $factory);
     } catch (ValidationException $validationException) {
         $caught = $validationException;
     }
@@ -777,7 +777,7 @@ it('FormRequest path does not short-circuit when parent is within max:N', functi
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 
@@ -822,7 +822,7 @@ it('FormRequest path short-circuits nested wildcard when inner parent exceeds ma
     $caught = null;
     try {
         $factory = resolve(Factory::class);
-        (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        defaultValidatorFor($formRequest, $factory);
     } catch (ValidationException $validationException) {
         $caught = $validationException;
     }
@@ -860,7 +860,7 @@ it('FormRequest path resolves parent for scalar wildcard (items.* of integers) w
     $caught = null;
     try {
         $factory = resolve(Factory::class);
-        (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        defaultValidatorFor($formRequest, $factory);
     } catch (ValidationException $validationException) {
         $caught = $validationException;
     }
@@ -900,7 +900,7 @@ it('parent-max detection handles string-form parent rule (array|max:5)', functio
     $caught = null;
     try {
         $factory = resolve(Factory::class);
-        (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        defaultValidatorFor($formRequest, $factory);
     } catch (ValidationException $validationException) {
         $caught = $validationException;
     }
@@ -1039,7 +1039,7 @@ it('parent-max remap populates Validator::failed() with the Max rule key', funct
     $caught = null;
     try {
         $factory = resolve(Factory::class);
-        (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        defaultValidatorFor($formRequest, $factory);
     } catch (ValidationException $validationException) {
         $caught = $validationException;
     }
@@ -1202,7 +1202,7 @@ it('FormRequest path: Phase 1 + 2 + 3 guards co-operate on a single request', fu
         $caught = null;
         try {
             $factory = resolve(Factory::class);
-            (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+            defaultValidatorFor($formRequest, $factory);
         } catch (ValidationException $e) {
             $caught = $e;
         }
