@@ -91,6 +91,19 @@ fi
 
 tags=$(git tag --list 'v*' --sort=v:refname)
 
+# A commit that touches only .github/ ships nothing (the directory is export-ignored), so a tag behind
+# the branch by such commits still hands consumers exactly what the branch would. Dependabot adds one
+# weekly; without this the scheduled check goes red on every workflow bump, in both tag models.
+ci_only() {
+  local files
+  files=$(git diff --name-only "$1" "${head}") || return 1
+  [ -n "${files}" ] || return 1
+  ! printf '%s\n' "${files}" | grep -qvE '^\.github/'
+}
+
+# More than one v* tag means real releases, which are immutable: they get a new patch, never a move.
+released() { [ "$(printf '%s\n' "${tags}" | grep -c .)" -gt 1 ]; }
+
 if [ -z "${tags}" ]; then
   ok "No v* tag, so nothing is pinned."
   exit 0
@@ -159,7 +172,11 @@ if [ "${commit}" = "${head}" ]; then
       ok "${highest} is also on ${BRANCH}."
     else
       hbehind=$(git rev-list --count "${hcommit}..${head}")
+      if ci_only "${hcommit}"; then
+        ok "${highest} is behind ${BRANCH} only by ${hbehind} commit(s) that touch only .github/."
+      else
       fail "${highest} is the highest tag and is ${hbehind} commit(s) behind ${BRANCH}. An unconstrained \`composer require\` resolves it, so it must be current or it must not exist."
+      fi
     fi
   fi
 else
@@ -169,7 +186,13 @@ else
   git log --oneline --no-decorate "${commit}..${head}" | sed 's/^/    /'
   echo
 
-  fail "${current} is behind ${BRANCH}. Move it (git tag -f ${current} ${BRANCH} && git push --force ${REMOTE} ${current}) or cut a new one."
+  if ci_only "${commit}"; then
+    ok "${current} is behind ${BRANCH} only by commits that touch only .github/, so nothing a consumer installs is unreleased."
+  elif released; then
+    fail "${current} is behind ${BRANCH}. It is a published release, so do not move it: cut ${current%.*}.$(( ${current##*.} + 1 ))."
+  else
+    fail "${current} is behind ${BRANCH}. Move it (git tag -f ${current} ${BRANCH} && git push --force ${REMOTE} ${current}) or cut a new one."
+  fi
 fi
 
 exit "${FAILED}"

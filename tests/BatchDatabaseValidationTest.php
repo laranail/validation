@@ -447,7 +447,7 @@ it('OptimizedValidator batches exists queries via HasFluentRules FormRequest', f
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 
@@ -478,7 +478,7 @@ it('OptimizedValidator batched exists reports errors with correct attribute path
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->keys())->toContain('items.1.email')
@@ -507,7 +507,7 @@ it('FormRequest path does not batch non-wildcard exists rules', function (): voi
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Should fail — email doesn't exist in DB
     expect($validator->passes())->toBeFalse()
@@ -535,7 +535,7 @@ it('FormRequest path does not batch unique rules with ignore()', function (): vo
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 });
@@ -564,7 +564,7 @@ it('FormRequest path batches exists rules with scalar where clauses', function (
     DB::connection('testing')->enableQueryLog();
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 
@@ -601,7 +601,7 @@ it('FormRequest path does not batch exists rules with extra wheres', function ()
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // carol is soft-deleted, so this should fail
     expect($validator->passes())->toBeFalse()
@@ -743,6 +743,10 @@ it('all null/empty values result in no batch query', function (): void {
     } catch (ValidationException $validationException) {
         $errors = $validationException->errors();
     }
+
+    // Every item is nullable and null, so validation passes
+    expect($errors)
+        ->toBeEmpty();
 
     $queryLog = DB::connection('testing')->getQueryLog();
     DB::connection('testing')->disableQueryLog();

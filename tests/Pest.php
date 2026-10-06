@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Simtabi\Laranail\Validation\FluentSchema;
 use Simtabi\Laranail\Validation\HasFluentRules;
 use Simtabi\Laranail\Validation\Tests\TestCase;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 uses(TestCase::class)->in(__DIR__);
 
@@ -111,4 +112,29 @@ function bootFormRequest(FormRequest $formRequest, array $data): FormRequest
     $instance->setRedirector(resolve(Redirector::class));
 
     return $instance;
+}
+
+/**
+ * Build the validator a FormRequest creates for itself, by running its
+ * protected createDefaultValidator() -- the method HasFluentRules overrides.
+ *
+ * Bound to the request, the closure takes FormRequest's declared return type,
+ * the Validator contract, which has no passes(). HasFluentRules returns the
+ * concrete Illuminate validator; this asserts that and returns it typed, so
+ * the call sites need no per-line narrowing.
+ */
+function defaultValidatorFor(FormRequest $formRequest, ValidationFactory $factory): Validator
+{
+    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+
+    if (! $validator instanceof Validator) {
+        throw new LogicException(sprintf(
+            '%s::createDefaultValidator() returned %s, expected %s.',
+            $formRequest::class,
+            get_debug_type($validator),
+            Validator::class,
+        ));
+    }
+
+    return $validator;
 }

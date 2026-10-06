@@ -178,7 +178,7 @@ it('does not skip validation for attributes that fail the fast check', function 
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // The fast check correctly identifies 'Jo' as failing (len 2 < min 5).
     // The bug was: after the fast check stored false, isset(false) returned true,
@@ -207,8 +207,7 @@ it('creates an OptimizedValidator from FluentFormRequest', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    /** @var Validator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator)->toBeInstanceOf(OptimizedValidator::class)
         ->and($validator->passes())->toBeTrue()
@@ -232,7 +231,7 @@ it('validates correctly with fast-checkable wildcard rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue()
         ->and($validator->validated()['items'])->toHaveCount(2);
@@ -254,7 +253,7 @@ it('reports errors correctly for invalid wildcard data', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->keys())->toContain('items.0.name')->not->toContain('items.1.name');
@@ -277,7 +276,7 @@ it('handles mixed fluent and string rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue()
         ->and($validator->validated())->toHaveKeys(['title', 'items']);
@@ -299,7 +298,7 @@ it('works with non-fast-checkable rules falling through to Laravel', function ()
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('items.1.email'))->toBeTrue();
@@ -322,7 +321,7 @@ it('extracts labels and messages correctly', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->first('items.0.name'))->toBe('Name is required');
@@ -346,7 +345,7 @@ it('validated() returns all wildcard data even when fast-checked', function (): 
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 
@@ -371,7 +370,7 @@ it('works with after() hooks on passing validation', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     $afterCalled = false;
     $validator->after(function () use (&$afterCalled): void {
@@ -397,7 +396,7 @@ it('after() hooks can add errors that cause validation to fail', function (): vo
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     $validator->after(function (Validator $v): void {
         $v->errors()->add('items', 'Custom cross-field error from after hook');
@@ -425,7 +424,7 @@ it('handles cross-field wildcard references correctly', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('items.1.end'))->toBeTrue();
@@ -447,8 +446,7 @@ it('handles rules without wildcards', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    /** @var Validator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // No wildcard rules — returns a plain Validator, not OptimizedValidator.
     expect($validator)->not->toBeInstanceOf(OptimizedValidator::class);
@@ -473,7 +471,7 @@ it('handles empty wildcard arrays gracefully', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Empty array with no 'required' on parent — passes. No fast checks invoked.
     expect($validator->passes())->toBeTrue();
@@ -492,7 +490,7 @@ it('fails required on empty wildcard arrays', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Laravel's required rule fails on empty arrays (count < 1).
     expect($validator->passes())->toBeFalse();
@@ -514,7 +512,7 @@ it('handles missing wildcard parent gracefully', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Items is not required, so missing is fine. No fast checks invoked.
     expect($validator->passes())->toBeTrue();
@@ -542,7 +540,7 @@ it('resets fast check caches when passes() is called multiple times', function (
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // First call — should pass.
     expect($validator->passes())->toBeTrue();
@@ -567,7 +565,7 @@ it('resets caches correctly when passes() transitions from pass to fail', functi
 
     $factory = resolve(Factory::class);
     /** @var OptimizedValidator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 
@@ -593,7 +591,7 @@ it('resets caches correctly when passes() transitions from fail to pass', functi
 
     $factory = resolve(Factory::class);
     /** @var OptimizedValidator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('items.0.name'))->toBeTrue();
@@ -623,7 +621,7 @@ it('respects bail rule when fast check fails and falls through to Laravel', func
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse();
     // With bail, only one error should be reported (not both required and min:3).
@@ -651,7 +649,7 @@ it('bail prevents closure from running when earlier rule fails', function (): vo
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('items.0.user_id'))->toBeTrue();
@@ -685,7 +683,7 @@ it('closure runs when bail rules pass and value is valid', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
     // All bail rules passed — closure should be called with the value.
@@ -716,7 +714,7 @@ it('fast check does not interfere with non-fast-checkable fields in same group',
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse();
     // Closure ran and added a custom error.
@@ -754,7 +752,7 @@ it('handles multiple independent wildcard groups', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->keys())->not->toContain('users.0.name')->not->toContain('users.1.name')
@@ -779,7 +777,7 @@ it('handles scalar each() rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue()
         ->and($validator->validated()['tags'])->toHaveCount(3);
@@ -798,7 +796,7 @@ it('reports errors for invalid scalar each() items', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('tags.1'))->toBeTrue()
@@ -828,7 +826,7 @@ it('handles nested each() rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 });
@@ -851,7 +849,7 @@ it('reports errors in nested each() rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('orders.0.items.1.qty'))->toBeTrue();
@@ -878,7 +876,7 @@ it('fast-checks eligible fields while falling through for ineligible ones in the
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse();
     // names are valid (fast-checked), email on item 1 fails (Laravel fallback)
@@ -907,7 +905,7 @@ it('respects stopOnFirstFailure with fast-checked attributes', function (): void
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
     $validator->stopOnFirstFailure();
 
     expect($validator->passes())->toBeFalse();
@@ -936,7 +934,7 @@ it('handles children() rules without wildcards', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue()
         ->and($validator->validated()['address']['street'])->toBe('123 Main St');
@@ -959,7 +957,7 @@ it('reports errors in children() rules', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('address.street'))->toBeTrue();
@@ -988,7 +986,7 @@ it('works with sometimes() rules added after validator creation', function (): v
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Add a dynamic rule via sometimes().
     $validator->sometimes('items.*.isbn', 'required|string|min:10', fn (Fluent $input, Fluent $item): bool => $item->type === 'book');
@@ -1065,7 +1063,7 @@ it('correctly identifies the specific invalid item among many valid ones', funct
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse()
         ->and($validator->errors()->has('items.37.name'))->toBeTrue()
@@ -1094,7 +1092,7 @@ it('does not mutate the shared factory resolver (Octane-safe)', function (): voi
         data: ['items' => [['name' => 'Test']]],
     );
 
-    (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    defaultValidatorFor($formRequest, $factory);
 
     // The factory's resolver must be untouched — no swap happened.
     $resolverAfter = $resolverProp->getValue($factory);
@@ -1121,7 +1119,7 @@ it('OptimizedValidator inherits factory extensions from base validator', functio
     );
 
     /** @var OptimizedValidator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 });
@@ -1139,7 +1137,7 @@ it('OptimizedValidator copies container and excludeUnvalidatedArrayKeys from fac
     );
 
     /** @var OptimizedValidator $validator */
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     // Container should be set (needed for class-based rule extensions).
     $containerProp = new ReflectionProperty(Validator::class, 'container');
@@ -1176,7 +1174,7 @@ it('preserves a preconfigured custom factory resolver', function (): void {
         data: ['items' => [['name' => 'Test']]],
     );
 
-    (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    defaultValidatorFor($formRequest, $factory);
 
     // The custom resolver must still be active — not replaced or cleared.
     $resolverProp = new ReflectionProperty(Illuminate\Validation\Factory::class, 'resolver');
@@ -1208,7 +1206,7 @@ it('validates a POST request through FluentFormRequest', function (): void {
         );
 
         $factory = resolve(Factory::class);
-        $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        $validator = defaultValidatorFor($formRequest, $factory);
 
         return response()->json($validator->validated());
     });
@@ -1236,10 +1234,10 @@ it('returns 422 for invalid data through FluentFormRequest', function (): void {
         );
 
         $factory = resolve(Factory::class);
-        $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+        $validator = defaultValidatorFor($formRequest, $factory);
 
         if ($validator->fails()) {
-            throw new ValidationException($validator); // @phpstan-ignore argument.type
+            throw new ValidationException($validator);
         }
 
         return response()->json($validator->validated());
@@ -1285,7 +1283,7 @@ it('respects stopOnFirstFailure on the FormRequest', function (): void {
     $instance->setRedirector(resolve(Redirector::class));
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($instance);
+    $validator = defaultValidatorFor($instance, $factory);
 
     expect($validator->passes())->toBeFalse();
     // With stopOnFirstFailure, only the first failing field should have errors
@@ -1302,7 +1300,7 @@ it('does not stop on first failure by default', function (): void {
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeFalse();
     // Without stopOnFirstFailure, both fields should have errors
@@ -1343,7 +1341,7 @@ it('auto-unwraps a RuleSet returned from rules()', function (): void {
     $instance->setRedirector(resolve(Redirector::class));
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($instance);
+    $validator = defaultValidatorFor($instance, $factory);
 
     expect($validator->passes())->toBeTrue()
         ->and($validator->validated())->toBe(['name' => 'Ada']);
@@ -1356,7 +1354,7 @@ it('still accepts a plain array from rules() (no regression)', function (): void
     );
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($formRequest);
+    $validator = defaultValidatorFor($formRequest, $factory);
 
     expect($validator->passes())->toBeTrue();
 });
@@ -1383,7 +1381,7 @@ it('auto-unwraps a RuleSet built via fluent chain in rules()', function (): void
     $instance->setRedirector(resolve(Redirector::class));
 
     $factory = resolve(Factory::class);
-    $validator = (fn () => $this->createDefaultValidator($factory))->call($instance);
+    $validator = defaultValidatorFor($instance, $factory);
 
     expect($validator->passes())->toBeTrue();
 });
