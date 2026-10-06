@@ -33,6 +33,7 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ### Changed
 
+- `scripts/verify-tag-currency.sh` passes a tag that is behind `main` only by `.github/`-only commits (a Dependabot bump ships nothing), and tells a package on real releases to cut a patch rather than move a published tag.
 - `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
   `increment_style` rewrote every one of them back, so the two gates could never both pass.
   Formatting belongs to Pint.
