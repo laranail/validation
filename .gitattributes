@@ -13,6 +13,8 @@
 .editorconfig         export-ignore
 .gitattributes        export-ignore
 .gitignore            export-ignore
+.gitguardian.yaml     export-ignore
+.gitleaks.toml        export-ignore
 .mcp.json             export-ignore
 benchmark.php         export-ignore
 CHANGELOG.md          export-ignore
