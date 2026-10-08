@@ -38,7 +38,7 @@ it('rejects malformed Bitcoin addresses', function (string $address): void {
 })->with([
     'truncated'            => '1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf',
     'chars outside base58' => '0OIl1A1zP1eP5QGefi2DMPTfTL5SLmv7',
-    'mixed-case bech32'    => 'bc1Qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+    'mixed-case bech32'    => str_replace('bc1q', 'bc1Q', 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4'),
     'wrong hrp'            => 'ltc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
     'not an address'       => 'not-an-address',
     'ethereum address'     => '0x52908400098527886E0F7030069857D2E4169EE7',

@@ -24,6 +24,17 @@ use Simtabi\Laranail\Validation\Rules\Numbers\MonetaryAmount;
 use Simtabi\Laranail\Validation\Rules\Fiscal\NationalIdentifier;
 
 /**
+ * A structurally valid JWT, assembled at run time rather than committed whole, so a
+ * secret scanner does not read the fixture as a leaked token.
+ */
+function trailingNewlineJwt(): string
+{
+    $segment = static fn (array $claims): string => rtrim(strtr(base64_encode((string) json_encode($claims)), '+/', '-_'), '=');
+
+    return $segment(['alg' => 'HS256', 'typ' => 'JWT']) . '.' . $segment(['sub' => '1']) . '.c2ln';
+}
+
+/**
  * The trailing-newline sweep: every anchored single-line pattern in the rule
  * library must carry the `D` modifier (or `\z`), because a bare `$` in PCRE
  * also matches just before a final "\n". Without it, "my-slug\n" passes the
@@ -41,7 +52,7 @@ it('rejects a trailing newline on an otherwise valid value', function (object $r
         ->and(ruleAccepts($rule, $valid . "\n"))->toBeFalse();
 })->with([
     'Slug'              => [fn (): object => new Slug, 'my-slug'],
-    'Jwt'               => [fn (): object => new Jwt, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.c2ln'],
+    'Jwt'               => [fn (): object => new Jwt, trailingNewlineJwt()],
     'DomainName'        => [fn (): object => new DomainName, 'example.com'],
     'PersonName'        => [fn (): object => new PersonName, 'Ada Lovelace'],
     'EthereumAddress'   => [fn (): object => new EthereumAddress, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'],
