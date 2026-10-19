@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 
 // =========================================================================
@@ -50,6 +51,7 @@ it('validates string with min and max', function (): void {
 
 it('validates string with chained modifiers and constraints', function (): void {
     $v = makeValidator(
+        // @credential-literal-exempt: shorter than the minimum length the rule under test enforces
         ['password' => 'short'],
         ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)],
     );
@@ -57,7 +59,7 @@ it('validates string with chained modifiers and constraints', function (): void 
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator(
-        ['password' => 'longenoughpassword'],
+        ['password' => TestCredentials::password('long')],
         ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12))->max(255)],
     );
 
@@ -435,14 +437,16 @@ it('validates string with dateFormat', function (): void {
 });
 
 it('validates string with confirmed', function (): void {
+    expect(TestCredentials::password('mismatch'))->not->toBe(TestCredentials::password('confirmed'));
+
     $v = makeValidator(
-        ['password' => 'secret', 'password_confirmation' => 'secret'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('confirmed')],
         ['password' => FluentRule::string()->confirmed()],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
-        ['password' => 'secret', 'password_confirmation' => 'different'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('mismatch')],
         ['password' => FluentRule::string()->confirmed()],
     );
     expect($v->passes())->toBeFalse();
@@ -450,13 +454,13 @@ it('validates string with confirmed', function (): void {
 
 it('validates string with same', function (): void {
     $v = makeValidator(
-        ['password' => 'secret', 'confirm' => 'secret'],
+        ['password' => TestCredentials::password('confirmed'), 'confirm' => TestCredentials::password('confirmed')],
         ['password' => FluentRule::string()->same('confirm')],
     );
     expect($v->passes())->toBeTrue();
 
     $v = makeValidator(
-        ['password' => 'secret', 'confirm' => 'other'],
+        ['password' => TestCredentials::password('confirmed'), 'confirm' => TestCredentials::password('mismatch')],
         ['password' => FluentRule::string()->same('confirm')],
     );
     expect($v->passes())->toBeFalse();

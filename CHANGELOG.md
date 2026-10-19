@@ -44,6 +44,14 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ### Changed
 
+- **Test credentials are generated at run time.** Passwords and secrets the suite only needed as
+  arbitrary values are now `TestCredentials::password()` / `TestCredentials::secret()`, so no
+  literal a secret scanner would report reaches the repository, and
+  `tests/Architecture/NoLiteralCredentialsTest.php` fails on any literal added later. Inputs whose
+  exact value is what a rule test proves (too short, missing one character class) keep their literal
+  and are marked exempt with a reason. The `laranail/package-tools` floor is now `^0.1.10`, and a
+  second check keeps every purpose passed to `TestCredentials` a single plain word, since a secret
+  scanner reads a compound purpose as the password itself.
 - `scripts/verify-tag-currency.sh` passes a tag that is behind `main` only by `.github/`-only commits (a Dependabot bump ships nothing), and tells a package on real releases to cut a patch rather than move a published tag.
 - `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
   `increment_style` rewrote every one of them back, so the two gates could never both pass.

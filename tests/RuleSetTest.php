@@ -16,6 +16,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\ArrayRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\NumericRule;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
 
 // =========================================================================
@@ -821,6 +822,7 @@ it('extracts label from fluent rule inside mixed array', function (): void {
     try {
         RuleSet::from([
             'secret' => ['bail', FluentRule::string('API Secret')->required()->min(20)],
+            // @credential-literal-exempt: shorter than the minimum length the rule under test enforces
         ])->validate(['secret' => 'short']);
     } catch (ValidationException $validationException) {
         expect($validationException->errors()['secret'][0])->toContain('API Secret');
@@ -2225,7 +2227,7 @@ it('dropUnknownFields strips unknown nested keys declared via children()', funct
         ]),
     ])->dropUnknownFields()->validate([
         'name' => 'John',
-        'meta' => ['type' => 'admin', 'secret' => 'leak'],
+        'meta' => ['type' => 'admin', 'secret' => TestCredentials::secret('unknown')],
     ]);
 
     expect($validated)
@@ -2240,7 +2242,7 @@ it('dropUnknownFields strips unknown nested keys declared via dotted rule keys',
         'meta'      => FluentRule::array()->required(),
         'meta.type' => FluentRule::string()->required(),
     ])->dropUnknownFields()->validate([
-        'meta' => ['type' => 'admin', 'secret' => 'leak'],
+        'meta' => ['type' => 'admin', 'secret' => TestCredentials::secret('unknown')],
     ]);
 
     expect($validated['meta'])
@@ -2275,7 +2277,7 @@ it('dropUnknownFields forces stripping even when host factory has disabled the f
                 'type' => FluentRule::string()->required(),
             ]),
         ])->dropUnknownFields()->validate([
-            'meta' => ['type' => 'admin', 'secret' => 'leak'],
+            'meta' => ['type' => 'admin', 'secret' => TestCredentials::secret('unknown')],
         ]);
 
         expect($validated['meta'])->not->toHaveKey('secret');
@@ -2294,10 +2296,10 @@ it('without dropUnknownFields and host factory disabled, unknown keys are retain
                 'type' => FluentRule::string()->required(),
             ]),
         ])->validate([
-            'meta' => ['type' => 'admin', 'secret' => 'keep'],
+            'meta' => ['type' => 'admin', 'secret' => TestCredentials::secret('retained')],
         ]);
 
-        expect($validated['meta'])->toHaveKey('secret', 'keep');
+        expect($validated['meta'])->toHaveKey('secret', TestCredentials::secret('retained'));
     } finally {
         $factory->excludeUnvalidatedArrayKeys();
     }
@@ -2322,7 +2324,7 @@ it('dropUnknownFields composes with stopOnFirstFailure', function (): void {
             'type' => FluentRule::string()->required(),
         ]),
     ])->dropUnknownFields()->stopOnFirstFailure()->validate([
-        'meta' => ['type' => 'admin', 'secret' => 'leak'],
+        'meta' => ['type' => 'admin', 'secret' => TestCredentials::secret('unknown')],
     ]);
 
     expect($validated['meta'])->not->toHaveKey('secret');
@@ -2574,14 +2576,15 @@ it('wildcard fast path enforces same:FIELD equality against sibling', function (
         ]),
     ];
 
+    expect(TestCredentials::password('mismatch'))->not->toBe(TestCredentials::password('confirmed'));
     // Mismatch → fail.
     expect(fn () => RuleSet::from($rules)->validate(['users' => [
-        ['password' => 'hunter2', 'password_confirmation' => 'hunter3'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('mismatch')],
     ]]))->toThrow(ValidationException::class);
 
     // Match → pass.
     $valid = ['users' => [
-        ['password' => 'hunter2', 'password_confirmation' => 'hunter2'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('confirmed')],
     ]];
     expect(RuleSet::from($rules)->validate($valid))->toBe($valid);
 });
@@ -2666,21 +2669,21 @@ it('wildcard fast path enforces confirmed (default suffix)', function (): void {
 
     // Mismatched confirmation → fail.
     expect(fn () => RuleSet::from($rules)->validate(['users' => [
-        ['password' => 'hunter2', 'password_confirmation' => 'hunter3'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('mismatch')],
     ]]))->toThrow(ValidationException::class);
 
     // Missing confirmation → fail.
     expect(fn () => RuleSet::from($rules)->validate(['users' => [
-        ['password' => 'hunter2'],
+        ['password' => TestCredentials::password('confirmed')],
     ]]))->toThrow(ValidationException::class);
 
     // Matching confirmation → pass (but `password_confirmation` is stripped
     // from validated output since it isn't in the rule set).
     $valid = ['users' => [
-        ['password' => 'hunter2', 'password_confirmation' => 'hunter2'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('confirmed')],
     ]];
     $result = RuleSet::from($rules)->validate($valid);
-    expect($result['users'][0]['password'])->toBe('hunter2');
+    expect($result['users'][0]['password'])->toBe(TestCredentials::password('confirmed'));
 });
 
 it('wildcard fast path enforces confirmed:custom_name', function (): void {
@@ -2692,14 +2695,14 @@ it('wildcard fast path enforces confirmed:custom_name', function (): void {
 
     // Mismatch → fail.
     expect(fn () => RuleSet::from($rules)->validate(['users' => [
-        ['pwd' => 'hunter2', 'pwd_check' => 'hunter3'],
+        ['pwd' => TestCredentials::password('confirmed'), 'pwd_check' => TestCredentials::password('mismatch')],
     ]]))->toThrow(ValidationException::class);
 
     // Match → pass.
     $valid = ['users' => [
-        ['pwd' => 'hunter2', 'pwd_check' => 'hunter2'],
+        ['pwd' => TestCredentials::password('confirmed'), 'pwd_check' => TestCredentials::password('confirmed')],
     ]];
-    expect(RuleSet::from($rules)->validate($valid)['users'][0]['pwd'])->toBe('hunter2');
+    expect(RuleSet::from($rules)->validate($valid)['users'][0]['pwd'])->toBe(TestCredentials::password('confirmed'));
 });
 
 it('wildcard fast path enforces different:FIELD against sibling', function (): void {

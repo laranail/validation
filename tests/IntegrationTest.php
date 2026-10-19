@@ -174,6 +174,7 @@ it('works with Laravel Rule::when when wrapped in array', function (): void {
     // Note: Rule::when() requires an array or string, not a bare object.
     // Wrap the fluent rule in an array.
     $validator = makeValidator(
+        // @credential-literal-exempt: shorter than the minimum length the rule under test enforces
         ['secret' => 'short'],
         ['secret' => LaravelRule::when($isAdmin, [FluentRule::string()->required()->min(12)])],
     );
@@ -185,6 +186,7 @@ it('skips with Laravel Rule::when when condition is false', function (): void {
     $isAdmin = false;
 
     $validator = makeValidator(
+        // @credential-literal-exempt: shorter than the min(12) the skipped branch would apply, so passing proves the skip
         ['secret' => 'short'],
         ['secret' => LaravelRule::when($isAdmin, [FluentRule::string()->required()->min(12)])],
     );
