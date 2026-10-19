@@ -17,6 +17,7 @@ use Simtabi\Laranail\Validation\FluentRule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Simtabi\Laranail\Validation\Builder\Nodes\StringRule;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestIntEnum;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestUnitEnum;
 use Simtabi\Laranail\Validation\Tests\Fixtures\TestStringEnum;
@@ -487,6 +488,7 @@ it('whenInput applies rules when condition is true', function (): void {
     );
 
     $compiled = RuleSet::compile(['password' => $stringRule]);
+    // @credential-literal-exempt: shorter than the min(12) the admin branch applies
     $validator = makeValidator(['role' => 'admin', 'password' => 'short'], $compiled);
     expect($validator->passes())->toBeFalse();
 });
@@ -498,6 +500,7 @@ it('whenInput skips rules when condition is false', function (): void {
     );
 
     $compiled = RuleSet::compile(['password' => $stringRule]);
+    // @credential-literal-exempt: shorter than the min(12) the skipped branch would apply, so passing proves the skip
     $validator = makeValidator(['role' => 'user', 'password' => 'short'], $compiled);
     expect($validator->passes())->toBeTrue();
 });
@@ -510,6 +513,7 @@ it('whenInput applies default rules when condition is false', function (): void 
     );
 
     $compiled = RuleSet::compile(['password' => $stringRule]);
+    // @credential-literal-exempt: longer than the max(5) the default branch applies
     $validator = makeValidator(['role' => 'user', 'password' => 'toolong'], $compiled);
     expect($validator->passes())->toBeFalse();
 });
@@ -763,6 +767,7 @@ it('supports multiple messages on different rules', function (): void {
 
 it('uses message inside when() conditional', function (): void {
     $validator = makeValidator(
+        // @credential-literal-exempt: shorter than the minimum length the rule under test enforces
         ['password' => 'short'],
         ['password' => FluentRule::string()->required()->when(true, fn (StringRule $r): StringRule => $r->min(12)->message('Admin passwords need 12+ chars.'))],
     );
@@ -934,7 +939,7 @@ it('validates field with filled', function (): void {
 });
 
 it('validates field with prohibited', function (): void {
-    $v = makeValidator(['secret' => 'value'], ['secret' => FluentRule::string()->prohibited()]);
+    $v = makeValidator(['secret' => TestCredentials::secret('prohibited')], ['secret' => FluentRule::string()->prohibited()]);
     expect($v->passes())->toBeFalse();
 
     $v = makeValidator([], ['secret' => FluentRule::string()->prohibited()]);
@@ -945,7 +950,7 @@ it('validates field with missing', function (): void {
     $v = makeValidator([], ['secret' => FluentRule::string()->missing()]);
     expect($v->passes())->toBeTrue();
 
-    $v = makeValidator(['secret' => 'value'], ['secret' => FluentRule::string()->missing()]);
+    $v = makeValidator(['secret' => TestCredentials::secret('missing')], ['secret' => FluentRule::string()->missing()]);
     expect($v->passes())->toBeFalse();
 });
 

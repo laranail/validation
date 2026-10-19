@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Validator;
 use Simtabi\Laranail\Validation\FastCheckCompiler;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 
 /**
  * Parity suite: for every fast-checkable rule, the compiled closure's
@@ -396,27 +397,27 @@ function itemAwareConfirmedParityGrid(): iterable
     $cases = [
         'default match' => [
             'required|confirmed', 'password',
-            'hunter2', ['password' => 'hunter2', 'password_confirmation' => 'hunter2'],
+            TestCredentials::password('confirmed'), ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('confirmed')],
         ],
         'default mismatch' => [
             'required|confirmed', 'password',
-            'hunter2', ['password' => 'hunter2', 'password_confirmation' => 'hunter3'],
+            TestCredentials::password('confirmed'), ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('mismatch')],
         ],
         'default confirmation missing' => [
             'required|confirmed', 'password',
-            'hunter2', ['password' => 'hunter2'],
+            TestCredentials::password('confirmed'), ['password' => TestCredentials::password('confirmed')],
         ],
         'default confirmation null' => [
             'required|confirmed', 'password',
-            'hunter2', ['password' => 'hunter2', 'password_confirmation' => null],
+            TestCredentials::password('confirmed'), ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => null],
         ],
         'custom name match' => [
             'required|confirmed:check', 'pwd',
-            'hunter2', ['pwd' => 'hunter2', 'check' => 'hunter2'],
+            TestCredentials::password('confirmed'), ['pwd' => TestCredentials::password('confirmed'), 'check' => TestCredentials::password('confirmed')],
         ],
         'custom name mismatch' => [
             'required|confirmed:check', 'pwd',
-            'hunter2', ['pwd' => 'hunter2', 'check' => 'hunter3'],
+            TestCredentials::password('confirmed'), ['pwd' => TestCredentials::password('confirmed'), 'check' => TestCredentials::password('mismatch')],
         ],
         'nullable value null' => [
             'nullable|confirmed', 'password',

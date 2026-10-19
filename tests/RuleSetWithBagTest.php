@@ -90,6 +90,7 @@ it('withBag() covers the Fortify use case end-to-end', function (): void {
     ])->withBag('updatePassword');
 
     try {
+        // @credential-literal-exempt: both values are shorter than the min() rules, so the bag must report them
         $ruleSet->validate(['current_password' => 'short', 'new_password' => 'alsoshort']);
         throw new RuntimeException('should have thrown');
     } catch (ValidationException $validationException) {

@@ -8,6 +8,7 @@ use Illuminate\Translation\ArrayLoader;
 use Simtabi\Laranail\Validation\MemoizingValidator;
 use Simtabi\Laranail\Validation\OptimizedValidator;
 use Illuminate\Validation\Validator as BaseValidator;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 
 /**
  * Parity suite for {@see MemoizingValidator}. The class memoizes string-rule
@@ -85,11 +86,11 @@ function memoParityScenarios(): iterable
         ['type' => 'required|in:person,company', 'vat' => 'required_if:type,company|string'],
     ];
     yield 'required_with + same — mismatch' => [
-        ['password' => 'secret', 'password_confirmation' => 'other'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('mismatch')],
         ['password' => 'required|string', 'password_confirmation' => 'required_with:password|same:password'],
     ];
     yield 'confirmed — passing' => [
-        ['password' => 'secret', 'password_confirmation' => 'secret'],
+        ['password' => TestCredentials::password('confirmed'), 'password_confirmation' => TestCredentials::password('confirmed')],
         ['password' => 'required|string|confirmed'],
     ];
     yield 'gt/lte field refs — passing' => [
@@ -117,7 +118,7 @@ function memoParityScenarios(): iterable
         ['role' => ['required', Rule::in(['admin', 'editor'])]],
     ];
     yield 'closure rule bypass — failing' => [
-        ['token' => 'nope'],
+        ['token' => TestCredentials::secret('closure')],
         ['token' => ['required', 'string', function (string $attribute, mixed $value, Closure $fail): void {
             if ($value !== 'ok') {
                 $fail('The :attribute is not ok.');

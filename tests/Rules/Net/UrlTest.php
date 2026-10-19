@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\RuleSet;
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 
 /*
  * Every value in the first block passes Laravel's own `url` rule. That is the
@@ -66,9 +67,9 @@ it('requires https when asked', function (): void {
 it('rejects credentials in the authority by default', function (): void {
     // A submitted URL carrying a password ends up in a database, in a log
     // line, and in the referrer of whatever the application fetches next.
-    expect(urlCheck(FluentRule::url(), 'https://user:password@example.com/'))->toBeFalse()
+    expect(urlCheck(FluentRule::url(), sprintf('https://user:%s@example.com/', TestCredentials::secret('userinfo'))))->toBeFalse()
         ->and(urlCheck(FluentRule::url(), 'https://user@example.com/'))->toBeFalse()
-        ->and(urlCheck(FluentRule::url()->allowCredentials(), 'https://user:password@example.com/'))->toBeTrue();
+        ->and(urlCheck(FluentRule::url()->allowCredentials(), sprintf('https://user:%s@example.com/', TestCredentials::secret('userinfo'))))->toBeTrue();
 });
 
 it('rejects a host that is not a domain', function (string $value): void {

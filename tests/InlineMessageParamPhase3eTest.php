@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Simtabi\Laranail\Validation\FluentRule;
+use Simtabi\Laranail\Package\Tools\Testing\TestCredentials;
 
 // =========================================================================
 // Phase 3e — `message:` on FluentRule static factories. Every factory
@@ -201,7 +202,7 @@ it('FluentRule::email(message: ...) surfaces in live validation', function (): v
 
 it('FluentRule::uuid(message: ...) surfaces in live validation', function (): void {
     $v = makeValidator(
-        ['token' => 'notuuid'],
+        ['token' => TestCredentials::secret('opaque')],
         ['token' => FluentRule::uuid(message: 'Must be a UUID.')],
     );
 
