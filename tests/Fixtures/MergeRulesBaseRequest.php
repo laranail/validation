@@ -25,4 +25,9 @@ abstract class MergeRulesBaseRequest extends FormRequest
             'base_only' => FluentRule::string()->required(),
         ];
     }
+
+    public function authorize(): bool
+    {
+        return true;
+    }
 }
