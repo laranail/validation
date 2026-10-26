@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Contracts\Translation\Translator;
 use Simtabi\Laranail\Validation\Rules\Markup\Xml;
 use Illuminate\Translation\PotentiallyTranslatedString;
@@ -69,7 +70,7 @@ it('validates against an XSD schema', function (): void {
         ->and(ruleAccepts($rule, '<invoice><total>ten</total></invoice>'))->toBeFalse()
         ->and(ruleAccepts($rule, '<order><total>10.50</total></order>'))->toBeFalse();
 
-    @unlink($schema);
+    File::delete($schema);
 });
 
 it('blames the deployment, not the document, when the schema is missing', function (): void {

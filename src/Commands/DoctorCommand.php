@@ -40,7 +40,7 @@ final class DoctorCommand extends Command
 
                 return is_array($config) && $config !== []
                     ? ['OK', 'flat laranail.validation key present']
-                    : ['FAIL', 'config(\'laranail.validation\') is empty — provider not registered?'];
+                    : ['FAIL', "config('laranail.validation') is empty — provider not registered?"];
             }],
             ['rule registry', function () use ($registrar): array {
                 $count = count($registrar->classes());

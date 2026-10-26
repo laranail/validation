@@ -17,6 +17,7 @@ use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
 use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
+use RectorLaravel\Rector\Class_\RemoveDefaultAuthorizeTrueFromFormRequestRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 
 return RectorConfig::configure()
@@ -81,6 +82,11 @@ return RectorConfig::configure()
         // links without changing their subject — both produce failing
         // (or nonsensical) assertions. mrpunyapal/rector-pest 0.2.17.
         UseToMatchRector::class,
+        // rector-laravel 2.7 deletes an authorize() that returns true. Laravel
+        // treats a missing authorize() as authorized, so src behaves the same,
+        // but the test fixtures define it on purpose (AuthorizedEach...,
+        // MergeRulesBaseRequest) to cover the path where the method exists.
+        RemoveDefaultAuthorizeTrueFromFormRequestRector::class,
         // Hot-path closure allocates a literal array on every invocation
         // when in_array() is used. Explicit === comparisons avoid that.
         RepeatedOrEqualToInArrayRector::class => [

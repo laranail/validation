@@ -16,6 +16,10 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 ## [Unreleased]
 ### Fixed
 
+- **`composer rector` failed with `Class "Rector\Transform\ValueObject\ArrayDimFetchToMethodCall" not found`.**
+  rector/rector 2.8.0 removed that class, and driftingly/rector-laravel 2.7.0, which `^2.3` still allowed beside
+  it, uses it in its array-access set. The floor is now `^2.7.1`, the first release without it, so the required
+  `rector` check cannot resolve the broken pair.
 - **The code-style CI job was formatting against Pint's defaults, not the shared laranail config.**
   `fix-php-code-style-issues.yml` ran `aglipanci/laravel-pint-action` with `configPath: pint.json` -
   a file this package does not ship. Pint handed a config path that does not exist falls back to its
