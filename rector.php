@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use RectorPest\Set\PestSetList;
 use RectorLaravel\Set\LaravelSetList;
-use RectorLaravel\Rector\Class_\RemoveDefaultAuthorizeTrueFromFormRequestRector;
 use RectorPest\Rules\UseToMatchRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
@@ -18,6 +17,7 @@ use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
 use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
+use RectorLaravel\Rector\Class_\RemoveDefaultAuthorizeTrueFromFormRequestRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 
 return RectorConfig::configure()
