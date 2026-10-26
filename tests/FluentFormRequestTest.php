@@ -1270,11 +1270,6 @@ it('respects stopOnFirstFailure on the FormRequest', function (): void {
                 'email' => FluentRule::email()->required(),
             ];
         }
-
-        public function authorize(): bool
-        {
-            return true;
-        }
     };
 
     $request = Request::create('/test', 'POST', []);
@@ -1324,11 +1319,6 @@ it('auto-unwraps a RuleSet returned from rules()', function (): void {
         {
             return self::$testRuleSet;
         }
-
-        public function authorize(): bool
-        {
-            return true;
-        }
     };
 
     $formRequest::$testRuleSet = RuleSet::from([
@@ -1368,11 +1358,6 @@ it('auto-unwraps a RuleSet built via fluent chain in rules()', function (): void
                 ->field('name', FluentRule::string()->required())
                 ->merge(['email' => FluentRule::email()->required()]);
         }
-
-        public function authorize(): bool
-        {
-            return true;
-        }
     };
 
     $request = Request::create('/test', 'POST', ['name' => 'Ada', 'email' => 'a@b.test']);
@@ -1401,11 +1386,6 @@ function createFluentFormRequest(array $rules, array $data): FormRequest
         public function rules(): array
         {
             return self::$testRules;
-        }
-
-        public function authorize(): bool
-        {
-            return true;
         }
     };
 

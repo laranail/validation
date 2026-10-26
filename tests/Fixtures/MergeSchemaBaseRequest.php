@@ -26,9 +26,4 @@ abstract class MergeSchemaBaseRequest extends FormRequest
             'base_only' => $rules->string()->required(),
         ];
     }
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 }

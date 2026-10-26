@@ -66,11 +66,6 @@ function traitSchemaWithBodyRules(): FormRequest
                 'body_only' => FluentRule::string()->required(),
             ];
         }
-
-        public function authorize(): bool
-        {
-            return true;
-        }
     };
 }
 
@@ -174,11 +169,6 @@ it('merges when both sources return a RuleSet', function (): void {
         public function rules(): RuleSet
         {
             return RuleSet::from(['from_rules' => FluentRule::string()->required()]);
-        }
-
-        public function authorize(): bool
-        {
-            return true;
         }
     };
 
