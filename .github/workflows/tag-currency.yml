@@ -31,19 +31,13 @@ concurrency:
 jobs:
   tag-currency:
     name: tag currency
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          # The whole history and every tag. The default shallow checkout has
-          # neither, and `git merge-base --is-ancestor` on a graph that stops at
-          # one commit answers "not an ancestor" for tags that are perfectly
-          # fine — the same false alarm that made the previous version of this
-          # check unusable.
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Verify the tag consumers resolve is on main
-        run: bash scripts/verify-tag-currency.sh main origin
+    # The shared hygiene workflow runs laranail/package-tools' canonical check
+    # over the API, so neither a checkout nor fetch depth matters any more.
+    # Release tags are immutable: a tag behind main is a warning that a release
+    # is due, never a red run. scripts/verify-tag-currency.sh is deprecated and
+    # delegates to the same canonical script when run by hand.
+    uses: laranail/.github/.github/workflows/hygiene.yml@main
+    with:
+      run-action-pins: false
+      run-tag-currency: true
+      run-dist-integrity: false
