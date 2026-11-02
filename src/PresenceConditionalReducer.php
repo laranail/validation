@@ -176,7 +176,7 @@ final class PresenceConditionalReducer extends AbstractConditionalReducer
         }
 
         if ($value instanceof UploadedFile) {
-            return (string) $value->getPath() !== '';
+            return $value->getPath() !== '';
         }
 
         return true;
