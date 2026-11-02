@@ -59,6 +59,20 @@
 # Only meaningful pre-1.0. From 1.0 the tag is immutable by design and this
 # exits without an opinion.
 
+# DEPRECATED since 2026-11-02, earliest removal in this package's next minor release.
+# The canonical check is laranail/package-tools' scripts/verify-tag-currency.sh, which CI runs
+# through laranail/.github's shared hygiene workflow. It follows the immutable-tag model: a tag
+# behind main is a release that is due (a warning), never a tag to move. This copy prints a notice
+# and delegates to that script when an installed copy (vendor/) already follows that model and `gh`
+# is available; otherwise it keeps working as before, so a caller that was not found does not break.
+echo "::notice::scripts/verify-tag-currency.sh is deprecated; use laranail/package-tools' scripts/verify-tag-currency.sh (CI runs it through laranail/.github's hygiene workflow)." >&2
+canonical="$(cd "$(dirname "$0")/.." && pwd)/vendor/laranail/package-tools/scripts/verify-tag-currency.sh"
+if [ -f "${canonical}" ] && grep -q 'title=Release due' "${canonical}" && command -v gh >/dev/null 2>&1; then
+  # This copy takes [branch] [remote]; the canonical one takes <owner/repo> [branch].
+  repo=$(git remote get-url "${2:-origin}" | sed -E 's#^(git@github\.com:|https://github\.com/)##; s#\.git$##')
+  exec bash "${canonical}" "${repo}" "${1:-main}"
+fi
+
 set -euo pipefail
 
 BRANCH="${1:-main}"
@@ -191,7 +205,7 @@ else
   elif released; then
     fail "${current} is behind ${BRANCH}. It is a published release, so do not move it: cut ${current%.*}.$(( ${current##*.} + 1 ))."
   else
-    fail "${current} is behind ${BRANCH}. Move it (git tag -f ${current} ${BRANCH} && git push --force ${REMOTE} ${current}) or cut a new one."
+    fail "${current} is behind ${BRANCH}. Tags are immutable, so do not move it: cut ${current%.*}.$(( ${current##*.} + 1 ))."
   fi
 fi
 

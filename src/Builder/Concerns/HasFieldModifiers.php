@@ -262,7 +262,7 @@ trait HasFieldModifiers
             }
 
             // Laravel 11: evaluate eagerly (inverted excludeIf)
-            $shouldExclude = $field instanceof Closure ? ! $field() : ! $field;
+            $shouldExclude = $field instanceof Closure ? ! (bool) $field() : ! $field;
 
             return $shouldExclude ? $this->addRule('exclude') : $this;
         }
