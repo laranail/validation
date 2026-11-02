@@ -14,11 +14,47 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 > part of `v0.1.0`. They are kept for provenance, not because those versions are installable.
 
 ## [Unreleased]
+
+## v0.1.1 - 2026-11-02
+
 ### Changed
 
 - The weekly tag-currency workflow now calls `laranail/.github`'s shared hygiene workflow, which
   uses `laranail/package-tools`' canonical script. Release tags are immutable, so a tag behind `main`
   is a warning that a release is due rather than a red run.
+
+- **Test credentials are generated at run time.** Passwords and secrets the suite only needed as
+  arbitrary values are now `TestCredentials::password()` / `TestCredentials::secret()`, so no
+  literal a secret scanner would report reaches the repository, and
+  `tests/Architecture/NoLiteralCredentialsTest.php` fails on any literal added later. Inputs whose
+  exact value is what a rule test proves (too short, missing one character class) keep their literal
+  and are marked exempt with a reason. The `laranail/package-tools` floor is now `^0.1.10`, and a
+  second check keeps every purpose passed to `TestCredentials` a single plain word, since a secret
+  scanner reads a compound purpose as the password itself.
+- `scripts/verify-tag-currency.sh` passes a tag that is behind `main` only by `.github/`-only commits (a Dependabot bump ships nothing), and tells a package on real releases to cut a patch rather than move a published tag.
+- `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
+  `increment_style` rewrote every one of them back, so the two gates could never both pass.
+  Formatting belongs to Pint.
+- `require` now declares `illuminate/routing`, which `Testing\FluentRulesTester` imports
+  (`Redirector`). It arrived only transitively before.
+- Dropped the `vcs` repositories for `laranail/atlas` and `laranail/enumerator`: nothing in this package's `require` or
+  `require-dev` closure installs them (checked with `composer why` after a fresh `composer update`).
+- `require` now declares every Illuminate component `src/` uses: `illuminate/auth`,
+  `illuminate/cache`, `illuminate/config`, `illuminate/container`, `illuminate/database`,
+  `illuminate/encryption`, `illuminate/events`, `illuminate/filesystem` and
+  `illuminate/translation`, plus `laravel/framework ^13.0`. `FluentFormRequest` extends
+  `Illuminate\Foundation\Http\FormRequest`, which has no split package, and the global helpers
+  `src/` calls (`config()`, `app()`, `trans()`, `event()`, `config_path()`, ...) are defined only in
+  `Illuminate/Foundation/helpers.php`. All of them arrived only transitively before.
+  `tests/DeclaredRequirementsTest.php` scans `src/` and fails on any use the manifest does not
+  declare.
+- `require-dev` raises `tomasvotruba/cognitive-complexity` to `^1.3`, and the PHPStan baseline
+  records the values 1.3.0 measures. 1.3.0 (2026-09-29) scores the same source differently from
+  1.2.0, mostly higher (`RuleSet` 141 -> 157, `RuleConfigBuilder::buildValueClosure()` 52 -> 76,
+  ...), so every complexity entry stopped matching and the required `phpstan` check went red with no
+  code change. Each entry is re-measured, none is removed, and four newly reported ones
+  (`BatchDatabaseChecker` and `DoctorCommand::handle()`) are added at their measured values. The
+  floor keeps a prefer-lowest resolve on the same scale; no limit was raised.
 
 ### Deprecated
 
@@ -58,41 +94,6 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
   null-values batch test now asserts validation passed, the custom-rule message test asserts the
   rule object survives `RuleSet::compile()`, and the `BadMethodCallException` test asserts the
   caught exception is `UnknownFluentRuleMethod`. Clean under both 2.2.17 and 2.3.0.
-
-### Changed
-
-- **Test credentials are generated at run time.** Passwords and secrets the suite only needed as
-  arbitrary values are now `TestCredentials::password()` / `TestCredentials::secret()`, so no
-  literal a secret scanner would report reaches the repository, and
-  `tests/Architecture/NoLiteralCredentialsTest.php` fails on any literal added later. Inputs whose
-  exact value is what a rule test proves (too short, missing one character class) keep their literal
-  and are marked exempt with a reason. The `laranail/package-tools` floor is now `^0.1.10`, and a
-  second check keeps every purpose passed to `TestCredentials` a single plain word, since a secret
-  scanner reads a compound purpose as the password itself.
-- `scripts/verify-tag-currency.sh` passes a tag that is behind `main` only by `.github/`-only commits (a Dependabot bump ships nothing), and tells a package on real releases to cut a patch rather than move a published tag.
-- `PostIncDecToPreIncDecRector` is skipped. Rector rewrote `$i++` to `++$i` in 21 files and Pint's
-  `increment_style` rewrote every one of them back, so the two gates could never both pass.
-  Formatting belongs to Pint.
-- `require` now declares `illuminate/routing`, which `Testing\FluentRulesTester` imports
-  (`Redirector`). It arrived only transitively before.
-- Dropped the `vcs` repositories for `laranail/atlas` and `laranail/enumerator`: nothing in this package's `require` or
-  `require-dev` closure installs them (checked with `composer why` after a fresh `composer update`).
-- `require` now declares every Illuminate component `src/` uses: `illuminate/auth`,
-  `illuminate/cache`, `illuminate/config`, `illuminate/container`, `illuminate/database`,
-  `illuminate/encryption`, `illuminate/events`, `illuminate/filesystem` and
-  `illuminate/translation`, plus `laravel/framework ^13.0`. `FluentFormRequest` extends
-  `Illuminate\Foundation\Http\FormRequest`, which has no split package, and the global helpers
-  `src/` calls (`config()`, `app()`, `trans()`, `event()`, `config_path()`, ...) are defined only in
-  `Illuminate/Foundation/helpers.php`. All of them arrived only transitively before.
-  `tests/DeclaredRequirementsTest.php` scans `src/` and fails on any use the manifest does not
-  declare.
-- `require-dev` raises `tomasvotruba/cognitive-complexity` to `^1.3`, and the PHPStan baseline
-  records the values 1.3.0 measures. 1.3.0 (2026-09-29) scores the same source differently from
-  1.2.0, mostly higher (`RuleSet` 141 -> 157, `RuleConfigBuilder::buildValueClosure()` 52 -> 76,
-  ...), so every complexity entry stopped matching and the required `phpstan` check went red with no
-  code change. Each entry is re-measured, none is removed, and four newly reported ones
-  (`BatchDatabaseChecker` and `DoctorCommand::handle()`) are added at their measured values. The
-  floor keeps a prefer-lowest resolve on the same scale; no limit was raised.
 
 ### Added
 
