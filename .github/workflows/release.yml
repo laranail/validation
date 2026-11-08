@@ -61,18 +61,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # v0.1.0 is a moving tag -- it is force-pushed on every change, so this
-          # workflow re-fires against a release that already exists. `gh release
-          # create` refuses outright in that case ("a release with the same tag
-          # name already exists: v0.1.0") and exits 1, which turns every routine
-          # tag move into a red run and buries any real release failure.
+          # A re-pushed tag re-fires this workflow against a release that already
+          # exists. `gh release create` refuses outright in that case ("a release
+          # with the same tag name already exists: v0.1.0") and exits 1, which would
+          # turn that into a red run and bury any real release failure.
           #
           # Editing when it exists is what laranail/password-tools already does.
           # The SBOM has to be re-uploaded explicitly on that path: `gh release
           # edit` does not take assets, and without --clobber the upload fails on
           # the asset name already being present.
+          #
+          # --draft=false is load-bearing, not a restatement of the default. DELETING a tag
+          # reverts its release to a DRAFT, and `gh release edit` leaves that flag exactly as it
+          # finds it -- so an edit after a tag is deleted and re-pushed goes GREEN while
+          # republishing nothing: correct tag, invisible release. This repository already holds
+          # two such orphans: the v1.0.0 and v1.0.1 releases, still drafts since those tags were
+          # withdrawn. Measured as a live failure in laranail/validation-js on 2026-11-08, whose
+          # release had to be published by hand.
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
-            gh release edit "$GITHUB_REF_NAME" --notes-file release-body.md
+            gh release edit "$GITHUB_REF_NAME" --draft=false --notes-file release-body.md
             gh release upload "$GITHUB_REF_NAME" sbom.cdx.json --clobber
           else
             gh release create "$GITHUB_REF_NAME" \

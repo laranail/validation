@@ -104,6 +104,25 @@ Publishing the release (`release: released`) fires three workflows:
   table to land, and benchmark numbers are never pasted in by hand.
 - **Benchmark** publishes the same measurements for the branch.
 
+### A deleted tag leaves its release behind as a draft
+
+Deleting a tag on the remote does not delete its GitHub release — it reverts it to a **draft**. The
+release keeps its body and assets and stops being visible, and the state survives the tag being gone
+for good: this repository still holds the `v1.0.0` and `v1.0.1` releases as drafts, from the tags
+withdrawn in the floor-to-`v0.1.0` reset.
+
+`gh release edit` leaves that flag exactly as it finds it, so both workflows that edit a release pass
+`--draft=false` — `release.yml` on its update path and `release-benchmark.yml` when it injects the
+table. Without it a run goes green having republished nothing, and nothing else reports it: the tag
+resolves, `composer` installs, and `composer tag-currency` passes, because none of them reads the
+release. `tests/ReleaseWorkflowTest.php` fails if any workflow's `gh release edit` drops the flag.
+
+So after re-pushing a tag, read the release:
+
+```bash
+gh release view vX.Y.Z --repo laranail/validation --json isDraft,publishedAt
+```
+
 ## Distribution
 
 laranail packages resolve through git VCS repositories rather than Packagist, so a consumer adds

@@ -15,6 +15,20 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ## [Unreleased]
 
+### Fixed
+
+- **A re-pushed tag no longer leaves its GitHub release unpublished.** Deleting a tag reverts its
+  release to a *draft* — it keeps its body and assets and stops being visible — and `gh release edit`
+  leaves that flag exactly as it finds it. So an edit after a tag is deleted and re-pushed goes
+  **green** having republished nothing: correct tag, invisible release. Nothing else reports that
+  state either, because the tag resolves, `composer` installs and `composer tag-currency` passes
+  without any of them reading the release. Both editing workflows now pass `--draft=false` —
+  `release.yml` on its update path and `release-benchmark.yml` when it injects the benchmark table,
+  which also runs by `workflow_dispatch` and so can reach a draft. `tests/ReleaseWorkflowTest.php`
+  fails if any workflow's `gh release edit` drops it. Measured as a live failure in
+  `laranail/validation-js` on 2026-11-08; this repository shows the residue of the same mechanism in
+  its `v1.0.0` and `v1.0.1` releases, still drafts since those tags were withdrawn.
+
 ## v0.1.1 - 2026-11-02
 
 ### Changed
