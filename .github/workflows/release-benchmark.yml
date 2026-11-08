@@ -70,4 +70,9 @@ jobs:
           cat benchmark-result.md >> current-body.md
           printf '%s\n' "$END" >> current-body.md
 
-          gh release edit "$TAG" --notes-file current-body.md
+          # --draft=false: this job also runs by workflow_dispatch, which can reach a release
+          # that is a DRAFT -- deleting a tag reverts its release to one, and this repository
+          # holds two such orphans from the withdrawn v1.0.x tags. `gh release edit` leaves the
+          # flag exactly as it finds it, so injecting the table without this would leave the
+          # release invisible on a run that still goes green.
+          gh release edit "$TAG" --draft=false --notes-file current-body.md
