@@ -17,6 +17,11 @@ Entries below `Unreleased` are written by CI from the GitHub release body — se
 
 ### Fixed
 
+- **A batched `exists` rule with `withoutTrashed()` no longer accepts soft-deleted rows on Laravel 13.43+.**
+  Laravel 13.43 changed how database rules store their where clauses (an explicit operator per clause, a
+  null value for `whereNull()`), and the batch checker kept only clauses with a non-null value, so the
+  soft-delete condition was dropped and a trashed row passed. Both shapes are now read, and a rule with a
+  clause the checker cannot read is validated by Laravel per item instead of being batched.
 - **A re-pushed tag no longer leaves its GitHub release unpublished.** Deleting a tag reverts its
   release to a *draft* — it keeps its body and assets and stops being visible — and `gh release edit`
   leaves that flag exactly as it finds it. So an edit after a tag is deleted and re-pushed goes

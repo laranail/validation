@@ -7,13 +7,10 @@ use RectorPest\Set\PestSetList;
 use RectorLaravel\Set\LaravelSetList;
 use RectorPest\Rules\UseToMatchRector;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
-use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
-use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
 use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
@@ -62,16 +59,14 @@ return RectorConfig::configure()
         PestSetList::PEST_LARAVEL,
     ])
     ->withSkip([
-        // Pint owns formatting, and it disagrees: Rector rewrites $i++ to ++$i,
-        // Pint's laravel preset rewrites it straight back. Verified by running
-        // them in sequence - Rector changed 21 files, Pint reverted every one,
-        // so the two gates could never both pass. Formatting goes to Pint.
-        PostIncDecToPreIncDecRector::class,
+        // PostIncDecToPreIncDecRector, EncapsedStringsToSprintfRector and
+        // ExplicitBoolCompareRector were skipped here until Rector 2.9 removed
+        // them (deprecated in 2.8, in no set). rector/rector is floored at ^2.9
+        // so no resolvable Rector still ships them. The first was skipped
+        // because it fought Pint over $i++ vs ++$i.
         DateFuncCallToCarbonRector::class,
         NullToStrictStringFuncCallArgRector::class,
         AddArrowFunctionReturnTypeRector::class,
-        EncapsedStringsToSprintfRector::class,
-        ExplicitBoolCompareRector::class,
         InlineArrayReturnAssignRector::class,
         PrivatizeFinalClassMethodRector::class,
         RemoveUselessParamTagRector::class,
