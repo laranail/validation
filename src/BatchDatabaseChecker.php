@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Simtabi\Laranail\Validation\Internal\BatchRuleShape;
+use Simtabi\Laranail\Validation\Internal\BatchWhereClauses;
 use Simtabi\Laranail\Validation\Internal\BatchPresenceQuery;
 use Simtabi\Laranail\Validation\Internal\ValueTypePredicates;
 use Simtabi\Laranail\Validation\Internal\PresenceMatchFidelity;
@@ -71,7 +72,11 @@ final class BatchDatabaseChecker
         try {
             $column = self::readProperty($rule, 'column');
 
-            return is_string($column) && $column !== 'NULL';
+            // A where clause the batched query could not replay would be
+            // dropped, and the batch would then answer a looser question than
+            // the rule asks. Leave any such rule to Laravel, per item.
+            return is_string($column) && $column !== 'NULL'
+                && BatchWhereClauses::of(self::readProperty($rule, 'wheres')) !== null;
         } catch (ReflectionException) {
             return false;
         }
@@ -550,7 +555,7 @@ final class BatchDatabaseChecker
     /**
      * Extract metadata from a database rule via reflection.
      *
-     * @return array{connection: string|null, table: string, column: string, wheres: array<int, array{column: string, value: string}>, ignore: mixed, idColumn: string}|null
+     * @return array{connection: string|null, table: string, column: string, wheres: array<int, array{column: string, operator: '='|'!='|'NULL'|'NOT_NULL', value: string|null}>, ignore: mixed, idColumn: string}|null
      */
     private static function extractMeta(Exists|Unique $rule): ?array
     {
@@ -581,14 +586,10 @@ final class BatchDatabaseChecker
                 $idColumn = is_string($rawIdColumn) ? $rawIdColumn : 'id';
             }
 
-            /** @var array<int, array{column: string, value: string}> $typedWheres */
-            $typedWheres = [];
+            $typedWheres = BatchWhereClauses::of($wheres);
 
-            foreach ($wheres as $where) {
-                if (is_array($where) && isset($where['column'], $where['value'])
-                    && is_string($where['column']) && is_scalar($where['value'])) {
-                    $typedWheres[] = ['column' => $where['column'], 'value' => (string) $where['value']];
-                }
+            if ($typedWheres === null) {
+                return null;
             }
 
             return [

@@ -9,8 +9,8 @@ use Illuminate\Database\Query\Builder;
 
 /**
  * Runs the batched whereIn query for exists/unique presence verification,
- * replaying Laravel's scalar where conditions (NULL / NOT_NULL / !value /
- * literal) and the unique-rule ignore clause.
+ * replaying the rule's where conditions (null, not null, not equal, equal)
+ * and the unique-rule ignore clause.
  *
  * @internal
  */
@@ -20,7 +20,7 @@ final class BatchPresenceQuery
 
     /**
      * @param array<int, mixed> $values
-     * @param array<int, array{column: string, value: string}> $wheres
+     * @param array<int, array{column: string, operator: '='|'!='|'NULL'|'NOT_NULL', value: string|null}> $wheres
      *
      * @return array<int, mixed>
      */
@@ -45,7 +45,7 @@ final class BatchPresenceQuery
 
             $query->whereIn($column, $chunk);
 
-            // Replay scalar where conditions (matches DatabasePresenceVerifier::addWhere()).
+            // Replay the rule's where conditions, as DatabasePresenceVerifier would.
             foreach ($wheres as $where) {
                 self::applyWhere($query, $where);
             }
@@ -61,32 +61,18 @@ final class BatchPresenceQuery
     }
 
     /**
-     * Apply a single Laravel-style where condition to the query.
+     * Apply one normalised where condition to the query, with the meaning
+     * DatabasePresenceVerifier gives it.
      *
-     * @param array{column: string, value: string} $where
+     * @param array{column: string, operator: '='|'!='|'NULL'|'NOT_NULL', value: string|null} $where
      */
     private static function applyWhere(Builder $query, array $where): void
     {
-        $extraValue = $where['value'];
-
-        if ($extraValue === 'NULL') {
-            $query->whereNull($where['column']);
-
-            return;
-        }
-
-        if ($extraValue === 'NOT_NULL') {
-            $query->whereNotNull($where['column']);
-
-            return;
-        }
-
-        if (str_starts_with($extraValue, '!')) {
-            $query->where($where['column'], '!=', mb_substr($extraValue, 1));
-
-            return;
-        }
-
-        $query->where($where['column'], $extraValue);
+        match ($where['operator']) {
+            'NULL'     => $query->whereNull($where['column']),
+            'NOT_NULL' => $query->whereNotNull($where['column']),
+            '!='       => $query->where($where['column'], '!=', $where['value']),
+            '='        => $query->where($where['column'], '=', $where['value']),
+        };
     }
 }
