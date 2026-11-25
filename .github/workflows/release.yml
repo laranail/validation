@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +29,7 @@ jobs:
         id: changelog
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          awk -v ver="$VERSION" '
+          awk -v ver="${VERSION%%-*}" '
             $0 ~ "^## (\\[)?(v)?"ver"([] ]|$)" { grab = 1; next }
             grab && /^## / { exit }
             grab { print }
@@ -78,11 +79,14 @@ jobs:
           # two such orphans: the v1.0.0 and v1.0.1 releases, still drafts since those tags were
           # withdrawn. Measured as a live failure in laranail/validation-js on 2026-11-08, whose
           # release had to be published by hand.
+          # A tag with a suffix (-rc.N) is a pre-release and never becomes Latest.
+          pre=(--prerelease=false)
+          case "$GITHUB_REF_NAME" in *-*) pre=(--prerelease --latest=false) ;; esac
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
-            gh release edit "$GITHUB_REF_NAME" --draft=false --notes-file release-body.md
+            gh release edit "$GITHUB_REF_NAME" --draft=false "${pre[@]}" --notes-file release-body.md
             gh release upload "$GITHUB_REF_NAME" sbom.cdx.json --clobber
           else
-            gh release create "$GITHUB_REF_NAME" \
+            gh release create "$GITHUB_REF_NAME" "${pre[@]}" \
               --title "$GITHUB_REF_NAME" \
               --notes-file release-body.md \
               --generate-notes \
